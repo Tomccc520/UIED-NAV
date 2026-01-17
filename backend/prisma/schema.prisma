@@ -1,0 +1,500 @@
+// Prisma Schema for UIED Navigation Database
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// 分类表
+model Category {
+  id             String         @id @default(cuid())
+  name           String
+  slug           String         @unique
+  icon           String
+  color          String
+  description    String?
+  parentId       String?        // 父分类ID，用于子分类
+  parent         Category?      @relation("CategoryChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  children       Category[]     @relation("CategoryChildren")
+  order          Int            @default(0)
+  visible        Boolean        @default(true)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  websites       Website[]
+  pageCategories PageCategory[]
+
+  @@index([parentId])
+}
+
+// 网站表
+model Website {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  url         String
+  iconUrl     String?  // 网站图标URL
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  isNew       Boolean  @default(false)
+  isFeatured  Boolean  @default(false)
+  isHot       Boolean  @default(false)
+  isPinned    Boolean  @default(false) // 置顶（在当前分类内置顶）
+  tags        String   // JSON string array
+  order       Int      @default(0)
+  clickCount  Int      @default(0) // 点击次数
+  // 监控相关字段
+  status          String   @default("unchecked") // unchecked, active, failed
+  lastCheckedAt   DateTime? // 最后检测时间
+  failedCount     Int      @default(0) // 连续失败次数
+  statusMessage   String?  // 状态消息（错误信息）
+  monitorLogs     MonitorLog[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([categoryId])
+  @@index([isNew])
+  @@index([isFeatured])
+  @@index([isHot])
+  @@index([isPinned])
+  @@index([clickCount])
+  @@index([status])
+}
+
+// 管理员表
+model Admin {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  email     String?  @unique
+  nickname  String?  // 昵称
+  avatar    String?  // 头像URL
+  role      String   @default("admin") // 角色: super_admin, admin, editor
+  status    String   @default("active") // 状态: active, disabled
+  lastLoginAt DateTime? // 最后登录时间
+  lastLoginIp String?   // 最后登录IP
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 站点设置表 - 存储各种配置
+model SiteSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique  // 配置键名
+  value     String   // JSON 格式的配置值
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 站点基本信息表
+model SiteInfo {
+  id          String   @id @default(cuid())
+  siteName    String   // 网站名称
+  siteTitle   String   // 网站标题（SEO）
+  description String   // 网站描述
+  keywords    String   // 关键词
+  logo        String?  // Logo URL
+  favicon     String?  // Favicon URL
+  icp         String?  // 备案号
+  icpLink     String?  // 备案链接
+  copyright   String?  // 版权信息
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 导航菜单表
+model NavMenu {
+  id          String    @id @default(cuid())
+  text        String
+  link        String?
+  external    Boolean   @default(false)
+  label       String?   // 标签文字，如 "New", "Hot"
+  labelType   String?   // 标签类型: info, shop, warning, success
+  icon        String?
+  parentId    String?   // 父菜单ID，用于二级菜单
+  parent      NavMenu?  @relation("NavMenuChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  children    NavMenu[] @relation("NavMenuChildren")
+  order       Int       @default(0)
+  visible     Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([parentId])
+}
+
+// 页脚链接分组表
+model FooterGroup {
+  id        String       @id @default(cuid())
+  title     String
+  order     Int          @default(0)
+  visible   Boolean      @default(true)
+  links     FooterLink[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+// 页脚链接表
+model FooterLink {
+  id        String      @id @default(cuid())
+  text      String
+  url       String
+  external  Boolean     @default(true)
+  groupId   String
+  group     FooterGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  order     Int         @default(0)
+  visible   Boolean     @default(true)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([groupId])
+}
+
+// 友情链接表
+model FriendLink {
+  id        String   @id @default(cuid())
+  name      String
+  url       String
+  order     Int      @default(0)
+  visible   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 社交媒体分组表 - 关注交流区域的分组
+model SocialMediaGroup {
+  id          String   @id @default(cuid())
+  name        String   // 分组名称，如 "社媒账号", "官方社群", "关注公众号"
+  icon        String?  // 分组图标
+  displayType String   @default("links") // 展示类型: links(链接列表), qrcode(二维码), mixed(混合)
+  order       Int      @default(0)
+  visible     Boolean  @default(true)
+  items       SocialMediaItem[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 社交媒体项目表 - 分组内的具体项目
+model SocialMediaItem {
+  id          String   @id @default(cuid())
+  groupId     String   // 所属分组ID
+  group       SocialMediaGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  name        String   // 名称，如 "PPT世界", "微信公众号"
+  type        String   // 类型: weibo, bilibili, xiaohongshu, douyin, wechat_official, wechat_group, wechat_mini, other
+  icon        String?  // 图标（可选，用于链接类型）
+  link        String?  // 链接地址
+  qrCodeUrl   String?  // 二维码图片URL
+  description String?  // 描述文字
+  extraInfo   String?  // 额外信息（JSON格式，如群列表）
+  order       Int      @default(0)
+  visible     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([groupId])
+}
+
+// 保留旧的 SocialMedia 表用于兼容（可后续迁移后删除）
+model SocialMedia {
+  id          String   @id @default(cuid())
+  name        String   // 名称，如 "交流群", "公众号"
+  type        String   // 类型: wechat_group, wechat_official, weibo, etc.
+  qrCodeUrl   String?  // 二维码图片URL
+  link        String?  // 链接地址
+  description String?  // 描述文字
+  order       Int      @default(0)
+  visible     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 页面配置表
+model Page {
+  id          String   @id @default(cuid())
+  name        String   // 页面名称，如 "UI导航"
+  slug        String   @unique // URL路径，如 "uiux", "ai"
+  type        String   // 页面类型标识，如 "uiux", "ai"
+  icon        String?  // 图标名称
+  description String?  // 页面描述
+  order       Int      @default(0)
+  visible     Boolean  @default(true)
+  // Hero Banner 配置
+  heroTitle         String?  // 页面主标题，如 "发现强大的AI工具"
+  heroHighlightText String?  // 高亮文本，如 "AI工具"
+  heroSubtitle      String?  // 页面副标题/描述
+  hotSearchTags String?  // 热门搜索标签，JSON数组格式
+  heroBgType    String   @default("default") // 背景类型: default(默认), color(纯色), gradient(渐变), image(图片)
+  heroBgValue   String?  // 背景值: CSS颜色/渐变值 或 图片URL
+  // Hero 区域显示模式配置
+  heroDisplayMode   String   @default("search") // 显示模式: search(搜索框), iconScroll(滚动图标)
+  heroScrollWebsites String? // 滚动图标的网站ID列表，JSON数组格式
+  // 搜索框配置
+  searchPlaceholder String? // 搜索框占位符
+  searchEnabled     Boolean @default(true) // 是否启用搜索
+  // 页面配置
+  showHotRecommendations Boolean @default(true) // 是否显示热门推荐
+  showCategories         Boolean @default(true) // 是否显示分类
+  showSidebar            Boolean @default(true) // 是否显示侧边栏
+  // 主题配置
+  themeColor    String?  // 主题色，如 "#0066ff"
+  // 关联
+  pageCategories PageCategory[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 页面分类关联表
+model PageCategory {
+  id         String   @id @default(cuid())
+  pageId     String
+  page       Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  order      Int      @default(0)
+  visible    Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([pageId, categoryId])
+  @@index([pageId])
+  @@index([categoryId])
+}
+
+// 热门推荐表 - 用于首页/各页面的热门推荐位
+model HotRecommendation {
+  id          String   @id @default(cuid())
+  name        String   // 网站名称
+  description String   // 描述
+  url         String   // 链接地址
+  iconUrl     String?  // 图标URL
+  pageSlug    String?  // 所属页面slug，null表示全局
+  position    String   @default("hot") // 位置: hot(热门), featured(推荐), ad(广告)
+  order       Int      @default(0)
+  visible     Boolean  @default(true)
+  startDate   DateTime? // 开始展示时间
+  endDate     DateTime? // 结束展示时间
+  clickCount  Int      @default(0) // 点击次数
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([pageSlug])
+  @@index([position])
+  @@index([visible])
+}
+
+// Banner/广告位表
+model Banner {
+  id          String   @id @default(cuid())
+  title       String   // 标题
+  description String?  // 描述
+  imageUrl    String?  // 图片URL（contentType为image时必填）
+  linkUrl     String?  // 点击跳转链接
+  linkTarget  String   @default("_blank") // 链接打开方式: _blank, _self
+  contentType String   @default("image") // 内容类型: image(图片), html(HTML代码)
+  htmlContent String?  // HTML代码内容（contentType为html时使用）
+  pageSlug    String?  // 所属页面slug，null表示全局/首页
+  position    String   @default("top") // 位置: top(顶部), sidebar(侧边栏), bottom(底部), popup(弹窗)
+  order       Int      @default(0)
+  visible     Boolean  @default(true)
+  startDate   DateTime? // 开始展示时间
+  endDate     DateTime? // 结束展示时间
+  clickCount  Int      @default(0) // 点击次数
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([pageSlug])
+  @@index([position])
+  @@index([visible])
+  @@index([contentType])
+}
+
+// Favicon API 配置表 - 用于获取网站图标
+model FaviconApi {
+  id          String   @id @default(cuid())
+  name        String   // API名称，如 "Google Favicon"
+  urlTemplate String   // URL模板，如 "https://t3.gstatic.cn/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=128&url={domain}"
+  description String?  // 描述
+  order       Int      @default(0) // 优先级，数字越小优先级越高
+  enabled     Boolean  @default(true) // 是否启用
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// AI 助手配置表 - 用于 AI 辅助功能
+model AiConfig {
+  id          String   @id @default(cuid())
+  name        String   // 配置名称，如 "SiliconFlow"
+  provider    String   // 提供商: siliconflow, openai, etc.
+  apiUrl      String   // API地址
+  apiKey      String   // API密钥
+  model       String   // 模型名称，如 "Qwen/Qwen2.5-7B-Instruct"
+  enabled     Boolean  @default(true) // 是否启用
+  isDefault   Boolean  @default(false) // 是否为默认配置
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// WordPress API 配置表 - 用于文章数据获取
+model WordPressConfig {
+  id          String   @id @default(cuid())
+  name        String   // 配置名称，如 "UIED博客"
+  apiUrl      String   // API基础URL，如 "https://www.uied.cn/wp-json/wp/v2"
+  enabled     Boolean  @default(true) // 是否启用
+  isDefault   Boolean  @default(false) // 是否为默认配置
+  cacheTime   Int      @default(7200) // 缓存时间（秒），默认2小时
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// WordPress 文章分类配置表 - 用于配置要显示的分类
+model WordPressCategory {
+  id              String   @id @default(cuid())
+  configId        String?  // 关联的WordPress配置ID（可选，null表示使用默认配置）
+  wpCategoryId    Int      // WordPress分类ID
+  wpCategoryName  String   // WordPress分类名称
+  displayName     String   // 显示名称
+  slug            String   // 唯一标识
+  description     String?  // 描述
+  order           Int      @default(0) // 排序
+  visible         Boolean  @default(true) // 是否显示
+  pageSlug        String?  // 关联的页面slug，null表示全局
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([slug])
+  @@index([configId])
+  @@index([pageSlug])
+}
+
+// WordPress 文章标签配置表 - 用于配置要显示的标签
+model WordPressTag {
+  id              String   @id @default(cuid())
+  configId        String?  // 关联的WordPress配置ID（可选）
+  wpTagId         Int      // WordPress标签ID
+  wpTagName       String   // WordPress标签名称
+  displayName     String   // 显示名称
+  slug            String   // 唯一标识
+  description     String?  // 描述
+  order           Int      @default(0) // 排序
+  visible         Boolean  @default(true) // 是否显示
+  pageSlug        String?  // 关联的页面slug，null表示全局
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([slug])
+  @@index([configId])
+  @@index([pageSlug])
+}
+
+// WordPress 组件配置表 - 用于配置前端组件显示
+model WordPressWidget {
+  id              String   @id @default(cuid())
+  name            String   // 组件名称，如 "设计文章"
+  pageSlug        String   // 关联的页面slug
+  position        String   // 显示位置，如 "main", "sidebar"
+  componentType   String   // 组件类型，如 "article-grid", "article-list"
+  title           String?  // 显示标题
+  limit           Int      @default(6) // 显示数量
+  showMoreLink    String?  // 查看更多链接
+  categoryIds     String?  // 要显示的分类ID列表（逗号分隔）
+  tagIds          String?  // 要显示的标签ID列表（逗号分隔）
+  order           Int      @default(0) // 排序
+  visible         Boolean  @default(true) // 是否显示
+  settings        String?  // 其他配置（JSON格式）
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([pageSlug, position])
+  @@index([pageSlug])
+}
+
+// 网站提交审核表 - 用户提交的网站待审核
+model WebsiteSubmission {
+  id          String   @id @default(cuid())
+  name        String   // 网站名称
+  description String   // 网站描述
+  url         String   // 网站URL
+  iconUrl     String?  // 网站图标URL
+  categoryId  String?  // 建议分类ID
+  tags        String?  // 标签
+  submitterName  String?  // 提交者名称
+  submitterEmail String?  // 提交者邮箱
+  submitterIp    String?  // 提交者IP
+  status      String   @default("pending") // 状态: pending(待审核), approved(已通过), rejected(已拒绝)
+  rejectReason String?  // 拒绝原因
+  reviewedAt  DateTime? // 审核时间
+  reviewedBy  String?   // 审核人
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+
+// 操作日志表 - 记录管理员操作
+model OperationLog {
+  id          String   @id @default(cuid())
+  adminId     String?  // 操作管理员ID
+  adminName   String   // 操作管理员用户名
+  action      String   // 操作类型: create, update, delete, login, logout, etc.
+  module      String   // 操作模块: website, category, page, settings, auth, etc.
+  targetId    String?  // 操作目标ID
+  targetName  String?  // 操作目标名称（便于查看）
+  detail      String?  // 操作详情（JSON格式，记录变更内容）
+  ip          String?  // 操作IP地址
+  userAgent   String?  // 浏览器信息
+  status      String   @default("success") // 操作状态: success, failed
+  errorMsg    String?  // 错误信息（如果失败）
+  createdAt   DateTime @default(now())
+
+  @@index([adminId])
+  @@index([action])
+  @@index([module])
+  @@index([createdAt])
+}
+
+// 监控配置表 - 网站状态监控配置
+model MonitorConfig {
+  id              String   @id @default(cuid())
+  checkInterval   Int      @default(86400) // 检测间隔（秒），默认24小时
+  timeout         Int      @default(10000) // 请求超时（毫秒）
+  maxRetries      Int      @default(3) // 最大重试次数
+  enabled         Boolean  @default(true) // 是否启用监控
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// 监控日志表 - 记录网站状态检测历史
+model MonitorLog {
+  id              String   @id @default(cuid())
+  websiteId       String
+  website         Website  @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  status          String   // success, failed
+  httpStatus      Int?     // HTTP 状态码
+  responseTime    Int?     // 响应时间（毫秒）
+  errorMessage    String?  // 错误信息
+  checkedAt       DateTime @default(now())
+
+  @@index([websiteId])
+  @@index([checkedAt])
+  @@index([status])
+}
+
+// 搜索日志表 - 记录用户搜索行为
+model SearchLog {
+  id          String   @id @default(cuid())
+  query       String   // 搜索关键词
+  resultCount Int      @default(0) // 搜索结果数量
+  searchMode  String   @default("keyword") // 搜索模式: keyword, ai
+  pageSlug    String?  // 搜索来源页面
+  ip          String?  // 用户IP
+  userAgent   String?  // 浏览器信息
+  createdAt   DateTime @default(now())
+
+  @@index([query])
+  @@index([searchMode])
+  @@index([createdAt])
+}

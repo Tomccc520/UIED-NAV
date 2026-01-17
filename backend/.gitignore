@@ -1,0 +1,32 @@
+# 依赖
+node_modules/
+
+# 环境变量
+.env
+.env.local
+.env.production
+
+# 数据库
+*.db
+*.db-journal
+*.db.backup*
+prisma/dev.db
+prisma/test.db
+
+# 上传文件
+uploads/*
+!uploads/.gitkeep
+
+# 导出文件
+exports/*
+!exports/.gitkeep
+
+# 日志
+*.log
+npm-debug.log*
+
+# 系统文件
+.DS_Store
+
+# 测试覆盖率
+coverage/

@@ -1,0 +1,29 @@
+# UIED 导航网站 - Docker Compose 配置
+# 使用方法：docker-compose up -d
+
+version: '3.8'
+
+services:
+  uied-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: uied-api
+    restart: always
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DATABASE_URL=file:./prisma/dev.db
+    env_file:
+      - .env
+    volumes:
+      # 数据库文件持久化（重要！）
+      - ./data/dev.db:/app/prisma/dev.db
+      # 上传文件持久化
+      - ./data/uploads:/app/uploads
+      # 导出文件持久化
+      - ./data/exports:/app/exports
+      # SEO 文件持久化
+      - ./data/public:/app/public

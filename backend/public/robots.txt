@@ -1,0 +1,10 @@
+# UIED 设计导航 robots.txt
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://www.uied.cn/sitemap.xml
+
+# 禁止爬取管理后台
+Disallow: /admin/
+Disallow: /api/

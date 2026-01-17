@@ -1,0 +1,54 @@
+{
+  "name": "uied-api",
+  "version": "1.0.0",
+  "description": "UIED 设计导航后端 API",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js",
+    "test": "vitest --run",
+    "test:watch": "vitest",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
+    "prisma:seed": "node src/utils/seed.js",
+    "seed:settings": "node src/utils/seedSettings.js",
+    "seed:admin": "node src/utils/seedAdmin.js",
+    "seed:all": "node src/utils/seed.js && node src/utils/seedSettings.js && node src/utils/seedAdmin.js"
+  },
+  "keywords": [
+    "api",
+    "express",
+    "prisma",
+    "sqlite"
+  ],
+  "author": "UIED Team",
+  "license": "MIT",
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "archiver": "^7.0.1",
+    "axios": "^1.13.2",
+    "bcryptjs": "^3.0.3",
+    "cheerio": "^1.1.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "express-rate-limit": "^8.2.1",
+    "express-validator": "^7.2.1",
+    "helmet": "^8.1.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.0.2",
+    "node-cache": "^5.1.2",
+    "node-cron": "^4.2.1",
+    "node-fetch": "^3.3.2",
+    "xmlbuilder2": "^4.0.3"
+  },
+  "devDependencies": {
+    "fast-check": "^4.5.3",
+    "nodemon": "^3.1.9",
+    "prisma": "^5.22.0",
+    "vitest": "^4.0.16"
+  }
+}
