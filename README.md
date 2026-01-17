@@ -3,8 +3,8 @@
 > 开源、免费、强大的设计师导航网站系统
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/Tomccc520/uied-nav-frontend.svg)](https://github.com/Tomccc520/uied-nav-frontend/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/Tomccc520/uied-nav-frontend.svg)](https://github.com/Tomccc520/uied-nav-frontend/network)
+[![GitHub Stars](https://img.shields.io/github/stars/Tomccc520/UIED-NAV.svg)](https://github.com/Tomccc520/UIED-NAV/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/Tomccc520/UIED-NAV.svg)](https://github.com/Tomccc520/UIED-NAV/network)
 
 [English](README.md) | [简体中文](README.md)
 
@@ -65,8 +65,8 @@ UIED 导航系统是一个现代化的设计资源导航网站系统，采用前
 #### 1. 克隆项目
 
 ```bash
-git clone https://github.com/Tomccc520/uied-nav-frontend.git
-cd uied-nav-frontend
+git clone https://github.com/Tomccc520/UIED-NAV.git
+cd UIED-NAV
 ```
 
 #### 2. 安装依赖
@@ -90,7 +90,7 @@ npm install
 ```bash
 # 后端配置
 cd backend
-cp .env.example .env
+cp .env.production.example .env
 # 编辑 .env 文件，配置数据库等信息
 
 # 前端配置
@@ -108,9 +108,17 @@ cp .env.example .env
 
 ```bash
 cd backend
-npm run prisma:generate
-npm run prisma:migrate
-npm run seed:all          # 填充初始数据（包含管理员账号）
+
+# 生成 Prisma Client
+npx prisma generate
+
+# 运行数据库迁移（创建表结构）
+npx prisma migrate deploy
+
+# 填充初始数据（包含管理员账号）
+node src/utils/seedAdmin.js
+node src/utils/seedSettings.js
+node src/utils/seedFaviconApis.js
 ```
 
 #### 5. 启动服务
@@ -244,8 +252,8 @@ uied-nav/
 ## 🔗 相关链接
 
 - [官网](https://fsuied.com)
-- [GitHub](https://github.com/Tomccc520/uied-nav-frontend)
-- [Gitee](https://gitee.com/tomdac/uied-nav-frontend)
+- [GitHub](https://github.com/Tomccc520/UIED-NAV)
+- [Gitee](https://gitee.com/tomdac/uied-nav)
 
 ---
 

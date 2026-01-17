@@ -43,3 +43,7 @@ coverage/
 # Kiro 配置和文档（不上传到开源仓库）
 .kiro/
 docs/
+
+# 开发工具脚本
+add_copyright.py
+0
