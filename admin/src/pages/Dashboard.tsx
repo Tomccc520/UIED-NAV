@@ -1,6 +1,6 @@
 /**
  * @file Dashboard.tsx
- * @description 管理后台组件
+ * @description 管理后台仪表盘 - 优化版
  * @author Tomda
  * @copyright 版权所有 (c) 2026 UIED技术团队
  * @website https://fsuied.com
@@ -9,78 +9,65 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Card, Row, Col, Statistic, Typography, Space, Tag, List, Avatar, Progress } from 'antd';
+import { Card, Row, Col, Typography, Space, Tag, theme } from 'antd';
 import { 
   AppstoreOutlined, 
   GlobalOutlined, 
-  MenuOutlined, 
-  RiseOutlined,
-  FireOutlined,
-  StarOutlined,
   FileOutlined,
-  BarChartOutlined,
+  RiseOutlined,
+  PlusOutlined,
+  EditOutlined,
+  EyeOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
 } from '@ant-design/icons';
-import api, { categoryApi, websiteApi, navMenuApi, friendLinkApi } from '../services/api';
+import { useNavigate } from 'react-router-dom';
+import api, { categoryApi, websiteApi } from '../services/api';
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 
-interface Website {
-  id: string;
-  name: string;
-  description: string;
-  isHot: boolean;
-  isFeatured: boolean;
-  isNew: boolean;
-  category?: { name: string };
+interface Stats {
+  categories: number;
+  websites: number;
+  pages: number;
+  submissions: number;
 }
 
-interface Page {
-  id: string;
-  name: string;
-  slug: string;
-  pageCategories?: { categoryId: string }[];
+interface QuickAction {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  path: string;
+  color: string;
 }
 
 export default function Dashboard() {
-  const [stats, setStats] = useState({
+  const navigate = useNavigate();
+  const { token } = theme.useToken();
+  const [stats, setStats] = useState<Stats>({
     categories: 0,
     websites: 0,
-    navMenus: 0,
-    friendLinks: 0,
     pages: 0,
-    hotWebsites: 0,
-    featuredWebsites: 0,
+    submissions: 0,
   });
-  const [recentWebsites, setRecentWebsites] = useState<Website[]>([]);
-  const [pages, setPages] = useState<Page[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [categories, websites, navMenus, friendLinks, pagesRes] = await Promise.all([
+        const [categories, websites, pagesRes, submissionsRes] = await Promise.all([
           categoryApi.getAll(),
           websiteApi.getAll(),
-          navMenuApi.getFlat(),
-          friendLinkApi.getAll(),
           api.get('/pages'),
+          api.get('/submissions').catch(() => ({ data: [] })),
         ]);
-        
-        const allWebsites = websites.data;
-        const hotCount = allWebsites.filter((w: Website) => w.isHot).length;
-        const featuredCount = allWebsites.filter((w: Website) => w.isFeatured).length;
         
         setStats({
           categories: categories.data.length,
-          websites: allWebsites.length,
-          navMenus: navMenus.data.length,
-          friendLinks: friendLinks.data.length,
+          websites: websites.data.length,
           pages: pagesRes.data.length,
-          hotWebsites: hotCount,
-          featuredWebsites: featuredCount,
+          submissions: Array.isArray(submissionsRes.data) ? submissionsRes.data.filter((s: any) => s.status === 'pending').length : 0,
         });
-        setRecentWebsites(allWebsites.slice(0, 5));
-        setPages(pagesRes.data);
       } catch (error) {
         console.error('获取统计数据失败:', error);
       } finally {
@@ -90,181 +77,230 @@ export default function Dashboard() {
     fetchStats();
   }, []);
 
+  const quickActions: QuickAction[] = [
+    {
+      title: '添加网站',
+      description: '快速添加新的网站资源',
+      icon: <PlusOutlined />,
+      path: '/websites',
+      color: '#52c41a',
+    },
+    {
+      title: '管理分类',
+      description: '组织和管理网站分类',
+      icon: <AppstoreOutlined />,
+      path: '/categories',
+      color: '#1890ff',
+    },
+    {
+      title: '编辑页面',
+      description: '配置和编辑页面内容',
+      icon: <EditOutlined />,
+      path: '/pages',
+      color: '#722ed1',
+    },
+    {
+      title: '审核提交',
+      description: '处理用户提交的网站',
+      icon: <CheckCircleOutlined />,
+      path: '/submissions',
+      color: '#fa8c16',
+    },
+  ];
+
   return (
     <div>
-      <div style={{ marginBottom: 24 }}>
-        <Title level={4} style={{ margin: 0 }}>仪表盘</Title>
-        <Text type="secondary">欢迎使用 UIED 设计导航管理系统</Text>
-      </div>
+      {/* 欢迎区域 */}
+      <Card 
+        style={{ 
+          marginBottom: 24,
+          background: `linear-gradient(135deg, ${token.colorPrimary} 0%, ${token.colorPrimaryHover} 100%)`,
+          border: 'none',
+        }}
+      >
+        <Space direction="vertical" size={4} style={{ display: 'flex' }}>
+          <Title level={3} style={{ margin: 0, color: '#fff' }}>
+            👋 欢迎回来！
+          </Title>
+          <Paragraph style={{ margin: 0, color: 'rgba(255, 255, 255, 0.85)', fontSize: 14 }}>
+            UIED 设计导航管理系统 - 让内容管理更简单
+          </Paragraph>
+        </Space>
+      </Card>
 
-      {/* 统计卡片 */}
+      {/* 核心统计 */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-        <Col xs={12} sm={8} lg={4}>
-          <Card size="small" bordered>
-            <Statistic
-              title="页面"
-              value={stats.pages}
-              prefix={<FileOutlined style={{ color: '#722ed1' }} />}
-              valueStyle={{ color: '#722ed1' }}
-            />
+        <Col xs={12} sm={12} md={6}>
+          <Card 
+            size="small" 
+            hoverable
+            onClick={() => navigate('/pages')}
+            style={{ cursor: 'pointer', borderColor: token.colorBorder, boxShadow: 'none' }}
+          >
+            <div style={{ marginBottom: 8 }}>
+              <Text type="secondary" style={{ fontSize: 14 }}>页面总数</Text>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <FileOutlined style={{ color: '#722ed1', fontSize: 24 }} />
+              <span style={{ color: '#722ed1', fontSize: 32, fontWeight: 600 }}>
+                {loading ? '-' : stats.pages}
+              </span>
+            </div>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              <EyeOutlined /> 点击查看详情
+            </Text>
           </Card>
         </Col>
-        <Col xs={12} sm={8} lg={4}>
-          <Card size="small" bordered>
-            <Statistic
-              title="分类"
-              value={stats.categories}
-              prefix={<AppstoreOutlined style={{ color: '#1890ff' }} />}
-              valueStyle={{ color: '#1890ff' }}
-            />
+        <Col xs={12} sm={12} md={6}>
+          <Card 
+            size="small" 
+            hoverable
+            onClick={() => navigate('/categories')}
+            style={{ cursor: 'pointer', borderColor: token.colorBorder, boxShadow: 'none' }}
+          >
+            <div style={{ marginBottom: 8 }}>
+              <Text type="secondary" style={{ fontSize: 14 }}>分类总数</Text>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <AppstoreOutlined style={{ color: '#1890ff', fontSize: 24 }} />
+              <span style={{ color: '#1890ff', fontSize: 32, fontWeight: 600 }}>
+                {loading ? '-' : stats.categories}
+              </span>
+            </div>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              <EyeOutlined /> 点击查看详情
+            </Text>
           </Card>
         </Col>
-        <Col xs={12} sm={8} lg={4}>
-          <Card size="small" bordered>
-            <Statistic
-              title="网站"
-              value={stats.websites}
-              prefix={<GlobalOutlined style={{ color: '#52c41a' }} />}
-              valueStyle={{ color: '#52c41a' }}
-            />
+        <Col xs={12} sm={12} md={6}>
+          <Card 
+            size="small" 
+            hoverable
+            onClick={() => navigate('/websites')}
+            style={{ cursor: 'pointer', borderColor: token.colorBorder, boxShadow: 'none' }}
+          >
+            <div style={{ marginBottom: 8 }}>
+              <Text type="secondary" style={{ fontSize: 14 }}>网站总数</Text>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <GlobalOutlined style={{ color: '#52c41a', fontSize: 24 }} />
+              <span style={{ color: '#52c41a', fontSize: 32, fontWeight: 600 }}>
+                {loading ? '-' : stats.websites}
+              </span>
+            </div>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              <EyeOutlined /> 点击查看详情
+            </Text>
           </Card>
         </Col>
-        <Col xs={12} sm={8} lg={4}>
-          <Card size="small" bordered>
-            <Statistic
-              title="菜单"
-              value={stats.navMenus}
-              prefix={<MenuOutlined style={{ color: '#faad14' }} />}
-              valueStyle={{ color: '#faad14' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={12} sm={8} lg={4}>
-          <Card size="small" bordered>
-            <Statistic
-              title="热门"
-              value={stats.hotWebsites}
-              prefix={<FireOutlined style={{ color: '#ff4d4f' }} />}
-              valueStyle={{ color: '#ff4d4f' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={12} sm={8} lg={4}>
-          <Card size="small" bordered>
-            <Statistic
-              title="推荐"
-              value={stats.featuredWebsites}
-              prefix={<StarOutlined style={{ color: '#eb2f96' }} />}
-              valueStyle={{ color: '#eb2f96' }}
-            />
+        <Col xs={12} sm={12} md={6}>
+          <Card 
+            size="small" 
+            hoverable
+            onClick={() => navigate('/submissions')}
+            style={{ cursor: 'pointer', borderColor: token.colorBorder, boxShadow: 'none' }}
+          >
+            <div style={{ marginBottom: 8 }}>
+              <Text type="secondary" style={{ fontSize: 14 }}>待审核</Text>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <ClockCircleOutlined style={{ color: '#fa8c16', fontSize: 24 }} />
+              <span style={{ color: '#fa8c16', fontSize: 32, fontWeight: 600 }}>
+                {loading ? '-' : stats.submissions}
+              </span>
+            </div>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              {stats.submissions > 0 ? (
+                <><CheckCircleOutlined /> 需要处理</>
+              ) : (
+                <><CheckCircleOutlined /> 暂无待审核</>
+              )}
+            </Text>
           </Card>
         </Col>
       </Row>
 
-      <Row gutter={[16, 16]}>
-        {/* 最近添加的网站 */}
-        <Col xs={24} lg={14}>
-          <Card
-            title={<Space><RiseOutlined style={{ color: '#1890ff' }} /><span>最近添加</span></Space>}
-            size="small"
-            bordered
-          >
-            <List
-              loading={loading}
-              dataSource={recentWebsites}
-              renderItem={(item) => (
-                <List.Item>
-                  <List.Item.Meta
-                    avatar={<Avatar style={{ backgroundColor: '#f0f5ff', color: '#1890ff' }}>{item.name.charAt(0)}</Avatar>}
-                    title={
-                      <Space size={4}>
-                        <span>{item.name}</span>
-                        {item.isHot && <Tag color="red">热</Tag>}
-                        {item.isFeatured && <Tag color="orange">荐</Tag>}
-                        {item.isNew && <Tag color="blue">新</Tag>}
-                      </Space>
-                    }
-                    description={<Text type="secondary" ellipsis style={{ maxWidth: 280 }}>{item.description}</Text>}
-                  />
-                  <Tag>{item.category?.name || '未分类'}</Tag>
-                </List.Item>
-              )}
-            />
-          </Card>
-        </Col>
+      {/* 快捷操作 */}
+      <Card 
+        title={
+          <Space style={{ display: 'flex', alignItems: 'center' }}>
+            <RiseOutlined style={{ color: token.colorPrimary }} />
+            <span>快捷操作</span>
+          </Space>
+        }
+        size="small"
+        style={{ borderColor: token.colorBorder, boxShadow: 'none' }}
+      >
+        <Row gutter={[16, 16]}>
+          {quickActions.map((action) => (
+            <Col xs={24} sm={12} md={6} key={action.path}>
+              <Card
+                size="small"
+                hoverable
+                onClick={() => navigate(action.path)}
+                style={{ 
+                  cursor: 'pointer',
+                  borderColor: action.color,
+                  transition: 'all 0.3s',
+                  padding: 16,
+                  boxShadow: 'none',
+                }}
+              >
+                <Space direction="vertical" size={8} style={{ width: '100%', display: 'flex' }}>
+                  <div style={{ 
+                    width: 40, 
+                    height: 40, 
+                    borderRadius: 8,
+                    background: `${action.color}15`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 20,
+                    color: action.color,
+                  }}>
+                    {action.icon}
+                  </div>
+                  <div>
+                    <Text strong style={{ fontSize: 15 }}>{action.title}</Text>
+                    <br />
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      {action.description}
+                    </Text>
+                  </div>
+                </Space>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </Card>
 
-        {/* 右侧 */}
-        <Col xs={24} lg={10}>
-          {/* 页面列表 */}
-          <Card
-            title={<Space><FileOutlined style={{ color: '#722ed1' }} /><span>页面概览</span></Space>}
-            size="small"
-            bordered
-            style={{ marginBottom: 16 }}
-          >
-            <List
-              loading={loading}
-              dataSource={pages.slice(0, 4)}
-              renderItem={(page) => (
-                <List.Item>
-                  <List.Item.Meta
-                    avatar={<Avatar style={{ backgroundColor: '#f9f0ff', color: '#722ed1' }}>{page.name.charAt(0)}</Avatar>}
-                    title={page.name}
-                    description={`/${page.slug}`}
-                  />
-                  <Tag color="purple">{page.pageCategories?.length || 0} 分类</Tag>
-                </List.Item>
-              )}
-            />
-          </Card>
-
-          {/* 网站分布 */}
-          <Card
-            title={<Space><BarChartOutlined style={{ color: '#52c41a' }} /><span>网站分布</span></Space>}
-            size="small"
-            bordered
-          >
-            <Space direction="vertical" style={{ width: '100%' }} size={12}>
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <Text>热门网站</Text>
-                  <Text strong>{stats.hotWebsites}</Text>
-                </div>
-                <Progress 
-                  percent={stats.websites ? Math.round(stats.hotWebsites / stats.websites * 100) : 0} 
-                  strokeColor="#ff4d4f"
-                  size="small"
-                  showInfo={false}
-                />
-              </div>
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <Text>推荐网站</Text>
-                  <Text strong>{stats.featuredWebsites}</Text>
-                </div>
-                <Progress 
-                  percent={stats.websites ? Math.round(stats.featuredWebsites / stats.websites * 100) : 0} 
-                  strokeColor="#faad14"
-                  size="small"
-                  showInfo={false}
-                />
-              </div>
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <Text>普通网站</Text>
-                  <Text strong>{stats.websites - stats.hotWebsites - stats.featuredWebsites}</Text>
-                </div>
-                <Progress 
-                  percent={stats.websites ? Math.round((stats.websites - stats.hotWebsites - stats.featuredWebsites) / stats.websites * 100) : 0} 
-                  strokeColor="#1890ff"
-                  size="small"
-                  showInfo={false}
-                />
-              </div>
+      {/* 系统状态 */}
+      <Card 
+        title="系统状态"
+        size="small"
+        style={{ marginTop: 16, borderColor: token.colorBorder, boxShadow: 'none' }}
+      >
+        <Row gutter={[16, 16]}>
+          <Col span={8}>
+            <Space direction="vertical" size={4} style={{ display: 'flex' }}>
+              <Text type="secondary">系统版本</Text>
+              <Text strong>v1.0.0</Text>
             </Space>
-          </Card>
-        </Col>
-      </Row>
+          </Col>
+          <Col span={8}>
+            <Space direction="vertical" size={4} style={{ display: 'flex' }}>
+              <Text type="secondary">运行状态</Text>
+              <Tag color="success">正常运行</Tag>
+            </Space>
+          </Col>
+          <Col span={8}>
+            <Space direction="vertical" size={4} style={{ display: 'flex' }}>
+              <Text type="secondary">数据库</Text>
+              <Tag color="processing">SQLite</Tag>
+            </Space>
+          </Col>
+        </Row>
+      </Card>
     </div>
   );
 }

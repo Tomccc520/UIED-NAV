@@ -162,6 +162,17 @@ export default function OperationLogs() {
     }
   };
 
+  const handleDelete = async (id: string) => {
+    try {
+      await api.delete(`/logs/${id}`);
+      message.success('删除成功');
+      fetchLogs(pagination.current, pagination.pageSize);
+      fetchStats();
+    } catch (error) {
+      message.error('删除失败');
+    }
+  };
+
   const columns: ColumnsType<LogItem> = [
     {
       title: '时间',
@@ -247,6 +258,24 @@ export default function OperationLogs() {
           </Tooltip>
         );
       },
+    },
+    {
+      title: '操作',
+      key: 'actions',
+      width: 80,
+      fixed: 'right',
+      render: (_: unknown, record: LogItem) => (
+        <Popconfirm
+          title="确定删除此日志吗？"
+          onConfirm={() => handleDelete(record.id)}
+          okText="确定"
+          cancelText="取消"
+        >
+          <Button type="link" danger size="small" icon={<DeleteOutlined />}>
+            删除
+          </Button>
+        </Popconfirm>
+      ),
     },
   ];
 

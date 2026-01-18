@@ -44,4 +44,11 @@ router.post('/cleanup', asyncHandler(async (req, res) => {
   res.json({ success: true, message: `已清理 ${count} 条日志`, count });
 }));
 
+// 删除单条日志
+router.delete('/:id', asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  await logService.deleteLog(id);
+  res.json({ success: true, message: '删除成功' });
+}));
+
 export default router;

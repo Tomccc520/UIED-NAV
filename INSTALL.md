@@ -116,8 +116,8 @@ node src/utils/seedFaviconApis.js  # 创建 Favicon API 配置
 ```
 
 **默认管理员账号**：
-- 用户名: `admin`
-- 密码: `admin123`
+- 用户名: `UIED`
+- 密码: `UIED123456`
 
 ⚠️ **重要**：首次登录后请立即修改密码！
 
@@ -217,7 +217,7 @@ npx prisma migrate deploy
 node src/utils/seedAdmin.js
 ```
 
-创建默认管理员账号（admin / admin123）
+创建默认管理员账号（UIED / UIED123456）
 
 #### 2. 创建系统设置
 

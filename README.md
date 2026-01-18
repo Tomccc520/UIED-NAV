@@ -146,8 +146,8 @@ npm run dev
 | 管理后台 | http://localhost:5173 | 内容管理系统 |
 
 **默认管理员账号：**
-- 用户名: `admin`
-- 密码: `admin123`
+- 用户名: `UIED`
+- 密码: `UIED123456`
 
 ---
 

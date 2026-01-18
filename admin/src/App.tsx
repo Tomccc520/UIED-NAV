@@ -11,6 +11,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ConfigProvider, App as AntApp } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
+import { theme } from './config/theme';
 import AdminLayout from './layouts/AdminLayout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -26,6 +27,7 @@ import Pages from './pages/Pages';
 import HotRecommendations from './pages/HotRecommendations';
 import SystemSettings from './pages/SystemSettings';
 import Banners from './pages/Banners';
+import './styles/accessibility.css';
 import FaviconApiSettings from './pages/FaviconApiSettings';
 import Statistics from './pages/Statistics';
 import AiSettings from './pages/AiSettings';
@@ -51,7 +53,7 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 
 function App() {
   return (
-    <ConfigProvider locale={zhCN}>
+    <ConfigProvider locale={zhCN} theme={theme}>
       <AntApp>
         <BrowserRouter basename="/admin">
           <Routes>

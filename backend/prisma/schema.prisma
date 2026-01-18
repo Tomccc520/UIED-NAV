@@ -498,3 +498,34 @@ model SearchLog {
   @@index([searchMode])
   @@index([createdAt])
 }
+
+// 配置项表 - 全站配置系统
+model Configuration {
+  id            Int      @id @default(autoincrement())
+  group         String   // 配置组: branding, seo, appearance, footer, admin, features, system
+  key           String   // 配置键
+  value         String   // 配置值（JSON 字符串）
+  type          String   // 数据类型: string, number, boolean, color, url, image, json
+  description   String?  // 配置说明
+  defaultValue  String?  // 默认值
+  validation    String?  // 验证规则（JSON 字符串）
+  isPublic      Boolean  @default(true) // 是否公开（前端可访问）
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@unique([group, key])
+  @@index([group])
+  @@index([isPublic])
+}
+
+// 配置版本表 - 配置历史快照
+model ConfigurationVersion {
+  id          Int      @id @default(autoincrement())
+  snapshot    String   // 完整配置快照（JSON 字符串）
+  userId      String   // 修改者 ID
+  description String?  // 版本说明
+  createdAt   DateTime @default(now())
+  
+  @@index([userId])
+  @@index([createdAt])
+}

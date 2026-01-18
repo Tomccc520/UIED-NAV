@@ -35,18 +35,18 @@ async function main() {
   // 创建默认管理员
   const admin = await prisma.admin.create({
     data: {
-      username: 'admin',
-      password: hashPassword('admin123'), // 默认密码
+      username: 'UIED',
+      password: hashPassword('UIED123456'), // 默认密码
       email: 'admin@uied.cn',
-      nickname: '超级管理员',
+      nickname: 'UIED 管理员',
       role: 'super_admin',
       status: 'active',
     },
   });
 
   console.log('✅ 默认管理员创建成功！');
-  console.log('   用户名: admin');
-  console.log('   密码: admin123');
+  console.log('   用户名: UIED');
+  console.log('   密码: UIED123456');
   console.log('   ⚠️  请登录后立即修改密码！');
 }
 

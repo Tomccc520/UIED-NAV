@@ -23,15 +23,15 @@ const hashPassword = (password) => {
 };
 
 async function resetAdmin() {
-  const hashedPassword = hashPassword('admin123');
+  const hashedPassword = hashPassword('UIED123456');
   await prisma.admin.updateMany({
-    where: { username: 'admin' },
+    where: { username: 'UIED' },
     data: { 
       password: hashedPassword,
       status: 'active'
     }
   });
-  console.log('✅ 管理员密码已重置为: admin123');
+  console.log('✅ 管理员密码已重置为: UIED123456');
   await prisma.$disconnect();
 }
 

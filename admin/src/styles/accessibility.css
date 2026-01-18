@@ -1,0 +1,168 @@
+/**
+ * @file styles/accessibility.css
+ * @description 无障碍性样式 - 键盘导航和焦点指示器
+ * @author Tomda
+ * @copyright 版权所有 (c) 2026 UIED技术团队
+ * @website https://fsuied.com
+ * @license MIT
+ * @version 1.0.0
+ */
+
+/* ===== 焦点指示器样式 ===== */
+
+/* 全局焦点样式 */
+*:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* 移除默认焦点样式 */
+*:focus {
+  outline: none;
+}
+
+/* 按钮焦点样式 */
+button:focus-visible,
+.ant-btn:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
+}
+
+/* 链接焦点样式 */
+a:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* 输入框焦点样式 */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+.ant-input:focus-visible,
+.ant-select:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.3);
+  outline-offset: 0;
+}
+
+/* 菜单项焦点样式 */
+.ant-menu-item:focus-visible,
+.ant-menu-submenu-title:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline-offset: -2px;
+}
+
+/* 表格行焦点样式 */
+.ant-table-row:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline-offset: -2px;
+}
+
+/* ===== 跳过导航链接 ===== */
+
+.skip-to-content {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  background: #3B82F6;
+  color: white;
+  padding: 12px 24px;
+  text-decoration: none;
+  border-radius: 0 0 8px 0;
+  font-weight: 600;
+  z-index: 10000;
+  transition: top 0.2s;
+}
+
+.skip-to-content:focus {
+  top: 0;
+  outline: 3px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
+}
+
+/* ===== 键盘导航提示 ===== */
+
+.keyboard-hint {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(30, 41, 59, 0.95);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.keyboard-hint.visible {
+  opacity: 1;
+}
+
+.keyboard-hint kbd {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  margin: 0 2px;
+}
+
+/* ===== 暗色模式焦点样式 ===== */
+
+[data-theme='dark'] *:focus-visible {
+  outline-color: rgba(96, 165, 250, 0.6);
+}
+
+[data-theme='dark'] button:focus-visible,
+[data-theme='dark'] .ant-btn:focus-visible {
+  outline-color: rgba(96, 165, 250, 0.6);
+}
+
+[data-theme='dark'] a:focus-visible {
+  outline-color: rgba(96, 165, 250, 0.6);
+}
+
+[data-theme='dark'] input:focus-visible,
+[data-theme='dark'] textarea:focus-visible,
+[data-theme='dark'] select:focus-visible,
+[data-theme='dark'] .ant-input:focus-visible,
+[data-theme='dark'] .ant-select:focus-visible {
+  outline-color: rgba(96, 165, 250, 0.4);
+}
+
+/* ===== 减少动画偏好支持 ===== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .skip-to-content {
+    transition: none;
+  }
+  
+  .keyboard-hint {
+    transition: none;
+  }
+}
+
+/* ===== 高对比度模式支持 ===== */
+
+@media (prefers-contrast: high) {
+  *:focus-visible {
+    outline-width: 4px;
+    outline-color: currentColor;
+  }
+  
+  button:focus-visible,
+  .ant-btn:focus-visible {
+    outline-width: 4px;
+  }
+}

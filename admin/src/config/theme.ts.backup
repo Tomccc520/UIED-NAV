@@ -1,0 +1,381 @@
+/**
+ * @file config/theme.ts.backup
+ * @description Ant Design 主题配置备份 - 创建于 Task 1.1 实施前
+ * @author Tomda
+ * @copyright 版权所有 (c) 2026 UIED技术团队
+ * @website https://fsuied.com
+ * @license MIT
+ * @version 1.0.0
+ * @backup-date 2026-01-18
+ */
+
+import type { ThemeConfig } from 'antd';
+
+// 亮色主题配置
+export const lightTheme: ThemeConfig = {
+  token: {
+    // === 颜色系统（基于 Analytics Dashboard 配色）===
+    colorPrimary: '#3B82F6',      // 信任蓝
+    colorSuccess: '#10B981',       // 成功绿
+    colorWarning: '#F59E0B',       // 警告橙
+    colorError: '#EF4444',         // 错误红
+    colorInfo: '#3B82F6',          // 信息蓝
+    
+    // 文本色系统
+    colorText: '#1E293B',          // 主要文本
+    colorTextSecondary: '#64748B', // 次要文本
+    colorTextTertiary: '#94A3B8',  // 辅助文本
+    colorTextQuaternary: '#CBD5E1', // 占位文本
+    
+    // 背景色系统
+    colorBgContainer: '#FFFFFF',
+    colorBgElevated: '#FFFFFF',
+    colorBgLayout: '#F8FAFC',
+    colorBgSpotlight: '#F1F5F9',
+    
+    // 边框色系统
+    colorBorder: '#E2E8F0',
+    colorBorderSecondary: '#F1F5F9',
+    
+    // === 字体系统 ===
+    fontFamily: "'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+    fontSize: 14,
+    fontSizeHeading1: 30,
+    fontSizeHeading2: 24,
+    fontSizeHeading3: 20,
+    fontSizeHeading4: 18,
+    fontSizeHeading5: 16,
+    
+    // === 间距系统（8px 网格）===
+    padding: 16,
+    paddingXS: 8,
+    paddingSM: 12,
+    paddingLG: 20,
+    paddingXL: 24,
+    margin: 16,
+    marginXS: 8,
+    marginSM: 12,
+    marginLG: 20,
+    marginXL: 24,
+    
+    // === 圆角系统 ===
+    borderRadius: 8,
+    borderRadiusLG: 12,
+    borderRadiusSM: 6,
+    borderRadiusXS: 4,
+    
+    // === 阴影系统 ===
+    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+    boxShadowSecondary: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+    boxShadowTertiary: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+    
+    // === 动画系统 ===
+    motionDurationFast: '0.15s',
+    motionDurationMid: '0.2s',
+    motionDurationSlow: '0.3s',
+    motionEaseInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    motionEaseOut: 'cubic-bezier(0, 0, 0.2, 1)',
+    motionEaseIn: 'cubic-bezier(0.4, 0, 1, 1)',
+  },
+  
+  components: {
+    // 布局组件
+    Layout: {
+      headerBg: '#FFFFFF',
+      headerHeight: 64,
+      headerPadding: '0 24px',
+      siderBg: '#FFFFFF',
+      bodyBg: '#F8FAFC',
+      footerBg: '#FFFFFF',
+      footerPadding: '24px 50px',
+      triggerBg: '#FFFFFF',
+      triggerColor: '#1E293B',
+    },
+    
+    // 菜单组件
+    Menu: {
+      itemBg: 'transparent',
+      itemSelectedBg: '#EFF6FF',
+      itemSelectedColor: '#3B82F6',
+      itemHoverBg: '#F8FAFC',
+      itemActiveBg: '#DBEAFE',
+      itemColor: '#64748B',
+      itemBorderRadius: 6,
+      itemMarginInline: 8,
+      itemPaddingInline: 12,
+    },
+    
+    // 表格组件
+    Table: {
+      headerBg: '#F8FAFC',
+      headerColor: '#1E293B',
+      rowHoverBg: '#F8FAFC',
+      borderColor: '#E2E8F0',
+      headerBorderRadius: 8,
+      cellPaddingBlock: 12,
+      cellPaddingInline: 16,
+      fontWeightStrong: 600,
+    },
+    
+    // 卡片组件
+    Card: {
+      headerBg: 'transparent',
+      headerFontSize: 16,
+      headerFontSizeSM: 14,
+      headerHeight: 56,
+      headerHeightSM: 48,
+      boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+      boxShadowTertiary: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+      borderRadiusLG: 12,
+    },
+    
+    // 按钮组件
+    Button: {
+      primaryShadow: '0 2px 0 rgba(59, 130, 246, 0.1)',
+      borderRadius: 6,
+      borderRadiusLG: 8,
+      borderRadiusSM: 4,
+      controlHeight: 32,
+      controlHeightLG: 40,
+      controlHeightSM: 24,
+      fontWeight: 500,
+    },
+    
+    // 输入框组件
+    Input: {
+      borderRadius: 6,
+      controlHeight: 32,
+      controlHeightLG: 40,
+      controlHeightSM: 24,
+      paddingBlock: 4,
+      paddingInline: 11,
+    },
+    
+    // 选择器组件
+    Select: {
+      borderRadius: 6,
+      controlHeight: 32,
+      controlHeightLG: 40,
+      controlHeightSM: 24,
+    },
+    
+    // 标签组件
+    Tag: {
+      borderRadiusSM: 4,
+      defaultBg: '#F1F5F9',
+      defaultColor: '#64748B',
+    },
+    
+    // 消息提示组件
+    Message: {
+      contentBg: '#FFFFFF',
+      contentPadding: '10px 16px',
+    },
+    
+    // 通知组件
+    Notification: {
+      width: 384,
+      borderRadiusLG: 12,
+    },
+    
+    // 模态框组件
+    Modal: {
+      headerBg: '#FFFFFF',
+      contentBg: '#FFFFFF',
+      borderRadiusLG: 12,
+      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+    },
+    
+    // 抽屉组件
+    Drawer: {
+      footerPaddingBlock: 16,
+      footerPaddingInline: 24,
+    },
+  },
+};
+
+// 暗色主题配置
+export const darkTheme: ThemeConfig = {
+  token: {
+    // === 颜色系统（暗色模式）===
+    colorPrimary: '#60A5FA',      // 亮一级的蓝色
+    colorSuccess: '#34D399',       // 亮一级的绿色
+    colorWarning: '#FBBF24',       // 亮一级的橙色
+    colorError: '#F87171',         // 亮一级的红色
+    colorInfo: '#60A5FA',          // 亮一级的蓝色
+    
+    // 文本色系统
+    colorText: '#F8FAFC',          // 主要文本
+    colorTextSecondary: '#CBD5E1', // 次要文本
+    colorTextTertiary: '#94A3B8',  // 辅助文本
+    colorTextQuaternary: '#64748B', // 占位文本
+    
+    // 背景色系统
+    colorBgContainer: '#1E293B',
+    colorBgElevated: '#1E293B',
+    colorBgLayout: '#0F172A',
+    colorBgSpotlight: '#334155',
+    
+    // 边框色系统
+    colorBorder: '#334155',
+    colorBorderSecondary: '#475569',
+    
+    // === 字体系统 ===
+    fontFamily: "'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+    fontSize: 14,
+    fontSizeHeading1: 30,
+    fontSizeHeading2: 24,
+    fontSizeHeading3: 20,
+    fontSizeHeading4: 18,
+    fontSizeHeading5: 16,
+    
+    // === 间距系统（8px 网格）===
+    padding: 16,
+    paddingXS: 8,
+    paddingSM: 12,
+    paddingLG: 20,
+    paddingXL: 24,
+    margin: 16,
+    marginXS: 8,
+    marginSM: 12,
+    marginLG: 20,
+    marginXL: 24,
+    
+    // === 圆角系统 ===
+    borderRadius: 8,
+    borderRadiusLG: 12,
+    borderRadiusSM: 6,
+    borderRadiusXS: 4,
+    
+    // === 阴影系统 ===
+    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.3)',
+    boxShadowSecondary: '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)',
+    boxShadowTertiary: '0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2)',
+    
+    // === 动画系统 ===
+    motionDurationFast: '0.15s',
+    motionDurationMid: '0.2s',
+    motionDurationSlow: '0.3s',
+    motionEaseInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    motionEaseOut: 'cubic-bezier(0, 0, 0.2, 1)',
+    motionEaseIn: 'cubic-bezier(0.4, 0, 1, 1)',
+  },
+  
+  components: {
+    // 布局组件
+    Layout: {
+      headerBg: '#1E293B',
+      headerHeight: 64,
+      headerPadding: '0 24px',
+      siderBg: '#1E293B',
+      bodyBg: '#0F172A',
+      footerBg: '#1E293B',
+      footerPadding: '24px 50px',
+      triggerBg: '#1E293B',
+      triggerColor: '#F8FAFC',
+    },
+    
+    // 菜单组件
+    Menu: {
+      itemBg: 'transparent',
+      itemSelectedBg: '#334155',
+      itemSelectedColor: '#60A5FA',
+      itemHoverBg: '#334155',
+      itemActiveBg: '#475569',
+      itemColor: '#CBD5E1',
+      itemBorderRadius: 6,
+      itemMarginInline: 8,
+      itemPaddingInline: 12,
+    },
+    
+    // 表格组件
+    Table: {
+      headerBg: '#334155',
+      headerColor: '#F8FAFC',
+      rowHoverBg: '#334155',
+      borderColor: '#334155',
+      headerBorderRadius: 8,
+      cellPaddingBlock: 12,
+      cellPaddingInline: 16,
+      fontWeightStrong: 600,
+    },
+    
+    // 卡片组件
+    Card: {
+      headerBg: 'transparent',
+      headerFontSize: 16,
+      headerFontSizeSM: 14,
+      headerHeight: 56,
+      headerHeightSM: 48,
+      boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.3)',
+      boxShadowTertiary: '0 1px 2px 0 rgba(0, 0, 0, 0.3)',
+      borderRadiusLG: 12,
+    },
+    
+    // 按钮组件
+    Button: {
+      primaryShadow: '0 2px 0 rgba(96, 165, 250, 0.2)',
+      borderRadius: 6,
+      borderRadiusLG: 8,
+      borderRadiusSM: 4,
+      controlHeight: 32,
+      controlHeightLG: 40,
+      controlHeightSM: 24,
+      fontWeight: 500,
+    },
+    
+    // 输入框组件
+    Input: {
+      borderRadius: 6,
+      controlHeight: 32,
+      controlHeightLG: 40,
+      controlHeightSM: 24,
+      paddingBlock: 4,
+      paddingInline: 11,
+    },
+    
+    // 选择器组件
+    Select: {
+      borderRadius: 6,
+      controlHeight: 32,
+      controlHeightLG: 40,
+      controlHeightSM: 24,
+    },
+    
+    // 标签组件
+    Tag: {
+      borderRadiusSM: 4,
+      defaultBg: '#334155',
+      defaultColor: '#CBD5E1',
+    },
+    
+    // 消息提示组件
+    Message: {
+      contentBg: '#1E293B',
+      contentPadding: '10px 16px',
+    },
+    
+    // 通知组件
+    Notification: {
+      width: 384,
+      borderRadiusLG: 12,
+    },
+    
+    // 模态框组件
+    Modal: {
+      headerBg: '#1E293B',
+      contentBg: '#1E293B',
+      borderRadiusLG: 12,
+      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2)',
+    },
+    
+    // 抽屉组件
+    Drawer: {
+      footerPaddingBlock: 16,
+      footerPaddingInline: 24,
+    },
+  },
+};
+
+// 默认导出亮色主题（保持向后兼容）
+export const theme = lightTheme;

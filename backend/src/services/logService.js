@@ -164,6 +164,16 @@ export const logService = {
 
     return result.count;
   },
+
+  /**
+   * 删除单条日志
+   * @param {string} id - 日志ID
+   */
+  async deleteLog(id) {
+    await prisma.operationLog.delete({
+      where: { id },
+    });
+  },
 };
 
 // 操作类型常量
