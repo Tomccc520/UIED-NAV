@@ -110,19 +110,57 @@ router.get('/', asyncHandler(async (req, res) => {
   }
 }));
 
-// 获取单个网站
+// 获取单个网站详情
 router.get('/:id', asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  
+  // 获取网站基本信息
   const website = await prisma.website.findUnique({
-    where: { id: req.params.id },
+    where: { id },
     include: {
-      category: true
+      category: {
+        include: {
+          parent: true, // 包含父分类信息
+        }
+      }
     }
   });
+  
   if (!website) {
     throw ApiError.notFound('网站不存在');
   }
+  
+  // 解析 tags
   website.tags = parseTags(website.tags);
-  res.json(website);
+  
+  // @pro-feature-start: website-detail-pro-data
+  // Pro 功能：获取评分、评论、收藏等信息
+  // 这些数据只在 Pro 版本中返回
+  // 开源版：这些字段为 null 或空数组
+  const proData = {
+    averageRating: null,
+    totalRatings: 0,
+    userRating: null,
+    isFavorited: false,
+    commentsCount: 0,
+  };
+  
+  // TODO: 在 Pro 版本中，这里会查询实际的评分、评论、收藏数据
+  // 例如：
+  // const ratings = await prisma.rating.aggregate({
+  //   where: { websiteId: id },
+  //   _avg: { rating: true },
+  //   _count: true,
+  // });
+  // proData.averageRating = ratings._avg.rating;
+  // proData.totalRatings = ratings._count;
+  // @pro-feature-end: website-detail-pro-data
+  
+  // 返回完整的网站详情
+  res.json({
+    ...website,
+    ...proData,
+  });
 }));
 
 // 获取推荐网站

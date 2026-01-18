@@ -52,6 +52,15 @@ model Website {
   failedCount     Int      @default(0) // 连续失败次数
   statusMessage   String?  // 状态消息（错误信息）
   monitorLogs     MonitorLog[]
+  
+  // @pro-feature-start: website-detail-pro-features
+  // Pro 功能关联
+  ratings         Rating[]
+  comments        WebsiteComment[]
+  favorites       Favorite[]
+  browsingHistory BrowsingHistory[]
+  // @pro-feature-end: website-detail-pro-features
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -529,3 +538,168 @@ model ConfigurationVersion {
   @@index([userId])
   @@index([createdAt])
 }
+
+// ============================================
+// Pro 功能模型（商业版）
+// ============================================
+
+// 用户表 - 用于 Pro 功能的用户系统
+// @pro-feature-start: user-system
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  avatar    String?
+  role      String   @default("user") // user, vip, admin
+  status    String   @default("active") // active, disabled
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Pro 功能关联
+  ratings          Rating[]
+  websiteComments  WebsiteComment[]
+  articleComments  ArticleComment[]
+  favorites        Favorite[]
+  browsingHistory  BrowsingHistory[]
+}
+// @pro-feature-end: user-system
+
+// 评分表 - 网站评分功能（Pro）
+// @pro-feature-start: ratings
+model Rating {
+  id         String   @id @default(cuid())
+  websiteId  String
+  userId     String
+  rating     Int      // 1-5 星评分
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  website    Website  @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([websiteId, userId])
+  @@index([websiteId])
+  @@index([userId])
+}
+// @pro-feature-end: ratings
+
+// 网站评论表 - 网站评论功能（Pro）
+// @pro-feature-start: website-comments
+model WebsiteComment {
+  id         String   @id @default(cuid())
+  websiteId  String
+  userId     String
+  text       String   // 评论内容，最大 500 字符
+  status     String   @default("approved") // approved, pending, rejected
+  createdAt  DateTime @default(now())
+  
+  website    Website  @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([websiteId, status])
+  @@index([userId])
+  @@index([createdAt])
+}
+// @pro-feature-end: website-comments
+
+// 收藏表 - 网站收藏功能（Pro）
+// @pro-feature-start: favorites
+model Favorite {
+  id         String   @id @default(cuid())
+  websiteId  String
+  userId     String
+  createdAt  DateTime @default(now())
+  
+  website    Website  @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([websiteId, userId])
+  @@index([userId])
+}
+// @pro-feature-end: favorites
+
+// 浏览历史表 - 浏览历史功能（Pro）
+// @pro-feature-start: browsing-history
+model BrowsingHistory {
+  id         String   @id @default(cuid())
+  websiteId  String
+  userId     String
+  viewedAt   DateTime @default(now())
+  
+  website    Website  @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([websiteId, userId])
+  @@index([userId, viewedAt])
+}
+// @pro-feature-end: browsing-history
+
+// 文章表 - 文章/博客系统（Pro）
+// @pro-feature-start: articles
+model Article {
+  id             String   @id @default(cuid())
+  title          String
+  content        String   // Markdown 内容
+  excerpt        String   // 摘要
+  coverImage     String?  // 封面图片 URL
+  author         String
+  category       String
+  slug           String   @unique // URL slug
+  status         String   @default("draft") // draft, published
+  viewCount      Int      @default(0)
+  seoTitle       String?  // SEO 标题，最大 60 字符
+  seoDescription String?  // SEO 描述，最大 160 字符
+  publishedAt    DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  tags           ArticleTag[]
+  comments       ArticleComment[]
+  
+  @@index([status, publishedAt])
+  @@index([category])
+  @@index([slug])
+}
+
+// 标签表 - 文章标签（Pro）
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  
+  articles  ArticleTag[]
+  
+  @@index([slug])
+}
+
+// 文章标签关联表 - 多对多关系（Pro）
+model ArticleTag {
+  articleId String
+  tagId     String
+  
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  
+  @@id([articleId, tagId])
+  @@index([tagId])
+}
+
+// 文章评论表 - 文章评论功能（Pro）
+model ArticleComment {
+  id         String   @id @default(cuid())
+  articleId  String
+  userId     String
+  text       String   // 评论内容，最大 1000 字符
+  status     String   @default("pending") // approved, pending, rejected
+  createdAt  DateTime @default(now())
+  
+  article    Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([articleId, status])
+  @@index([userId])
+  @@index([createdAt])
+}
+// @pro-feature-end: articles
+
