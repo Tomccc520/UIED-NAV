@@ -1,4 +1,4 @@
-# UIED 导航系统 - MySQL 数据库配置
+# UIED 导航系统 - MySQL + Redis 配置
 # 用于 likeadmin 迁移后的数据库服务
 
 services:
@@ -16,7 +16,7 @@ services:
       TZ: Asia/Shanghai
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./mysql-init:/docker-entrypoint-initdb.d  # 初始化脚本目录
+      - ./mysql-init:/docker-entrypoint-initdb.d
     command: 
       - --default-authentication-plugin=mysql_native_password
       - --character-set-server=utf8mb4
@@ -29,20 +29,26 @@ services:
       timeout: 5s
       retries: 5
 
-  # Redis 服务 - 如果本地没有镜像可以先注释掉
-  # redis:
-  #   image: redis:7-alpine
-  #   container_name: uied_redis
-  #   restart: unless-stopped
-  #   ports:
-  #     - "6380:6379"
-  #   volumes:
-  #     - redis_data:/data
-  #   command: redis-server --appendonly yes
+  redis:
+    image: redis:7-alpine
+    container_name: uied_redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"  # 使用 6380 避免与其他 Redis 实例冲突
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   mysql_data:
     name: uied_mysql_data
+  redis_data:
+    name: uied_redis_data
 
 networks:
   default:
