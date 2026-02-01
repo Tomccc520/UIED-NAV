@@ -88,3 +88,275 @@ export function uiedWebsiteClick(params: any) {
 export function uiedWebsiteSearch(params?: any) {
     return request.get({ url: '/uied/website/search', params })
 }
+
+// ==================== 页面管理 ====================
+
+// 页面列表（分页）
+export function uiedPageList(params?: any) {
+    return request.get({ url: '/uied/page/list', params })
+}
+
+// 页面列表（全部）
+export function uiedPageAll(params?: any) {
+    return request.get({ url: '/uied/page/all', params })
+}
+
+// 页面详情
+export function uiedPageDetail(params: any) {
+    return request.get({ url: '/uied/page/detail', params })
+}
+
+// 添加页面
+export function uiedPageAdd(params: any) {
+    return request.post({ url: '/uied/page/add', params })
+}
+
+// 编辑页面
+export function uiedPageEdit(params: any) {
+    return request.post({ url: '/uied/page/edit', params })
+}
+
+// 删除页面
+export function uiedPageDelete(params: any) {
+    return request.post({ url: '/uied/page/del', params })
+}
+
+// 获取页面分类
+export function uiedPageCategories(params: any) {
+    return request.get({ url: '/uied/page/categories', params })
+}
+
+// 更新页面分类
+export function uiedPageUpdateCategories(params: any) {
+    return request.post({ url: '/uied/page/updateCategories', params })
+}
+
+// ==================== 热门推荐 ====================
+
+// 热门推荐列表
+export function uiedHotRecommendationList(params?: any) {
+    return request.get({ url: '/uied/hotRecommendation/list', params })
+}
+
+// 热门推荐详情
+export function uiedHotRecommendationDetail(params: any) {
+    return request.get({ url: '/uied/hotRecommendation/detail', params })
+}
+
+// 添加热门推荐
+export function uiedHotRecommendationAdd(params: any) {
+    return request.post({ url: '/uied/hotRecommendation/add', params })
+}
+
+// 编辑热门推荐
+export function uiedHotRecommendationEdit(params: any) {
+    return request.post({ url: '/uied/hotRecommendation/edit', params })
+}
+
+// 删除热门推荐
+export function uiedHotRecommendationDelete(params: any) {
+    return request.post({ url: '/uied/hotRecommendation/del', params })
+}
+
+// ==================== 站点设置 ====================
+
+// 获取设置
+export function uiedSettingGet(params?: any) {
+    return request.get({ url: '/uied/setting/get', params })
+}
+
+// 保存设置
+export function uiedSettingSave(params: any) {
+    return request.post({ url: '/uied/setting/save', params })
+}
+
+// 获取站点信息
+export function uiedSiteInfo() {
+    return request.get({ url: '/uied/setting/siteInfo' })
+}
+
+// 保存站点信息
+export function uiedSaveSiteInfo(params: any) {
+    return request.post({ url: '/uied/setting/saveSiteInfo', params })
+}
+
+// 获取公开设置
+export function uiedPublicSettings() {
+    return request.get({ url: '/uied/setting/public' })
+}
+
+// ==================== 导航菜单 ====================
+
+export function uiedNavMenuList(params?: any) {
+    return request.get({ url: '/uied/navMenu/list', params })
+}
+
+export function uiedNavMenuAll() {
+    return request.get({ url: '/uied/navMenu/all' })
+}
+
+export function uiedNavMenuDetail(params: any) {
+    return request.get({ url: '/uied/navMenu/detail', params })
+}
+
+export function uiedNavMenuAdd(params: any) {
+    return request.post({ url: '/uied/navMenu/add', params })
+}
+
+export function uiedNavMenuEdit(params: any) {
+    return request.post({ url: '/uied/navMenu/edit', params })
+}
+
+export function uiedNavMenuDelete(params: any) {
+    return request.post({ url: '/uied/navMenu/del', params })
+}
+
+export function uiedNavMenuSort(params: any) {
+    return request.post({ url: '/uied/navMenu/sort', params })
+}
+
+// ==================== 友情链接 ====================
+
+export function uiedFriendLinkList(params?: any) {
+    return request.get({ url: '/uied/friendLink/list', params })
+}
+
+export function uiedFriendLinkDetail(params: any) {
+    return request.get({ url: '/uied/friendLink/detail', params })
+}
+
+export function uiedFriendLinkAdd(params: any) {
+    return request.post({ url: '/uied/friendLink/add', params })
+}
+
+export function uiedFriendLinkEdit(params: any) {
+    return request.post({ url: '/uied/friendLink/edit', params })
+}
+
+export function uiedFriendLinkDelete(params: any) {
+    return request.post({ url: '/uied/friendLink/del', params })
+}
+
+// ==================== 页脚设置 ====================
+
+export function uiedFooterGroupList(params?: any) {
+    return request.get({ url: '/uied/footer/groupList', params })
+}
+
+export function uiedFooterGroupAll() {
+    return request.get({ url: '/uied/footer/groupAll' })
+}
+
+export function uiedFooterGroupAdd(params: any) {
+    return request.post({ url: '/uied/footer/groupAdd', params })
+}
+
+export function uiedFooterGroupEdit(params: any) {
+    return request.post({ url: '/uied/footer/groupEdit', params })
+}
+
+export function uiedFooterGroupDelete(params: any) {
+    return request.post({ url: '/uied/footer/groupDel', params })
+}
+
+export function uiedFooterLinkList(params?: any) {
+    return request.get({ url: '/uied/footer/linkList', params })
+}
+
+export function uiedFooterLinkAdd(params: any) {
+    return request.post({ url: '/uied/footer/linkAdd', params })
+}
+
+export function uiedFooterLinkEdit(params: any) {
+    return request.post({ url: '/uied/footer/linkEdit', params })
+}
+
+export function uiedFooterLinkDelete(params: any) {
+    return request.post({ url: '/uied/footer/linkDel', params })
+}
+
+// ==================== 社交媒体 ====================
+
+export function uiedSocialMediaGroupList(params?: any) {
+    return request.get({ url: '/uied/socialMedia/groupList', params })
+}
+
+export function uiedSocialMediaGroupAll() {
+    return request.get({ url: '/uied/socialMedia/groupAll' })
+}
+
+export function uiedSocialMediaGroupAdd(params: any) {
+    return request.post({ url: '/uied/socialMedia/groupAdd', params })
+}
+
+export function uiedSocialMediaGroupEdit(params: any) {
+    return request.post({ url: '/uied/socialMedia/groupEdit', params })
+}
+
+export function uiedSocialMediaGroupDelete(params: any) {
+    return request.post({ url: '/uied/socialMedia/groupDel', params })
+}
+
+export function uiedSocialMediaItemList(params?: any) {
+    return request.get({ url: '/uied/socialMedia/itemList', params })
+}
+
+export function uiedSocialMediaItemAdd(params: any) {
+    return request.post({ url: '/uied/socialMedia/itemAdd', params })
+}
+
+export function uiedSocialMediaItemEdit(params: any) {
+    return request.post({ url: '/uied/socialMedia/itemEdit', params })
+}
+
+export function uiedSocialMediaItemDelete(params: any) {
+    return request.post({ url: '/uied/socialMedia/itemDel', params })
+}
+
+// ==================== 广告管理 ====================
+
+export function uiedBannerList(params?: any) {
+    return request.get({ url: '/uied/banner/list', params })
+}
+
+export function uiedBannerDetail(params: any) {
+    return request.get({ url: '/uied/banner/detail', params })
+}
+
+export function uiedBannerAdd(params: any) {
+    return request.post({ url: '/uied/banner/add', params })
+}
+
+export function uiedBannerEdit(params: any) {
+    return request.post({ url: '/uied/banner/edit', params })
+}
+
+export function uiedBannerDelete(params: any) {
+    return request.post({ url: '/uied/banner/del', params })
+}
+
+// ==================== Favicon API ====================
+
+export function uiedFaviconApiList(params?: any) {
+    return request.get({ url: '/uied/faviconApi/list', params })
+}
+
+export function uiedFaviconApiDetail(params: any) {
+    return request.get({ url: '/uied/faviconApi/detail', params })
+}
+
+export function uiedFaviconApiAdd(params: any) {
+    return request.post({ url: '/uied/faviconApi/add', params })
+}
+
+export function uiedFaviconApiEdit(params: any) {
+    return request.post({ url: '/uied/faviconApi/edit', params })
+}
+
+export function uiedFaviconApiDelete(params: any) {
+    return request.post({ url: '/uied/faviconApi/del', params })
+}
+
+export function uiedFaviconApiSetDefault(params: any) {
+    return request.post({ url: '/uied/faviconApi/setDefault', params })
+}
