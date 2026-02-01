@@ -27,6 +27,9 @@ import {
   Statistic,
   Row,
   Col,
+  Radio,
+  Alert,
+  Typography,
 } from 'antd';
 import {
   PlusOutlined,
@@ -38,6 +41,7 @@ import {
   DollarOutlined,
   SearchOutlined,
   ImportOutlined,
+  SettingOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import api, { websiteApi } from '../services/api';
@@ -78,6 +82,8 @@ const positionOptions = [
   { value: 'ad', label: 'UIED系列', icon: <DollarOutlined style={{ color: '#52c41a' }} /> },
 ];
 
+const { Text } = Typography;
+
 export default function HotRecommendations() {
   const [items, setItems] = useState<HotRecommendation[]>([]);
   const [pages, setPages] = useState<Page[]>([]);
@@ -95,6 +101,11 @@ export default function HotRecommendations() {
   const [websiteSearch, setWebsiteSearch] = useState('');
   const [selectedWebsites, setSelectedWebsites] = useState<Website[]>([]);
   const [importPosition, setImportPosition] = useState<string>('hot');
+  
+  // 点击行为配置
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+  const [clickMode, setClickMode] = useState<'direct' | 'modal'>('direct');
+  const [settingsLoading, setSettingsLoading] = useState(false);
 
   const fetchItems = async () => {
     setLoading(true);
@@ -122,7 +133,34 @@ export default function HotRecommendations() {
   useEffect(() => {
     fetchItems();
     fetchPages();
+    fetchClickSettings();
   }, [filterPosition]);
+
+  // 获取点击行为配置
+  const fetchClickSettings = async () => {
+    try {
+      const res = await api.get('/settings/hot-recommendation-click');
+      const data = res.data.data || res.data;
+      setClickMode(data.clickMode || 'direct');
+    } catch (error) {
+      // 默认值
+      setClickMode('direct');
+    }
+  };
+
+  // 保存点击行为配置
+  const saveClickSettings = async () => {
+    setSettingsLoading(true);
+    try {
+      await api.put('/admin/settings/hot-recommendation-click', { clickMode });
+      message.success('设置已保存');
+      setSettingsModalOpen(false);
+    } catch (error) {
+      message.error('保存失败');
+    } finally {
+      setSettingsLoading(false);
+    }
+  };
 
   // 搜索网站
   const fetchWebsites = async (search: string) => {
@@ -403,6 +441,9 @@ export default function HotRecommendations() {
             )}
           </Space>
           <Space>
+            <Button icon={<SettingOutlined />} onClick={() => setSettingsModalOpen(true)}>
+              点击行为设置
+            </Button>
             <Button icon={<ImportOutlined />} onClick={handleOpenWebsiteModal}>
               从网站导入
             </Button>
@@ -576,6 +617,51 @@ export default function HotRecommendations() {
             </div>
           )}
         </Space>
+      </Modal>
+
+      {/* 点击行为设置弹窗 */}
+      <Modal
+        title="热门推荐点击行为设置"
+        open={settingsModalOpen}
+        onOk={saveClickSettings}
+        onCancel={() => setSettingsModalOpen(false)}
+        confirmLoading={settingsLoading}
+        okText="保存设置"
+      >
+        <Alert
+          message="点击行为配置"
+          description="配置用户点击热门推荐时的行为。此设置仅影响热门推荐区域，不影响其他网站卡片。"
+          type="info"
+          showIcon
+          style={{ marginBottom: 16 }}
+        />
+        
+        <Radio.Group 
+          value={clickMode} 
+          onChange={(e) => setClickMode(e.target.value)}
+          style={{ width: '100%' }}
+        >
+          <Space direction="vertical" style={{ width: '100%' }}>
+            <Radio value="direct" style={{ padding: '8px 0' }}>
+              <div>
+                <Text strong>直接跳转</Text>
+                <br />
+                <Text type="secondary" style={{ fontSize: 13 }}>
+                  点击后直接在新窗口打开外部链接
+                </Text>
+              </div>
+            </Radio>
+            <Radio value="modal" style={{ padding: '8px 0' }}>
+              <div>
+                <Text strong>弹窗确认</Text>
+                <br />
+                <Text type="secondary" style={{ fontSize: 13 }}>
+                  显示跳转确认弹窗，用户确认后跳转
+                </Text>
+              </div>
+            </Radio>
+          </Space>
+        </Radio.Group>
       </Modal>
     </div>
   );

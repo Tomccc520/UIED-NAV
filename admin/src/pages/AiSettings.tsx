@@ -310,6 +310,7 @@ export default function AiSettings() {
         <h2 style={{ margin: 0 }}>
           <RobotOutlined style={{ marginRight: 8 }} />
           AI 助手配置
+          <Tag color="purple" style={{ marginLeft: 8, verticalAlign: 'middle' }}>Pro</Tag>
         </h2>
         <p style={{ color: '#666', fontSize: 14, marginTop: 8 }}>
           配置 AI 服务，用于智能搜索、对话助手和自动生成内容

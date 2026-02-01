@@ -69,6 +69,119 @@ router.get('/friend-links', asyncHandler(async (req, res) => {
   res.json(links);
 }));
 
+// 获取固定链接配置 - 公开（前端需要根据配置生成 URL）
+router.get('/permalink', asyncHandler(async (req, res) => {
+  const setting = await prisma.siteSetting.findUnique({
+    where: { key: 'permalink_config' }
+  });
+  if (!setting) {
+    // 返回默认值
+    res.json({ 
+      success: true,
+      data: {
+        structure: 'plain',
+        customPattern: ''
+      }
+    });
+    return;
+  }
+  const data = JSON.parse(setting.value);
+  // 移除旧的 hotRecommendationClickMode 字段
+  delete data.hotRecommendationClickMode;
+  res.json({ success: true, data });
+}));
+
+// 获取热门推荐点击行为配置 - 公开
+router.get('/hot-recommendation-click', asyncHandler(async (req, res) => {
+  const setting = await prisma.siteSetting.findUnique({
+    where: { key: 'hot_recommendation_click' }
+  });
+  if (!setting) {
+    res.json({ 
+      success: true,
+      data: { clickMode: 'direct' }
+    });
+    return;
+  }
+  res.json({ success: true, data: JSON.parse(setting.value) });
+}));
+
+// 获取详情页侧边栏配置 - 公开
+router.get('/detail-sidebar-config', asyncHandler(async (req, res) => {
+  const setting = await prisma.siteSetting.findUnique({
+    where: { key: 'detailSidebarConfig' }
+  });
+  
+  // 默认配置
+  const defaultConfig = {
+    enabled: true,
+    showRelated: true,
+    relatedTitle: '你可能还喜欢',
+    relatedCount: 6,
+    relatedMode: 'auto',
+    manualWebsiteIds: [],
+    showTags: true,
+    tagsTitle: '深入探索',
+    showCategory: true,
+    categoryTitle: '相关分类',
+    visitBtnText: '访问网站',
+  };
+  
+  if (!setting) {
+    res.json({ success: true, data: defaultConfig });
+    return;
+  }
+  
+  const data = JSON.parse(setting.value);
+  res.json({ success: true, data: { ...defaultConfig, ...data } });
+}));
+
+// 获取网站的标签 - 公开（前端详情页使用）
+router.get('/website/:websiteId/tags', asyncHandler(async (req, res) => {
+  const { websiteId } = req.params;
+  
+  const tags = await prisma.websiteTagRelation.findMany({
+    where: { websiteId },
+    include: { tag: true }
+  });
+  
+  res.json({
+    success: true,
+    data: tags.map(r => r.tag)
+  });
+}));
+
+// 获取详情页全局配置 - 公开（版权、免责声明等）
+router.get('/detailPageConfig', asyncHandler(async (req, res) => {
+  const setting = await prisma.siteSetting.findUnique({
+    where: { key: 'detailPageConfig' }
+  });
+  
+  // 默认配置 - 与后台管理默认值保持一致
+  const defaultConfig = {
+    copyrightEnabled: true,
+    copyrightText: '本站收录的网站资源均来自互联网，仅供学习和研究使用。',
+    copyrightLink: '',
+    disclaimerEnabled: true,
+    disclaimerText: '免责声明：本站不对所收录网站的内容、安全性、合法性负责，访问时请注意甄别。',
+    footerTipEnabled: true,
+    footerTipText: '如果您发现本页面收录的网站存在问题，欢迎向我们反馈。',
+    shareEnabled: true,
+    shareText: '分享给朋友',
+    reportEnabled: true,
+    reportText: '举报问题',
+    reportEmail: '',
+  };
+  
+  if (!setting) {
+    res.json({ success: true, data: defaultConfig });
+    return;
+  }
+  
+  const data = JSON.parse(setting.value);
+  res.json({ success: true, data: { ...defaultConfig, ...data } });
+}));
+
 // 获取前端功能配置 - 公开
 router.get('/frontend-config', asyncHandler(async (req, res) => {
   // 批量获取所有配置
@@ -90,9 +203,9 @@ router.get('/frontend-config', asyncHandler(async (req, res) => {
     }
   });
   
-  // 默认配置
+  // 默认配置 - 默认关闭弹窗，点击网站卡片跳转详情页
   const defaultExitModalConfig = {
-    enabled: true,
+    enabled: false,  // 默认关闭，点击跳转详情页
     title: '即将离开本站',
     description: '您即将访问第三方网站，请注意保护个人信息安全。',
     confirmText: '继续访问',
@@ -101,6 +214,7 @@ router.get('/frontend-config', asyncHandler(async (req, res) => {
     reportText: '举报此链接',
     autoRedirect: false,
     autoRedirectSeconds: 5,
+    openInNewWindow: true,  // 默认新窗口打开
     showAd: false,
     adCode: '',
     adPosition: 'bottom',
@@ -121,6 +235,8 @@ router.get('/frontend-config', asyncHandler(async (req, res) => {
     searchPlaceholder: '搜索工具...',
     defaultThemeColor: '#2563EB',
     enableDarkMode: false,
+    websiteClickMode: 'detail',  // 默认跳转详情页
+    detailPageNewWindow: false,  // 默认当前窗口打开详情页
   };
   
   // 合并配置

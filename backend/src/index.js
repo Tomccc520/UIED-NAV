@@ -35,6 +35,15 @@ import seoRoutes from './routes/seoRoutes.js';
 import seoScraperRoutes from './routes/seoScraperRoutes.js';
 import exportRoutes from './routes/exportRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import articleRoutes from './routes/articleRoutes.js';
+// @pro-feature-start: comments
+import commentRoutes from './routes/commentRoutes.js';
+// @pro-feature-end: comments
+// @pro-feature-start: media-library
+import mediaRoutes from './routes/mediaRoutes.js';
+// @pro-feature-end: media-library
+// 网站标签路由
+import websiteTagRoutes from './routes/websiteTagRoutes.js';
 import { startMonitorJob } from './jobs/monitorJob.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 
@@ -151,8 +160,12 @@ app.use((req, res, next) => {
   next();
 });
 
-// 静态文件服务 - 提供上传的图片访问
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+// 静态文件服务 - 提供上传的图片访问（添加 CORS 头）
+app.use('/uploads', (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+}, express.static(path.join(__dirname, '../uploads')));
 
 // 静态文件服务 - 提供 SEO 文件访问（sitemap.xml, robots.txt）
 app.use(express.static(path.join(__dirname, '../public')));
@@ -171,6 +184,11 @@ app.use('/api/hot-recommendations', hotRecommendationRoutes);
 app.use('/api/banners', bannerRoutes);
 app.use('/api/favicon-api', faviconApiRoutes);
 app.use('/api/wordpress', wordpressConfigRoutes);
+
+// @pro-feature-start: articles
+// 文章系统路由（Pro 功能）
+app.use('/api/articles', articleRoutes);
+// @pro-feature-end: articles
 
 // 前端需要的公开设置接口（导航菜单、页脚、友情链接）
 app.use('/api/settings', publicSettingRoutes);
@@ -514,6 +532,19 @@ app.use('/api/seo', authMiddleware, seoRoutes);
 app.use('/api/seo-scraper', authMiddleware, seoScraperRoutes);
 app.use('/api/export', authMiddleware, exportRoutes);
 app.use('/api/users', authMiddleware, userRoutes);
+
+// @pro-feature-start: comments
+// 评论管理路由（Pro 功能）
+app.use('/api/admin/comments', authMiddleware, commentRoutes);
+// @pro-feature-end: comments
+
+// @pro-feature-start: media-library
+// 媒体库路由（Pro 功能）
+app.use('/api/media', authMiddleware, mediaRoutes);
+// @pro-feature-end: media-library
+
+// 网站标签路由
+app.use('/api/website-tags', authMiddleware, websiteTagRoutes);
 
 // 提交管理接口（需要认证）
 app.use('/api/submissions', submissionRoutes);

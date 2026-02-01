@@ -8,7 +8,7 @@
  * @version 1.0.0
  */
 
-const { hasFeature, getRequiredVersion } = require('../config/features');
+import { hasFeature, getRequiredVersion } from '../config/features.js';
 
 /**
  * 功能权限检查中间件
@@ -157,7 +157,7 @@ function requireEnterprise() {
   };
 }
 
-module.exports = {
+export {
   requireFeature,
   loadLicense,
   requirePro,

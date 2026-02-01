@@ -1,17 +1,19 @@
 /**
  * @file NavMenus.tsx
- * @description 管理后台组件
+ * @description 导航菜单管理 - 支持多级菜单
  * @author Tomda
  * @copyright 版权所有 (c) 2026 UIED技术团队
  * @website https://fsuied.com
  * @license MIT
- * @version 1.0.0
+ * @version 2.0.0
  */
 
 import { useEffect, useState } from 'react';
-import { Table, Button, Modal, Form, Input, InputNumber, Select, Switch, Space, Tag, message, Popconfirm } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Table, Button, Modal, Form, Input, InputNumber, Select, Switch, Space, Tag, message, Popconfirm, Badge, Typography } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, MenuOutlined, DownOutlined } from '@ant-design/icons';
 import { navMenuApi } from '../services/api';
+
+const { Title, Text } = Typography;
 
 interface NavMenu {
   id: string;
@@ -96,20 +98,37 @@ export default function NavMenus() {
   };
 
   const columns = [
-    { title: '菜单名称', dataIndex: 'text', key: 'text' },
+    { 
+      title: '菜单名称', 
+      dataIndex: 'text', 
+      key: 'text',
+      render: (text: string, record: NavMenu) => (
+        <Space>
+          <span>{text}</span>
+          {record.children && record.children.length > 0 && (
+            <Badge count={record.children.length} style={{ backgroundColor: '#1677ff' }} />
+          )}
+        </Space>
+      ),
+    },
     { 
       title: '链接', 
       dataIndex: 'link', 
       key: 'link',
       ellipsis: true,
-      render: (link: string) => link || '-'
+      render: (link: string, record: NavMenu) => {
+        if (record.children && record.children.length > 0) {
+          return <Text type="secondary"><DownOutlined style={{ marginRight: 4 }} />下拉菜单</Text>;
+        }
+        return link || '-';
+      }
     },
     {
       title: '标签',
       key: 'label',
       render: (_: any, record: NavMenu) => (
         record.label ? (
-          <Tag color={record.labelType === 'shop' ? 'green' : 'blue'}>
+          <Tag color={record.labelType === 'shop' ? 'green' : record.labelType === 'warning' ? 'orange' : 'blue'}>
             {record.label}
           </Tag>
         ) : '-'
@@ -119,7 +138,7 @@ export default function NavMenus() {
       title: '外部链接',
       dataIndex: 'external',
       key: 'external',
-      render: (external: boolean) => external ? '是' : '否',
+      render: (external: boolean) => external ? <Tag color="blue">是</Tag> : <Tag>否</Tag>,
     },
     {
       title: '显示',
@@ -129,10 +148,11 @@ export default function NavMenus() {
         <Tag color={visible ? 'green' : 'red'}>{visible ? '显示' : '隐藏'}</Tag>
       ),
     },
-    { title: '排序', dataIndex: 'order', key: 'order' },
+    { title: '排序', dataIndex: 'order', key: 'order', width: 80 },
     {
       title: '操作',
       key: 'action',
+      width: 120,
       render: (_: any, record: NavMenu) => (
         <Space>
           <Button size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
@@ -149,8 +169,14 @@ export default function NavMenus() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-        <h2>导航菜单管理</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <div>
+          <Title level={4} style={{ margin: 0 }}>
+            <MenuOutlined style={{ marginRight: 8 }} />
+            导航菜单管理
+          </Title>
+          <Text type="secondary">管理网站顶部导航菜单，支持多级菜单</Text>
+        </div>
         <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
           添加菜单
         </Button>
@@ -163,7 +189,9 @@ export default function NavMenus() {
         loading={loading}
         expandable={{
           childrenColumnName: 'children',
+          rowExpandable: (record) => !!(record.children && record.children.length > 0),
         }}
+        pagination={false}
       />
 
       <Modal
@@ -174,11 +202,11 @@ export default function NavMenus() {
         width={500}
       >
         <Form form={form} layout="vertical">
-          <Form.Item name="text" label="菜单名称" rules={[{ required: true }]}>
-            <Input />
+          <Form.Item name="text" label="菜单名称" rules={[{ required: true, message: '请输入菜单名称' }]}>
+            <Input placeholder="如：首页、工具、关于" />
           </Form.Item>
-          <Form.Item name="link" label="链接">
-            <Input placeholder="留空表示有子菜单" />
+          <Form.Item name="link" label="链接" extra="留空表示有子菜单（下拉菜单）">
+            <Input placeholder="/page/about 或 https://example.com" />
           </Form.Item>
           <Form.Item name="parentId" label="父菜单">
             <Select allowClear placeholder="选择父菜单（留空为顶级菜单）">
@@ -195,19 +223,19 @@ export default function NavMenus() {
               <Switch />
             </Form.Item>
           </Space>
-          <Form.Item name="label" label="标签文字">
-            <Input placeholder="如: New, Hot" />
+          <Form.Item name="label" label="标签文字" extra="如: New, Hot, 限时">
+            <Input placeholder="标签文字" />
           </Form.Item>
           <Form.Item name="labelType" label="标签类型">
-            <Select allowClear>
+            <Select allowClear placeholder="选择标签颜色">
               <Select.Option value="info">信息 (蓝色)</Select.Option>
               <Select.Option value="shop">商店 (绿色)</Select.Option>
-              <Select.Option value="warning">警告 (黄色)</Select.Option>
+              <Select.Option value="warning">警告 (橙色)</Select.Option>
               <Select.Option value="success">成功 (绿色)</Select.Option>
             </Select>
           </Form.Item>
-          <Form.Item name="order" label="排序">
-            <InputNumber style={{ width: '100%' }} />
+          <Form.Item name="order" label="排序" extra="数字越小越靠前">
+            <InputNumber style={{ width: '100%' }} min={0} />
           </Form.Item>
         </Form>
       </Modal>

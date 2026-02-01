@@ -5,4 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: '/admin/',  // 部署到子路径
+  server: {
+    port: 5174,  // 避免与其他项目冲突
+  },
 })

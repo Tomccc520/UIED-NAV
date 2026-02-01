@@ -41,6 +41,18 @@ import DataExport from './pages/DataExport';
 import Users from './pages/Users';
 import Account from './pages/Account';
 import WebsiteConfig from './pages/WebsiteConfig';
+import PermalinkSettings from './pages/PermalinkSettings';
+// @pro-feature-start: articles
+import Articles from './pages/Articles';
+// @pro-feature-end: articles
+// @pro-feature-start: comments
+import Comments from './pages/Comments';
+// @pro-feature-end: comments
+// @pro-feature-start: media-library
+import MediaLibrary from './pages/MediaLibrary';
+// @pro-feature-end: media-library
+// 标签管理
+import Tags from './pages/Tags';
 
 // 路由守卫组件
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -77,6 +89,7 @@ function App() {
               <Route path="banners" element={<Banners />} />
               <Route path="website-config" element={<WebsiteConfig />} />
               <Route path="categories" element={<Categories />} />
+              <Route path="tags" element={<Tags />} />
               <Route path="websites" element={<Websites />} />
               <Route path="nav-menus" element={<NavMenus />} />
               <Route path="footer" element={<FooterSettings />} />
@@ -93,9 +106,19 @@ function App() {
               <Route path="logs" element={<OperationLogs />} />
               <Route path="monitor" element={<Monitor />} />
               <Route path="seo" element={<SeoSettings />} />
+              <Route path="permalink" element={<PermalinkSettings />} />
               <Route path="data-export" element={<DataExport />} />
               <Route path="users" element={<Users />} />
               <Route path="account" element={<Account />} />
+              {/* @pro-feature-start: articles */}
+              <Route path="articles" element={<Articles />} />
+              {/* @pro-feature-end: articles */}
+              {/* @pro-feature-start: comments */}
+              <Route path="comments" element={<Comments />} />
+              {/* @pro-feature-end: comments */}
+              {/* @pro-feature-start: media-library */}
+              <Route path="media" element={<MediaLibrary />} />
+              {/* @pro-feature-end: media-library */}
             </Route>
           </Routes>
         </BrowserRouter>

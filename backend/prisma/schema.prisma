@@ -34,6 +34,7 @@ model Category {
 model Website {
   id          String   @id @default(cuid())
   name        String
+  slug        String?  @unique // 固定链接，如 "dribbble"，用于 SEO 友好的 URL
   description String
   url         String
   iconUrl     String?  // 网站图标URL
@@ -46,6 +47,14 @@ model Website {
   tags        String   // JSON string array
   order       Int      @default(0)
   clickCount  Int      @default(0) // 点击次数
+  // SEO 相关字段（用于详情页）
+  seoTitle       String?  // SEO 标题，最大 60 字符
+  seoDescription String?  // SEO 描述，最大 160 字符
+  seoKeywords    String?  // SEO 关键词
+  // 详情页内容字段
+  detailContent  String?  // 详情页富文本内容（Markdown 格式）
+  screenshots    String?  // 截图URL列表，JSON数组格式
+  visitBtnText   String?  // 访问按钮文字，默认"访问网站"
   // 监控相关字段
   status          String   @default("unchecked") // unchecked, active, failed
   lastCheckedAt   DateTime? // 最后检测时间
@@ -60,6 +69,9 @@ model Website {
   favorites       Favorite[]
   browsingHistory BrowsingHistory[]
   // @pro-feature-end: website-detail-pro-features
+  
+  // 网站标签关联
+  websiteTags     WebsiteTagRelation[]
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -703,3 +715,56 @@ model ArticleComment {
 }
 // @pro-feature-end: articles
 
+
+// 媒体库表 - 管理上传的图片和文件（Pro）
+// @pro-feature-start: media-library
+model Media {
+  id          String   @id @default(cuid())
+  filename    String   // 文件名
+  originalName String  // 原始文件名
+  mimeType    String   // MIME 类型
+  size        Int      // 文件大小（字节）
+  url         String   // 访问 URL
+  width       Int?     // 图片宽度（仅图片）
+  height      Int?     // 图片高度（仅图片）
+  alt         String?  // 替代文本
+  folder      String   @default("default") // 文件夹分类
+  uploadedBy  String?  // 上传者
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([folder])
+  @@index([mimeType])
+  @@index([createdAt])
+}
+// @pro-feature-end: media-library
+
+
+// 网站标签表 - 用于网站分类和筛选
+model WebsiteTag {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  color       String   @default("#1890ff")
+  description String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  websites    WebsiteTagRelation[]
+  
+  @@index([slug])
+  @@index([order])
+}
+
+// 网站标签关联表 - 多对多关系
+model WebsiteTagRelation {
+  websiteId String
+  tagId     String
+  
+  website   Website    @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  tag       WebsiteTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  
+  @@id([websiteId, tagId])
+  @@index([tagId])
+}

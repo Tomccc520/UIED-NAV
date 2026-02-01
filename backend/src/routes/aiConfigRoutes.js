@@ -741,6 +741,456 @@ router.post('/chat/stream', async (req, res) => {
   }
 });
 
+// 辅助函数：获取 AI 配置（支持指定 configId）
+async function getAiConfig(configId) {
+  if (configId) {
+    const config = await prisma.aiConfig.findFirst({
+      where: { id: configId, enabled: true },
+    });
+    if (config) return config;
+  }
+  // 回退到默认配置
+  let config = await prisma.aiConfig.findFirst({
+    where: { enabled: true, isDefault: true },
+  });
+  if (!config) {
+    config = await prisma.aiConfig.findFirst({
+      where: { enabled: true },
+    });
+  }
+  return config;
+}
+
+// AI 润色 - 优化文章内容
+router.post('/polish', async (req, res) => {
+  try {
+    const { content, configId } = req.body;
+    
+    if (!content) {
+      return res.status(400).json({ success: false, error: '请提供内容' });
+    }
+    
+    // 获取 AI 配置（支持指定模型）
+    const config = await getAiConfig(configId);
+    if (!config) {
+      return res.status(400).json({ success: false, error: '没有可用的 AI 配置，请先在系统设置中配置 AI' });
+    }
+    
+    // 构建提示词
+    const prompt = `请对以下内容进行润色优化，保持原意的同时让文字更加流畅、专业、有吸引力。
+注意：
+1. 保持原有的格式（如标题、列表、段落等）
+2. 不要改变原文的核心观点
+3. 可以适当补充细节，但不要过度扩展
+4. 直接返回润色后的内容，不要有任何解释
+
+原文内容：
+${content}`;
+
+    // 调用 AI API
+    let response;
+    try {
+      response = await fetch(config.apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${config.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: config.model,
+          messages: [
+            { role: 'user', content: prompt }
+          ],
+          temperature: 0.7,
+          max_tokens: 2000,
+        }),
+        agent: httpsAgent,
+      });
+    } catch (fetchError) {
+      console.error('AI 润色网络错误:', fetchError);
+      return res.status(500).json({ success: false, error: `AI 服务连接失败: ${fetchError.message}` });
+    }
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('AI 润色错误:', response.status, errorText);
+      return res.status(500).json({ success: false, error: 'AI 服务暂时不可用' });
+    }
+    
+    const data = await response.json();
+    const result = data.choices?.[0]?.message?.content;
+    
+    if (!result) {
+      return res.status(500).json({ success: false, error: 'AI 返回内容为空' });
+    }
+    
+    res.json({ success: true, data: result });
+  } catch (error) {
+    console.error('AI 润色失败:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// AI 续写 - 继续扩展内容
+router.post('/continue', async (req, res) => {
+  try {
+    const { content, configId } = req.body;
+    
+    if (!content) {
+      return res.status(400).json({ success: false, error: '请提供内容' });
+    }
+    
+    // 获取 AI 配置（支持指定模型）
+    const config = await getAiConfig(configId);
+    if (!config) {
+      return res.status(400).json({ success: false, error: '没有可用的 AI 配置，请先在系统设置中配置 AI' });
+    }
+    
+    // 构建提示词
+    const prompt = `请根据以下内容继续写作，保持相同的风格和主题。
+注意：
+1. 保持与原文一致的写作风格
+2. 内容要有逻辑性，与前文衔接自然
+3. 续写 200-400 字左右
+4. 直接返回续写的内容，不要有任何解释或前缀
+
+原文内容：
+${content}`;
+
+    // 调用 AI API
+    let response;
+    try {
+      response = await fetch(config.apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${config.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: config.model,
+          messages: [
+            { role: 'user', content: prompt }
+          ],
+          temperature: 0.8,
+          max_tokens: 1000,
+        }),
+        agent: httpsAgent,
+      });
+    } catch (fetchError) {
+      console.error('AI 续写网络错误:', fetchError);
+      return res.status(500).json({ success: false, error: `AI 服务连接失败: ${fetchError.message}` });
+    }
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('AI 续写错误:', response.status, errorText);
+      return res.status(500).json({ success: false, error: 'AI 服务暂时不可用' });
+    }
+    
+    const data = await response.json();
+    const result = data.choices?.[0]?.message?.content;
+    
+    if (!result) {
+      return res.status(500).json({ success: false, error: 'AI 返回内容为空' });
+    }
+    
+    res.json({ success: true, data: result });
+  } catch (error) {
+    console.error('AI 续写失败:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// AI 扩写 - 扩展内容，增加更多细节
+router.post('/expand', async (req, res) => {
+  try {
+    const { content, configId } = req.body;
+    
+    if (!content) {
+      return res.status(400).json({ success: false, error: '请提供内容' });
+    }
+    
+    // 获取 AI 配置（支持指定模型）
+    const config = await getAiConfig(configId);
+    if (!config) {
+      return res.status(400).json({ success: false, error: '没有可用的 AI 配置，请先在系统设置中配置 AI' });
+    }
+    
+    // 构建提示词
+    const prompt = `请对以下内容进行扩写，增加更多细节、例子和说明，使内容更加丰富完整。
+注意：
+1. 保持原有的核心观点和结构
+2. 增加具体的例子、数据或案例来支撑观点
+3. 可以添加相关的背景知识或延伸内容
+4. 扩写后的内容应该是原文的 2-3 倍长度
+5. 直接返回扩写后的内容，不要有任何解释
+
+原文内容：
+${content}`;
+
+    // 调用 AI API
+    let response;
+    try {
+      response = await fetch(config.apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${config.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: config.model,
+          messages: [
+            { role: 'user', content: prompt }
+          ],
+          temperature: 0.7,
+          max_tokens: 3000,
+        }),
+        agent: httpsAgent,
+      });
+    } catch (fetchError) {
+      console.error('AI 扩写网络错误:', fetchError);
+      return res.status(500).json({ success: false, error: `AI 服务连接失败: ${fetchError.message}` });
+    }
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('AI 扩写错误:', response.status, errorText);
+      return res.status(500).json({ success: false, error: 'AI 服务暂时不可用' });
+    }
+    
+    const data = await response.json();
+    const result = data.choices?.[0]?.message?.content;
+    
+    if (!result) {
+      return res.status(500).json({ success: false, error: 'AI 返回内容为空' });
+    }
+    
+    res.json({ success: true, data: result });
+  } catch (error) {
+    console.error('AI 扩写失败:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// AI 总结 - 提炼要点，生成简洁摘要
+router.post('/summarize', async (req, res) => {
+  try {
+    const { content, configId } = req.body;
+    
+    if (!content) {
+      return res.status(400).json({ success: false, error: '请提供内容' });
+    }
+    
+    // 获取 AI 配置（支持指定模型）
+    const config = await getAiConfig(configId);
+    if (!config) {
+      return res.status(400).json({ success: false, error: '没有可用的 AI 配置，请先在系统设置中配置 AI' });
+    }
+    
+    // 构建提示词
+    const prompt = `请对以下内容进行总结，提炼核心要点，生成简洁的摘要。
+注意：
+1. 保留最重要的信息和观点
+2. 使用简洁明了的语言
+3. 可以使用列表形式呈现要点
+4. 摘要长度控制在原文的 1/3 左右
+5. 直接返回总结内容，不要有任何解释
+
+原文内容：
+${content}`;
+
+    // 调用 AI API
+    let response;
+    try {
+      response = await fetch(config.apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${config.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: config.model,
+          messages: [
+            { role: 'user', content: prompt }
+          ],
+          temperature: 0.5,
+          max_tokens: 1000,
+        }),
+        agent: httpsAgent,
+      });
+    } catch (fetchError) {
+      console.error('AI 总结网络错误:', fetchError);
+      return res.status(500).json({ success: false, error: `AI 服务连接失败: ${fetchError.message}` });
+    }
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('AI 总结错误:', response.status, errorText);
+      return res.status(500).json({ success: false, error: 'AI 服务暂时不可用' });
+    }
+    
+    const data = await response.json();
+    const result = data.choices?.[0]?.message?.content;
+    
+    if (!result) {
+      return res.status(500).json({ success: false, error: 'AI 返回内容为空' });
+    }
+    
+    res.json({ success: true, data: result });
+  } catch (error) {
+    console.error('AI 总结失败:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// AI 翻译 - 中英互译
+router.post('/translate', async (req, res) => {
+  try {
+    const { content, configId } = req.body;
+    
+    if (!content) {
+      return res.status(400).json({ success: false, error: '请提供内容' });
+    }
+    
+    // 获取 AI 配置（支持指定模型）
+    const config = await getAiConfig(configId);
+    if (!config) {
+      return res.status(400).json({ success: false, error: '没有可用的 AI 配置，请先在系统设置中配置 AI' });
+    }
+    
+    // 检测语言并构建提示词
+    const isChinese = /[\u4e00-\u9fa5]/.test(content);
+    const targetLang = isChinese ? '英文' : '中文';
+    
+    const prompt = `请将以下内容翻译成${targetLang}。
+注意：
+1. 保持原文的语气和风格
+2. 专业术语要准确翻译
+3. 保持原有的格式（如标题、列表、段落等）
+4. 直接返回翻译结果，不要有任何解释
+
+原文内容：
+${content}`;
+
+    // 调用 AI API
+    let response;
+    try {
+      response = await fetch(config.apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${config.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: config.model,
+          messages: [
+            { role: 'user', content: prompt }
+          ],
+          temperature: 0.3,
+          max_tokens: 2000,
+        }),
+        agent: httpsAgent,
+      });
+    } catch (fetchError) {
+      console.error('AI 翻译网络错误:', fetchError);
+      return res.status(500).json({ success: false, error: `AI 服务连接失败: ${fetchError.message}` });
+    }
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('AI 翻译错误:', response.status, errorText);
+      return res.status(500).json({ success: false, error: 'AI 服务暂时不可用' });
+    }
+    
+    const data = await response.json();
+    const result = data.choices?.[0]?.message?.content;
+    
+    if (!result) {
+      return res.status(500).json({ success: false, error: 'AI 返回内容为空' });
+    }
+    
+    res.json({ success: true, data: result });
+  } catch (error) {
+    console.error('AI 翻译失败:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// AI 自定义指令 - 根据用户指令处理内容
+router.post('/custom', async (req, res) => {
+  try {
+    const { content, prompt: userPrompt, configId } = req.body;
+    
+    if (!content) {
+      return res.status(400).json({ success: false, error: '请提供内容' });
+    }
+    if (!userPrompt) {
+      return res.status(400).json({ success: false, error: '请提供指令' });
+    }
+    
+    // 获取 AI 配置（支持指定模型）
+    const config = await getAiConfig(configId);
+    if (!config) {
+      return res.status(400).json({ success: false, error: '没有可用的 AI 配置，请先在系统设置中配置 AI' });
+    }
+    
+    // 构建提示词
+    const prompt = `请根据以下指令处理内容：
+
+用户指令：${userPrompt}
+
+需要处理的内容：
+${content}
+
+注意：
+1. 严格按照用户指令执行
+2. 保持专业和准确
+3. 直接返回处理结果，不要有任何解释`;
+
+    // 调用 AI API
+    let response;
+    try {
+      response = await fetch(config.apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${config.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: config.model,
+          messages: [
+            { role: 'user', content: prompt }
+          ],
+          temperature: 0.7,
+          max_tokens: 2000,
+        }),
+        agent: httpsAgent,
+      });
+    } catch (fetchError) {
+      console.error('AI 自定义指令网络错误:', fetchError);
+      return res.status(500).json({ success: false, error: `AI 服务连接失败: ${fetchError.message}` });
+    }
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('AI 自定义指令错误:', response.status, errorText);
+      return res.status(500).json({ success: false, error: 'AI 服务暂时不可用' });
+    }
+    
+    const data = await response.json();
+    const result = data.choices?.[0]?.message?.content;
+    
+    if (!result) {
+      return res.status(500).json({ success: false, error: 'AI 返回内容为空' });
+    }
+    
+    res.json({ success: true, data: result });
+  } catch (error) {
+    console.error('AI 自定义指令失败:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // AI 工具推荐 - 根据当前页面推荐相关工具
 router.post('/recommend', async (req, res) => {
   try {

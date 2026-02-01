@@ -61,6 +61,11 @@ const FEATURES = {
  * @returns {boolean} 是否有权限使用该功能
  */
 function hasFeature(license, feature) {
+  // 开发环境：所有功能都可用（方便测试）
+  if (process.env.NODE_ENV === 'development' || process.env.ENABLE_ALL_FEATURES === 'true') {
+    return true;
+  }
+  
   // 如果没有许可证或许可证类型为 free，只能使用免费功能
   if (!license || license.type === 'free') {
     return FEATURES.free.includes(feature);
@@ -114,7 +119,7 @@ function getFeaturesForLicense(licenseType) {
   return features;
 }
 
-module.exports = {
+export {
   FEATURES,
   hasFeature,
   getRequiredVersion,

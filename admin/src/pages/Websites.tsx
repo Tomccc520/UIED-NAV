@@ -28,6 +28,8 @@ import {
   Tooltip,
   Upload,
   Image,
+  Tabs,
+  Select,
 } from 'antd';
 import type { UploadProps } from 'antd';
 import {
@@ -42,12 +44,16 @@ import {
   GlobalOutlined,
   RobotOutlined,
   PushpinOutlined,
+  EyeOutlined,
 } from '@ant-design/icons';
+import NovelEditor from '../components/NovelEditor';
+import AIContentModal from '../components/AIContentModal';
 import api, { websiteApi, categoryApi, faviconApiService, type PaginationInfo } from '../services/api';
 
 interface Website {
   id: string;
   name: string;
+  slug?: string;
   description: string;
   url: string;
   iconUrl?: string;
@@ -59,8 +65,25 @@ interface Website {
   isPinned: boolean;
   tags: string;
   order: number;
+  // SEO 字段
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
+  // 详情页内容字段
+  detailContent?: string;
+  screenshots?: string;
+  visitBtnText?: string;
   createdAt?: string;
   updatedAt?: string;
+  // 网站标签
+  websiteTags?: WebsiteTag[];
+}
+
+interface WebsiteTag {
+  id: string;
+  name: string;
+  slug: string;
+  color?: string;
 }
 
 interface Category {
@@ -87,6 +110,11 @@ export default function Websites() {
   const [fetchingIcon, setFetchingIcon] = useState(false);
   const [fetchingSeo, setFetchingSeo] = useState(false); // 新增：SEO抓取状态
   const [generatingAi, setGeneratingAi] = useState(false);
+  const [screenshots, setScreenshots] = useState<string[]>([]); // 截图列表
+  const [detailContent, setDetailContent] = useState<string>(''); // 详情内容
+  const [aiModalOpen, setAiModalOpen] = useState(false); // AI 弹窗状态
+  const [websiteTags, setWebsiteTags] = useState<WebsiteTag[]>([]); // 所有可用标签
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]); // 当前选中的标签ID
   const [form] = Form.useForm();
   
   // 分页状态
@@ -112,6 +140,38 @@ export default function Websites() {
       setCategories(tree);
     } catch (error) {
       message.error('获取分类失败');
+    }
+  };
+
+  // 获取所有网站标签
+  const fetchWebsiteTags = async () => {
+    try {
+      const res = await api.get('/website-tags');
+      const tags = res.data.data || res.data || [];
+      setWebsiteTags(tags);
+    } catch (error) {
+      console.error('获取标签失败:', error);
+    }
+  };
+
+  // 获取网站的标签
+  const fetchWebsiteTagIds = async (websiteId: string) => {
+    try {
+      const res = await api.get(`/website-tags/website/${websiteId}/tags`);
+      const tags = res.data.data || [];
+      setSelectedTagIds(tags.map((t: WebsiteTag) => t.id));
+    } catch (error) {
+      console.error('获取网站标签失败:', error);
+      setSelectedTagIds([]);
+    }
+  };
+
+  // 保存网站标签
+  const saveWebsiteTags = async (websiteId: string, tagIds: string[]) => {
+    try {
+      await api.post(`/website-tags/website/${websiteId}/tags`, { tagIds });
+    } catch (error) {
+      console.error('保存标签失败:', error);
     }
   };
 
@@ -226,6 +286,7 @@ export default function Websites() {
 
   useEffect(() => {
     fetchCategories();
+    fetchWebsiteTags();
   }, []);
 
   // 当分类加载完成后，获取网站数据
@@ -251,6 +312,9 @@ export default function Websites() {
     setEditingId(null);
     setIconUrl('');
     setIconUrlInput(''); // 清空图标URL输入
+    setScreenshots([]); // 清空截图
+    setDetailContent(''); // 清空详情内容
+    setSelectedTagIds([]); // 清空选中的标签
     form.resetFields();
     form.setFieldsValue({ 
       order: 0, 
@@ -260,6 +324,7 @@ export default function Websites() {
       isPinned: false,
       tags: '',
       categoryId: selectedCategory || undefined,
+      visitBtnText: '访问网站',
     });
     setModalOpen(true);
   };
@@ -268,9 +333,21 @@ export default function Websites() {
     setEditingId(record.id);
     setIconUrl(record.iconUrl || '');
     setIconUrlInput(record.iconUrl || ''); // 设置图标URL输入
+    // 解析截图列表
+    try {
+      const screenshotList = record.screenshots ? JSON.parse(record.screenshots) : [];
+      setScreenshots(Array.isArray(screenshotList) ? screenshotList : []);
+    } catch {
+      setScreenshots([]);
+    }
+    // 设置详情内容
+    setDetailContent(record.detailContent || '');
+    // 获取网站标签
+    fetchWebsiteTagIds(record.id);
     form.setFieldsValue({
       ...record,
       tags: record.tags || '',
+      visitBtnText: record.visitBtnText || '访问网站',
     });
     setModalOpen(true);
   };
@@ -294,17 +371,31 @@ export default function Websites() {
         ...values,
         iconUrl: iconUrl || null,
         tags: typeof values.tags === 'string' ? values.tags : JSON.stringify(values.tags || []),
+        screenshots: JSON.stringify(screenshots),
+        detailContent: detailContent || '', // 使用状态中的详情内容
+        slug: values.slug?.trim() || null,
       };
       
       console.log('提交数据:', data);
       
+      let websiteId = editingId;
       if (editingId) {
         await websiteApi.update(editingId, data);
         message.success('更新成功');
       } else {
-        await websiteApi.create(data);
+        const res = await websiteApi.create(data);
+        websiteId = res.data.id || res.data.data?.id;
         message.success('创建成功');
       }
+      
+      // 保存网站标签
+      if (websiteId && selectedTagIds.length > 0) {
+        await saveWebsiteTags(websiteId, selectedTagIds);
+      } else if (websiteId && selectedTagIds.length === 0 && editingId) {
+        // 如果编辑时清空了标签，也要更新
+        await saveWebsiteTags(websiteId, []);
+      }
+      
       setModalOpen(false);
       // 刷新当前页数据
       fetchWebsites(pagination.page, pagination.pageSize);
@@ -425,6 +516,14 @@ export default function Websites() {
     }
   };
 
+  // 查看网站详情页（前端）
+  const handleViewDetail = (record: Website) => {
+    // 在新窗口打开前端详情页，优先使用 slug
+    const frontendUrl = import.meta.env.VITE_FRONTEND_URL || 'http://localhost:3000';
+    const identifier = record.slug || record.id;
+    window.open(`${frontendUrl}/website/${identifier}`, '_blank');
+  };
+
   const uploadProps: UploadProps = {
     beforeUpload: handleUploadIcon,
     showUploadList: false,
@@ -519,9 +618,12 @@ export default function Websites() {
     {
       title: '操作',
       key: 'action',
-      width: 130,
+      width: 160,
       render: (_: any, record: Website) => (
         <Space size={4}>
+          <Tooltip title="查看详情">
+            <Button size="small" type="text" icon={<EyeOutlined />} onClick={() => handleViewDetail(record)} />
+          </Tooltip>
           <Tooltip title={record.isPinned ? '取消置顶' : '置顶'}>
             <Button 
               size="small" 
@@ -621,212 +723,476 @@ export default function Websites() {
         title={editingId ? '编辑网站' : '添加网站'}
         open={modalOpen}
         onOk={handleSubmit}
-        onCancel={() => setModalOpen(false)}
-        width={700}
+        onCancel={() => {
+          setModalOpen(false);
+          setAiModalOpen(false);
+        }}
+        width={800}
       >
         <Form form={form} layout="vertical">
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item 
-                name="name" 
-                label="网站名称" 
-                rules={[{ required: true, message: '请输入网站名称' }]}
-              >
-                <Input placeholder="如：Dribbble" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item 
-                name="categoryId" 
-                label="所属分类" 
-                rules={[{ required: true, message: '请选择分类' }]}
-              >
-                <TreeSelect
-                  placeholder="选择分类"
-                  treeDefaultExpandAll
-                  treeData={convertToTreeSelectData(categories)}
-                  showSearch
-                  treeNodeFilterProp="title"
-                />
-              </Form.Item>
-            </Col>
-          </Row>
+          <Tabs
+            defaultActiveKey="basic"
+            items={[
+              {
+                key: 'basic',
+                label: '基本信息',
+                children: (
+                  <>
+                    <Row gutter={16}>
+                      <Col span={12}>
+                        <Form.Item 
+                          name="name" 
+                          label="网站名称" 
+                          rules={[{ required: true, message: '请输入网站名称' }]}
+                        >
+                          <Input placeholder="如：Dribbble" />
+                        </Form.Item>
+                      </Col>
+                      <Col span={12}>
+                        <Form.Item 
+                          name="categoryId" 
+                          label="所属分类" 
+                          rules={[{ required: true, message: '请选择分类' }]}
+                        >
+                          <TreeSelect
+                            placeholder="选择分类"
+                            treeDefaultExpandAll
+                            treeData={convertToTreeSelectData(categories)}
+                            showSearch
+                            treeNodeFilterProp="title"
+                          />
+                        </Form.Item>
+                      </Col>
+                    </Row>
 
-          <Form.Item 
-            name="url" 
-            label="网站URL" 
-            rules={[
-              { required: true, message: '请输入网站URL' },
-              { type: 'url', message: '请输入有效的URL' }
-            ]}
-          >
-            <Input 
-              placeholder="https://dribbble.com" 
-              addonAfter={
-                <Space size={4}>
-                  <Button 
-                    type="link" 
-                    size="small" 
-                    icon={<GlobalOutlined />}
-                    loading={fetchingSeo}
-                    onClick={handleSeoFetch}
-                    style={{ padding: 0, height: 'auto' }}
-                    title="从网页抓取SEO信息"
-                  >
-                    SEO
-                  </Button>
-                  <Button 
-                    type="link" 
-                    size="small" 
-                    icon={<RobotOutlined />}
-                    loading={generatingAi}
-                    onClick={handleAiGenerate}
-                    style={{ padding: 0, height: 'auto' }}
-                    title="AI智能生成"
-                  >
-                    AI
-                  </Button>
-                </Space>
-              }
-            />
-          </Form.Item>
-
-          <Form.Item label="网站图标">
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: 16,
-              padding: 16,
-              border: '1px dashed #d9d9d9',
-              borderRadius: 8,
-              background: '#fafafa'
-            }}>
-              {iconUrl ? (
-                <Image
-                  src={iconUrl}
-                  alt="网站图标"
-                  style={{ width: 64, height: 64, objectFit: 'contain' }}
-                  fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
-                />
-              ) : (
-                <div style={{ 
-                  width: 64, 
-                  height: 64, 
-                  background: '#f0f0f0', 
-                  borderRadius: 8,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  <GlobalOutlined style={{ fontSize: 24, color: '#999' }} />
-                </div>
-              )}
-              <div style={{ flex: 1 }}>
-                <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                  <Space>
-                    <Upload {...uploadProps}>
-                      <Button size="small" icon={<UploadOutlined />}>上传图标</Button>
-                    </Upload>
-                    <Button 
-                      size="small" 
-                      icon={<GlobalOutlined />} 
-                      onClick={handleFetchFavicon}
-                      loading={fetchingIcon}
+                    <Form.Item 
+                      name="url" 
+                      label="网站URL" 
+                      rules={[
+                        { required: true, message: '请输入网站URL' },
+                        { type: 'url', message: '请输入有效的URL' }
+                      ]}
                     >
-                      自动获取
-                    </Button>
-                    {iconUrl && (
-                      <Button 
-                        size="small" 
-                        danger 
-                        onClick={() => setIconUrl('')}
-                      >
-                        清除
-                      </Button>
-                    )}
-                  </Space>
-                  <Input
-                    size="small"
-                    placeholder="或输入图标URL"
-                    value={iconUrlInput}
-                    onChange={(e) => setIconUrlInput(e.target.value)}
-                    onPressEnter={() => {
-                      if (iconUrlInput) {
-                        setIconUrl(iconUrlInput);
-                        message.success('图标URL已设置');
+                      <Input 
+                        placeholder="https://dribbble.com" 
+                        addonAfter={
+                          <Space size={4}>
+                            <Button 
+                              type="link" 
+                              size="small" 
+                              icon={<GlobalOutlined />}
+                              loading={fetchingSeo}
+                              onClick={handleSeoFetch}
+                              style={{ padding: 0, height: 'auto' }}
+                              title="从网页抓取SEO信息"
+                            >
+                              SEO
+                            </Button>
+                            <Button 
+                              type="link" 
+                              size="small" 
+                              icon={<RobotOutlined />}
+                              loading={generatingAi}
+                              onClick={handleAiGenerate}
+                              style={{ padding: 0, height: 'auto' }}
+                              title="AI智能生成"
+                            >
+                              AI
+                            </Button>
+                          </Space>
+                        }
+                      />
+                    </Form.Item>
+
+                    <Form.Item 
+                      name="slug" 
+                      label="固定链接"
+                      extra={
+                        <span>
+                          用于 SEO 友好的 URL，如 dribbble，访问地址将变为 /website/dribbble。
+                          <Button 
+                            type="link" 
+                            size="small" 
+                            style={{ padding: '0 4px' }}
+                            onClick={async () => {
+                              const name = form.getFieldValue('name');
+                              const url = form.getFieldValue('url');
+                              if (name) {
+                                try {
+                                  // 调用后端 API 生成拼音 slug
+                                  const response = await api.post('/websites/generate-slug', {
+                                    name,
+                                    url,
+                                    excludeId: editingId
+                                  });
+                                  if (response.data.success) {
+                                    form.setFieldValue('slug', response.data.data.slug);
+                                    message.success('已生成固定链接');
+                                  }
+                                } catch (error) {
+                                  console.error('生成 slug 失败:', error);
+                                  // 降级：简单处理
+                                  const slug = name
+                                    .toLowerCase()
+                                    .replace(/[^a-z0-9]+/g, '-')
+                                    .replace(/^-|-$/g, '');
+                                  form.setFieldValue('slug', slug);
+                                }
+                              }
+                            }}
+                          >
+                            自动生成
+                          </Button>
+                        </span>
                       }
-                    }}
-                    addonAfter={
-                      <Button 
-                        type="link" 
-                        size="small"
-                        onClick={() => {
-                          if (iconUrlInput) {
-                            setIconUrl(iconUrlInput);
-                            message.success('图标URL已设置');
-                          }
+                    >
+                      <Input 
+                        placeholder="dribbble（留空则使用ID）" 
+                        addonBefore="/website/"
+                      />
+                    </Form.Item>
+
+                    <Form.Item label="网站图标">
+                      <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: 16,
+                        padding: 16,
+                        border: '1px dashed #d9d9d9',
+                        borderRadius: 8,
+                        background: '#fafafa'
+                      }}>
+                        {iconUrl ? (
+                          <Image
+                            src={iconUrl}
+                            alt="网站图标"
+                            style={{ width: 64, height: 64, objectFit: 'contain' }}
+                            fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+                          />
+                        ) : (
+                          <div style={{ 
+                            width: 64, 
+                            height: 64, 
+                            background: '#f0f0f0', 
+                            borderRadius: 8,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            <GlobalOutlined style={{ fontSize: 24, color: '#999' }} />
+                          </div>
+                        )}
+                        <div style={{ flex: 1 }}>
+                          <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                            <Space>
+                              <Upload {...uploadProps}>
+                                <Button size="small" icon={<UploadOutlined />}>上传图标</Button>
+                              </Upload>
+                              <Button 
+                                size="small" 
+                                icon={<GlobalOutlined />} 
+                                onClick={handleFetchFavicon}
+                                loading={fetchingIcon}
+                              >
+                                自动获取
+                              </Button>
+                              {iconUrl && (
+                                <Button 
+                                  size="small" 
+                                  danger 
+                                  onClick={() => setIconUrl('')}
+                                >
+                                  清除
+                                </Button>
+                              )}
+                            </Space>
+                            <Input
+                              size="small"
+                              placeholder="或输入图标URL"
+                              value={iconUrlInput}
+                              onChange={(e) => setIconUrlInput(e.target.value)}
+                              onPressEnter={() => {
+                                if (iconUrlInput) {
+                                  setIconUrl(iconUrlInput);
+                                  message.success('图标URL已设置');
+                                }
+                              }}
+                              addonAfter={
+                                <Button 
+                                  type="link" 
+                                  size="small"
+                                  onClick={() => {
+                                    if (iconUrlInput) {
+                                      setIconUrl(iconUrlInput);
+                                      message.success('图标URL已设置');
+                                    }
+                                  }}
+                                  style={{ padding: 0, height: 'auto' }}
+                                >
+                                  确定
+                                </Button>
+                              }
+                            />
+                          </Space>
+                        </div>
+                      </div>
+                    </Form.Item>
+
+                    <Form.Item 
+                      name="description" 
+                      label="网站描述" 
+                      rules={[{ required: true, message: '请输入网站描述' }]}
+                    >
+                      <Input.TextArea rows={3} placeholder="简要描述这个网站的功能和特点" />
+                    </Form.Item>
+
+                    <Form.Item 
+                      name="tags" 
+                      label="标签（文本）"
+                      extra="多个标签用逗号分隔，如：设计,灵感,UI（旧版标签方式）"
+                    >
+                      <Input placeholder="设计,灵感,UI" />
+                    </Form.Item>
+
+                    <Form.Item 
+                      label="网站标签"
+                      extra="从标签库中选择标签，可在「标签管理」中添加新标签"
+                    >
+                      <Select
+                        mode="multiple"
+                        placeholder="选择标签..."
+                        value={selectedTagIds}
+                        onChange={setSelectedTagIds}
+                        style={{ width: '100%' }}
+                        optionFilterProp="label"
+                        options={websiteTags.map(tag => ({
+                          value: tag.id,
+                          label: tag.name,
+                        }))}
+                        tagRender={(props) => {
+                          const tag = websiteTags.find(t => t.id === props.value);
+                          return (
+                            <Tag
+                              color={tag?.color || '#1890ff'}
+                              closable={props.closable}
+                              onClose={props.onClose}
+                              style={{ marginRight: 3 }}
+                            >
+                              {props.label}
+                            </Tag>
+                          );
                         }}
-                        style={{ padding: 0, height: 'auto' }}
-                      >
-                        确定
-                      </Button>
-                    }
-                  />
-                  <span style={{ fontSize: 12, color: '#999' }}>
-                    支持上传图片、自动获取favicon或输入图标URL
+                      />
+                    </Form.Item>
+
+                    <Row gutter={16}>
+                      <Col span={6}>
+                        <Form.Item name="isPinned" label="置顶" valuePropName="checked">
+                          <Switch />
+                        </Form.Item>
+                      </Col>
+                      <Col span={6}>
+                        <Form.Item name="isHot" label="热门" valuePropName="checked">
+                          <Switch />
+                        </Form.Item>
+                      </Col>
+                      <Col span={6}>
+                        <Form.Item name="isNew" label="新增" valuePropName="checked">
+                          <Switch />
+                        </Form.Item>
+                      </Col>
+                      <Col span={6}>
+                        <Form.Item name="isFeatured" label="推荐" valuePropName="checked">
+                          <Switch />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    <Row gutter={16}>
+                      <Col span={6}>
+                        <Form.Item name="order" label="排序">
+                          <InputNumber style={{ width: '100%' }} min={0} />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                  </>
+                ),
+              },
+              {
+                key: 'detail',
+                label: (
+                  <span>
+                    详情页内容
+                    <Tag color="purple" style={{ marginLeft: 6, fontSize: 10 }}>Pro</Tag>
                   </span>
-                </Space>
-              </div>
-            </div>
-          </Form.Item>
+                ),
+                children: (
+                  <>
+                    <Form.Item 
+                      name="visitBtnText" 
+                      label="访问按钮文字"
+                      extra="自定义访问按钮的显示文字"
+                    >
+                      <Input placeholder="访问网站" maxLength={20} />
+                    </Form.Item>
 
-          <Form.Item 
-            name="description" 
-            label="网站描述" 
-            rules={[{ required: true, message: '请输入网站描述' }]}
-          >
-            <Input.TextArea rows={3} placeholder="简要描述这个网站的功能和特点" />
-          </Form.Item>
+                    <Form.Item label="产品截图">
+                      <div style={{ 
+                        display: 'flex', 
+                        flexWrap: 'wrap', 
+                        gap: 8,
+                        marginBottom: 8
+                      }}>
+                        {screenshots.map((url, index) => (
+                          <div key={index} style={{ position: 'relative' }}>
+                            <Image
+                              src={url}
+                              alt={`截图 ${index + 1}`}
+                              style={{ width: 120, height: 80, objectFit: 'cover', borderRadius: 4 }}
+                              fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+                            />
+                            <Button
+                              type="text"
+                              danger
+                              size="small"
+                              style={{ 
+                                position: 'absolute', 
+                                top: -8, 
+                                right: -8,
+                                background: '#fff',
+                                borderRadius: '50%',
+                                padding: 0,
+                                width: 20,
+                                height: 20,
+                                lineHeight: '20px',
+                              }}
+                              onClick={() => {
+                                const newScreenshots = [...screenshots];
+                                newScreenshots.splice(index, 1);
+                                setScreenshots(newScreenshots);
+                              }}
+                            >
+                              ×
+                            </Button>
+                          </div>
+                        ))}
+                        {screenshots.length < 6 && (
+                          <Upload
+                            showUploadList={false}
+                            accept="image/*"
+                            beforeUpload={async (file) => {
+                              const formData = new FormData();
+                              formData.append('file', file);
+                              try {
+                                const response = await api.post('/upload/image', formData, {
+                                  headers: { 'Content-Type': 'multipart/form-data' },
+                                });
+                                const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+                                const serverUrl = apiBaseUrl.replace(/\/api\/?$/, '');
+                                const uploadedUrl = response.data.url.startsWith('http') 
+                                  ? response.data.url 
+                                  : `${serverUrl}${response.data.url}`;
+                                setScreenshots([...screenshots, uploadedUrl]);
+                                message.success('截图上传成功');
+                              } catch (error) {
+                                message.error('上传失败');
+                              }
+                              return false;
+                            }}
+                          >
+                            <div style={{ 
+                              width: 120, 
+                              height: 80, 
+                              border: '1px dashed #d9d9d9',
+                              borderRadius: 4,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              background: '#fafafa',
+                            }}>
+                              <PlusOutlined style={{ fontSize: 20, color: '#999' }} />
+                            </div>
+                          </Upload>
+                        )}
+                      </div>
+                      <span style={{ fontSize: 12, color: '#999' }}>
+                        最多上传 6 张截图，建议尺寸 1200x800
+                      </span>
+                    </Form.Item>
 
-          <Form.Item 
-            name="tags" 
-            label="标签"
-            extra="多个标签用逗号分隔，如：设计,灵感,UI"
-          >
-            <Input placeholder="设计,灵感,UI" />
-          </Form.Item>
-
-          <Row gutter={16}>
-            <Col span={6}>
-              <Form.Item name="isPinned" label="置顶" valuePropName="checked" extra="在当前分类内置顶显示">
-                <Switch />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item name="isHot" label="热门" valuePropName="checked">
-                <Switch />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item name="isNew" label="新增" valuePropName="checked">
-                <Switch />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item name="isFeatured" label="推荐" valuePropName="checked">
-                <Switch />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={6}>
-              <Form.Item name="order" label="排序">
-                <InputNumber style={{ width: '100%' }} min={0} />
-              </Form.Item>
-            </Col>
-          </Row>
+                    <Form.Item 
+                      label={
+                        <Space>
+                          <span>详情内容</span>
+                          <Button 
+                            size="small" 
+                            icon={<RobotOutlined />}
+                            onClick={() => setAiModalOpen(true)}
+                          >
+                            AI 助手
+                          </Button>
+                        </Space>
+                      }
+                      extra="支持富文本编辑，用于详情页的详细介绍"
+                    >
+                      <NovelEditor
+                        value={detailContent}
+                        onChange={(html) => setDetailContent(html)}
+                        placeholder="输入网站的详细介绍..."
+                        minHeight={200}
+                        maxHeight={400}
+                      />
+                    </Form.Item>
+                  </>
+                ),
+              },
+              {
+                key: 'seo',
+                label: (
+                  <span>
+                    SEO 设置
+                    <Tag color="purple" style={{ marginLeft: 6, fontSize: 10 }}>Pro</Tag>
+                  </span>
+                ),
+                children: (
+                  <>
+                    <Form.Item 
+                      name="seoTitle" 
+                      label="SEO 标题"
+                      extra="用于详情页的 title 标签，建议 60 字符以内"
+                    >
+                      <Input placeholder="留空则使用网站名称" maxLength={60} showCount />
+                    </Form.Item>
+                    <Form.Item 
+                      name="seoDescription" 
+                      label="SEO 描述"
+                      extra="用于详情页的 meta description，建议 160 字符以内"
+                    >
+                      <Input.TextArea rows={3} placeholder="留空则使用网站描述" maxLength={160} showCount />
+                    </Form.Item>
+                    <Form.Item 
+                      name="seoKeywords" 
+                      label="SEO 关键词"
+                      extra="多个关键词用逗号分隔"
+                    >
+                      <Input placeholder="如：设计工具,UI设计,灵感" />
+                    </Form.Item>
+                  </>
+                ),
+              },
+            ]}
+          />
         </Form>
       </Modal>
+
+      {/* AI 内容助手弹窗 */}
+      <AIContentModal
+        open={aiModalOpen}
+        onClose={() => setAiModalOpen(false)}
+        onInsert={(content) => setDetailContent(content)}
+        initialContent={detailContent}
+        mode="replace"
+      />
     </div>
   );
 }

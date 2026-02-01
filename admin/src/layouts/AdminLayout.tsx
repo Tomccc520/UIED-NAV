@@ -10,7 +10,7 @@
 
 import { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Layout, Menu, theme, Avatar, Dropdown, Space, message, Button } from 'antd';
+import { Layout, Menu, theme, Avatar, Dropdown, Space, message, Button, Tag, Tooltip } from 'antd';
 import {
   DashboardOutlined,
   AppstoreOutlined,
@@ -23,9 +23,13 @@ import {
   GithubOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  SearchOutlined,
+  ApiOutlined,
+  GlobalOutlined,
 } from '@ant-design/icons';
 import { authApi } from '../services/api';
 import Breadcrumb from '../components/Breadcrumb';
+import GlobalSearch from '../components/GlobalSearch';
 
 const { Header, Sider, Content } = Layout;
 
@@ -38,11 +42,21 @@ const menuItems = [
     children: [
       { key: '/pages', label: '页面管理' },
       { key: '/categories', label: '分类管理' },
+      { key: '/tags', label: '标签管理' },
       { key: '/websites', label: '网站管理' },
+      // @pro-feature-start: articles
+      { key: '/articles', label: <span>文章管理 <Tag color="purple" style={{ marginLeft: 4, fontSize: 10, padding: '0 4px', lineHeight: '16px' }}>Pro</Tag></span> },
+      // @pro-feature-end: articles
       { key: '/hot-recommendations', label: '热门推荐' },
-      { key: '/banners', label: '广告位管理' },
+      { key: '/banners', label: <span>广告位管理 <Tag color="purple" style={{ marginLeft: 4, fontSize: 10, padding: '0 4px', lineHeight: '16px' }}>Pro</Tag></span> },
       { key: '/submissions', label: '提交审核' },
+      // @pro-feature-start: comments
+      { key: '/comments', label: <span>评论管理 <Tag color="purple" style={{ marginLeft: 4, fontSize: 10, padding: '0 4px', lineHeight: '16px' }}>Pro</Tag></span> },
+      // @pro-feature-end: comments
       { key: '/batch-import', label: '批量导入' },
+      // @pro-feature-start: media-library
+      { key: '/media', label: <span>媒体库 <Tag color="purple" style={{ marginLeft: 4, fontSize: 10, padding: '0 4px', lineHeight: '16px' }}>Pro</Tag></span> },
+      // @pro-feature-end: media-library
     ],
   },
   {
@@ -56,19 +70,33 @@ const menuItems = [
     ],
   },
   {
+    key: 'appearance',
+    icon: <GlobalOutlined />,
+    label: '外观设置',
+    children: [
+      { key: '/website-config', label: '网站配置' },
+      { key: '/nav-menus', label: '导航菜单' },
+      { key: '/footer', label: '页脚设置' },
+      { key: '/friend-links', label: '友情链接' },
+      { key: '/social-media-groups', label: '关注交流' },
+    ],
+  },
+  {
     key: 'settings',
     icon: <SettingOutlined />,
     label: '系统设置',
     children: [
       { key: '/system', label: '基本设置' },
-      { key: '/website-config', label: '网站配置' },
       { key: '/seo', label: 'SEO 管理' },
-      { key: '/nav-menus', label: '导航菜单' },
-      { key: '/footer', label: '页脚设置' },
-      { key: '/friend-links', label: '友情链接' },
-      { key: '/social-media-groups', label: '关注交流' },
+    ],
+  },
+  {
+    key: 'api',
+    icon: <ApiOutlined />,
+    label: 'API 设置',
+    children: [
       { key: '/favicon-api', label: 'Favicon API' },
-      { key: '/ai-settings', label: 'AI 助手' },
+      { key: '/ai-settings', label: <span>AI 助手 <Tag color="purple" style={{ marginLeft: 4, fontSize: 10, padding: '0 4px', lineHeight: '16px' }}>Pro</Tag></span> },
       { key: '/wordpress', label: 'WordPress' },
     ],
   },
@@ -86,6 +114,7 @@ const menuItems = [
 export default function AdminLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const [username, setUsername] = useState('管理员');
+  const [searchVisible, setSearchVisible] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { token } = theme.useToken();
@@ -97,6 +126,18 @@ export default function AdminLayout() {
       const user = JSON.parse(userStr);
       setUsername(user.username);
     }
+  }, []);
+
+  // 全局快捷键 Cmd/Ctrl + K
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchVisible(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const handleMenuClick = ({ key }: { key: string }) => {
@@ -141,9 +182,12 @@ export default function AdminLayout() {
   // 获取展开的子菜单
   const getOpenKeys = () => {
     const path = location.pathname;
-    if (['/pages', '/categories', '/websites', '/hot-recommendations', '/banners', '/submissions', '/batch-import'].includes(path)) return ['content'];
-    if (['/system', '/nav-menus', '/footer', '/friend-links', '/social-media-groups', '/favicon-api', '/ai-settings', '/wordpress'].includes(path))
-      return ['settings'];
+    if (['/pages', '/categories', '/tags', '/websites', '/articles', '/hot-recommendations', '/banners', '/submissions', '/comments', '/batch-import', '/media'].includes(path)) return ['content'];
+    if (['/website-config', '/nav-menus', '/footer', '/friend-links', '/social-media-groups'].includes(path)) return ['appearance'];
+    if (['/system', '/seo'].includes(path)) return ['settings'];
+    if (['/favicon-api', '/ai-settings', '/wordpress'].includes(path)) return ['api'];
+    if (['/statistics', '/monitor', '/data-export'].includes(path)) return ['data'];
+    if (['/users', '/logs'].includes(path)) return ['system'];
     return [];
   };
 
@@ -162,53 +206,62 @@ export default function AdminLayout() {
         style={{
           boxShadow: '2px 0 8px rgba(0,0,0,0.06)',
           zIndex: 10,
-          position: 'relative',
-          display: 'flex',
-          flexDirection: 'column',
+          position: 'fixed',
+          left: 0,
+          top: 0,
+          bottom: 0,
           height: '100vh',
           overflow: 'hidden',
         }}
       >
-        {/* Logo 区域 */}
-        <div
-          style={{
-            height: 64,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '0 16px',
-            borderBottom: '1px solid #f0f0f0',
-            flexShrink: 0,
-          }}
-        >
-          {!collapsed && (
-            <img src="/admin/logo.svg" alt="UIED" style={{ height: 32 }} />
-          )}
-          {collapsed && (
-            <img src="/admin/logo.svg" alt="UIED" style={{ height: 28 }} />
-          )}
-        </div>
-
-        <Menu
-          mode="inline"
-          selectedKeys={getSelectedKeys()}
-          defaultOpenKeys={getOpenKeys()}
-          items={menuItems}
-          onClick={handleMenuClick}
-          style={{
-            borderRight: 0,
-            padding: '8px 0',
-            fontSize: 14,
-            flex: 1,
-            overflowY: 'auto',
-            minHeight: 0,
-          }}
-        />
-
-        {/* 底部区域：版权信息（固定） */}
-        <div style={{ flexShrink: 0 }}>
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          height: '100%',
+        }}>
+          {/* Logo 区域 */}
           <div
             style={{
+              height: 64,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '0 16px',
+              borderBottom: '1px solid #f0f0f0',
+              flexShrink: 0,
+            }}
+          >
+            {!collapsed && (
+              <img src="/admin/logo.svg" alt="UIED" style={{ height: 32 }} />
+            )}
+            {collapsed && (
+              <img src="/admin/logo.svg" alt="UIED" style={{ height: 28 }} />
+            )}
+          </div>
+
+          {/* 菜单区域 - 可滚动 */}
+          <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+            <Menu
+              mode="inline"
+              selectedKeys={getSelectedKeys()}
+              defaultOpenKeys={getOpenKeys()}
+              items={menuItems}
+              onClick={handleMenuClick}
+              style={{
+                borderRight: 0,
+                padding: '8px 0',
+                fontSize: 14,
+                flex: 1,
+                overflowY: 'auto',
+                overflowX: 'hidden',
+              }}
+            />
+          </div>
+
+          {/* 底部区域：版权信息（固定在底部） */}
+          <div
+            style={{
+              flexShrink: 0,
               padding: collapsed ? '12px 0' : '12px 20px',
               borderTop: '1px solid #f0f0f0',
               background: '#fff',
@@ -313,7 +366,7 @@ export default function AdminLayout() {
         </div>
       </Sider>
 
-      <Layout>
+      <Layout style={{ marginLeft: collapsed ? 80 : 240, transition: 'margin-left 0.2s' }}>
         <Header
           style={{
             padding: '0 32px',
@@ -355,6 +408,34 @@ export default function AdminLayout() {
           </div>
 
           <Space size={20}>
+            {/* 全局搜索按钮 */}
+            <Tooltip title="搜索 (⌘K)">
+              <Button
+                type="text"
+                icon={<SearchOutlined />}
+                onClick={() => setSearchVisible(true)}
+                style={{
+                  borderRadius: 6,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '4px 12px',
+                  background: token.colorBgTextHover,
+                  color: token.colorTextSecondary,
+                }}
+              >
+                <span style={{ fontSize: 13 }}>搜索</span>
+                <span style={{ 
+                  fontSize: 11, 
+                  padding: '2px 6px', 
+                  background: token.colorBgContainer,
+                  borderRadius: 4,
+                  border: `1px solid ${token.colorBorderSecondary}`,
+                }}>
+                  ⌘K
+                </span>
+              </Button>
+            </Tooltip>
             <Button
               type="default"
               icon={<HomeOutlined />}
@@ -428,6 +509,9 @@ export default function AdminLayout() {
           </div>
         </Content>
       </Layout>
+      
+      {/* 全局搜索弹窗 */}
+      <GlobalSearch visible={searchVisible} onClose={() => setSearchVisible(false)} />
     </Layout>
   );
 }

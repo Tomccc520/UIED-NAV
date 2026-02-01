@@ -179,6 +179,74 @@ router.delete('/friend-links/:id', asyncHandler(async (req, res) => {
 
 // ========== 通用设置 ==========
 
+// 获取固定链接设置
+router.get('/permalink', asyncHandler(async (req, res) => {
+  const setting = await prisma.siteSetting.findUnique({
+    where: { key: 'permalink_config' }
+  });
+  if (!setting) {
+    // 返回默认值
+    res.json({ 
+      success: true,
+      data: {
+        structure: 'plain',
+        customPattern: ''
+      }
+    });
+    return;
+  }
+  const data = JSON.parse(setting.value);
+  // 移除旧的 hotRecommendationClickMode 字段
+  delete data.hotRecommendationClickMode;
+  res.json({ success: true, data });
+}));
+
+// 保存固定链接设置
+router.put('/permalink', asyncHandler(async (req, res) => {
+  const { structure, customPattern } = req.body;
+  const value = JSON.stringify({
+    structure: structure || 'plain',
+    customPattern: customPattern || ''
+  });
+  
+  const setting = await prisma.siteSetting.upsert({
+    where: { key: 'permalink_config' },
+    update: { value },
+    create: { key: 'permalink_config', value }
+  });
+  res.json({ success: true, data: JSON.parse(setting.value) });
+}));
+
+// 获取热门推荐点击行为设置
+router.get('/hot-recommendation-click', asyncHandler(async (req, res) => {
+  const setting = await prisma.siteSetting.findUnique({
+    where: { key: 'hot_recommendation_click' }
+  });
+  if (!setting) {
+    res.json({ 
+      success: true,
+      data: { clickMode: 'direct' }
+    });
+    return;
+  }
+  res.json({ success: true, data: JSON.parse(setting.value) });
+}));
+
+// 保存热门推荐点击行为设置
+router.put('/hot-recommendation-click', asyncHandler(async (req, res) => {
+  const { clickMode } = req.body;
+  const value = JSON.stringify({
+    clickMode: clickMode || 'direct'
+  });
+  
+  const setting = await prisma.siteSetting.upsert({
+    where: { key: 'hot_recommendation_click' },
+    update: { value },
+    create: { key: 'hot_recommendation_click', value }
+  });
+  res.json({ success: true, data: JSON.parse(setting.value) });
+}));
+
 // 获取设置
 router.get('/settings/:key', asyncHandler(async (req, res) => {
   const setting = await prisma.siteSetting.findUnique({

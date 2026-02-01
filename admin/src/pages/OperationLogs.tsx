@@ -154,11 +154,21 @@ export default function OperationLogs() {
   const handleCleanup = async () => {
     try {
       const res = await api.post('/logs/cleanup', { days: 90 });
-      message.success(res.data.message);
-      fetchLogs();
-      fetchStats();
-    } catch (error) {
-      message.error('清理失败');
+      if (res.data.success) {
+        if (res.data.count > 0) {
+          message.success(res.data.message);
+        } else {
+          message.info('没有需要清理的旧日志（90天内的日志会保留）');
+        }
+        fetchLogs();
+        fetchStats();
+      } else {
+        message.error(res.data.message || '清理失败');
+      }
+    } catch (error: any) {
+      console.error('清理日志失败:', error);
+      const errorMsg = error.response?.data?.message || error.message || '清理失败';
+      message.error(errorMsg);
     }
   };
 
