@@ -52,8 +52,8 @@ class WebsiteService extends Service {
       `SELECT w.id, w.name, w.slug, w.description, w.url, w.icon_url as iconUrl,
               w.category_id as categoryId, c.name as categoryName,
               w.is_new as isNew, w.is_featured as isFeatured, w.is_hot as isHot, w.is_pinned as isPinned,
-              w.tags, w.sort as \`order\`, w.click_count as clickCount,
-              w.status, w.create_time as createdAt
+              w.tags, w.sort as sortOrder, w.click_count as clickCount,
+              w.status as isActive, w.create_time as createdAt
        FROM uied_website w
        LEFT JOIN uied_category c ON w.category_id = c.id
        WHERE ${whereClause}
@@ -69,6 +69,7 @@ class WebsiteService extends Service {
       isFeatured: w.isFeatured === 1,
       isHot: w.isHot === 1,
       isPinned: w.isPinned === 1,
+      isActive: w.isActive !== 'disabled',
       tags: w.tags ? JSON.parse(w.tags) : [],
     }));
     
