@@ -27,11 +27,16 @@ class PageService extends Service {
     );
     const total = countResult.total;
     
-    // 获取列表
+    // 获取列表（包含所有 Hero 配置字段）
     const pages = await app.model.query(
-      `SELECT id, name, slug, title, description, icon, hero_title as heroTitle,
-              hero_subtitle as heroSubtitle, hero_bg_image as heroBgImage,
-              seo_title as seoTitle, seo_description as seoDescription, seo_keywords as seoKeywords,
+      `SELECT id, name, slug, type, description, icon,
+              hero_title as heroTitle, hero_highlight_text as heroHighlightText,
+              hero_subtitle as heroSubtitle, hot_search_tags as hotSearchTags,
+              hero_bg_type as heroBgType, hero_bg_value as heroBgValue,
+              hero_display_mode as heroDisplayMode, hero_scroll_websites as heroScrollWebsites,
+              search_placeholder as searchPlaceholder, search_enabled as searchEnabled,
+              show_hot_recommendations as showHotRecommendations, show_categories as showCategories,
+              show_sidebar as showSidebar, theme_color as themeColor,
               sort as sortOrder, is_show as isActive, create_time as createdAt
        FROM uied_page
        WHERE is_delete = 0
@@ -43,6 +48,12 @@ class PageService extends Service {
     const lists = pages.map(p => ({
       ...p,
       isActive: p.isActive === 1,
+      searchEnabled: p.searchEnabled === 1,
+      showHotRecommendations: p.showHotRecommendations === 1,
+      showCategories: p.showCategories === 1,
+      showSidebar: p.showSidebar === 1,
+      hotSearchTags: p.hotSearchTags ? this.safeJsonParse(p.hotSearchTags, []) : [],
+      heroScrollWebsites: p.heroScrollWebsites ? this.safeJsonParse(p.heroScrollWebsites, []) : [],
     }));
     
     return { lists, count: total, page, pageSize };
@@ -54,7 +65,7 @@ class PageService extends Service {
   async all() {
     const { app } = this;
     const pages = await app.model.query(
-      `SELECT id, name, slug, title, icon, sort as sortOrder
+      `SELECT id, name, slug, type, icon, sort as sortOrder
        FROM uied_page
        WHERE is_delete = 0 AND is_show = 1
        ORDER BY sort ASC, id ASC`,
@@ -91,16 +102,23 @@ class PageService extends Service {
       id: page.id,
       name: page.name,
       slug: page.slug,
-      title: page.title,
+      type: page.type,
       description: page.description,
       icon: page.icon,
       heroTitle: page.hero_title,
+      heroHighlightText: page.hero_highlight_text,
       heroSubtitle: page.hero_subtitle,
-      heroBgImage: page.hero_bg_image,
-      heroConfig: page.hero_config ? JSON.parse(page.hero_config) : null,
-      seoTitle: page.seo_title,
-      seoDescription: page.seo_description,
-      seoKeywords: page.seo_keywords,
+      hotSearchTags: page.hot_search_tags ? this.safeJsonParse(page.hot_search_tags, []) : [],
+      heroBgType: page.hero_bg_type,
+      heroBgValue: page.hero_bg_value,
+      heroDisplayMode: page.hero_display_mode,
+      heroScrollWebsites: page.hero_scroll_websites ? this.safeJsonParse(page.hero_scroll_websites, []) : [],
+      searchPlaceholder: page.search_placeholder,
+      searchEnabled: page.search_enabled === 1,
+      showHotRecommendations: page.show_hot_recommendations === 1,
+      showCategories: page.show_categories === 1,
+      showSidebar: page.show_sidebar === 1,
+      themeColor: page.theme_color,
       sortOrder: page.sort,
       isActive: page.is_show === 1,
       createdAt: page.create_time,
@@ -124,16 +142,21 @@ class PageService extends Service {
     }
     
     const [result] = await app.model.query(
-      `INSERT INTO uied_page (name, slug, title, description, icon, hero_title, hero_subtitle,
-        hero_bg_image, hero_config, seo_title, seo_description, seo_keywords, sort, is_show,
-        create_time, update_time)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO uied_page (name, slug, type, description, icon, hero_title, hero_highlight_text,
+        hero_subtitle, hot_search_tags, hero_bg_type, hero_bg_value, hero_display_mode,
+        hero_scroll_websites, search_placeholder, search_enabled, show_hot_recommendations,
+        show_categories, show_sidebar, theme_color, sort, is_show, create_time, update_time)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       {
         replacements: [
-          data.name, data.slug, data.title || data.name, data.description || '',
-          data.icon || '', data.heroTitle || '', data.heroSubtitle || '',
-          data.heroBgImage || '', data.heroConfig ? JSON.stringify(data.heroConfig) : null,
-          data.seoTitle || '', data.seoDescription || '', data.seoKeywords || '',
+          data.name, data.slug, data.type || '', data.description || '',
+          data.icon || '', data.heroTitle || '', data.heroHighlightText || '',
+          data.heroSubtitle || '', data.hotSearchTags ? JSON.stringify(data.hotSearchTags) : null,
+          data.heroBgType || 'default', data.heroBgValue || '',
+          data.heroDisplayMode || 'search', data.heroScrollWebsites ? JSON.stringify(data.heroScrollWebsites) : null,
+          data.searchPlaceholder || '', data.searchEnabled !== false ? 1 : 0,
+          data.showHotRecommendations !== false ? 1 : 0, data.showCategories !== false ? 1 : 0,
+          data.showSidebar !== false ? 1 : 0, data.themeColor || null,
           data.sortOrder || 0, data.isActive !== false ? 1 : 0, now, now,
         ],
         type: app.Sequelize.QueryTypes.INSERT,
@@ -155,16 +178,23 @@ class PageService extends Service {
     
     if (data.name !== undefined) { updates.push('name = ?'); values.push(data.name); }
     if (data.slug !== undefined) { updates.push('slug = ?'); values.push(data.slug); }
-    if (data.title !== undefined) { updates.push('title = ?'); values.push(data.title); }
+    if (data.type !== undefined) { updates.push('type = ?'); values.push(data.type); }
     if (data.description !== undefined) { updates.push('description = ?'); values.push(data.description); }
     if (data.icon !== undefined) { updates.push('icon = ?'); values.push(data.icon); }
     if (data.heroTitle !== undefined) { updates.push('hero_title = ?'); values.push(data.heroTitle); }
+    if (data.heroHighlightText !== undefined) { updates.push('hero_highlight_text = ?'); values.push(data.heroHighlightText); }
     if (data.heroSubtitle !== undefined) { updates.push('hero_subtitle = ?'); values.push(data.heroSubtitle); }
-    if (data.heroBgImage !== undefined) { updates.push('hero_bg_image = ?'); values.push(data.heroBgImage); }
-    if (data.heroConfig !== undefined) { updates.push('hero_config = ?'); values.push(JSON.stringify(data.heroConfig)); }
-    if (data.seoTitle !== undefined) { updates.push('seo_title = ?'); values.push(data.seoTitle); }
-    if (data.seoDescription !== undefined) { updates.push('seo_description = ?'); values.push(data.seoDescription); }
-    if (data.seoKeywords !== undefined) { updates.push('seo_keywords = ?'); values.push(data.seoKeywords); }
+    if (data.hotSearchTags !== undefined) { updates.push('hot_search_tags = ?'); values.push(JSON.stringify(data.hotSearchTags)); }
+    if (data.heroBgType !== undefined) { updates.push('hero_bg_type = ?'); values.push(data.heroBgType); }
+    if (data.heroBgValue !== undefined) { updates.push('hero_bg_value = ?'); values.push(data.heroBgValue); }
+    if (data.heroDisplayMode !== undefined) { updates.push('hero_display_mode = ?'); values.push(data.heroDisplayMode); }
+    if (data.heroScrollWebsites !== undefined) { updates.push('hero_scroll_websites = ?'); values.push(JSON.stringify(data.heroScrollWebsites)); }
+    if (data.searchPlaceholder !== undefined) { updates.push('search_placeholder = ?'); values.push(data.searchPlaceholder); }
+    if (data.searchEnabled !== undefined) { updates.push('search_enabled = ?'); values.push(data.searchEnabled ? 1 : 0); }
+    if (data.showHotRecommendations !== undefined) { updates.push('show_hot_recommendations = ?'); values.push(data.showHotRecommendations ? 1 : 0); }
+    if (data.showCategories !== undefined) { updates.push('show_categories = ?'); values.push(data.showCategories ? 1 : 0); }
+    if (data.showSidebar !== undefined) { updates.push('show_sidebar = ?'); values.push(data.showSidebar ? 1 : 0); }
+    if (data.themeColor !== undefined) { updates.push('theme_color = ?'); values.push(data.themeColor); }
     if (data.sortOrder !== undefined) { updates.push('sort = ?'); values.push(data.sortOrder); }
     if (data.isActive !== undefined) { updates.push('is_show = ?'); values.push(data.isActive ? 1 : 0); }
     
@@ -191,6 +221,22 @@ class PageService extends Service {
       'UPDATE uied_page SET is_delete = 1, delete_time = ? WHERE id = ?',
       { replacements: [now, id], type: app.Sequelize.QueryTypes.UPDATE }
     );
+  }
+
+  /**
+   * 安全解析 JSON（兼容逗号分隔字符串）
+   */
+  safeJsonParse(str, defaultValue = []) {
+    if (!str) return defaultValue;
+    try {
+      return JSON.parse(str);
+    } catch {
+      // 如果不是 JSON，按逗号分隔处理
+      if (typeof str === 'string') {
+        return str.split(',').map(s => s.trim()).filter(Boolean);
+      }
+      return defaultValue;
+    }
   }
 
   /**

@@ -10,32 +10,62 @@
 <template>
     <div class="nav-menu-lists">
         <el-card class="!border-none" shadow="never">
-            <div class="mb-4 flex justify-between">
-                <el-button type="primary" @click="handleAdd(0)">
-                    <template #icon><icon name="el-icon-Plus" /></template>
-                    添加菜单
+            <div class="mb-4 flex justify-between items-center">
+                <div class="flex gap-4 items-center">
+                    <el-button type="primary" @click="handleAdd(0)">
+                        <template #icon><icon name="el-icon-Plus" /></template>
+                        添加菜单
+                    </el-button>
+                    <div class="text-gray-500 text-sm">
+                        共 <span class="text-primary font-medium">{{ totalMenus }}</span> 个菜单，
+                        <span class="text-primary font-medium">{{ topLevelMenus }}</span> 个顶级分类
+                    </div>
+                </div>
+                <el-button @click="toggleExpand">
+                    {{ isExpanded ? '全部收起' : '全部展开' }}
                 </el-button>
             </div>
-            <el-table size="large" v-loading="loading" :data="menuTree" row-key="id" default-expand-all>
-                <el-table-column label="菜单名称" prop="name" min-width="200" />
+            <el-table 
+                ref="tableRef"
+                size="large" 
+                v-loading="loading" 
+                :data="menuTree" 
+                row-key="id" 
+                :default-expand-all="isExpanded"
+                :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+                border
+            >
+                <el-table-column label="菜单名称" prop="name" min-width="200">
+                    <template #default="{ row }">
+                        <div class="flex items-center gap-2">
+                            <el-icon v-if="row.icon" class="text-gray-500"><component :is="row.icon" /></el-icon>
+                            <span :class="{ 'font-medium': !row.parentId }">{{ row.name }}</span>
+                            <el-tag v-if="row.label" :type="row.labelType === 'shop' ? 'success' : 'info'" size="small">
+                                {{ row.label }}
+                            </el-tag>
+                            <el-tag v-if="row.children?.length" type="info" size="small" class="ml-1">
+                                {{ row.children.length }}个子菜单
+                            </el-tag>
+                        </div>
+                    </template>
+                </el-table-column>
                 <el-table-column label="链接" prop="url" min-width="200" show-overflow-tooltip />
-                <el-table-column label="图标" prop="icon" width="100" />
-                <el-table-column label="排序" prop="sortOrder" width="80" />
-                <el-table-column label="新窗口" width="80">
+                <el-table-column label="排序" prop="sortOrder" width="80" align="center" />
+                <el-table-column label="新窗口" width="80" align="center">
                     <template #default="{ row }">
                         <el-tag :type="row.openInNewTab ? 'success' : 'info'" size="small">
                             {{ row.openInNewTab ? '是' : '否' }}
                         </el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column label="状态" width="80">
+                <el-table-column label="状态" width="80" align="center">
                     <template #default="{ row }">
                         <el-tag :type="row.isActive ? 'success' : 'info'" size="small">
                             {{ row.isActive ? '显示' : '隐藏' }}
                         </el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="180" fixed="right">
+                <el-table-column label="操作" width="200" fixed="right" align="center">
                     <template #default="{ row }">
                         <el-button type="primary" link @click="handleAdd(row.id)">添加子菜单</el-button>
                         <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
@@ -64,6 +94,17 @@
                 <el-form-item label="排序">
                     <el-input-number v-model="editData.sortOrder" :min="0" />
                 </el-form-item>
+                <el-form-item label="标签">
+                    <el-input v-model="editData.label" placeholder="如: New, 热门" />
+                </el-form-item>
+                <el-form-item label="标签类型">
+                    <el-select v-model="editData.labelType" placeholder="选择标签样式" clearable style="width: 100%">
+                        <el-option label="信息(蓝色)" value="info" />
+                        <el-option label="成功(绿色)" value="shop" />
+                        <el-option label="警告(橙色)" value="warning" />
+                        <el-option label="危险(红色)" value="danger" />
+                    </el-select>
+                </el-form-item>
                 <el-form-item label="新窗口">
                     <el-switch v-model="editData.openInNewTab" />
                 </el-form-item>
@@ -82,23 +123,36 @@
 <script lang="ts" setup name="uiedNavMenu">
 import { uiedNavMenuAll, uiedNavMenuAdd, uiedNavMenuEdit, uiedNavMenuDelete } from '@/api/uied'
 import feedback from '@/utils/feedback'
-import type { FormInstance, FormRules } from 'element-plus'
+import type { FormInstance, FormRules, TableInstance } from 'element-plus'
 
 const loading = ref(false)
 const menuTree = ref<any[]>([])
 const menuTreeOptions = ref<any[]>([])
+const isExpanded = ref(true)
+const tableRef = ref<TableInstance>()
+
+// 计算菜单统计
+const totalMenus = computed(() => {
+    const countMenus = (items: any[]): number => {
+        return items.reduce((sum, item) => sum + 1 + countMenus(item.children || []), 0)
+    }
+    return countMenus(menuTree.value)
+})
+
+const topLevelMenus = computed(() => menuTree.value.length)
 
 const showEdit = ref(false)
 const editLoading = ref(false)
 const editFormRef = ref<FormInstance>()
-const editData = reactive({ id: 0, parentId: 0, name: '', url: '', icon: '', sortOrder: 0, openInNewTab: false, isActive: true })
+const editData = reactive({ id: 0, parentId: 0, name: '', url: '', icon: '', sortOrder: 0, label: '', labelType: '', openInNewTab: false, isActive: true })
 const editRules: FormRules = { name: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }] }
 
 const getLists = async () => {
     loading.value = true
     try {
         const res = await uiedNavMenuAll()
-        menuTree.value = res?.data || []
+        // request interceptor 已解包 data，res 直接就是数组
+        menuTree.value = Array.isArray(res) ? res : (res || [])
         menuTreeOptions.value = [{ value: 0, label: '顶级菜单' }, ...buildTreeOptions(menuTree.value)]
     } finally {
         loading.value = false
@@ -113,7 +167,7 @@ const buildTreeOptions = (items: any[]): any[] => {
     }))
 }
 
-const resetEditData = () => Object.assign(editData, { id: 0, parentId: 0, name: '', url: '', icon: '', sortOrder: 0, openInNewTab: false, isActive: true })
+const resetEditData = () => Object.assign(editData, { id: 0, parentId: 0, name: '', url: '', icon: '', sortOrder: 0, label: '', labelType: '', openInNewTab: false, isActive: true })
 
 const handleAdd = (parentId: number) => { resetEditData(); editData.parentId = parentId; showEdit.value = true }
 const handleEdit = (row: any) => { Object.assign(editData, row); showEdit.value = true }
@@ -133,6 +187,13 @@ const handleDelete = async (id: number) => {
     await feedback.confirm('确定要删除该菜单吗？子菜单也会被删除')
     await uiedNavMenuDelete({ id })
     feedback.msgSuccess('删除成功')
+    getLists()
+}
+
+// 切换展开/收起
+const toggleExpand = () => {
+    isExpanded.value = !isExpanded.value
+    // 重新加载数据以应用展开状态
     getLists()
 }
 

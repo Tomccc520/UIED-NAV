@@ -16,16 +16,16 @@ class BannerService extends Service {
   async list(params = {}) {
     const { app } = this;
     const page = parseInt(params.pageNo) || 1;
-    const pageSize = parseInt(params.pageSize) || 20;
+    const pageSize = parseInt(params.pageSize) || 15;
     const offset = (page - 1) * pageSize;
 
     const [countResult] = await app.model.query(
-      'SELECT COUNT(*) as total FROM uied_banner',
+      'SELECT COUNT(*) as total FROM uied_banner WHERE is_delete = 0',
       { type: app.Sequelize.QueryTypes.SELECT }
     );
 
     const lists = await app.model.query(
-      `SELECT * FROM uied_banner ORDER BY sort_order ASC, id ASC LIMIT ? OFFSET ?`,
+      `SELECT * FROM uied_banner WHERE is_delete = 0 ORDER BY sort ASC, id ASC LIMIT ? OFFSET ?`,
       { replacements: [pageSize, offset], type: app.Sequelize.QueryTypes.SELECT }
     );
 
@@ -40,7 +40,7 @@ class BannerService extends Service {
   async detail(id) {
     const { app } = this;
     const [item] = await app.model.query(
-      'SELECT * FROM uied_banner WHERE id = ?',
+      'SELECT * FROM uied_banner WHERE id = ? AND is_delete = 0',
       { replacements: [id], type: app.Sequelize.QueryTypes.SELECT }
     );
     return item ? this.formatItem(item) : null;
@@ -51,12 +51,15 @@ class BannerService extends Service {
     const now = Math.floor(Date.now() / 1000);
 
     const [result] = await app.model.query(
-      `INSERT INTO uied_banner (title, image, url, position, sort_order, is_active, start_time, end_time, create_time, update_time)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO uied_banner (title, description, image_url, link_url, link_target, content_type, 
+       html_content, page_slug, position, sort, is_show, start_time, end_time, create_time, update_time)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       {
         replacements: [
-          data.title || '', data.image || '', data.url || '', data.position || 'home',
-          data.sortOrder || 0, data.isActive !== false ? 1 : 0,
+          data.title || '', data.description || '', data.imageUrl || data.image || '', 
+          data.linkUrl || data.url || '', data.linkTarget || '_blank', data.contentType || 'image',
+          data.htmlContent || '', data.pageSlug || null, data.position || 'top',
+          data.sort || data.sortOrder || 0, data.isShow !== false ? 1 : 0,
           data.startTime || null, data.endTime || null, now, now,
         ],
         type: app.Sequelize.QueryTypes.INSERT,
@@ -71,12 +74,15 @@ class BannerService extends Service {
     const now = Math.floor(Date.now() / 1000);
 
     await app.model.query(
-      `UPDATE uied_banner SET title = ?, image = ?, url = ?, position = ?,
-       sort_order = ?, is_active = ?, start_time = ?, end_time = ?, update_time = ? WHERE id = ?`,
+      `UPDATE uied_banner SET title = ?, description = ?, image_url = ?, link_url = ?, link_target = ?,
+       content_type = ?, html_content = ?, page_slug = ?, position = ?, sort = ?, is_show = ?, 
+       start_time = ?, end_time = ?, update_time = ? WHERE id = ?`,
       {
         replacements: [
-          data.title || '', data.image || '', data.url || '', data.position || 'home',
-          data.sortOrder || 0, data.isActive !== false ? 1 : 0,
+          data.title || '', data.description || '', data.imageUrl || data.image || '', 
+          data.linkUrl || data.url || '', data.linkTarget || '_blank', data.contentType || 'image',
+          data.htmlContent || '', data.pageSlug || null, data.position || 'top',
+          data.sort || data.sortOrder || 0, data.isShow !== false ? 1 : 0,
           data.startTime || null, data.endTime || null, now, data.id,
         ],
         type: app.Sequelize.QueryTypes.UPDATE,
@@ -86,9 +92,11 @@ class BannerService extends Service {
 
   async del(id) {
     const { app } = this;
-    await app.model.query('DELETE FROM uied_banner WHERE id = ?', {
-      replacements: [id],
-      type: app.Sequelize.QueryTypes.DELETE,
+    const now = Math.floor(Date.now() / 1000);
+    // 软删除
+    await app.model.query('UPDATE uied_banner SET is_delete = 1, delete_time = ? WHERE id = ?', {
+      replacements: [now, id],
+      type: app.Sequelize.QueryTypes.UPDATE,
     });
   }
 
@@ -96,13 +104,23 @@ class BannerService extends Service {
     return {
       id: item.id,
       title: item.title,
-      image: item.image,
-      url: item.url,
+      description: item.description,
+      imageUrl: item.image_url,
+      image: item.image_url, // 兼容
+      linkUrl: item.link_url,
+      url: item.link_url, // 兼容
+      linkTarget: item.link_target,
+      contentType: item.content_type,
+      htmlContent: item.html_content,
+      pageSlug: item.page_slug,
       position: item.position,
-      sortOrder: item.sort_order,
-      isActive: item.is_active === 1,
+      sort: item.sort,
+      sortOrder: item.sort, // 兼容
+      isShow: item.is_show === 1,
+      isActive: item.is_show === 1, // 兼容
       startTime: item.start_time,
       endTime: item.end_time,
+      clickCount: item.click_count,
       createTime: item.create_time,
       updateTime: item.update_time,
     };

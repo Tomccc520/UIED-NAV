@@ -58,6 +58,12 @@ module.exports = app => {
       defaultValue: '',
       comment: '分类',
     },
+    category_id: {
+      type: INTEGER.UNSIGNED,
+      allowNull: true,
+      defaultValue: null,
+      comment: '分类ID，关联 uied_article_category',
+    },
     slug: {
       type: STRING(200),
       allowNull: false,

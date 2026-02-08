@@ -17,9 +17,11 @@ module.exports = options => {
     console.log(options);
     console.log(notLoginUri, '这里是中间件。');
     const url = ctx.request.url;
-    const auths = replaceAll(url.replace('/api/', ''), '/', ':');
+    // 去掉查询参数后再转换
+    const urlPath = url.split('?')[0];
+    const auths = replaceAll(urlPath.replace('/api/', ''), '/', ':');
     // 免登录接口
-    if (notLoginUri.includes(auths)) {
+    if (notLoginUri.includes(auths) || isNotLoginUri(auths, notLoginUri)) {
       await next();
       return;
     }
@@ -121,6 +123,34 @@ module.exports = options => {
 
   function replaceAll(str, find, replace) {
     return str.replace(new RegExp(find, 'g'), replace);
+  }
+
+  /**
+   * 检查是否匹配免登录路由（支持通配符和前缀匹配）
+   * @param {string} auths - 当前请求的路由标识
+   * @param {string[]} notLoginUriList - 免登录路由列表
+   * @returns {boolean}
+   */
+  function isNotLoginUri(auths, notLoginUriList) {
+    for (const uri of notLoginUriList) {
+      // 支持通配符 * 匹配
+      if (uri.includes('*')) {
+        const pattern = uri.replace(/\*/g, '.*');
+        const regex = new RegExp(`^${pattern}$`);
+        if (regex.test(auths)) {
+          return true;
+        }
+      }
+      // 支持前缀匹配（以 : 结尾表示前缀）
+      if (uri.endsWith(':') && auths.startsWith(uri.slice(0, -1))) {
+        return true;
+      }
+      // 支持 pages:* 这种格式匹配 pages:xxx:xxx
+      if (uri.endsWith(':*') && auths.startsWith(uri.slice(0, -1))) {
+        return true;
+      }
+    }
+    return false;
   }
 
   return tokenAuth;

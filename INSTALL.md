@@ -6,13 +6,14 @@
 
 ## 📋 环境要求
 
-- **Node.js**: >= 18.0.0
-- **npm**: >= 9.0.0
+- **Node.js**: >= 16.0.0
+- **npm**: >= 8.0.0
+- **Docker**: 用于运行 MySQL 数据库
 - **操作系统**: Linux / macOS / Windows
 
 ---
 
-## 🚀 快速安装（5 分钟）
+## 🚀 快速安装
 
 ### 1. 克隆项目
 
@@ -26,54 +27,38 @@ git clone https://gitee.com/tomdac/uied-nav.git
 cd uied-nav
 ```
 
-### 2. 安装依赖
+### 2. 启动 MySQL 数据库
+
+```bash
+# 使用 Docker 启动 MySQL
+docker-compose -f docker/docker-compose.mysql.yml up -d
+
+# 验证 MySQL 是否启动成功
+docker ps | grep uied_mysql
+```
+
+### 3. 安装依赖
 
 ```bash
 # 安装后端依赖
-cd backend
-npm install
-
-# 安装前端依赖
-cd ../frontend
+cd server/server
 npm install
 
 # 安装管理后台依赖
 cd ../admin
 npm install
+
+# 安装前端依赖
+cd ../../frontend
+npm install
 ```
 
-### 3. 配置环境变量
-
-#### 后端配置
-
-```bash
-cd backend
-cp .env.example .env
-```
-
-编辑 `backend/.env` 文件：
-
-```env
-# 数据库配置（默认使用 SQLite）
-DATABASE_URL="file:./prisma/dev.db"
-
-# JWT 密钥（请修改为随机字符串）
-JWT_SECRET="your-secret-key-change-this-in-production"
-
-# 服务器端口
-PORT=3001
-
-# CORS 允许的源
-CORS_ORIGIN="http://localhost:3000,http://localhost:5173"
-
-# Node 环境
-NODE_ENV="development"
-```
+### 4. 配置环境变量
 
 #### 前端配置
 
 ```bash
-cd ../frontend
+cd frontend
 cp .env.example .env
 ```
 
@@ -81,62 +66,42 @@ cp .env.example .env
 
 ```env
 # API 地址
-REACT_APP_API_URL=http://localhost:3001/api
+REACT_APP_API_URL=http://localhost:8002/api
+PORT=3003
 ```
 
-#### 管理后台配置
+### 5. 初始化数据库
 
 ```bash
-cd ../admin
-cp .env.example .env
-```
+# 导入 likeadmin 基础表
+docker exec -i uied_mysql mysql -u uied -puied123456 uied_nav < server/sql/install.sql
 
-编辑 `admin/.env` 文件：
-
-```env
-# API 地址
-VITE_API_URL=http://localhost:3001/api
-```
-
-### 4. 初始化数据库
-
-```bash
-cd backend
-
-# 生成 Prisma Client
-npx prisma generate
-
-# 运行数据库迁移（创建表结构）
-npx prisma migrate deploy
-
-# 填充初始数据
-node src/utils/seedAdmin.js        # 创建管理员账号
-node src/utils/seedSettings.js     # 创建系统设置
-node src/utils/seedFaviconApis.js  # 创建 Favicon API 配置
+# 导入 UIED 业务表
+docker exec -i uied_mysql mysql -u uied -puied123456 uied_nav < server/sql/uied_tables.sql
 ```
 
 **默认管理员账号**：
-- 用户名: `UIED`
-- 密码: `UIED123456`
+- 用户名: `admin`
+- 密码: `123456`
 
 ⚠️ **重要**：首次登录后请立即修改密码！
 
-### 5. 启动服务
+### 6. 启动服务
 
 #### 方式一：分别启动（推荐开发环境）
 
 ```bash
-# 终端 1：启动后端
-cd backend
+# 终端 1：启动后端 (Egg.js)
+cd server/server
 npm run dev
 
-# 终端 2：启动前端
+# 终端 2：启动管理后台 (Vue 3)
+cd server/admin
+npm run dev
+
+# 终端 3：启动前端 (React)
 cd frontend
 npm start
-
-# 终端 3：启动管理后台
-cd admin
-npm run dev
 ```
 
 #### 方式二：使用启动脚本
@@ -147,119 +112,38 @@ chmod +x start.sh
 ./start.sh
 ```
 
-### 6. 访问系统
+### 7. 访问系统
 
 | 服务 | 地址 | 说明 |
 |------|------|------|
-| 前端 | http://localhost:3000 | 用户访问的网站 |
-| 管理后台 | http://localhost:5173 | 内容管理系统 |
-| 后端 API | http://localhost:3001/api | RESTful API |
+| 前端 | http://localhost:3003 | 用户访问的网站 |
+| 管理后台 | http://localhost:5174 | 内容管理系统 |
+| 后端 API | http://localhost:8002/api | RESTful API |
 
 ---
 
 ## 🗄️ 数据库说明
 
-### SQLite（默认）
+### MySQL（默认）
 
-项目默认使用 SQLite 数据库，无需额外安装数据库服务。
+项目使用 MySQL 8.0 数据库，通过 Docker 容器运行。
 
-**数据库文件位置**：`backend/prisma/dev.db`
+**数据库配置**：
+- 主机: `127.0.0.1`
+- 端口: `3308`
+- 数据库名: `uied_nav`
+- 用户名: `uied`
+- 密码: `uied123456`
 
-**优点**：
-- ✅ 零配置，开箱即用
-- ✅ 轻量级，适合中小型项目
-- ✅ 单文件，易于备份
-
-**缺点**：
-- ❌ 不支持高并发
-- ❌ 不适合大型项目
-
-### 切换到 MySQL/PostgreSQL（可选）
-
-如果需要更强大的数据库，可以切换到 MySQL 或 PostgreSQL。
-
-#### 1. 修改 `backend/prisma/schema.prisma`
-
-```prisma
-datasource db {
-  provider = "mysql"  // 或 "postgresql"
-  url      = env("DATABASE_URL")
-}
-```
-
-#### 2. 修改 `backend/.env`
-
-```env
-# MySQL
-DATABASE_URL="mysql://username:password@localhost:3306/uied_nav"
-
-# PostgreSQL
-DATABASE_URL="postgresql://username:password@localhost:5432/uied_nav"
-```
-
-#### 3. 重新生成和迁移
-
+**备份数据库**：
 ```bash
-cd backend
-npx prisma generate
-npx prisma migrate deploy
+docker exec uied_mysql mysqldump -u uied -puied123456 uied_nav > data/mysql_backup_$(date +%Y%m%d_%H%M%S).sql
 ```
 
----
-
-## 📦 数据初始化详解
-
-### 必需的初始化脚本
-
-#### 1. 创建管理员账号
-
+**恢复数据库**：
 ```bash
-node src/utils/seedAdmin.js
+docker exec -i uied_mysql mysql -u uied -puied123456 uied_nav < data/mysql_backup_YYYYMMDD_HHMMSS.sql
 ```
-
-创建默认管理员账号（UIED / UIED123456）
-
-#### 2. 创建系统设置
-
-```bash
-node src/utils/seedSettings.js
-```
-
-创建系统基础配置（站点名称、描述等）
-
-#### 3. 创建 Favicon API 配置
-
-```bash
-node src/utils/seedFaviconApis.js
-```
-
-配置 Favicon 获取服务
-
-### 可选的初始化脚本
-
-#### 4. 创建示例页面
-
-```bash
-node src/utils/seedPages.js
-```
-
-创建示例页面（首页、关于等）
-
-#### 5. 创建热门推荐
-
-```bash
-node src/utils/seedHotRecommendations.js
-```
-
-创建热门推荐配置
-
-#### 6. 创建社交媒体配置
-
-```bash
-node src/utils/seedSocialMedia.js
-```
-
-创建社交媒体链接配置
 
 ---
 
@@ -267,37 +151,25 @@ node src/utils/seedSocialMedia.js
 
 ### 1. 端口被占用
 
-如果端口 3000、3001 或 5173 被占用，可以修改：
+如果端口被占用，可以修改：
 
-**后端端口**：修改 `backend/.env` 中的 `PORT`
+**后端端口**：修改 `server/server/config/config.local.js` 中的端口配置
 
-**前端端口**：修改 `frontend/package.json` 中的 start 脚本：
-```json
-"start": "PORT=3002 react-scripts start"
-```
+**前端端口**：修改 `frontend/.env` 中的 `PORT`
 
-**管理后台端口**：修改 `admin/vite.config.ts`：
-```typescript
-export default defineConfig({
-  server: {
-    port: 5174
-  }
-})
-```
+**管理后台端口**：修改 `server/admin/vite.config.ts`
 
-### 2. 数据库迁移失败
+### 2. MySQL 连接失败
 
 ```bash
-cd backend
+# 检查 MySQL 容器状态
+docker ps | grep uied_mysql
 
-# 重置数据库
-rm prisma/dev.db
-npx prisma migrate deploy
+# 查看 MySQL 日志
+docker logs uied_mysql
 
-# 重新填充数据
-node src/utils/seedAdmin.js
-node src/utils/seedSettings.js
-node src/utils/seedFaviconApis.js
+# 重启 MySQL 容器
+docker-compose -f docker/docker-compose.mysql.yml restart
 ```
 
 ### 3. 依赖安装失败
@@ -316,9 +188,9 @@ npm install
 ### 4. 前端无法连接后端
 
 检查：
-1. 后端是否正常启动（http://localhost:3001/api）
+1. 后端是否正常启动（http://localhost:8002/api）
 2. 前端 `.env` 中的 `REACT_APP_API_URL` 是否正确
-3. 后端 `.env` 中的 `CORS_ORIGIN` 是否包含前端地址
+3. MySQL 数据库是否正常运行
 
 ---
 
@@ -335,33 +207,31 @@ npm run build
 ### 2. 构建管理后台
 
 ```bash
-cd admin
+cd server/admin
 npm run build
 # 构建产物在 dist/ 目录
 ```
 
-### 3. 配置生产环境变量
+### 3. 配置生产环境
 
-```bash
-cd backend
-cp .env.production.example .env.production
-```
+编辑 `server/server/config/config.prod.js`：
 
-编辑 `.env.production`：
-
-```env
-DATABASE_URL="file:./prisma/prod.db"
-JWT_SECRET="your-production-secret-key"
-PORT=3001
-NODE_ENV="production"
-CORS_ORIGIN="https://yourdomain.com"
+```javascript
+config.sequelize = {
+  dialect: 'mysql',
+  host: 'your-mysql-host',
+  port: 3306,
+  database: 'uied_nav',
+  username: 'your-username',
+  password: 'your-password',
+};
 ```
 
 ### 4. 启动生产环境
 
 ```bash
-cd backend
-NODE_ENV=production npm start
+cd server/server
+npm start
 ```
 
 ### 5. 使用 Nginx 反向代理
@@ -379,13 +249,13 @@ server {
 
     # 管理后台
     location /admin {
-        root /path/to/admin/dist;
+        root /path/to/server/admin/dist;
         try_files $uri /index.html;
     }
 
     # 后端 API
     location /api {
-        proxy_pass http://localhost:3001;
+        proxy_pass http://localhost:8002;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
     }
@@ -396,8 +266,9 @@ server {
 
 ## 📚 更多文档
 
-- [开发指南](https://github.com/Tomccc520/UIED-NAV)
-- [API 文档](https://github.com/Tomccc520/UIED-NAV)
+- [开发指南](docs/开发指南.md)
+- [Docker部署教程](docs/Docker部署教程.md)
+- [宝塔部署教程](docs/宝塔部署教程.md)
 - [常见问题](https://github.com/Tomccc520/UIED-NAV/issues)
 
 ---

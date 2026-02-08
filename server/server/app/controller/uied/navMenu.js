@@ -10,17 +10,22 @@
 
 'use strict';
 
-const Controller = require('egg').Controller;
+const baseController = require('../baseController');
 
-class NavMenuController extends Controller {
+class NavMenuController extends baseController {
   /**
    * 导航菜单列表
    */
   async list() {
     const { ctx } = this;
-    const params = { ...ctx.query, ...ctx.request.body };
-    const result = await ctx.service.uied.navMenu.list(params);
-    ctx.body = { code: 200, msg: 'success', ...result };
+    try {
+      const params = { ...ctx.query, ...ctx.request.body };
+      const result = await ctx.service.uied.navMenu.list(params);
+      this.result({ data: result });
+    } catch (error) {
+      ctx.logger.error('获取导航菜单列表失败:', error);
+      this.result({ code: 500, message: '获取导航菜单列表失败' });
+    }
   }
 
   /**
@@ -28,8 +33,13 @@ class NavMenuController extends Controller {
    */
   async all() {
     const { ctx } = this;
-    const result = await ctx.service.uied.navMenu.all();
-    ctx.body = { code: 200, msg: 'success', data: result };
+    try {
+      const result = await ctx.service.uied.navMenu.all();
+      this.result({ data: result });
+    } catch (error) {
+      ctx.logger.error('获取全部导航菜单失败:', error);
+      this.result({ code: 500, message: '获取全部导航菜单失败' });
+    }
   }
 
   /**
@@ -37,13 +47,17 @@ class NavMenuController extends Controller {
    */
   async detail() {
     const { ctx } = this;
-    const { id } = { ...ctx.query, ...ctx.request.body };
-    if (!id) {
-      ctx.body = { code: 400, msg: '参数错误' };
-      return;
+    try {
+      const { id } = { ...ctx.query, ...ctx.request.body };
+      if (!id) {
+        return this.result({ code: 400, message: '参数错误' });
+      }
+      const result = await ctx.service.uied.navMenu.detail(id);
+      this.result({ data: result });
+    } catch (error) {
+      ctx.logger.error('获取导航菜单详情失败:', error);
+      this.result({ code: 500, message: '获取导航菜单详情失败' });
     }
-    const result = await ctx.service.uied.navMenu.detail(id);
-    ctx.body = { code: 200, msg: 'success', data: result };
   }
 
   /**
@@ -51,9 +65,14 @@ class NavMenuController extends Controller {
    */
   async add() {
     const { ctx } = this;
-    const data = ctx.request.body;
-    const result = await ctx.service.uied.navMenu.add(data);
-    ctx.body = { code: 200, msg: '添加成功', data: result };
+    try {
+      const data = ctx.request.body;
+      const result = await ctx.service.uied.navMenu.add(data);
+      this.result({ data: result, message: '添加成功' });
+    } catch (error) {
+      ctx.logger.error('添加导航菜单失败:', error);
+      this.result({ code: 500, message: '添加导航菜单失败' });
+    }
   }
 
   /**
@@ -61,13 +80,17 @@ class NavMenuController extends Controller {
    */
   async edit() {
     const { ctx } = this;
-    const data = ctx.request.body;
-    if (!data.id) {
-      ctx.body = { code: 400, msg: '参数错误' };
-      return;
+    try {
+      const data = ctx.request.body;
+      if (!data.id) {
+        return this.result({ code: 400, message: '参数错误' });
+      }
+      await ctx.service.uied.navMenu.edit(data);
+      this.result({ message: '编辑成功' });
+    } catch (error) {
+      ctx.logger.error('编辑导航菜单失败:', error);
+      this.result({ code: 500, message: '编辑导航菜单失败' });
     }
-    await ctx.service.uied.navMenu.edit(data);
-    ctx.body = { code: 200, msg: '编辑成功' };
   }
 
   /**
@@ -75,13 +98,17 @@ class NavMenuController extends Controller {
    */
   async del() {
     const { ctx } = this;
-    const { id } = ctx.request.body;
-    if (!id) {
-      ctx.body = { code: 400, msg: '参数错误' };
-      return;
+    try {
+      const { id } = ctx.request.body;
+      if (!id) {
+        return this.result({ code: 400, message: '参数错误' });
+      }
+      await ctx.service.uied.navMenu.del(id);
+      this.result({ message: '删除成功' });
+    } catch (error) {
+      ctx.logger.error('删除导航菜单失败:', error);
+      this.result({ code: 500, message: '删除导航菜单失败' });
     }
-    await ctx.service.uied.navMenu.del(id);
-    ctx.body = { code: 200, msg: '删除成功' };
   }
 
   /**
@@ -89,13 +116,17 @@ class NavMenuController extends Controller {
    */
   async sort() {
     const { ctx } = this;
-    const { items } = ctx.request.body;
-    if (!items || !Array.isArray(items)) {
-      ctx.body = { code: 400, msg: '参数错误' };
-      return;
+    try {
+      const { items } = ctx.request.body;
+      if (!items || !Array.isArray(items)) {
+        return this.result({ code: 400, message: '参数错误' });
+      }
+      await ctx.service.uied.navMenu.sort(items);
+      this.result({ message: '排序成功' });
+    } catch (error) {
+      ctx.logger.error('排序失败:', error);
+      this.result({ code: 500, message: '排序失败' });
     }
-    await ctx.service.uied.navMenu.sort(items);
-    ctx.body = { code: 200, msg: '排序成功' };
   }
 }
 

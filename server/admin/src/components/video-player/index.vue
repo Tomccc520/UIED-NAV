@@ -1,68 +1,68 @@
 <template>
-    <div>
-        <video-play
-            ref="playerRef"
-            v-bind="options"
+    <div class="video-player-placeholder">
+        <video
+            ref="videoRef"
             :src="src"
+            :poster="poster"
+            :width="width"
+            :height="height"
+            controls
             @play="onPlay"
             @pause="onPause"
-            @timeupdate="onTimeupdate"
-            @canplay="onCanplay"
-        />
+        >
+            您的浏览器不支持视频播放
+        </video>
     </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, shallowRef } from 'vue'
-import 'vue3-video-play/dist/style.css'
-import VideoPlay from 'vue3-video-play'
+/**
+ * @file components/video-player/index.vue
+ * @description 视频播放器组件（简化版）
+ * @author Tomda
+ * @copyright 版权所有 (c) 2026 UIED技术团队
+ * @website https://fsuied.com
+ * @license MIT
+ * @version 1.0.0
+ */
+
+import { ref } from 'vue'
+
 const props = defineProps({
     src: {
         type: String,
         required: true
     },
-    width: String,
-    height: String,
-    poster: String
+    width: {
+        type: String,
+        default: '100%'
+    },
+    height: {
+        type: String,
+        default: 'auto'
+    },
+    poster: {
+        type: String,
+        default: ''
+    }
 })
 
-const playerRef = shallowRef()
-const options = reactive({
-    color: 'var(--el-color-primary)', //主题色
-    muted: false, //静音
-    webFullScreen: false,
-    speedRate: ['0.75', '1.0', '1.25', '1.5', '2.0'], //播放倍速
-    autoPlay: true, //自动播放
-    loop: false, //循环播放
-    mirror: false, //镜像画面
-    ligthOff: false, //关灯模式
-    volume: 0.3, //默认音量大小
-    control: true, //是否显示控制器
-    title: '', //视频名称
-    poster: '', //封面
-    ...props
-})
+const videoRef = ref<HTMLVideoElement | null>(null)
 
 const play = () => {
-    playerRef.value.play()
+    videoRef.value?.play()
 }
 
 const pause = () => {
-    playerRef.value.pause()
+    videoRef.value?.pause()
 }
 
-const onPlay = (event: any) => {
-    console.log(event, '播放')
-}
-const onPause = (event: any) => {
-    console.log(event, '暂停')
+const onPlay = (event: Event) => {
+    console.log('视频播放', event)
 }
 
-const onTimeupdate = (event: any) => {
-    console.log(event, '时间更新')
-}
-const onCanplay = (event: any) => {
-    console.log(event, '可以播放')
+const onPause = (event: Event) => {
+    console.log('视频暂停', event)
 }
 
 defineExpose({
@@ -70,3 +70,12 @@ defineExpose({
     pause
 })
 </script>
+
+<style scoped>
+.video-player-placeholder {
+    width: 100%;
+}
+.video-player-placeholder video {
+    max-width: 100%;
+}
+</style>

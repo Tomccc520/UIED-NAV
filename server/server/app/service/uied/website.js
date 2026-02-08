@@ -15,8 +15,11 @@ const Service = require('egg').Service;
 class WebsiteService extends Service {
   /**
    * 获取网站列表（分页）
+   * @param {Object} params
+   * @param {number} params.categoryId - 分类ID
+   * @param {boolean} params.includeChildren - 是否包含子分类的网站
    */
-  async list({ page = 1, pageSize = 20, categoryId, keyword, status }) {
+  async list({ page = 1, pageSize = 20, categoryId, keyword, status, includeChildren }) {
     const { app } = this;
     const offset = (page - 1) * pageSize;
     
@@ -25,8 +28,14 @@ class WebsiteService extends Service {
     const replacements = [];
     
     if (categoryId) {
-      whereClause += ' AND w.category_id = ?';
-      replacements.push(categoryId);
+      if (includeChildren) {
+        // 包含子分类：查询该分类及其所有子分类的网站
+        whereClause += ' AND (w.category_id = ? OR w.category_id IN (SELECT id FROM uied_category WHERE parent_id = ? AND is_delete = 0))';
+        replacements.push(categoryId, categoryId);
+      } else {
+        whereClause += ' AND w.category_id = ?';
+        replacements.push(categoryId);
+      }
     }
     
     if (keyword) {
@@ -351,6 +360,52 @@ class WebsiteService extends Service {
       page,
       pageSize,
     };
+  }
+
+  /**
+   * 通过ID列表获取网站（支持新数字ID和旧cuid格式）
+   */
+  async getByIds(ids) {
+    const { app } = this;
+    if (!ids || ids.length === 0) return [];
+    
+    // 分离数字ID和字符串ID（旧cuid格式）
+    const numericIds = ids.filter(id => /^\d+$/.test(String(id)));
+    const stringIds = ids.filter(id => !/^\d+$/.test(String(id)));
+    
+    let whereConditions = [];
+    const replacements = [];
+    
+    if (numericIds.length > 0) {
+      whereConditions.push(`w.id IN (${numericIds.join(',')})`);
+    }
+    
+    if (stringIds.length > 0) {
+      const placeholders = stringIds.map(() => '?').join(',');
+      whereConditions.push(`w.old_id IN (${placeholders})`);
+      replacements.push(...stringIds);
+    }
+    
+    if (whereConditions.length === 0) return [];
+    
+    const websites = await app.model.query(
+      `SELECT w.id, w.old_id as oldId, w.name, w.slug, w.description, w.url, w.icon_url as iconUrl,
+              w.category_id as categoryId, c.name as categoryName,
+              w.is_new as isNew, w.is_featured as isFeatured, w.is_hot as isHot,
+              w.tags, w.click_count as clickCount
+       FROM uied_website w
+       LEFT JOIN uied_category c ON w.category_id = c.id
+       WHERE w.is_delete = 0 AND (${whereConditions.join(' OR ')})`,
+      { replacements, type: app.Sequelize.QueryTypes.SELECT }
+    );
+    
+    return websites.map(w => ({
+      ...w,
+      isNew: w.isNew === 1,
+      isFeatured: w.isFeatured === 1,
+      isHot: w.isHot === 1,
+      tags: w.tags ? JSON.parse(w.tags) : [],
+    }));
   }
 }
 

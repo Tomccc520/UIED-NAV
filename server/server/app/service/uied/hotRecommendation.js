@@ -16,33 +16,38 @@ class HotRecommendationService extends Service {
   /**
    * 获取热门推荐列表
    */
-  async list({ page = 1, pageSize = 20, position }) {
+  async list({ page = 1, pageSize = 20, position, pageSlug }) {
     const { app } = this;
     const offset = (page - 1) * pageSize;
     
-    let whereClause = 'hr.is_delete = 0';
+    let whereClause = 'is_delete = 0';
     const replacements = [];
     
     if (position) {
-      whereClause += ' AND hr.position = ?';
+      whereClause += ' AND position = ?';
       replacements.push(position);
+    }
+    
+    if (pageSlug) {
+      whereClause += ' AND page_slug = ?';
+      replacements.push(pageSlug);
     }
     
     // 获取总数
     const [countResult] = await app.model.query(
-      `SELECT COUNT(*) as total FROM uied_hot_recommendation hr WHERE ${whereClause}`,
+      `SELECT COUNT(*) as total FROM uied_hot_recommendation WHERE ${whereClause}`,
       { replacements, type: app.Sequelize.QueryTypes.SELECT }
     );
     
-    // 获取列表
+    // 获取列表 - 映射字段名以兼容 Vue 管理后台
     const items = await app.model.query(
-      `SELECT hr.id, hr.website_id as websiteId, w.name as websiteName, w.url as websiteUrl,
-              w.icon_url as websiteIcon, hr.title, hr.description, hr.icon, hr.position,
-              hr.sort as sortOrder, hr.is_active as isActive, hr.create_time as createdAt
-       FROM uied_hot_recommendation hr
-       LEFT JOIN uied_website w ON hr.website_id = w.id
+      `SELECT id, name as websiteName, name as title, description, url as websiteUrl, 
+              icon_url as websiteIcon, icon_url as iconUrl, page_slug as pageSlug,
+              position, sort as sortOrder, is_show as isActive, click_count as clickCount,
+              create_time as createdAt
+       FROM uied_hot_recommendation
        WHERE ${whereClause}
-       ORDER BY hr.sort ASC, hr.id DESC
+       ORDER BY sort ASC, id DESC
        LIMIT ? OFFSET ?`,
       { replacements: [...replacements, pageSize, offset], type: app.Sequelize.QueryTypes.SELECT }
     );
@@ -62,27 +67,19 @@ class HotRecommendationService extends Service {
     const { app } = this;
     
     const [item] = await app.model.query(
-      `SELECT hr.*, w.name as websiteName, w.url as websiteUrl
-       FROM uied_hot_recommendation hr
-       LEFT JOIN uied_website w ON hr.website_id = w.id
-       WHERE hr.id = ? AND hr.is_delete = 0`,
+      `SELECT id, name, description, url, icon_url as iconUrl, page_slug as pageSlug,
+              position, sort as sortOrder, is_show as isShow, click_count as clickCount,
+              create_time as createdAt
+       FROM uied_hot_recommendation
+       WHERE id = ? AND is_delete = 0`,
       { replacements: [id], type: app.Sequelize.QueryTypes.SELECT }
     );
     
     if (!item) return null;
     
     return {
-      id: item.id,
-      websiteId: item.website_id,
-      websiteName: item.websiteName,
-      websiteUrl: item.websiteUrl,
-      title: item.title,
-      description: item.description,
-      icon: item.icon,
-      position: item.position,
-      sortOrder: item.sort,
-      isActive: item.is_active === 1,
-      createdAt: item.create_time,
+      ...item,
+      isShow: item.isShow === 1,
     };
   }
 
@@ -94,13 +91,20 @@ class HotRecommendationService extends Service {
     const now = Math.floor(Date.now() / 1000);
     
     const [result] = await app.model.query(
-      `INSERT INTO uied_hot_recommendation (website_id, title, description, icon, position, sort, is_active, create_time, update_time)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO uied_hot_recommendation (name, description, url, icon_url, page_slug, position, sort, is_show, create_time, update_time)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       {
         replacements: [
-          data.websiteId, data.title || '', data.description || '', data.icon || '',
-          data.position || 'sidebar', data.sortOrder || 0, data.isActive !== false ? 1 : 0,
-          now, now,
+          data.name,
+          data.description || '',
+          data.url,
+          data.iconUrl || null,
+          data.pageSlug || null,
+          data.position || 'hot',
+          data.sortOrder || 0,
+          data.isShow !== false ? 1 : 0,
+          now,
+          now,
         ],
         type: app.Sequelize.QueryTypes.INSERT,
       }
@@ -119,13 +123,14 @@ class HotRecommendationService extends Service {
     const updates = [];
     const values = [];
     
-    if (data.websiteId !== undefined) { updates.push('website_id = ?'); values.push(data.websiteId); }
-    if (data.title !== undefined) { updates.push('title = ?'); values.push(data.title); }
+    if (data.name !== undefined) { updates.push('name = ?'); values.push(data.name); }
     if (data.description !== undefined) { updates.push('description = ?'); values.push(data.description); }
-    if (data.icon !== undefined) { updates.push('icon = ?'); values.push(data.icon); }
+    if (data.url !== undefined) { updates.push('url = ?'); values.push(data.url); }
+    if (data.iconUrl !== undefined) { updates.push('icon_url = ?'); values.push(data.iconUrl); }
+    if (data.pageSlug !== undefined) { updates.push('page_slug = ?'); values.push(data.pageSlug); }
     if (data.position !== undefined) { updates.push('position = ?'); values.push(data.position); }
     if (data.sortOrder !== undefined) { updates.push('sort = ?'); values.push(data.sortOrder); }
-    if (data.isActive !== undefined) { updates.push('is_active = ?'); values.push(data.isActive ? 1 : 0); }
+    if (data.isShow !== undefined) { updates.push('is_show = ?'); values.push(data.isShow ? 1 : 0); }
     
     updates.push('update_time = ?');
     values.push(now);
@@ -149,6 +154,51 @@ class HotRecommendationService extends Service {
     await app.model.query(
       'UPDATE uied_hot_recommendation SET is_delete = 1, delete_time = ? WHERE id = ?',
       { replacements: [now, id], type: app.Sequelize.QueryTypes.UPDATE }
+    );
+  }
+
+  /**
+   * 获取激活的热门推荐（前端调用）
+   * 返回字段与前端 useHotRecommendations hook 期望的格式一致
+   */
+  async getActive(position, limit = 20) {
+    const { app } = this;
+    
+    let whereClause = 'is_delete = 0 AND is_show = 1';
+    const replacements = [];
+    
+    if (position && position !== 'all') {
+      whereClause += ' AND position = ?';
+      replacements.push(position);
+    }
+    
+    const items = await app.model.query(
+      `SELECT id, name, description, url, icon_url as iconUrl, 
+              page_slug as pageSlug, position, sort as 'order', 
+              is_show as visible, click_count as clickCount
+       FROM uied_hot_recommendation
+       WHERE ${whereClause}
+       ORDER BY sort ASC, id DESC
+       LIMIT ?`,
+      { replacements: [...replacements, limit], type: app.Sequelize.QueryTypes.SELECT }
+    );
+    
+    // 转换 visible 为布尔值
+    return items.map(item => ({
+      ...item,
+      visible: item.visible === 1,
+    }));
+  }
+
+  /**
+   * 记录热门推荐点击
+   */
+  async recordClick(id) {
+    const { app } = this;
+    
+    await app.model.query(
+      'UPDATE uied_hot_recommendation SET click_count = click_count + 1 WHERE id = ?',
+      { replacements: [id], type: app.Sequelize.QueryTypes.UPDATE }
     );
   }
 }

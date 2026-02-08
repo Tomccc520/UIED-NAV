@@ -360,3 +360,164 @@ export function uiedFaviconApiDelete(params: any) {
 export function uiedFaviconApiSetDefault(params: any) {
     return request.post({ url: '/uied/faviconApi/setDefault', params })
 }
+
+// ==================== 文章标签管理 ====================
+
+// 文章标签列表（分页）
+export function uiedArticleTagList(params?: any) {
+    return request.get({ url: '/uied/articleTag/list', params })
+}
+
+// 文章标签列表（全部）
+export function uiedArticleTagAll() {
+    return request.get({ url: '/uied/articleTag/all' })
+}
+
+// 添加文章标签
+export function uiedArticleTagAdd(params: any) {
+    return request.post({ url: '/uied/articleTag/add', params })
+}
+
+// 编辑文章标签
+export function uiedArticleTagEdit(params: any) {
+    return request.post({ url: '/uied/articleTag/edit', params })
+}
+
+// 删除文章标签
+export function uiedArticleTagDelete(params: any) {
+    return request.post({ url: '/uied/articleTag/del', params })
+}
+
+// ==================== 文章分类管理 ====================
+
+// 文章分类列表（分页）
+export function uiedArticleCategoryList(params?: any) {
+    return request.get({ url: '/uied/articleCategory/list', params })
+}
+
+// 文章分类列表（全部）
+export function uiedArticleCategoryAll() {
+    return request.get({ url: '/uied/articleCategory/all' })
+}
+
+// 添加文章分类
+export function uiedArticleCategoryAdd(params: any) {
+    return request.post({ url: '/uied/articleCategory/add', params })
+}
+
+// 编辑文章分类
+export function uiedArticleCategoryEdit(params: any) {
+    return request.post({ url: '/uied/articleCategory/edit', params })
+}
+
+// 删除文章分类
+export function uiedArticleCategoryDelete(params: any) {
+    return request.post({ url: '/uied/articleCategory/del', params })
+}
+
+// ==================== 文章批量操作 ====================
+
+// 文章批量状态更新
+export function uiedArticleBatchStatus(params: any) {
+    return request.post({ url: '/uied/article/batchStatus', params })
+}
+
+// ==================== 评论管理 ====================
+
+// 评论列表
+export function uiedCommentList(params?: any) {
+    return request.get({ url: '/uied/comment/list', params })
+}
+
+// 评论审核通过
+export function uiedCommentApprove(params: any) {
+    return request.post({ url: '/uied/comment/approve', params })
+}
+
+// 评论审核拒绝
+export function uiedCommentReject(params: any) {
+    return request.post({ url: '/uied/comment/reject', params })
+}
+
+// 删除评论
+export function uiedCommentDelete(params: any) {
+    return request.post({ url: '/uied/comment/del', params })
+}
+
+// 待审核评论数量
+export function uiedCommentPendingCount() {
+    return request.get({ url: '/uied/comment/pendingCount' })
+}
+
+// 评论统计
+export function uiedCommentStats() {
+    return request.get({ url: '/uied/comment/stats' })
+}
+
+// ==================== AI 配置管理 ====================
+
+// AI 配置列表
+export function uiedAiConfigList() {
+    return request.get({ url: '/uied/aiConfig/list' })
+}
+
+// AI 配置详情
+export function uiedAiConfigDetail(params: any) {
+    return request.get({ url: '/uied/aiConfig/detail', params })
+}
+
+// 添加 AI 配置
+export function uiedAiConfigAdd(params: any) {
+    return request.post({ url: '/uied/aiConfig/add', params })
+}
+
+// 编辑 AI 配置
+export function uiedAiConfigEdit(params: any) {
+    return request.post({ url: '/uied/aiConfig/edit', params })
+}
+
+// 删除 AI 配置
+export function uiedAiConfigDelete(params: any) {
+    return request.post({ url: '/uied/aiConfig/del', params })
+}
+
+// 测试 AI 连接
+export function uiedAiConfigTest(params: any) {
+    return request.post({ url: '/uied/aiConfig/test', params })
+}
+
+// ==================== AI 批量生成 ====================
+
+// 批量生成网站信息
+export function uiedAiConfigBatchGenerate(params: any) {
+    return request.post({ url: '/uied/aiConfig/batchGenerate', params })
+}
+
+// 确认批量生成结果
+export function uiedAiConfigBatchConfirm(params: any) {
+    return request.post({ url: '/uied/aiConfig/batchConfirm', params })
+}
+
+// ==================== AI 使用日志 ====================
+
+// AI 使用日志列表
+export function uiedAiUsageLogList(params?: any) {
+    return request.get({ url: '/uied/aiUsageLog/list', params })
+}
+
+// AI 使用统计
+export function uiedAiUsageLogStats() {
+    return request.get({ url: '/uied/aiUsageLog/stats' })
+}
+
+// ==================== AI 功能开关 ====================
+
+// 获取 AI 功能开关
+export function uiedAiFeatureToggle() {
+    return request.get({ url: '/uied/aiConfig/featureToggle' })
+}
+
+// 保存 AI 功能开关
+export function uiedAiSaveFeatureToggle(params: any) {
+    return request.post({ url: '/uied/aiConfig/saveFeatureToggle', params })
+}

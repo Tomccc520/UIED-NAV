@@ -60,6 +60,21 @@ module.exports = app => {
       defaultValue: null,
       comment: '父分类ID',
     },
+    seo_title: {
+      type: STRING(200),
+      allowNull: true,
+      comment: 'SEO标题，如"2025年最好的96个AI智能体工具"',
+    },
+    seo_description: {
+      type: TEXT,
+      allowNull: true,
+      comment: 'SEO描述/简介，用于搜索引擎和页面展示',
+    },
+    seo_keywords: {
+      type: STRING(300),
+      allowNull: true,
+      comment: 'SEO关键词，逗号分隔',
+    },
     sort: {
       type: INTEGER.UNSIGNED,
       allowNull: false,

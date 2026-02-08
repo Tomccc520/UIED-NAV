@@ -19,11 +19,12 @@ class HotRecommendationController extends baseController {
   async list() {
     const { ctx } = this;
     try {
-      const { pageNo = 1, pageSize = 20, position } = ctx.query;
+      const { pageNo = 1, pageSize = 20, position, pageSlug } = ctx.query;
       const result = await ctx.service.uied.hotRecommendation.list({
         page: parseInt(pageNo),
         pageSize: parseInt(pageSize),
         position,
+        pageSlug,
       });
       this.result({ data: result });
     } catch (error) {
@@ -60,8 +61,8 @@ class HotRecommendationController extends baseController {
     const { ctx } = this;
     try {
       const data = ctx.request.body;
-      if (!data.websiteId) {
-        return this.result({ code: 400, message: '请选择网站' });
+      if (!data.name || !data.url) {
+        return this.result({ code: 400, message: '名称和URL不能为空' });
       }
       const result = await ctx.service.uied.hotRecommendation.add(data);
       this.result({ data: result, message: '创建成功' });

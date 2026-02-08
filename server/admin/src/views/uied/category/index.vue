@@ -99,7 +99,7 @@
         <el-dialog
             v-model="showEdit"
             :title="editData.id ? '编辑分类' : '添加分类'"
-            width="500px"
+            width="600px"
             :close-on-click-modal="false"
         >
             <el-form ref="editFormRef" :model="editData" :rules="editRules" label-width="100px">
@@ -123,6 +123,35 @@
                 <el-form-item label="分类描述">
                     <el-input v-model="editData.description" type="textarea" :rows="3" placeholder="请输入分类描述" />
                 </el-form-item>
+                <el-divider content-position="left">SEO 设置（提升搜索引擎排名）</el-divider>
+                <el-form-item label="SEO标题">
+                    <template #label>
+                        <span>SEO标题</span>
+                        <el-tooltip content="用于搜索引擎展示的页面标题，如「2025年最好的96个AI智能体工具」，建议30字以内，包含核心关键词" placement="top">
+                            <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                        </el-tooltip>
+                    </template>
+                    <el-input v-model="editData.seoTitle" placeholder="留空则使用分类名称" />
+                </el-form-item>
+                <el-form-item label="SEO描述">
+                    <template #label>
+                        <span>SEO描述</span>
+                        <el-tooltip content="用于搜索引擎展示的页面描述，建议150字以内。会显示在分类页面头部，帮助用户和搜索引擎理解该分类内容" placement="top">
+                            <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                        </el-tooltip>
+                    </template>
+                    <el-input v-model="editData.seoDescription" type="textarea" :rows="3" placeholder="留空则使用分类描述" />
+                </el-form-item>
+                <el-form-item label="SEO关键词">
+                    <template #label>
+                        <span>SEO关键词</span>
+                        <el-tooltip content="多个关键词用英文逗号分隔，建议5-10个核心关键词，有助于搜索引擎索引" placement="top">
+                            <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                        </el-tooltip>
+                    </template>
+                    <el-input v-model="editData.seoKeywords" placeholder="关键词1,关键词2,关键词3" />
+                </el-form-item>
+                <el-divider content-position="left">其他设置</el-divider>
                 <el-form-item label="图标URL">
                     <el-input v-model="editData.icon" placeholder="请输入图标URL" />
                 </el-form-item>
@@ -148,6 +177,7 @@
 import { uiedCategoryList, uiedCategoryAll, uiedCategoryAdd, uiedCategoryEdit, uiedCategoryDelete } from '@/api/uied'
 import { usePaging } from '@/hooks/usePaging'
 import feedback from '@/utils/feedback'
+import { QuestionFilled } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
 
 const queryParams = reactive({
@@ -189,6 +219,9 @@ const editData = reactive({
     slug: '',
     parentId: 0,
     description: '',
+    seoTitle: '',
+    seoDescription: '',
+    seoKeywords: '',
     icon: '',
     themeColor: '',
     sortOrder: 0,
@@ -206,6 +239,9 @@ const resetEditData = () => {
     editData.slug = ''
     editData.parentId = 0
     editData.description = ''
+    editData.seoTitle = ''
+    editData.seoDescription = ''
+    editData.seoKeywords = ''
     editData.icon = ''
     editData.themeColor = ''
     editData.sortOrder = 0
@@ -226,6 +262,9 @@ const handleEdit = (row: any) => {
     editData.slug = row.slug || ''
     editData.parentId = row.parentId || 0
     editData.description = row.description || ''
+    editData.seoTitle = row.seoTitle || ''
+    editData.seoDescription = row.seoDescription || ''
+    editData.seoKeywords = row.seoKeywords || ''
     editData.icon = row.icon || ''
     editData.themeColor = row.themeColor || ''
     editData.sortOrder = row.sortOrder || 0

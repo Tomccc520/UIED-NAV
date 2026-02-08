@@ -8,5 +8,6 @@ module.exports = app => {
   // 加载路由文件
   require('./router/system')(app);
   require('./router/uied')(app); // UIED 业务路由
+  require('./router/frontend')(app); // 前端兼容路由
   // require('./router/socket')(app); // 开启之后需要连接 有超时阻塞
 };

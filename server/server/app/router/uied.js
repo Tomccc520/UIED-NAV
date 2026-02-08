@@ -108,4 +108,128 @@ module.exports = app => {
   router.all('/api/uied/faviconApi/edit', controller.uied.faviconApi.edit);
   router.all('/api/uied/faviconApi/del', controller.uied.faviconApi.del);
   router.all('/api/uied/faviconApi/setDefault', controller.uied.faviconApi.setDefault);
+  
+  // ==================== 网站标签 ====================
+  router.all('/api/uied/websiteTag/list', controller.uied.websiteTag.list);
+  router.all('/api/uied/websiteTag/all', controller.uied.websiteTag.all);
+  router.all('/api/uied/websiteTag/detail', controller.uied.websiteTag.detail);
+  router.all('/api/uied/websiteTag/add', controller.uied.websiteTag.add);
+  router.all('/api/uied/websiteTag/edit', controller.uied.websiteTag.edit);
+  router.all('/api/uied/websiteTag/del', controller.uied.websiteTag.del);
+  router.all('/api/uied/websiteTag/websiteTags', controller.uied.websiteTag.websiteTags);
+  router.all('/api/uied/websiteTag/setWebsiteTags', controller.uied.websiteTag.setWebsiteTags);
+  
+  // ==================== SEO 抓取 ====================
+  router.all('/api/uied/seoScraper/fetch', controller.uied.seoScraper.fetch);
+  
+  // ==================== 网站提交 ====================
+  router.all('/api/uied/submission/checkUrl', controller.uied.submission.checkUrl);
+  router.all('/api/uied/submission/submit', controller.uied.submission.submit);
+  router.all('/api/uied/submission/status', controller.uied.submission.status);
+  router.all('/api/uied/submission/list', controller.uied.submission.list);
+  router.all('/api/uied/submission/pendingCount', controller.uied.submission.pendingCount);
+  router.all('/api/uied/submission/approve', controller.uied.submission.approve);
+  router.all('/api/uied/submission/reject', controller.uied.submission.reject);
+  router.all('/api/uied/submission/edit', controller.uied.submission.edit);
+  router.all('/api/uied/submission/del', controller.uied.submission.del);
+  
+  // ==================== 数据导出 ====================
+  router.all('/api/uied/export/websites', controller.uied.export.websites);
+  router.all('/api/uied/export/categories', controller.uied.export.categories);
+  router.all('/api/uied/export/all', controller.uied.export.all);
+  router.all('/api/uied/export/websitesCSV', controller.uied.export.websitesCSV);
+  router.all('/api/uied/export/websitesJSON', controller.uied.export.websitesJSON);
+  router.all('/api/uied/export/categoriesCSV', controller.uied.export.categoriesCSV);
+  router.all('/api/uied/export/categoriesJSON', controller.uied.export.categoriesJSON);
+  router.all('/api/uied/export/backup', controller.uied.export.backup);
+  router.all('/api/uied/export/list', controller.uied.export.list);
+  router.all('/api/uied/export/download/:filename', controller.uied.export.download);
+  router.all('/api/uied/export/del', controller.uied.export.del);
+  
+  // ==================== 操作日志 ====================
+  router.all('/api/uied/operationLog/list', controller.uied.operationLog.list);
+  router.all('/api/uied/operationLog/stats', controller.uied.operationLog.stats);
+  router.all('/api/uied/operationLog/cleanup', controller.uied.operationLog.cleanup);
+  router.all('/api/uied/operationLog/del', controller.uied.operationLog.del);
+  
+  // ==================== 监控 ====================
+  router.all('/api/uied/monitor/statistics', controller.uied.monitor.statistics);
+  router.all('/api/uied/monitor/failedWebsites', controller.uied.monitor.failedWebsites);
+  router.all('/api/uied/monitor/config', controller.uied.monitor.getConfig);
+  router.all('/api/uied/monitor/updateConfig', controller.uied.monitor.updateConfig);
+  router.all('/api/uied/monitor/checkWebsite', controller.uied.monitor.checkWebsite);
+  router.all('/api/uied/monitor/checkAll', controller.uied.monitor.checkAll);
+  router.all('/api/uied/monitor/resetStatus', controller.uied.monitor.resetStatus);
+  
+  // ==================== AI 配置 ====================
+  router.all('/api/uied/aiConfig/list', controller.uied.aiConfig.list);
+  router.all('/api/uied/aiConfig/default', controller.uied.aiConfig.getDefault);
+  router.all('/api/uied/aiConfig/get', controller.uied.aiConfig.get);
+  router.all('/api/uied/aiConfig/save', controller.uied.aiConfig.save);
+  router.all('/api/uied/aiConfig/test', controller.uied.aiConfig.test);
+  router.all('/api/uied/aiConfig/add', controller.uied.aiConfig.add);
+  router.all('/api/uied/aiConfig/edit', controller.uied.aiConfig.edit);
+  router.all('/api/uied/aiConfig/del', controller.uied.aiConfig.del);
+  router.all('/api/uied/aiConfig/generateWebsiteInfo', controller.uied.aiConfig.generateWebsiteInfo);
+  router.all('/api/uied/aiConfig/batchGenerate', controller.uied.aiConfig.batchGenerate);
+  router.all('/api/uied/aiConfig/batchConfirm', controller.uied.aiConfig.batchConfirm);
+  router.all('/api/uied/aiConfig/chat', controller.uied.aiConfig.chat);
+  router.all('/api/uied/aiConfig/featureToggle', controller.uied.aiConfig.featureToggle);
+  router.all('/api/uied/aiConfig/saveFeatureToggle', controller.uied.aiConfig.saveFeatureToggle);
+  
+  // ==================== AI 使用日志 ====================
+  router.all('/api/uied/aiUsageLog/list', controller.uied.aiUsageLog.list);
+  router.all('/api/uied/aiUsageLog/stats', controller.uied.aiUsageLog.stats);
+  
+  // ==================== 文章管理 ====================
+  router.all('/api/uied/article/list', controller.uied.article.list);
+  router.all('/api/uied/article/detail', controller.uied.article.detail);
+  router.all('/api/uied/article/add', controller.uied.article.add);
+  router.all('/api/uied/article/edit', controller.uied.article.edit);
+  router.all('/api/uied/article/del', controller.uied.article.del);
+  router.all('/api/uied/article/batchStatus', controller.uied.article.batchStatus);
+  router.all('/api/uied/article/categories', controller.uied.article.categories);
+  
+  // ==================== 文章标签 ====================
+  router.all('/api/uied/articleTag/list', controller.uied.articleTag.list);
+  router.all('/api/uied/articleTag/all', controller.uied.articleTag.all);
+  router.all('/api/uied/articleTag/add', controller.uied.articleTag.add);
+  router.all('/api/uied/articleTag/edit', controller.uied.articleTag.edit);
+  router.all('/api/uied/articleTag/del', controller.uied.articleTag.del);
+  router.all('/api/uied/articleTag/articleTags', controller.uied.articleTag.articleTags);
+  router.all('/api/uied/articleTag/setArticleTags', controller.uied.articleTag.setArticleTags);
+  
+  // ==================== 文章分类 ====================
+  router.all('/api/uied/articleCategory/list', controller.uied.articleCategory.list);
+  router.all('/api/uied/articleCategory/all', controller.uied.articleCategory.all);
+  router.all('/api/uied/articleCategory/add', controller.uied.articleCategory.add);
+  router.all('/api/uied/articleCategory/edit', controller.uied.articleCategory.edit);
+  router.all('/api/uied/articleCategory/del', controller.uied.articleCategory.del);
+  
+  // ==================== 评论管理 ====================
+  router.all('/api/uied/comment/list', controller.uied.comment.list);
+  router.all('/api/uied/comment/detail', controller.uied.comment.detail);
+  router.all('/api/uied/comment/approve', controller.uied.comment.approve);
+  router.all('/api/uied/comment/reject', controller.uied.comment.reject);
+  router.all('/api/uied/comment/del', controller.uied.comment.del);
+  router.all('/api/uied/comment/pendingCount', controller.uied.comment.pendingCount);
+  router.all('/api/uied/comment/stats', controller.uied.comment.stats);
+  
+  // ==================== 数据统计 ====================
+  router.all('/api/uied/statistics/clicks', controller.uied.statistics.clicks);
+  router.all('/api/uied/statistics/search', controller.uied.statistics.search);
+  router.all('/api/uied/statistics/overview', controller.uied.statistics.overview);
+  router.all('/api/uied/statistics/recent', controller.uied.statistics.recent);
+  
+  // ==================== WordPress 配置 ====================
+  router.all('/api/uied/wordpress/configs', controller.uied.wordpressConfig.configList);
+  router.all('/api/uied/wordpress/configs/default', controller.uied.wordpressConfig.configDefault);
+  router.all('/api/uied/wordpress/configs/add', controller.uied.wordpressConfig.configAdd);
+  router.all('/api/uied/wordpress/configs/edit', controller.uied.wordpressConfig.configEdit);
+  router.all('/api/uied/wordpress/configs/del', controller.uied.wordpressConfig.configDel);
+  router.all('/api/uied/wordpress/categories', controller.uied.wordpressConfig.categoryList);
+  router.all('/api/uied/wordpress/categories/add', controller.uied.wordpressConfig.categoryAdd);
+  router.all('/api/uied/wordpress/categories/edit', controller.uied.wordpressConfig.categoryEdit);
+  router.all('/api/uied/wordpress/categories/del', controller.uied.wordpressConfig.categoryDel);
+  router.all('/api/uied/wordpress/posts', controller.uied.wordpressConfig.posts);
 };

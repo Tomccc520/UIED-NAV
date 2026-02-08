@@ -57,11 +57,40 @@
                             <el-select v-model="pageConfigData.websiteClickMode" style="width: 100%">
                                 <el-option label="跳转详情页" value="detail" />
                                 <el-option label="弹窗确认后跳转" value="direct" />
+                                <el-option label="直达网站" value="directExternal" />
                             </el-select>
-                            <div class="text-gray-400 text-xs mt-1">设置用户点击网站卡片时的行为</div>
+                            <div class="text-gray-400 text-xs mt-1">
+                                设置用户点击网站卡片时的行为：<br/>
+                                「跳转详情页」- 点击卡片进入网站介绍页面<br/>
+                                「弹窗确认后跳转」- 点击卡片弹窗提示后跳转外部网站<br/>
+                                「直达网站」- 点击卡片直接打开外部网站（箭头变为"查看详情"指向详情页）
+                            </div>
+                        </el-form-item>
+                        <el-form-item label="卡片直达箭头">
+                            <el-switch v-model="pageConfigData.showDirectArrow" />
+                            <div class="text-gray-400 text-xs mt-1">
+                                开启后，网站卡片右侧会显示一个快捷按钮（鼠标移入时出现）。<br/>
+                                当点击行为为「跳转详情页」或「弹窗确认后跳转」时，箭头显示"直达网站"，点击直接打开外部链接。<br/>
+                                当点击行为为「直达网站」时，箭头显示"查看详情"，点击进入网站详情页。
+                            </div>
+                        </el-form-item>
+                        <el-form-item label="详情页新窗口打开">
+                            <el-switch v-model="pageConfigData.detailPageNewWindow" />
+                            <div class="text-gray-400 text-xs mt-1">
+                                开启后，点击网站卡片进入详情页时会在浏览器新标签页中打开。<br/>
+                                关闭后，将在当前页面中打开详情页。仅在点击行为为「跳转详情页」时生效。
+                            </div>
+                        </el-form-item>
+                        <el-form-item label="箭头新窗口打开">
+                            <el-switch v-model="pageConfigData.directArrowNewWindow" />
+                            <div class="text-gray-400 text-xs mt-1">
+                                开启后，点击卡片上的直达箭头时会在浏览器新标签页中打开目标页面。<br/>
+                                关闭后，将在当前页面中打开目标页面。
+                            </div>
                         </el-form-item>
                         <el-form-item label="每页显示数量">
                             <el-input-number v-model="pageConfigData.pageSize" :min="10" :max="100" />
+                            <div class="text-gray-400 text-xs mt-1">每页显示的网站数量，建议 20-50 之间</div>
                         </el-form-item>
                         <el-form-item>
                             <el-button type="primary" :loading="pageConfigLoading" @click="handleSavePageConfig">保存</el-button>
@@ -93,6 +122,8 @@
                         </el-form-item>
                     </el-form>
                 </el-tab-pane>
+
+
             </el-tabs>
         </el-card>
     </div>
@@ -123,6 +154,9 @@ const siteInfoData = reactive({
 const pageConfigLoading = ref(false)
 const pageConfigData = reactive({
     websiteClickMode: 'detail',
+    showDirectArrow: false,
+    detailPageNewWindow: false,
+    directArrowNewWindow: true,
     pageSize: 20,
 })
 
@@ -135,6 +169,8 @@ const exitModalData = reactive({
     autoRedirect: true,
     countdown: 5,
 })
+
+
 
 // 加载站点信息
 const loadSiteInfo = async () => {

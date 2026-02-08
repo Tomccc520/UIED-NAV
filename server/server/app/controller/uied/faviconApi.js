@@ -10,65 +10,61 @@
 
 'use strict';
 
-const Controller = require('egg').Controller;
+const baseController = require('../baseController');
 
-class FaviconApiController extends Controller {
+class FaviconApiController extends baseController {
   async list() {
     const { ctx } = this;
     const params = { ...ctx.query, ...ctx.request.body };
     const result = await ctx.service.uied.faviconApi.list(params);
-    ctx.body = { code: 200, msg: 'success', ...result };
+    this.result({ data: result });
   }
 
   async detail() {
     const { ctx } = this;
     const { id } = { ...ctx.query, ...ctx.request.body };
     if (!id) {
-      ctx.body = { code: 400, msg: '参数错误' };
-      return;
+      return this.result({ code: 400, message: '参数错误' });
     }
     const result = await ctx.service.uied.faviconApi.detail(id);
-    ctx.body = { code: 200, msg: 'success', data: result };
+    this.result({ data: result });
   }
 
   async add() {
     const { ctx } = this;
     const data = ctx.request.body;
     const result = await ctx.service.uied.faviconApi.add(data);
-    ctx.body = { code: 200, msg: '添加成功', data: result };
+    this.result({ data: result, message: '添加成功' });
   }
 
   async edit() {
     const { ctx } = this;
     const data = ctx.request.body;
     if (!data.id) {
-      ctx.body = { code: 400, msg: '参数错误' };
-      return;
+      return this.result({ code: 400, message: '参数错误' });
     }
     await ctx.service.uied.faviconApi.edit(data);
-    ctx.body = { code: 200, msg: '编辑成功' };
+    this.result({ message: '编辑成功' });
   }
 
   async del() {
     const { ctx } = this;
     const { id } = ctx.request.body;
     if (!id) {
-      ctx.body = { code: 400, msg: '参数错误' };
-      return;
+      return this.result({ code: 400, message: '参数错误' });
     }
     await ctx.service.uied.faviconApi.del(id);
-    ctx.body = { code: 200, msg: '删除成功' };
+    this.result({ message: '删除成功' });
   }
 
   async setDefault() {
     const { ctx } = this;
     const { id } = ctx.request.body;
     if (!id) {
-      ctx.body = { code: 400, msg: '参数错误' };
-      return;
+      return this.result({ code: 400, message: '参数错误' });
     }
     await ctx.service.uied.faviconApi.setDefault(id);
-    ctx.body = { code: 200, msg: '设置成功' };
+    this.result({ message: '设置成功' });
   }
 }
 

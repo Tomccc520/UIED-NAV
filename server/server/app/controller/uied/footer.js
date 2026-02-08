@@ -10,50 +10,48 @@
 
 'use strict';
 
-const Controller = require('egg').Controller;
+const baseController = require('../baseController');
 
-class FooterController extends Controller {
+class FooterController extends baseController {
   // ==================== 页脚分组 ====================
   async groupList() {
     const { ctx } = this;
     const params = { ...ctx.query, ...ctx.request.body };
     const result = await ctx.service.uied.footer.groupList(params);
-    ctx.body = { code: 200, msg: 'success', ...result };
+    this.result({ data: result });
   }
 
   async groupAll() {
     const { ctx } = this;
     const result = await ctx.service.uied.footer.groupAll();
-    ctx.body = { code: 200, msg: 'success', data: result };
+    this.result({ data: result });
   }
 
   async groupAdd() {
     const { ctx } = this;
     const data = ctx.request.body;
     const result = await ctx.service.uied.footer.groupAdd(data);
-    ctx.body = { code: 200, msg: '添加成功', data: result };
+    this.result({ data: result, message: '添加成功' });
   }
 
   async groupEdit() {
     const { ctx } = this;
     const data = ctx.request.body;
     if (!data.id) {
-      ctx.body = { code: 400, msg: '参数错误' };
-      return;
+      return this.result({ code: 400, message: '参数错误' });
     }
     await ctx.service.uied.footer.groupEdit(data);
-    ctx.body = { code: 200, msg: '编辑成功' };
+    this.result({ message: '编辑成功' });
   }
 
   async groupDel() {
     const { ctx } = this;
     const { id } = ctx.request.body;
     if (!id) {
-      ctx.body = { code: 400, msg: '参数错误' };
-      return;
+      return this.result({ code: 400, message: '参数错误' });
     }
     await ctx.service.uied.footer.groupDel(id);
-    ctx.body = { code: 200, msg: '删除成功' };
+    this.result({ message: '删除成功' });
   }
 
   // ==================== 页脚链接 ====================
@@ -61,36 +59,34 @@ class FooterController extends Controller {
     const { ctx } = this;
     const params = { ...ctx.query, ...ctx.request.body };
     const result = await ctx.service.uied.footer.linkList(params);
-    ctx.body = { code: 200, msg: 'success', ...result };
+    this.result({ data: result });
   }
 
   async linkAdd() {
     const { ctx } = this;
     const data = ctx.request.body;
     const result = await ctx.service.uied.footer.linkAdd(data);
-    ctx.body = { code: 200, msg: '添加成功', data: result };
+    this.result({ data: result, message: '添加成功' });
   }
 
   async linkEdit() {
     const { ctx } = this;
     const data = ctx.request.body;
     if (!data.id) {
-      ctx.body = { code: 400, msg: '参数错误' };
-      return;
+      return this.result({ code: 400, message: '参数错误' });
     }
     await ctx.service.uied.footer.linkEdit(data);
-    ctx.body = { code: 200, msg: '编辑成功' };
+    this.result({ message: '编辑成功' });
   }
 
   async linkDel() {
     const { ctx } = this;
     const { id } = ctx.request.body;
     if (!id) {
-      ctx.body = { code: 400, msg: '参数错误' };
-      return;
+      return this.result({ code: 400, message: '参数错误' });
     }
     await ctx.service.uied.footer.linkDel(id);
-    ctx.body = { code: 200, msg: '删除成功' };
+    this.result({ message: '删除成功' });
   }
 }
 

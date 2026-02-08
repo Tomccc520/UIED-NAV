@@ -44,9 +44,10 @@ class CategoryService extends Service {
     
     // 获取列表
     const categories = await app.model.query(
-      `SELECT c.id, c.name, c.slug, c.icon, c.color, c.description, 
+      `SELECT c.id, c.name, c.slug, c.icon, c.color, c.description,
+              c.seo_title as seoTitle, c.seo_description as seoDescription, c.seo_keywords as seoKeywords,
               c.parent_id as parentId, c.sort as sortOrder, c.is_show as isActive,
-              c.theme_color as themeColor, c.create_time as createdAt,
+              c.color as themeColor, c.create_time as createdAt,
               (SELECT COUNT(*) FROM uied_website w WHERE w.category_id = c.id AND w.is_delete = 0) as websiteCount
        FROM uied_category c
        WHERE ${whereClause}
@@ -92,7 +93,9 @@ class CategoryService extends Service {
     
     // 获取所有分类
     const categories = await app.model.query(
-      `SELECT id, name, slug, icon, color, description, parent_id as parentId, 
+      `SELECT id, name, slug, icon, color, description,
+              seo_title as seoTitle, seo_description as seoDescription, seo_keywords as seoKeywords,
+              parent_id as parentId, 
               sort as \`order\`, is_show as visible, create_time as createdAt
        FROM uied_category 
        WHERE is_delete = 0 
@@ -111,7 +114,9 @@ class CategoryService extends Service {
   async all() {
     const { app } = this;
     const categories = await app.model.query(
-      `SELECT id, name, slug, icon, color, description, parent_id as parentId, 
+      `SELECT id, name, slug, icon, color, description,
+              seo_title as seoTitle, seo_description as seoDescription, seo_keywords as seoKeywords,
+              parent_id as parentId, 
               sort as \`order\`, is_show as visible
        FROM uied_category 
        WHERE is_delete = 0 
@@ -128,7 +133,9 @@ class CategoryService extends Service {
   async detail(id) {
     const { app } = this;
     const [category] = await app.model.query(
-      `SELECT id, name, slug, icon, color, description, parent_id as parentId, 
+      `SELECT id, name, slug, icon, color, description,
+              seo_title as seoTitle, seo_description as seoDescription, seo_keywords as seoKeywords,
+              parent_id as parentId, 
               sort as \`order\`, is_show as visible, create_time as createdAt
        FROM uied_category 
        WHERE id = ? AND is_delete = 0`,
@@ -154,18 +161,21 @@ class CategoryService extends Service {
     }
     
     const [result] = await app.model.query(
-      `INSERT INTO uied_category (name, slug, icon, color, description, parent_id, sort, is_show, create_time, update_time)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO uied_category (name, slug, icon, color, description, seo_title, seo_description, seo_keywords, parent_id, sort, is_show, create_time, update_time)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       {
         replacements: [
           data.name,
           data.slug,
           data.icon || '',
-          data.color || '#1890ff',
+          data.color || data.themeColor || '#1890ff',
           data.description || null,
+          data.seoTitle || null,
+          data.seoDescription || null,
+          data.seoKeywords || null,
           data.parentId || null,
-          data.order || 0,
-          data.visible !== false ? 1 : 0,
+          data.sortOrder ?? data.order ?? 0,
+          (data.isActive !== undefined ? data.isActive : (data.visible !== false ? 1 : 0)),
           now,
           now,
         ],
@@ -203,6 +213,11 @@ class CategoryService extends Service {
       }
     }
     
+    // 兼容 admin 和 frontend 字段名
+    const sortValue = data.sortOrder ?? data.order;
+    const showValue = data.isActive !== undefined ? data.isActive : (data.visible !== undefined ? (data.visible ? 1 : 0) : null);
+    const colorValue = data.themeColor || data.color;
+
     await app.model.query(
       `UPDATE uied_category SET 
         name = COALESCE(?, name),
@@ -210,6 +225,9 @@ class CategoryService extends Service {
         icon = COALESCE(?, icon),
         color = COALESCE(?, color),
         description = ?,
+        seo_title = ?,
+        seo_description = ?,
+        seo_keywords = ?,
         parent_id = ?,
         sort = COALESCE(?, sort),
         is_show = COALESCE(?, is_show),
@@ -220,11 +238,14 @@ class CategoryService extends Service {
           data.name,
           data.slug,
           data.icon,
-          data.color,
+          colorValue,
           data.description,
+          data.seoTitle !== undefined ? data.seoTitle : null,
+          data.seoDescription !== undefined ? data.seoDescription : null,
+          data.seoKeywords !== undefined ? data.seoKeywords : null,
           data.parentId,
-          data.order,
-          data.visible !== undefined ? (data.visible ? 1 : 0) : null,
+          sortValue,
+          showValue,
           now,
           data.id,
         ],

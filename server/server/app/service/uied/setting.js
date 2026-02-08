@@ -163,6 +163,13 @@ class SettingService extends Service {
       ...settings,
     };
   }
+
+  /**
+   * 通过 key 获取设置（别名，兼容 controller 调用）
+   */
+  async getSettingByKey(key) {
+    return await this.get(key);
+  }
 }
 
 module.exports = SettingService;
