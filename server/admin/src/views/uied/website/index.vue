@@ -5,7 +5,7 @@
  * @copyright 版权所有 (c) 2026 UIED技术团队
  * @website https://fsuied.com
  * @license MIT
- * @version 3.0.0 - 编辑改为独立页面模式
+ * @version 3.1.0 - 增加前端路径快捷查看列
 -->
 <template>
     <div class="website-lists">
@@ -74,6 +74,18 @@
                         <a :href="row.url" target="_blank" class="text-primary hover:underline">{{ row.url }}</a>
                     </template>
                 </el-table-column>
+                <el-table-column label="前端路径" width="160" show-overflow-tooltip>
+                    <template #default="{ row }">
+                        <a
+                            :href="getFrontendUrl(row)"
+                            target="_blank"
+                            class="text-primary hover:underline"
+                            style="font-size: 12px;"
+                        >
+                            /website/{{ row.slug || row.id }}
+                        </a>
+                    </template>
+                </el-table-column>
                 <el-table-column label="点击量" prop="clickCount" width="90" />
                 <el-table-column label="排序" prop="sortOrder" width="80" />
                 <el-table-column label="状态" width="80">
@@ -103,6 +115,13 @@ import { usePaging } from '@/hooks/usePaging'
 import feedback from '@/utils/feedback'
 
 const router = useRouter()
+
+// 前端访问地址（开发环境 localhost:3003，生产环境可根据实际域名修改）
+const FRONTEND_BASE_URL = 'http://localhost:3003'
+const getFrontendUrl = (row: any) => {
+    const path = row.slug || row.id
+    return `${FRONTEND_BASE_URL}/website/${path}`
+}
 
 const queryParams = reactive({
     keyword: '',
