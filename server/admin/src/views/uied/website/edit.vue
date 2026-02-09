@@ -1,11 +1,11 @@
 <!--
  * @file views/uied/website/edit.vue
- * @description UIED 网站编辑页面 - 独立页面模式，对接素材中心
+ * @description UIED 网站编辑页面 - 独立页面模式，AI 辅助编辑器
  * @author Tomda
  * @copyright 版权所有 (c) 2026 UIED技术团队
  * @website https://fsuied.com
  * @license MIT
- * @version 1.0.0
+ * @version 2.0.0
 -->
 <template>
     <div class="website-edit" v-loading="pageLoading">
@@ -71,12 +71,14 @@
 
                 <!-- 详情页内容 -->
                 <el-tab-pane label="详情页" name="detail">
-                    <el-form :model="editData" label-width="100px" style="max-width: 900px;">
+                    <el-form :model="editData" label-width="100px">
                         <el-form-item label="访问按钮">
-                            <el-input v-model="editData.visitBtnText" placeholder="默认：访问网站" />
+                            <el-input v-model="editData.visitBtnText" placeholder="默认：访问网站" style="max-width: 400px;" />
                         </el-form-item>
+                    </el-form>
 
-                        <el-divider content-position="left">缩略图</el-divider>
+                    <el-divider content-position="left">缩略图</el-divider>
+                    <el-form :model="editData" label-width="100px" style="max-width: 900px;">
                         <el-form-item>
                             <template #label>
                                 <span>缩略图</span>
@@ -100,21 +102,98 @@
                                 </div>
                             </div>
                         </el-form-item>
+                    </el-form>
 
-                        <el-divider content-position="left">详情内容</el-divider>
-                        <el-form-item label="详情内容">
-                            <div style="width: 100%">
-                                <div class="mb-2 flex justify-end">
-                                    <el-button type="primary" size="small" :loading="aiGenerating" @click="handleAiGenerateContent">
-                                        <el-icon class="mr-1"><MagicStick /></el-icon>
-                                        AI 生成内容
+                    <el-divider content-position="left">详情内容（AI 辅助编辑）</el-divider>
+                    <!-- AI 编辑器布局：左编辑器 + 右AI助手 -->
+                    <div class="ai-editor-layout">
+                        <div class="ai-editor-layout__main">
+                            <editor v-model="editData.detailContent" :height="560" mode="default" />
+                        </div>
+                        <aside class="ai-editor-layout__sidebar">
+                            <div class="ai-chat">
+                                <div class="ai-chat__header">
+                                    <div>
+                                        <div class="ai-chat__title">AI 写作助手</div>
+                                        <div class="ai-chat__sub-title">对话式创作，输出可直接落稿</div>
+                                    </div>
+                                    <el-tag size="small" type="success">对话模式</el-tag>
+                                </div>
+                                <div class="ai-chat__shortcut">
+                                    <el-button type="primary" plain size="small" :loading="aiGenerating" @click="handleAiGenerate('replace')">
+                                        生成正文
+                                    </el-button>
+                                    <el-button type="success" plain size="small" :loading="aiGenerating" @click="handleAiGenerate('append')">
+                                        续写正文
+                                    </el-button>
+                                    <el-button type="warning" size="small" :loading="aiGenerating" @click="handleAiGenerate('polish')">
+                                        润色正文
                                     </el-button>
                                 </div>
-                                <editor v-model="editData.detailContent" :height="500" mode="default" />
+                                <div class="ai-chat__messages" ref="chatMessagesRef">
+                                    <template v-if="chatMessages.length">
+                                        <div
+                                            v-for="item in chatMessages"
+                                            :key="item.id"
+                                            class="ai-chat__message"
+                                            :class="item.role === 'user' ? 'ai-chat__message--user' : 'ai-chat__message--assistant'"
+                                        >
+                                            <div class="ai-chat__message-role">{{ item.role === 'user' ? '我' : 'AI' }}</div>
+                                            <div class="ai-chat__message-content">
+                                                <span>{{ item.content }}</span>
+                                                <span v-if="item.streaming" class="ai-chat__cursor">|</span>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    <div v-else class="ai-chat__empty">
+                                        输入指令开始对话，例如：帮我写一段产品介绍。
+                                    </div>
+                                </div>
+                                <div class="ai-chat__composer">
+                                    <el-input
+                                        v-model="chatPrompt"
+                                        type="textarea"
+                                        :autosize="{ minRows: 2, maxRows: 5 }"
+                                        resize="none"
+                                        :disabled="aiGenerating"
+                                        placeholder="输入你的写作诉求（Shift+Enter 换行）"
+                                        @keydown="handleComposerKeydown"
+                                    />
+                                    <div class="ai-chat__composer-actions">
+                                        <el-button type="primary" size="small" :loading="aiGenerating" @click="handleSendChatPrompt">
+                                            发送
+                                        </el-button>
+                                        <el-button size="small" :disabled="!chatMessages.length || aiGenerating" @click="clearChatMessages">
+                                            清空
+                                        </el-button>
+                                    </div>
+                                </div>
+                                <div class="ai-chat__apply-bar">
+                                    <div class="ai-chat__apply-title">
+                                        最近输出：{{ lastGenerateModeLabel }}
+                                        <el-tag v-if="aiGenerating" size="small" type="warning">生成中</el-tag>
+                                    </div>
+                                    <el-space wrap>
+                                        <el-button size="small" type="primary" :disabled="!hasDraft || aiGenerating" @click="applyAiDraft('replace')">
+                                            替换全文
+                                        </el-button>
+                                        <el-button size="small" type="success" :disabled="!hasDraft || aiGenerating" @click="applyAiDraft('append')">
+                                            追加全文
+                                        </el-button>
+                                        <el-button size="small" :disabled="!hasDraft || aiGenerating" @click="copyAiDraft">
+                                            复制输出
+                                        </el-button>
+                                        <el-button size="small" :disabled="!hasDraft || aiGenerating" @click="clearAiDraft">
+                                            清空
+                                        </el-button>
+                                    </el-space>
+                                </div>
                             </div>
-                        </el-form-item>
+                        </aside>
+                    </div>
 
-                        <el-divider content-position="left">产品截图</el-divider>
+                    <el-divider content-position="left">产品截图</el-divider>
+                    <el-form :model="editData" label-width="100px" style="max-width: 900px;">
                         <el-form-item>
                             <template #label>
                                 <span>产品截图</span>
@@ -123,12 +202,7 @@
                                 </el-tooltip>
                             </template>
                             <div style="width: 100%">
-                                <material-picker
-                                    v-model="screenshotList"
-                                    type="image"
-                                    :limit="20"
-                                    size="120px"
-                                />
+                                <material-picker v-model="screenshotList" type="image" :limit="20" size="120px" />
                             </div>
                         </el-form-item>
                     </el-form>
@@ -158,13 +232,7 @@
         </div>
 
         <!-- 缩略图素材选择器（隐藏触发器模式） -->
-        <material-picker
-            ref="thumbnailPickerRef"
-            type="image"
-            :limit="1"
-            hidden-upload
-            @change="handleThumbnailSelect"
-        />
+        <material-picker ref="thumbnailPickerRef" type="image" :limit="1" hidden-upload @change="handleThumbnailSelect" />
     </div>
 </template>
 
@@ -176,6 +244,10 @@ import { QuestionFilled, MagicStick, FolderOpened } from '@element-plus/icons-vu
 import editor from '@/components/editor/index.vue'
 import MaterialPicker from '@/components/material/picker.vue'
 
+type AiGenerateMode = 'replace' | 'append' | 'polish'
+type ChatRole = 'user' | 'assistant'
+interface ChatMessage { id: number; role: ChatRole; content: string; streaming?: boolean }
+
 const route = useRoute()
 const router = useRouter()
 
@@ -184,8 +256,6 @@ const pageLoading = ref(false)
 const submitLoading = ref(false)
 const activeTab = ref('basic')
 const editFormRef = ref<FormInstance>()
-
-// 是否编辑模式
 const isEdit = computed(() => !!route.query.id)
 
 // 分类列表
@@ -199,28 +269,18 @@ const getCategoryList = async () => {
     }
 }
 
-// 截图列表（素材中心管理）
+// 截图列表
 const screenshotList = ref<string[]>([])
 
 // 表单数据
 const editData = reactive({
-    id: 0,
-    name: '',
-    slug: '',
-    url: '',
+    id: 0, name: '', slug: '', url: '',
     categoryId: '' as string | number,
-    description: '',
-    iconUrl: '',
+    description: '', iconUrl: '',
     tags: [] as string[],
-    sortOrder: 0,
-    isActive: 1,
-    isPinned: 0,
-    detailContent: '',
-    visitBtnText: '',
-    thumbnail: '',
-    seoTitle: '',
-    seoDescription: '',
-    seoKeywords: '',
+    sortOrder: 0, isActive: 1, isPinned: 0,
+    detailContent: '', visitBtnText: '', thumbnail: '',
+    seoTitle: '', seoDescription: '', seoKeywords: '',
 })
 
 const editRules: FormRules = {
@@ -252,7 +312,6 @@ const loadDetail = async (id: string | number) => {
         editData.seoTitle = data.seoTitle || data.seo_title || ''
         editData.seoDescription = data.seoDescription || data.seo_description || ''
         editData.seoKeywords = data.seoKeywords || data.seo_keywords || ''
-        // 截图
         const screenshots = data.screenshots || []
         screenshotList.value = Array.isArray(screenshots) ? [...screenshots] : []
     } catch (error) {
@@ -263,67 +322,194 @@ const loadDetail = async (id: string | number) => {
     }
 }
 
-// 缩略图素材选择器
+// ==================== 缩略图 ====================
 const thumbnailPickerRef = ref<InstanceType<typeof MaterialPicker>>()
-const openThumbnailPicker = () => {
-    thumbnailPickerRef.value?.showPopup(-1)
-}
+const openThumbnailPicker = () => { thumbnailPickerRef.value?.showPopup(-1) }
 const handleThumbnailSelect = (urls: string | string[]) => {
     const url = Array.isArray(urls) ? urls[0] : urls
     if (url) editData.thumbnail = url
 }
-
-// 截图获取缩略图
 const capturingThumbnail = ref(false)
 const handleCaptureThumbnail = async () => {
-    if (!editData.url) {
-        feedback.msgWarning('请先填写网站URL')
-        return
-    }
+    if (!editData.url) { feedback.msgWarning('请先填写网站URL'); return }
     capturingThumbnail.value = true
     try {
         editData.thumbnail = `https://image.thum.io/get/width/1280/crop/800/${editData.url}`
-        feedback.msgSuccess('缩略图URL已生成，请检查预览效果')
-    } catch (error) {
-        feedback.msgError('获取缩略图失败')
-    } finally {
-        capturingThumbnail.value = false
-    }
+        feedback.msgSuccess('缩略图URL已生成')
+    } finally { capturingThumbnail.value = false }
 }
 
-// AI 生成详情内容
+// ==================== AI 对话助手 ====================
 const aiGenerating = ref(false)
-const handleAiGenerateContent = async () => {
-    if (!editData.id) {
-        feedback.msgWarning('请先保存网站基础信息后再使用 AI 生成')
-        return
+const aiDraftText = ref('')
+const lastGenerateMode = ref<AiGenerateMode>('replace')
+const chatPrompt = ref('')
+const chatSeq = ref(0)
+const chatMessages = ref<ChatMessage[]>([])
+const chatMessagesRef = ref<HTMLDivElement | null>(null)
+const streamTimer = ref<number | null>(null)
+
+const hasDraft = computed(() => Boolean(aiDraftText.value.trim()))
+const lastGenerateModeLabel = computed(() => {
+    const map: Record<AiGenerateMode, string> = { replace: '生成', append: '续写', polish: '润色' }
+    return map[lastGenerateMode.value] || '生成'
+})
+
+// 滚动到底部
+const scrollChatToBottom = () => {
+    nextTick(() => {
+        if (chatMessagesRef.value) chatMessagesRef.value.scrollTop = chatMessagesRef.value.scrollHeight
+    })
+}
+
+// 追加消息
+const appendChatMessage = (role: ChatRole, content: string, streaming = false) => {
+    chatSeq.value++
+    const msg: ChatMessage = { id: chatSeq.value, role, content: content.trim(), streaming }
+    chatMessages.value.push(msg)
+    scrollChatToBottom()
+    return msg
+}
+
+// 停止流式输出
+const stopStream = () => {
+    if (streamTimer.value !== null) { window.clearInterval(streamTimer.value); streamTimer.value = null }
+    chatMessages.value.forEach(m => { if (m.streaming) m.streaming = false })
+}
+
+// 流式输出效果
+const startStreamReply = (fullText: string) => {
+    stopStream()
+    const text = fullText.trim()
+    const msg = appendChatMessage('assistant', '', true)
+    if (!text) { msg.streaming = false; return Promise.resolve() }
+    const total = text.length
+    const chunkSize = Math.max(1, Math.ceil(total / 100))
+    let cursor = 0
+    return new Promise<void>(resolve => {
+        streamTimer.value = window.setInterval(() => {
+            cursor = Math.min(total, cursor + chunkSize)
+            msg.content = text.slice(0, cursor)
+            scrollChatToBottom()
+            if (cursor >= total) { msg.streaming = false; stopStream(); resolve() }
+        }, 20)
+    })
+}
+
+const clearChatMessages = () => { stopStream(); chatMessages.value = [] }
+const clearAiDraft = () => { aiDraftText.value = '' }
+
+// 纯文本转 HTML
+const plainTextToHtml = (text: string) => {
+    if (!text.trim()) return ''
+    const escape = (s: string) => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] || c))
+    return text.split(/\n{2,}/).map(b => `<p>${escape(b).replace(/\n/g, '<br/>')}</p>`).join('')
+}
+
+// 富文本转纯文本
+const toPlainText = (html: string) => (html || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()
+
+// 清理 Markdown 围栏
+const normalizeDraft = (text: string) => (text || '').replace(/\r\n/g, '\n').replace(/```[\w-]*\n?/g, '').replace(/```/g, '').trim()
+
+// 构建 AI 提示
+const buildPrompt = (mode: AiGenerateMode, userPrompt = '') => {
+    const currentText = toPlainText(editData.detailContent)
+    const websiteName = editData.name || '未命名网站'
+    const websiteUrl = editData.url || ''
+    const websiteDesc = editData.description || ''
+
+    const modeInstructions: Record<AiGenerateMode, string> = {
+        replace: '请为这个网站生成一段完整的详情介绍，结构清晰，适合展示在网站详情页。',
+        append: '请基于现有内容续写，逻辑连贯，避免重复已有内容。',
+        polish: '请在不改变原意前提下润色全文，增强可读性和专业感。'
     }
+
+    let prompt = `网站名称：${websiteName}\n网站地址：${websiteUrl}\n`
+    if (websiteDesc) prompt += `网站描述：${websiteDesc}\n`
+    if (currentText && mode !== 'replace') prompt += `\n当前正文内容：\n${currentText}\n`
+    prompt += `\n${modeInstructions[mode]}\n请只输出纯文本，不要 Markdown 代码块。`
+    if (userPrompt) prompt += `\n用户额外要求：${userPrompt}`
+    return prompt
+}
+
+// 请求 AI
+const requestAiDraft = async (mode: AiGenerateMode, userPrompt = '') => {
+    const message = buildPrompt(mode, userPrompt)
+    const res = await uiedAiChat({ message, context: '网站详情内容编辑' })
+    const reply = res?.reply || res?.content || res?.data?.reply || ''
+    const draft = normalizeDraft(reply)
+    if (!draft) { feedback.msgWarning('AI 未返回可用结果，请调整后重试'); return '' }
+    aiDraftText.value = draft
+    lastGenerateMode.value = mode
+    await startStreamReply(draft)
+    return draft
+}
+
+// 快捷生成
+const handleAiGenerate = async (mode: AiGenerateMode) => {
+    const labels: Record<AiGenerateMode, string> = { replace: '请生成完整正文', append: '请续写正文', polish: '请润色正文' }
+    appendChatMessage('user', labels[mode])
     aiGenerating.value = true
     try {
-        const res = await uiedAiGenerateDetailContent({ websiteId: editData.id })
-        if (res?.content) {
-            editData.detailContent = res.content
-            feedback.msgSuccess('AI 内容生成成功')
-        }
+        const draft = await requestAiDraft(mode)
+        if (draft) feedback.msgSuccess('AI 已返回结果')
     } catch (error: any) {
-        feedback.msgError(error?.msg || error?.message || 'AI 生成失败，请检查 AI 配置')
-    } finally {
-        aiGenerating.value = false
-    }
+        feedback.msgError(error?.msg || error?.message || 'AI 处理失败')
+    } finally { aiGenerating.value = false }
 }
 
-// 提交保存
+// 发送自定义指令
+const handleSendChatPrompt = async () => {
+    const prompt = chatPrompt.value.trim()
+    if (!prompt) { feedback.msgWarning('请输入处理诉求'); return }
+    const mode: AiGenerateMode = /续写|扩写/.test(prompt) ? 'append' : /润色|优化|改写/.test(prompt) ? 'polish' : 'replace'
+    appendChatMessage('user', prompt)
+    chatPrompt.value = ''
+    aiGenerating.value = true
+    try {
+        const draft = await requestAiDraft(mode, prompt)
+        if (draft) feedback.msgSuccess('AI 已返回结果')
+    } catch (error: any) {
+        feedback.msgError(error?.msg || error?.message || 'AI 处理失败')
+    } finally { aiGenerating.value = false }
+}
+
+// 键盘快捷发送
+const handleComposerKeydown = (event: KeyboardEvent) => {
+    if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); handleSendChatPrompt() }
+}
+
+// 应用 AI 草稿
+const applyAiDraft = (mode: 'replace' | 'append') => {
+    const draft = aiDraftText.value.trim()
+    if (!draft) { feedback.msgWarning('没有可用的 AI 草稿'); return }
+    const html = plainTextToHtml(draft)
+    if (mode === 'append' && editData.detailContent.trim()) {
+        editData.detailContent = `${editData.detailContent}<p><br/></p>${html}`
+    } else {
+        editData.detailContent = html
+    }
+    feedback.msgSuccess(mode === 'append' ? '已追加到正文' : '已替换正文')
+}
+
+// 复制草稿
+const copyAiDraft = async () => {
+    const draft = aiDraftText.value.trim()
+    if (!draft) return
+    try {
+        await navigator.clipboard.writeText(draft)
+        feedback.msgSuccess('已复制到剪贴板')
+    } catch { feedback.msgError('复制失败') }
+}
+
+// ==================== 提交保存 ====================
 const handleSubmit = async () => {
     await editFormRef.value?.validate()
     submitLoading.value = true
     try {
-        const screenshots = screenshotList.value.filter((url: string) => url && url.trim() !== '')
-        const submitData = {
-            ...editData,
-            screenshots,
-            thumbnail: editData.thumbnail || null,
-            order: editData.sortOrder,
-        }
+        const screenshots = screenshotList.value.filter((url: string) => url?.trim())
+        const submitData = { ...editData, screenshots, thumbnail: editData.thumbnail || null, order: editData.sortOrder }
         if (editData.id) {
             await uiedWebsiteEdit(submitData)
             feedback.msgSuccess('编辑成功')
@@ -334,50 +520,37 @@ const handleSubmit = async () => {
         handleBack()
     } catch (error: any) {
         feedback.msgError(error?.msg || error?.message || '保存失败')
-    } finally {
-        submitLoading.value = false
-    }
+    } finally { submitLoading.value = false }
 }
 
-// 返回列表
-const handleBack = () => {
-    router.back()
-}
+const handleBack = () => { router.back() }
 
-// AI 悬浮菜单事件处理（选中文本后点击 AI 按钮）
+// AI 悬浮菜单事件（编辑器选中文本 → AI 改写）
 const aiRewriting = ref(false)
 const handleAiHover = async (e: Event) => {
-    const { text, editor } = (e as CustomEvent).detail
+    const { text, editor: ed } = (e as CustomEvent).detail
     if (!text || aiRewriting.value) return
-
     aiRewriting.value = true
     try {
         const res = await uiedAiChat({
-            message: `请优化改写以下文本，保持原意但使其更加专业流畅，直接返回改写后的文本，不要加任何解释：\n\n${text}`,
+            message: `请优化改写以下文本，保持原意但使其更加专业流畅，直接返回改写后的文本：\n\n${text}`,
             context: '网站详情内容编辑'
         })
         const newText = res?.reply || res?.content || res?.data?.reply
-        if (newText && editor) {
-            editor.insertText(newText)
-            feedback.msgSuccess('AI 改写完成')
-        }
+        if (newText && ed) { ed.insertText(newText); feedback.msgSuccess('AI 改写完成') }
     } catch (error: any) {
-        feedback.msgError(error?.msg || 'AI 改写失败，请检查 AI 配置')
-    } finally {
-        aiRewriting.value = false
-    }
+        feedback.msgError(error?.msg || 'AI 改写失败')
+    } finally { aiRewriting.value = false }
 }
 
 onMounted(async () => {
     await getCategoryList()
-    if (route.query.id) {
-        await loadDetail(route.query.id as string)
-    }
-    // 监听编辑器 AI 悬浮按钮事件
+    if (route.query.id) await loadDetail(route.query.id as string)
     window.addEventListener('wangeditor-ai-hover', handleAiHover)
 })
 
 onBeforeUnmount(() => {
+    stopStream()
     window.removeEventListener('wangeditor-ai-hover', handleAiHover)
 })
 </script>
@@ -392,5 +565,137 @@ onBeforeUnmount(() => {
     text-align: right;
     z-index: 10;
     margin: 0 -20px -20px;
+}
+
+/* AI 编辑器布局 */
+.ai-editor-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 420px;
+    gap: 12px;
+    align-items: start;
+}
+.ai-editor-layout__main {
+    min-width: 0;
+}
+.ai-editor-layout__sidebar {
+    min-width: 0;
+    position: sticky;
+    top: 10px;
+}
+
+/* AI 对话面板 */
+.ai-chat {
+    border: 1px solid var(--el-border-color);
+    border-radius: 12px;
+    background: #fff;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 560px;
+}
+.ai-chat__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+.ai-chat__title {
+    font-size: 15px;
+    font-weight: 600;
+}
+.ai-chat__sub-title {
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+}
+.ai-chat__shortcut {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.ai-chat__messages {
+    border: 1px solid var(--el-border-color-light);
+    border-radius: 10px;
+    padding: 10px;
+    flex: 1;
+    overflow-y: auto;
+    background: #fafafa;
+}
+.ai-chat__message {
+    margin-bottom: 8px;
+}
+.ai-chat__message:last-child {
+    margin-bottom: 0;
+}
+.ai-chat__message-role {
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+    margin-bottom: 2px;
+}
+.ai-chat__message-content {
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 13px;
+    line-height: 1.65;
+    padding: 10px 12px;
+    border-radius: 10px;
+}
+.ai-chat__message--user .ai-chat__message-content {
+    background: #e9f3ff;
+}
+.ai-chat__message--assistant .ai-chat__message-content {
+    background: #f4f6f8;
+}
+.ai-chat__cursor {
+    display: inline-block;
+    margin-left: 2px;
+    animation: ai-cursor-blink 1s infinite;
+}
+.ai-chat__empty {
+    font-size: 13px;
+    color: var(--el-text-color-secondary);
+    line-height: 1.7;
+    padding: 8px 2px;
+}
+.ai-chat__composer {
+    border: 1px solid var(--el-border-color-light);
+    border-radius: 10px;
+    padding: 8px;
+    background: #fff;
+}
+.ai-chat__composer-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+.ai-chat__apply-bar {
+    border-top: 1px dashed var(--el-border-color-light);
+    padding-top: 10px;
+}
+.ai-chat__apply-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+    margin-bottom: 8px;
+}
+
+@keyframes ai-cursor-blink {
+    0%, 45% { opacity: 1; }
+    46%, 100% { opacity: 0; }
+}
+
+@media (max-width: 1400px) {
+    .ai-editor-layout {
+        grid-template-columns: 1fr;
+    }
+    .ai-editor-layout__sidebar {
+        position: static;
+    }
+    .ai-chat {
+        height: auto;
+        min-height: 400px;
+    }
 }
 </style>

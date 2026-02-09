@@ -492,7 +492,7 @@ const rsa = {
     'uied:statistics:recent',
   ],
 
-  publicUrl: 'http://127.0.0.1:8001',
+  publicUrl: 'http://127.0.0.1:8002',
   // 资源访问前缀
   publicPrefix: '/api/uploads',
   // 版本
