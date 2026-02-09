@@ -13,35 +13,98 @@
             <el-tabs v-model="activeTab">
                 <!-- 站点信息 -->
                 <el-tab-pane label="站点信息" name="siteInfo">
+                    <el-alert type="info" :closable="false" style="margin-bottom: 20px">
+                        <template #title>配置网站的基本信息，包括名称、SEO、备案等。修改后保存即可生效。</template>
+                    </el-alert>
                     <el-form ref="siteInfoFormRef" :model="siteInfoData" label-width="120px" style="max-width: 600px">
-                        <el-form-item label="站点名称">
+                        <el-form-item>
+                            <template #label>
+                                <span>站点名称</span>
+                                <el-tooltip content="显示在浏览器标签页和页面顶部的网站名称" placement="top">
+                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                                </el-tooltip>
+                            </template>
                             <el-input v-model="siteInfoData.siteName" placeholder="请输入站点名称" />
                         </el-form-item>
-                        <el-form-item label="站点标题">
+                        <el-form-item>
+                            <template #label>
+                                <span>站点标题</span>
+                                <el-tooltip content="用于SEO的页面标题，显示在搜索引擎结果中，建议30字以内" placement="top">
+                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                                </el-tooltip>
+                            </template>
                             <el-input v-model="siteInfoData.siteTitle" placeholder="请输入站点标题" />
                         </el-form-item>
-                        <el-form-item label="站点描述">
+                        <el-form-item>
+                            <template #label>
+                                <span>站点描述</span>
+                                <el-tooltip content="用于SEO的页面描述，显示在搜索引擎结果中，建议120字以内" placement="top">
+                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                                </el-tooltip>
+                            </template>
                             <el-input v-model="siteInfoData.siteDescription" type="textarea" :rows="3" placeholder="请输入站点描述" />
                         </el-form-item>
-                        <el-form-item label="站点关键词">
+                        <el-form-item>
+                            <template #label>
+                                <span>站点关键词</span>
+                                <el-tooltip content="用于SEO的关键词，多个关键词用英文逗号分隔" placement="top">
+                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                                </el-tooltip>
+                            </template>
                             <el-input v-model="siteInfoData.siteKeywords" placeholder="多个关键词用逗号分隔" />
                         </el-form-item>
-                        <el-form-item label="Logo">
+                        <el-form-item>
+                            <template #label>
+                                <span>Logo</span>
+                                <el-tooltip content="网站Logo图片地址，支持PNG/SVG格式，建议尺寸200x50" placement="top">
+                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                                </el-tooltip>
+                            </template>
                             <el-input v-model="siteInfoData.logo" placeholder="Logo URL" />
                         </el-form-item>
-                        <el-form-item label="Favicon">
+                        <el-form-item>
+                            <template #label>
+                                <span>Favicon</span>
+                                <el-tooltip content="浏览器标签页上的小图标，支持ICO/PNG格式，建议32x32" placement="top">
+                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                                </el-tooltip>
+                            </template>
                             <el-input v-model="siteInfoData.favicon" placeholder="Favicon URL" />
                         </el-form-item>
-                        <el-form-item label="ICP备案号">
+                        <el-form-item>
+                            <template #label>
+                                <span>ICP备案号</span>
+                                <el-tooltip content="网站ICP备案号，显示在页面底部，如：京ICP备XXXXXXXX号" placement="top">
+                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                                </el-tooltip>
+                            </template>
                             <el-input v-model="siteInfoData.icp" placeholder="请输入ICP备案号" />
                         </el-form-item>
-                        <el-form-item label="版权信息">
+                        <el-form-item>
+                            <template #label>
+                                <span>版权信息</span>
+                                <el-tooltip content="显示在页面底部的版权声明文字" placement="top">
+                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                                </el-tooltip>
+                            </template>
                             <el-input v-model="siteInfoData.copyright" placeholder="请输入版权信息" />
                         </el-form-item>
-                        <el-form-item label="联系邮箱">
+                        <el-form-item>
+                            <template #label>
+                                <span>联系邮箱</span>
+                                <el-tooltip content="用于接收用户反馈和举报的邮箱地址" placement="top">
+                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                                </el-tooltip>
+                            </template>
                             <el-input v-model="siteInfoData.contactEmail" placeholder="请输入联系邮箱" />
                         </el-form-item>
-                        <el-form-item label="统计代码">
+                        <el-form-item>
+                            <template #label>
+                                <span>统计代码</span>
+                                <el-tooltip content="第三方统计代码（如百度统计、Google Analytics），将插入到页面底部" placement="top">
+                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                                </el-tooltip>
+                            </template>
                             <el-input v-model="siteInfoData.analyticsCode" type="textarea" :rows="4" placeholder="请输入统计代码" />
                         </el-form-item>
                         <el-form-item>
@@ -52,46 +115,83 @@
 
                 <!-- 页面配置 -->
                 <el-tab-pane label="页面配置" name="pageConfig">
-                    <el-form ref="pageConfigFormRef" :model="pageConfigData" label-width="120px" style="max-width: 600px">
-                        <el-form-item label="网站点击行为">
+                    <el-alert type="info" :closable="false" style="margin-bottom: 20px">
+                        <template #title>控制前端网站卡片的点击行为、直达箭头、窗口打开方式等全局页面交互配置。</template>
+                    </el-alert>
+                    <el-form ref="pageConfigFormRef" :model="pageConfigData" label-width="140px" style="max-width: 650px">
+                        <el-divider content-position="left">点击行为</el-divider>
+
+                        <el-form-item>
+                            <template #label>
+                                <span>网站点击行为</span>
+                                <el-tooltip placement="top">
+                                    <template #content>
+                                        设置用户点击网站卡片时的行为：<br/>
+                                        「跳转详情页」- 进入网站介绍页面<br/>
+                                        「弹窗确认后跳转」- 弹窗提示后跳转外部网站<br/>
+                                        「直达网站」- 直接打开外部网站
+                                    </template>
+                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                                </el-tooltip>
+                            </template>
                             <el-select v-model="pageConfigData.websiteClickMode" style="width: 100%">
                                 <el-option label="跳转详情页" value="detail" />
                                 <el-option label="弹窗确认后跳转" value="direct" />
                                 <el-option label="直达网站" value="directExternal" />
                             </el-select>
-                            <div class="text-gray-400 text-xs mt-1">
-                                设置用户点击网站卡片时的行为：<br/>
-                                「跳转详情页」- 点击卡片进入网站介绍页面<br/>
-                                「弹窗确认后跳转」- 点击卡片弹窗提示后跳转外部网站<br/>
-                                「直达网站」- 点击卡片直接打开外部网站（箭头变为"查看详情"指向详情页）
-                            </div>
                         </el-form-item>
-                        <el-form-item label="卡片直达箭头">
+
+                        <el-divider content-position="left">直达箭头</el-divider>
+
+                        <el-form-item>
+                            <template #label>
+                                <span>卡片直达箭头</span>
+                                <el-tooltip placement="top">
+                                    <template #content>
+                                        开启后，网站卡片右侧显示快捷按钮（鼠标移入时出现）。<br/>
+                                        点击行为为「详情页/弹窗」时，箭头为"直达网站"。<br/>
+                                        点击行为为「直达网站」时，箭头为"查看详情"。
+                                    </template>
+                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                                </el-tooltip>
+                            </template>
                             <el-switch v-model="pageConfigData.showDirectArrow" />
-                            <div class="text-gray-400 text-xs mt-1">
-                                开启后，网站卡片右侧会显示一个快捷按钮（鼠标移入时出现）。<br/>
-                                当点击行为为「跳转详情页」或「弹窗确认后跳转」时，箭头显示"直达网站"，点击直接打开外部链接。<br/>
-                                当点击行为为「直达网站」时，箭头显示"查看详情"，点击进入网站详情页。
-                            </div>
                         </el-form-item>
-                        <el-form-item label="详情页新窗口打开">
-                            <el-switch v-model="pageConfigData.detailPageNewWindow" />
-                            <div class="text-gray-400 text-xs mt-1">
-                                开启后，点击网站卡片进入详情页时会在浏览器新标签页中打开。<br/>
-                                关闭后，将在当前页面中打开详情页。仅在点击行为为「跳转详情页」时生效。
-                            </div>
-                        </el-form-item>
-                        <el-form-item label="箭头新窗口打开">
+
+                        <el-form-item>
+                            <template #label>
+                                <span>箭头新窗口打开</span>
+                                <el-tooltip content="开启后，点击直达箭头时在浏览器新标签页中打开目标页面" placement="top">
+                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                                </el-tooltip>
+                            </template>
                             <el-switch v-model="pageConfigData.directArrowNewWindow" />
-                            <div class="text-gray-400 text-xs mt-1">
-                                开启后，点击卡片上的直达箭头时会在浏览器新标签页中打开目标页面。<br/>
-                                关闭后，将在当前页面中打开目标页面。
-                            </div>
                         </el-form-item>
-                        <el-form-item label="每页显示数量">
+
+                        <el-divider content-position="left">窗口行为</el-divider>
+
+                        <el-form-item>
+                            <template #label>
+                                <span>详情页新窗口</span>
+                                <el-tooltip content="开启后，点击卡片进入详情页时在新标签页打开。仅在点击行为为「跳转详情页」时生效" placement="top">
+                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                                </el-tooltip>
+                            </template>
+                            <el-switch v-model="pageConfigData.detailPageNewWindow" />
+                        </el-form-item>
+
+                        <el-divider content-position="left">分页</el-divider>
+
+                        <el-form-item>
+                            <template #label>
+                                <span>每页显示数量</span>
+                                <el-tooltip content="每页显示的网站数量，建议20-50之间，数值过大可能影响加载速度" placement="top">
+                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                                </el-tooltip>
+                            </template>
                             <el-input-number v-model="pageConfigData.pageSize" :min="10" :max="100" />
-                            <div class="text-gray-400 text-xs mt-1">每页显示的网站数量，建议 20-50 之间</div>
                         </el-form-item>
+
                         <el-form-item>
                             <el-button type="primary" :loading="pageConfigLoading" @click="handleSavePageConfig">保存</el-button>
                         </el-form-item>
@@ -100,21 +200,53 @@
 
                 <!-- 跳转提醒 -->
                 <el-tab-pane label="跳转提醒" name="exitModal">
+                    <el-alert type="info" :closable="false" style="margin-bottom: 20px">
+                        <template #title>配置用户点击外部链接时的跳转确认弹窗。仅在点击行为为「弹窗确认后跳转」时生效。</template>
+                    </el-alert>
                     <el-form ref="exitModalFormRef" :model="exitModalData" label-width="120px" style="max-width: 600px">
-                        <el-form-item label="启用弹窗">
+                        <el-form-item>
+                            <template #label>
+                                <span>启用弹窗</span>
+                                <el-tooltip content="开启后，用户点击外部链接时会弹出确认提示窗口" placement="top">
+                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                                </el-tooltip>
+                            </template>
                             <el-switch v-model="exitModalData.enabled" />
                         </el-form-item>
-                        <el-form-item label="弹窗标题">
+                        <el-form-item>
+                            <template #label>
+                                <span>弹窗标题</span>
+                                <el-tooltip content="弹窗顶部显示的标题文字" placement="top">
+                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                                </el-tooltip>
+                            </template>
                             <el-input v-model="exitModalData.title" placeholder="即将离开本站" />
                         </el-form-item>
-                        <el-form-item label="弹窗描述">
+                        <el-form-item>
+                            <template #label>
+                                <span>弹窗描述</span>
+                                <el-tooltip content="弹窗中显示的提示说明文字" placement="top">
+                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                                </el-tooltip>
+                            </template>
                             <el-input v-model="exitModalData.description" type="textarea" :rows="2" placeholder="您即将访问外部网站，请注意安全" />
                         </el-form-item>
-                        <el-form-item label="自动跳转">
+                        <el-form-item>
+                            <template #label>
+                                <span>自动跳转</span>
+                                <el-tooltip content="开启后，倒计时结束将自动跳转到目标网站，无需用户手动点击" placement="top">
+                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                                </el-tooltip>
+                            </template>
                             <el-switch v-model="exitModalData.autoRedirect" />
-                            <span class="text-gray-400 text-xs ml-2">倒计时结束后自动跳转</span>
                         </el-form-item>
-                        <el-form-item label="倒计时(秒)">
+                        <el-form-item>
+                            <template #label>
+                                <span>倒计时(秒)</span>
+                                <el-tooltip content="自动跳转前的等待秒数，建议3-10秒" placement="top">
+                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                                </el-tooltip>
+                            </template>
                             <el-input-number v-model="exitModalData.countdown" :min="1" :max="30" />
                         </el-form-item>
                         <el-form-item>
@@ -131,6 +263,7 @@
 
 <script lang="ts" setup name="uiedSetting">
 import { uiedSiteInfo, uiedSaveSiteInfo, uiedSettingGet, uiedSettingSave } from '@/api/uied'
+import { QuestionFilled } from '@element-plus/icons-vue'
 import feedback from '@/utils/feedback'
 
 const activeTab = ref('siteInfo')
