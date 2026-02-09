@@ -1,11 +1,11 @@
 <!--
  * @file views/uied/website/index.vue
- * @description UIED 网站管理页面 - 含详情页编辑
+ * @description UIED 网站管理列表页面
  * @author Tomda
  * @copyright 版权所有 (c) 2026 UIED技术团队
  * @website https://fsuied.com
  * @license MIT
- * @version 2.0.0
+ * @version 3.0.0 - 编辑改为独立页面模式
 -->
 <template>
     <div class="website-lists">
@@ -51,9 +51,9 @@
                     共 {{ pager.count }} 个网站
                 </div>
             </div>
-            <el-table 
-                size="large" 
-                v-loading="pager.loading" 
+            <el-table
+                size="large"
+                v-loading="pager.loading"
                 :data="pager.lists"
                 @selection-change="handleSelectionChange"
             >
@@ -71,9 +71,7 @@
                 <el-table-column label="分类" prop="categoryName" width="120" />
                 <el-table-column label="URL" min-width="200" show-overflow-tooltip>
                     <template #default="{ row }">
-                        <a :href="row.url" target="_blank" class="text-primary hover:underline">
-                            {{ row.url }}
-                        </a>
+                        <a :href="row.url" target="_blank" class="text-primary hover:underline">{{ row.url }}</a>
                     </template>
                 </el-table-column>
                 <el-table-column label="点击量" prop="clickCount" width="90" />
@@ -96,177 +94,15 @@
                 <pagination v-model="pager" @change="getLists" />
             </div>
         </el-card>
-
-        <!-- 添加/编辑弹窗 -->
-        <el-dialog
-            v-model="showEdit"
-            :title="editData.id ? '编辑网站' : '添加网站'"
-            width="800px"
-            :close-on-click-modal="false"
-            top="5vh"
-        >
-            <el-tabs v-model="activeTab">
-                <!-- 基础信息 -->
-                <el-tab-pane label="基础信息" name="basic">
-                    <el-form ref="editFormRef" :model="editData" :rules="editRules" label-width="100px">
-                        <el-form-item label="网站名称" prop="name">
-                            <el-input v-model="editData.name" placeholder="请输入网站名称" />
-                        </el-form-item>
-                        <el-form-item label="固定链接">
-                            <el-input v-model="editData.slug" placeholder="留空自动生成，用于详情页URL">
-                                <template #prepend>/website/</template>
-                            </el-input>
-                        </el-form-item>
-                        <el-form-item label="网站URL" prop="url">
-                            <el-input v-model="editData.url" placeholder="请输入网站URL" />
-                        </el-form-item>
-                        <el-form-item label="所属分类" prop="categoryId">
-                            <el-select v-model="editData.categoryId" placeholder="请选择分类" style="width: 100%">
-                                <el-option
-                                    v-for="item in categoryList"
-                                    :key="item.id"
-                                    :label="item.name"
-                                    :value="item.id"
-                                />
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item label="网站描述">
-                            <el-input v-model="editData.description" type="textarea" :rows="3" placeholder="请输入网站描述" />
-                        </el-form-item>
-                        <el-form-item label="图标URL">
-                            <el-input v-model="editData.iconUrl" placeholder="请输入图标URL" />
-                        </el-form-item>
-                        <el-form-item label="标签">
-                            <el-select
-                                v-model="editData.tags"
-                                multiple
-                                filterable
-                                allow-create
-                                default-first-option
-                                placeholder="输入标签后回车添加"
-                                style="width: 100%"
-                            />
-                        </el-form-item>
-                        <el-row :gutter="16">
-                            <el-col :span="8">
-                                <el-form-item label="排序">
-                                    <el-input-number v-model="editData.sortOrder" :min="0" :max="9999" style="width: 100%" />
-                                </el-form-item>
-                            </el-col>
-                            <el-col :span="8">
-                                <el-form-item label="状态">
-                                    <el-switch v-model="editData.isActive" :active-value="1" :inactive-value="0" />
-                                </el-form-item>
-                            </el-col>
-                            <el-col :span="8">
-                                <el-form-item label="置顶">
-                                    <el-switch v-model="editData.isPinned" :active-value="1" :inactive-value="0" />
-                                </el-form-item>
-                            </el-col>
-                        </el-row>
-                    </el-form>
-                </el-tab-pane>
-
-                <!-- 详情页内容 -->
-                <el-tab-pane label="详情页" name="detail">
-                    <el-form :model="editData" label-width="100px">
-                        <el-form-item label="访问按钮">
-                            <el-input v-model="editData.visitBtnText" placeholder="默认：访问网站" />
-                        </el-form-item>
-                        <el-divider content-position="left">缩略图</el-divider>
-                        <el-form-item>
-                            <template #label>
-                                <span>缩略图</span>
-                                <el-tooltip content="网站预览缩略图，用于列表和详情页展示。支持输入URL或上传图片" placement="top">
-                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
-                                </el-tooltip>
-                            </template>
-                            <div style="width: 100%">
-                                <el-input v-model="editData.thumbnail" placeholder="输入缩略图URL" clearable>
-                                    <template #append>
-                                        <el-button @click="handleCaptureThumbnail" :loading="capturingThumbnail">
-                                            截图获取
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                                <div v-if="editData.thumbnail" class="mt-2">
-                                    <el-image
-                                        :src="editData.thumbnail"
-                                        style="max-width: 320px; max-height: 200px; border-radius: 4px; border: 1px solid #eee;"
-                                        fit="contain"
-                                        :preview-src-list="[editData.thumbnail]"
-                                    />
-                                </div>
-                            </div>
-                        </el-form-item>
-                        <el-divider content-position="left">详情内容</el-divider>
-                        <el-form-item label="详情内容">
-                            <div style="width: 100%">
-                                <div class="mb-2 flex justify-end">
-                                    <el-button type="primary" size="small" :loading="aiGenerating" @click="handleAiGenerateContent">
-                                        <el-icon class="mr-1"><MagicStick /></el-icon>
-                                        AI 生成内容
-                                    </el-button>
-                                </div>
-                                <editor
-                                    v-model="editData.detailContent"
-                                    :height="400"
-                                    mode="default"
-                                />
-                            </div>
-                        </el-form-item>
-                        <el-form-item label="产品截图">
-                            <div style="width: 100%">
-                                <div v-for="(_url, index) in screenshotList" :key="index" class="flex items-center mb-2 gap-2">
-                                    <el-input v-model="screenshotList[index]" placeholder="截图URL" />
-                                    <el-button type="danger" link @click="removeScreenshot(index)">删除</el-button>
-                                </div>
-                                <el-button type="primary" link @click="addScreenshot">+ 添加截图URL</el-button>
-                                <div class="text-gray-400 text-xs mt-1">
-                                    添加产品截图URL，将在详情页展示为图片画廊
-                                </div>
-                            </div>
-                        </el-form-item>
-                    </el-form>
-                </el-tab-pane>
-
-                <!-- SEO 设置 -->
-                <el-tab-pane label="SEO" name="seo">
-                    <el-form :model="editData" label-width="100px">
-                        <el-form-item label="SEO 标题">
-                            <el-input v-model="editData.seoTitle" placeholder="留空使用网站名称" maxlength="100" show-word-limit />
-                        </el-form-item>
-                        <el-form-item label="SEO 描述">
-                            <el-input
-                                v-model="editData.seoDescription"
-                                type="textarea"
-                                :rows="3"
-                                placeholder="留空使用网站描述"
-                                maxlength="300"
-                                show-word-limit
-                            />
-                        </el-form-item>
-                        <el-form-item label="SEO 关键词">
-                            <el-input v-model="editData.seoKeywords" placeholder="多个关键词用逗号分隔" maxlength="200" show-word-limit />
-                        </el-form-item>
-                    </el-form>
-                </el-tab-pane>
-            </el-tabs>
-            <template #footer>
-                <el-button @click="showEdit = false">取消</el-button>
-                <el-button type="primary" :loading="editLoading" @click="handleSubmit">确定</el-button>
-            </template>
-        </el-dialog>
     </div>
 </template>
 
 <script lang="ts" setup name="uiedWebsite">
-import { uiedWebsiteList, uiedWebsiteAdd, uiedWebsiteEdit, uiedWebsiteDelete, uiedWebsiteBatchDelete, uiedWebsiteDetail, uiedCategoryAll, uiedAiGenerateDetailContent } from '@/api/uied'
+import { uiedWebsiteList, uiedWebsiteDelete, uiedWebsiteBatchDelete, uiedCategoryAll } from '@/api/uied'
 import { usePaging } from '@/hooks/usePaging'
 import feedback from '@/utils/feedback'
-import type { FormInstance, FormRules } from 'element-plus'
-import { QuestionFilled, MagicStick } from '@element-plus/icons-vue'
-import editor from '@/components/editor/index.vue'
+
+const router = useRouter()
 
 const queryParams = reactive({
     keyword: '',
@@ -295,146 +131,13 @@ const handleSelectionChange = (rows: any[]) => {
     selectedIds.value = rows.map(row => row.id)
 }
 
-// 编辑相关
-const showEdit = ref(false)
-const editLoading = ref(false)
-const editFormRef = ref<FormInstance>()
-const activeTab = ref('basic')
-
-// 截图列表（独立管理，提交时合并到 editData）
-const screenshotList = ref<string[]>([])
-
-const addScreenshot = () => {
-    screenshotList.value.push('')
-}
-
-const removeScreenshot = (index: number) => {
-    screenshotList.value.splice(index, 1)
-}
-
-const editData = reactive({
-    id: 0,
-    name: '',
-    slug: '',
-    url: '',
-    categoryId: '' as string | number,
-    description: '',
-    iconUrl: '',
-    tags: [] as string[],
-    sortOrder: 0,
-    isActive: 1,
-    isPinned: 0,
-    // 详情页字段
-    detailContent: '',
-    visitBtnText: '',
-    thumbnail: '',
-    // SEO 字段
-    seoTitle: '',
-    seoDescription: '',
-    seoKeywords: '',
-})
-
-const editRules: FormRules = {
-    name: [{ required: true, message: '请输入网站名称', trigger: 'blur' }],
-    url: [{ required: true, message: '请输入网站URL', trigger: 'blur' }],
-    categoryId: [{ required: true, message: '请选择分类', trigger: 'change' }]
-}
-
-const resetEditData = () => {
-    editData.id = 0
-    editData.name = ''
-    editData.slug = ''
-    editData.url = ''
-    editData.categoryId = ''
-    editData.description = ''
-    editData.iconUrl = ''
-    editData.tags = []
-    editData.sortOrder = 0
-    editData.isActive = 1
-    editData.isPinned = 0
-    editData.detailContent = ''
-    editData.visitBtnText = ''
-    editData.thumbnail = ''
-    editData.seoTitle = ''
-    editData.seoDescription = ''
-    editData.seoKeywords = ''
-    screenshotList.value = []
-    activeTab.value = 'basic'
-}
-
+// 跳转到编辑页面
 const handleAdd = () => {
-    resetEditData()
-    showEdit.value = true
+    router.push('/uied/website/edit')
 }
 
-const handleEdit = async (row: any) => {
-    resetEditData()
-    editLoading.value = true
-    showEdit.value = true
-    try {
-        // 通过详情接口获取完整数据（包含 detailContent、screenshots 等）
-        const detail = await uiedWebsiteDetail({ id: row.id })
-        const data = detail || row
-        editData.id = data.id
-        editData.name = data.name || ''
-        editData.slug = data.slug || ''
-        editData.url = data.url || ''
-        editData.categoryId = data.categoryId || data.category_id || null
-        editData.description = data.description || ''
-        editData.iconUrl = data.iconUrl || data.icon_url || ''
-        editData.tags = Array.isArray(data.tags) ? data.tags : []
-        editData.sortOrder = data.order || data.sortOrder || data.sort || 0
-        editData.isActive = (data.isActive || data.status !== 'disabled') ? 1 : 0
-        editData.isPinned = data.isPinned ? 1 : 0
-        editData.detailContent = data.detailContent || data.detail_content || ''
-        editData.visitBtnText = data.visitBtnText || data.visit_btn_text || ''
-        editData.thumbnail = data.thumbnail || ''
-        editData.seoTitle = data.seoTitle || data.seo_title || ''
-        editData.seoDescription = data.seoDescription || data.seo_description || ''
-        editData.seoKeywords = data.seoKeywords || data.seo_keywords || ''
-        // 截图
-        const screenshots = data.screenshots || []
-        screenshotList.value = Array.isArray(screenshots) ? [...screenshots] : []
-    } catch (error) {
-        console.error('获取网站详情失败:', error)
-        // 降级使用列表行数据
-        editData.id = row.id
-        editData.name = row.name || ''
-        editData.url = row.url || ''
-        editData.categoryId = row.categoryId || ''
-        editData.description = row.description || ''
-        editData.iconUrl = row.iconUrl || ''
-        editData.sortOrder = row.sortOrder || 0
-        editData.isActive = row.isActive ? 1 : 0
-    } finally {
-        editLoading.value = false
-    }
-}
-
-const handleSubmit = async () => {
-    await editFormRef.value?.validate()
-    editLoading.value = true
-    try {
-        // 合并截图数据
-        const screenshots = screenshotList.value.filter(url => url.trim() !== '')
-        const submitData = {
-            ...editData,
-            screenshots,
-            thumbnail: editData.thumbnail || null,
-            order: editData.sortOrder,
-        }
-        if (editData.id) {
-            await uiedWebsiteEdit(submitData)
-            feedback.msgSuccess('编辑成功')
-        } else {
-            await uiedWebsiteAdd(submitData)
-            feedback.msgSuccess('添加成功')
-        }
-        showEdit.value = false
-        getLists()
-    } finally {
-        editLoading.value = false
-    }
+const handleEdit = (row: any) => {
+    router.push(`/uied/website/edit?id=${row.id}`)
 }
 
 const handleDelete = async (id: number) => {
@@ -450,47 +153,6 @@ const handleBatchDelete = async () => {
     feedback.msgSuccess('删除成功')
     selectedIds.value = []
     getLists()
-}
-
-// AI 生成详情内容
-const aiGenerating = ref(false)
-const handleAiGenerateContent = async () => {
-    if (!editData.id) {
-        feedback.msgWarning('请先保存网站基础信息后再使用 AI 生成')
-        return
-    }
-    aiGenerating.value = true
-    try {
-        const res = await uiedAiGenerateDetailContent({ websiteId: editData.id })
-        if (res?.content) {
-            editData.detailContent = res.content
-            feedback.msgSuccess('AI 内容生成成功')
-        }
-    } catch (error: any) {
-        feedback.msgError(error?.msg || error?.message || 'AI 生成失败，请检查 AI 配置')
-    } finally {
-        aiGenerating.value = false
-    }
-}
-
-// 截图获取缩略图
-const capturingThumbnail = ref(false)
-const handleCaptureThumbnail = async () => {
-    if (!editData.url) {
-        feedback.msgWarning('请先填写网站URL')
-        return
-    }
-    capturingThumbnail.value = true
-    try {
-        // 使用免费截图 API 生成缩略图
-        const encodedUrl = encodeURIComponent(editData.url)
-        editData.thumbnail = `https://image.thum.io/get/width/1280/crop/800/${editData.url}`
-        feedback.msgSuccess('缩略图URL已生成，请检查预览效果')
-    } catch (error) {
-        feedback.msgError('获取缩略图失败')
-    } finally {
-        capturingThumbnail.value = false
-    }
 }
 
 onMounted(() => {
