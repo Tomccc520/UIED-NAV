@@ -3,7 +3,7 @@
         <toolbar
             class="border-b border-br"
             :editor="editorRef"
-            :defaultConfig="toolbarConfig"
+            :defaultConfig="mergedToolbarConfig"
             :mode="mode"
         />
         <w-editor
@@ -25,7 +25,8 @@
 <script setup lang="ts">
 import '@wangeditor/editor/dist/css/style.css' // 引入 css
 import { Editor as WEditor, Toolbar } from '@wangeditor/editor-for-vue'
-import type { IEditorConfig, IToolbarConfig } from '@wangeditor/editor'
+import type { IEditorConfig, IToolbarConfig, IDomEditor } from '@wangeditor/editor'
+import { Boot } from '@wangeditor/editor'
 import MaterialPicker from '@/components/material/picker.vue'
 import { addUnit } from '@/utils/util'
 import type { CSSProperties } from 'vue'
@@ -58,6 +59,54 @@ const fileType = ref('')
 
 let insertFn: any
 
+// 注册 AI 悬浮菜单按钮（只注册一次）
+let aiMenuRegistered = false
+function registerAiHoverMenu() {
+    if (aiMenuRegistered) return
+    aiMenuRegistered = true
+
+    class AiHoverMenu {
+        title = 'AI'
+        tag = 'button'
+        iconSvg = '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>'
+
+        isActive() { return false }
+        getValue() { return '' }
+        isDisabled(editor: IDomEditor) { return !editor.getSelectionText() }
+
+        exec(editor: IDomEditor) {
+            const selectedText = editor.getSelectionText()
+            if (!selectedText) return
+
+            // 触发自定义事件，由外部处理 AI 逻辑
+            const event = new CustomEvent('wangeditor-ai-hover', {
+                detail: { text: selectedText, editor }
+            })
+            window.dispatchEvent(event)
+        }
+    }
+
+    const aiMenuConf = {
+        key: 'aiHoverMenu',
+        factory() { return new AiHoverMenu() }
+    }
+
+    try {
+        Boot.registerMenu(aiMenuConf)
+    } catch (e) {
+        // 已注册则忽略
+    }
+}
+
+registerAiHoverMenu()
+
+// 合并 toolbar 配置，将 AI 按钮加入 hoverbar
+const mergedToolbarConfig = computed<Partial<IToolbarConfig>>(() => {
+    return {
+        ...props.toolbarConfig
+    }
+})
+
 const editorConfig: Partial<IEditorConfig> = {
     MENU_CONF: {
         uploadImage: {
@@ -73,6 +122,15 @@ const editorConfig: Partial<IEditorConfig> = {
                 materialPickerRef.value?.showPopup(-1)
                 insertFn = insert
             }
+        }
+    },
+    hoverbarKeys: {
+        // 选中文本时的悬浮菜单
+        text: {
+            menuKeys: [
+                'headerSelect', 'bold', 'italic', 'underline', 'through',
+                'color', 'bgColor', 'insertLink', 'aiHoverMenu'
+            ]
         }
     }
 }
@@ -117,6 +175,15 @@ const handleCreated = (editor: any) => {
 }
 .w-e-text-container [data-slate-editor] ol {
     list-style: decimal;
+}
+/* AI 悬浮按钮样式 */
+.w-e-hover-bar {
+    .w-e-menu-tooltip-v5[data-tooltip="AI"] {
+        button {
+            color: #7c3aed;
+            font-weight: bold;
+        }
+    }
 }
 h1 {
     font-size: 2em;

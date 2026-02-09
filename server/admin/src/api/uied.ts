@@ -526,3 +526,8 @@ export function uiedAiFeatureToggle() {
 export function uiedAiSaveFeatureToggle(params: any) {
     return request.post({ url: '/uied/aiConfig/saveFeatureToggle', params })
 }
+
+// AI 对话（用于编辑器 AI 功能）
+export function uiedAiChat(params: any) {
+    return request.post({ url: '/uied/aiConfig/chat', params })
+}

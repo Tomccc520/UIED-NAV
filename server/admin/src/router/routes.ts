@@ -47,6 +47,22 @@ export const constantRoutes: Array<RouteRecordRaw> = [
                 }
             }
         ]
+    },
+    {
+        path: '/uied/website',
+        component: LAYOUT,
+        children: [
+            {
+                path: 'edit',
+                name: Symbol(),
+                component: () => import('@/views/uied/website/edit.vue'),
+                meta: {
+                    title: '编辑网站',
+                    hidden: true,
+                    activeMenu: '/uied/website'
+                }
+            }
+        ]
     }
 ]
 
