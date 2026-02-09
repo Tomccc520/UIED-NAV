@@ -126,6 +126,11 @@ module.exports = app => {
       allowNull: true,
       comment: '截图URL列表JSON',
     },
+    thumbnail: {
+      type: STRING(500),
+      allowNull: true,
+      comment: '缩略图/预览图URL',
+    },
     visit_btn_text: {
       type: STRING(50),
       allowNull: true,

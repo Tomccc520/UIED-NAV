@@ -646,6 +646,114 @@ class AiConfigService extends Service {
   }
 
   /**
+   * AI 生成网站详情内容
+   * 根据网站信息生成富文本 HTML 详情内容
+   * @param {number} websiteId - 网站ID
+   * @returns {Object} 包含 content 的结果
+   */
+  async generateDetailContent(websiteId) {
+    const { ctx, app } = this;
+
+    // 获取网站信息
+    const [website] = await app.model.query(
+      'SELECT id, name, url, description, tags FROM uied_website WHERE id = ? AND is_delete = 0',
+      { replacements: [websiteId], type: app.Sequelize.QueryTypes.SELECT }
+    );
+
+    if (!website) {
+      throw new Error('网站不存在');
+    }
+
+    // 获取 AI 配置
+    const config = await this.getDefault();
+    if (!config) {
+      throw new Error('没有可用的 AI 配置，请先在系统设置中配置 AI');
+    }
+
+    const tags = website.tags ? (() => { try { return JSON.parse(website.tags); } catch { return []; } })() : [];
+
+    const prompt = `请为以下网站生成一篇详细的介绍内容，用于网站详情页展示。请直接返回 HTML 格式内容，不要包含 \`\`\` 代码块标记。
+
+网站名称: ${website.name}
+网站URL: ${website.url}
+网站描述: ${website.description || '无'}
+标签: ${tags.join(', ') || '无'}
+
+要求：
+1. 使用 HTML 标签格式化内容（h2, h3, p, ul, li, strong 等）
+2. 内容包含：网站简介、主要功能/特点、适用人群、使用场景
+3. 内容长度 300-600 字
+4. 语言风格专业但易读
+5. 不要包含虚假信息，基于网站名称和描述合理推断`;
+
+    const startTime = Date.now();
+
+    try {
+      const response = await ctx.curl(config.apiUrl, {
+        method: 'POST',
+        contentType: 'json',
+        data: {
+          model: config.model,
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.7,
+          max_tokens: 2000,
+        },
+        headers: {
+          Authorization: `Bearer ${config.apiKey}`,
+        },
+        timeout: 60000,
+        dataType: 'json',
+      });
+
+      if (response.status !== 200) {
+        throw new Error('AI API 调用失败');
+      }
+
+      let content = response.data.choices?.[0]?.message?.content;
+      if (!content) {
+        throw new Error('AI 返回内容为空');
+      }
+
+      // 清理可能的代码块标记
+      content = content.replace(/^```html?\s*/i, '').replace(/\s*```$/i, '').trim();
+
+      const tokensUsed = response.data.usage?.total_tokens || 0;
+      const durationMs = Date.now() - startTime;
+
+      try {
+        await ctx.service.uied.aiUsageLog.add({
+          configId: config.id || 0,
+          featureType: 'generate_detail',
+          requestContent: `生成详情内容: ${website.name}`,
+          responseStatus: 'success',
+          tokensUsed,
+          durationMs,
+        });
+      } catch (logErr) {
+        ctx.logger.error('AI日志记录失败:', logErr);
+      }
+
+      return { content };
+    } catch (error) {
+      const durationMs = Date.now() - startTime;
+      try {
+        await ctx.service.uied.aiUsageLog.add({
+          configId: config.id || 0,
+          featureType: 'generate_detail',
+          requestContent: `生成详情内容: ${website.name}`,
+          responseStatus: 'failed',
+          errorMessage: error.message || 'AI 生成失败',
+          tokensUsed: 0,
+          durationMs,
+        });
+      } catch (logErr) {
+        ctx.logger.error('AI日志记录失败:', logErr);
+      }
+      throw error;
+    }
+  }
+
+  /**
    * AI 对话
    */
   async chat(message, context = []) {

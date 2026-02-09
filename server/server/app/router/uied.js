@@ -171,6 +171,7 @@ module.exports = app => {
   router.all('/api/uied/aiConfig/edit', controller.uied.aiConfig.edit);
   router.all('/api/uied/aiConfig/del', controller.uied.aiConfig.del);
   router.all('/api/uied/aiConfig/generateWebsiteInfo', controller.uied.aiConfig.generateWebsiteInfo);
+  router.all('/api/uied/aiConfig/generateDetailContent', controller.uied.aiConfig.generateDetailContent);
   router.all('/api/uied/aiConfig/batchGenerate', controller.uied.aiConfig.batchGenerate);
   router.all('/api/uied/aiConfig/batchConfirm', controller.uied.aiConfig.batchConfirm);
   router.all('/api/uied/aiConfig/chat', controller.uied.aiConfig.chat);

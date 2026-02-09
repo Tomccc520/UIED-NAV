@@ -498,6 +498,11 @@ export function uiedAiConfigBatchConfirm(params: any) {
     return request.post({ url: '/uied/aiConfig/batchConfirm', params })
 }
 
+// AI 生成网站详情内容
+export function uiedAiGenerateDetailContent(params: any) {
+    return request.post({ url: '/uied/aiConfig/generateDetailContent', params })
+}
+
 // ==================== AI 使用日志 ====================
 
 // AI 使用日志列表

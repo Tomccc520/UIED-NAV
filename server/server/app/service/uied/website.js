@@ -142,6 +142,7 @@ class WebsiteService extends Service {
       seoKeywords: website.seo_keywords,
       detailContent: website.detail_content,
       screenshots: website.screenshots ? JSON.parse(website.screenshots) : [],
+      thumbnail: website.thumbnail,
       visitBtnText: website.visit_btn_text,
       status: website.status,
       createdAt: website.create_time,
@@ -170,9 +171,9 @@ class WebsiteService extends Service {
     const [result] = await app.model.query(
       `INSERT INTO uied_website (name, slug, description, url, icon_url, category_id,
         is_new, is_featured, is_hot, is_pinned, tags, sort, click_count,
-        seo_title, seo_description, seo_keywords, detail_content, screenshots, visit_btn_text,
+        seo_title, seo_description, seo_keywords, detail_content, screenshots, thumbnail, visit_btn_text,
         status, create_time, update_time)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       {
         replacements: [
           data.name,
@@ -193,6 +194,7 @@ class WebsiteService extends Service {
           data.seoKeywords || null,
           data.detailContent || null,
           data.screenshots ? JSON.stringify(data.screenshots) : null,
+          data.thumbnail || null,
           data.visitBtnText || null,
           'unchecked',
           now,
@@ -254,6 +256,7 @@ class WebsiteService extends Service {
     if (data.seoKeywords !== undefined) { updates.push('seo_keywords = ?'); values.push(data.seoKeywords); }
     if (data.detailContent !== undefined) { updates.push('detail_content = ?'); values.push(data.detailContent); }
     if (data.screenshots !== undefined) { updates.push('screenshots = ?'); values.push(JSON.stringify(data.screenshots)); }
+    if (data.thumbnail !== undefined) { updates.push('thumbnail = ?'); values.push(data.thumbnail); }
     if (data.visitBtnText !== undefined) { updates.push('visit_btn_text = ?'); values.push(data.visitBtnText); }
     
     updates.push('update_time = ?');

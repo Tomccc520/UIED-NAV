@@ -173,17 +173,46 @@
                         <el-form-item label="访问按钮">
                             <el-input v-model="editData.visitBtnText" placeholder="默认：访问网站" />
                         </el-form-item>
+                        <el-divider content-position="left">缩略图</el-divider>
+                        <el-form-item>
+                            <template #label>
+                                <span>缩略图</span>
+                                <el-tooltip content="网站预览缩略图，用于列表和详情页展示。支持输入URL或上传图片" placement="top">
+                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                                </el-tooltip>
+                            </template>
+                            <div style="width: 100%">
+                                <el-input v-model="editData.thumbnail" placeholder="输入缩略图URL" clearable>
+                                    <template #append>
+                                        <el-button @click="handleCaptureThumbnail" :loading="capturingThumbnail">
+                                            截图获取
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                                <div v-if="editData.thumbnail" class="mt-2">
+                                    <el-image
+                                        :src="editData.thumbnail"
+                                        style="max-width: 320px; max-height: 200px; border-radius: 4px; border: 1px solid #eee;"
+                                        fit="contain"
+                                        :preview-src-list="[editData.thumbnail]"
+                                    />
+                                </div>
+                            </div>
+                        </el-form-item>
+                        <el-divider content-position="left">详情内容</el-divider>
                         <el-form-item label="详情内容">
                             <div style="width: 100%">
-                                <el-input
-                                    v-model="editData.detailContent"
-                                    type="textarea"
-                                    :rows="12"
-                                    placeholder="支持 HTML 和简单 Markdown 格式，用于网站详情页展示"
-                                />
-                                <div class="text-gray-400 text-xs mt-1">
-                                    支持 HTML 标签和简单 Markdown（标题、加粗、链接、列表等）
+                                <div class="mb-2 flex justify-end">
+                                    <el-button type="primary" size="small" :loading="aiGenerating" @click="handleAiGenerateContent">
+                                        <el-icon class="mr-1"><MagicStick /></el-icon>
+                                        AI 生成内容
+                                    </el-button>
                                 </div>
+                                <editor
+                                    v-model="editData.detailContent"
+                                    :height="400"
+                                    mode="default"
+                                />
                             </div>
                         </el-form-item>
                         <el-form-item label="产品截图">
@@ -232,10 +261,12 @@
 </template>
 
 <script lang="ts" setup name="uiedWebsite">
-import { uiedWebsiteList, uiedWebsiteAdd, uiedWebsiteEdit, uiedWebsiteDelete, uiedWebsiteBatchDelete, uiedWebsiteDetail, uiedCategoryAll } from '@/api/uied'
+import { uiedWebsiteList, uiedWebsiteAdd, uiedWebsiteEdit, uiedWebsiteDelete, uiedWebsiteBatchDelete, uiedWebsiteDetail, uiedCategoryAll, uiedAiGenerateDetailContent } from '@/api/uied'
 import { usePaging } from '@/hooks/usePaging'
 import feedback from '@/utils/feedback'
 import type { FormInstance, FormRules } from 'element-plus'
+import { QuestionFilled, MagicStick } from '@element-plus/icons-vue'
+import editor from '@/components/editor/index.vue'
 
 const queryParams = reactive({
     keyword: '',
@@ -296,6 +327,7 @@ const editData = reactive({
     // 详情页字段
     detailContent: '',
     visitBtnText: '',
+    thumbnail: '',
     // SEO 字段
     seoTitle: '',
     seoDescription: '',
@@ -322,6 +354,7 @@ const resetEditData = () => {
     editData.isPinned = 0
     editData.detailContent = ''
     editData.visitBtnText = ''
+    editData.thumbnail = ''
     editData.seoTitle = ''
     editData.seoDescription = ''
     editData.seoKeywords = ''
@@ -355,6 +388,7 @@ const handleEdit = async (row: any) => {
         editData.isPinned = data.isPinned ? 1 : 0
         editData.detailContent = data.detailContent || data.detail_content || ''
         editData.visitBtnText = data.visitBtnText || data.visit_btn_text || ''
+        editData.thumbnail = data.thumbnail || ''
         editData.seoTitle = data.seoTitle || data.seo_title || ''
         editData.seoDescription = data.seoDescription || data.seo_description || ''
         editData.seoKeywords = data.seoKeywords || data.seo_keywords || ''
@@ -386,6 +420,7 @@ const handleSubmit = async () => {
         const submitData = {
             ...editData,
             screenshots,
+            thumbnail: editData.thumbnail || null,
             order: editData.sortOrder,
         }
         if (editData.id) {
@@ -415,6 +450,47 @@ const handleBatchDelete = async () => {
     feedback.msgSuccess('删除成功')
     selectedIds.value = []
     getLists()
+}
+
+// AI 生成详情内容
+const aiGenerating = ref(false)
+const handleAiGenerateContent = async () => {
+    if (!editData.id) {
+        feedback.msgWarning('请先保存网站基础信息后再使用 AI 生成')
+        return
+    }
+    aiGenerating.value = true
+    try {
+        const res = await uiedAiGenerateDetailContent({ websiteId: editData.id })
+        if (res?.content) {
+            editData.detailContent = res.content
+            feedback.msgSuccess('AI 内容生成成功')
+        }
+    } catch (error: any) {
+        feedback.msgError(error?.msg || error?.message || 'AI 生成失败，请检查 AI 配置')
+    } finally {
+        aiGenerating.value = false
+    }
+}
+
+// 截图获取缩略图
+const capturingThumbnail = ref(false)
+const handleCaptureThumbnail = async () => {
+    if (!editData.url) {
+        feedback.msgWarning('请先填写网站URL')
+        return
+    }
+    capturingThumbnail.value = true
+    try {
+        // 使用免费截图 API 生成缩略图
+        const encodedUrl = encodeURIComponent(editData.url)
+        editData.thumbnail = `https://image.thum.io/get/width/1280/crop/800/${editData.url}`
+        feedback.msgSuccess('缩略图URL已生成，请检查预览效果')
+    } catch (error) {
+        feedback.msgError('获取缩略图失败')
+    } finally {
+        capturingThumbnail.value = false
+    }
 }
 
 onMounted(() => {

@@ -575,6 +575,7 @@ class FrontendService extends Service {
       seoKeywords: website.seo_keywords,
       detailContent: website.detail_content,
       screenshots: website.screenshots ? this.safeJsonParse(website.screenshots, []) : [],
+      thumbnail: website.thumbnail,
       visitBtnText: website.visit_btn_text,
       createdAt: website.create_time ? new Date(website.create_time * 1000).toISOString() : null,
       updatedAt: website.update_time ? new Date(website.update_time * 1000).toISOString() : null,

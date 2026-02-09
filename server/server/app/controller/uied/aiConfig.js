@@ -251,6 +251,24 @@ class AiConfigController extends baseController {
   }
 
   /**
+   * AI 生成网站详情内容
+   */
+  async generateDetailContent() {
+    const { ctx } = this;
+    try {
+      const { websiteId } = ctx.request.body;
+      if (!websiteId) {
+        return this.result({ code: 400, message: '请提供网站ID' });
+      }
+      const result = await ctx.service.uied.aiConfig.generateDetailContent(websiteId);
+      this.result({ data: result });
+    } catch (error) {
+      ctx.logger.error('AI生成详情内容失败:', error);
+      this.result({ code: 500, message: error.message || 'AI生成失败' });
+    }
+  }
+
+  /**
    * AI 对话
    */
   async chat() {
