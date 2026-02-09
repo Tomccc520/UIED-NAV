@@ -164,21 +164,24 @@ class HotRecommendationService extends Service {
   async getActive(position, limit = 20) {
     const { app } = this;
     
-    let whereClause = 'is_delete = 0 AND is_show = 1';
+    let whereClause = 'hr.is_delete = 0 AND hr.is_show = 1';
     const replacements = [];
     
     if (position && position !== 'all') {
-      whereClause += ' AND position = ?';
+      whereClause += ' AND hr.position = ?';
       replacements.push(position);
     }
     
+    // LEFT JOIN uied_website 通过 URL 匹配，获取真实的 website_id 和 slug
     const items = await app.model.query(
-      `SELECT id, name, description, url, icon_url as iconUrl, 
-              page_slug as pageSlug, position, sort as 'order', 
-              is_show as visible, click_count as clickCount
-       FROM uied_hot_recommendation
+      `SELECT hr.id, hr.name, hr.description, hr.url, hr.icon_url as iconUrl, 
+              hr.page_slug as pageSlug, hr.position, hr.sort as 'order', 
+              hr.is_show as visible, hr.click_count as clickCount,
+              w.id as websiteId, w.slug as websiteSlug
+       FROM uied_hot_recommendation hr
+       LEFT JOIN uied_website w ON hr.url = w.url AND w.is_delete = 0
        WHERE ${whereClause}
-       ORDER BY sort ASC, id DESC
+       ORDER BY hr.sort ASC, hr.id DESC
        LIMIT ?`,
       { replacements: [...replacements, limit], type: app.Sequelize.QueryTypes.SELECT }
     );
@@ -187,6 +190,8 @@ class HotRecommendationService extends Service {
     return items.map(item => ({
       ...item,
       visible: item.visible === 1,
+      websiteId: item.websiteId || null,
+      websiteSlug: item.websiteSlug || null,
     }));
   }
 
