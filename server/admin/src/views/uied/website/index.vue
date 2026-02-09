@@ -74,15 +74,10 @@
                         <a :href="row.url" target="_blank" class="text-primary hover:underline">{{ row.url }}</a>
                     </template>
                 </el-table-column>
-                <el-table-column label="前端路径" width="160" show-overflow-tooltip>
+                <el-table-column label="前端" width="80" align="center">
                     <template #default="{ row }">
-                        <a
-                            :href="getFrontendUrl(row)"
-                            target="_blank"
-                            class="text-primary hover:underline"
-                            style="font-size: 12px;"
-                        >
-                            /website/{{ row.slug || row.id }}
+                        <a :href="getFrontendUrl(row)" target="_blank">
+                            <el-button type="primary" link size="small">查看</el-button>
                         </a>
                     </template>
                 </el-table-column>

@@ -44,7 +44,10 @@
                             <el-input v-model="editData.description" type="textarea" :rows="3" placeholder="请输入网站描述" />
                         </el-form-item>
                         <el-form-item label="图标URL">
-                            <el-input v-model="editData.iconUrl" placeholder="请输入图标URL" />
+                            <div class="flex gap-2" style="width: 100%">
+                                <el-input v-model="editData.iconUrl" placeholder="请输入图标URL" clearable />
+                                <el-button :loading="fetchingIcon" @click="handleFetchIcon">获取图标</el-button>
+                            </div>
                         </el-form-item>
                         <el-form-item label="标签">
                             <el-select v-model="editData.tags" multiple filterable allow-create default-first-option placeholder="输入标签后回车添加" style="width: 100%" />
@@ -237,7 +240,7 @@
 </template>
 
 <script lang="ts" setup name="uiedWebsiteEdit">
-import { uiedWebsiteAdd, uiedWebsiteEdit, uiedWebsiteDetail, uiedCategoryAll, uiedAiGenerateDetailContent, uiedAiChat } from '@/api/uied'
+import { uiedWebsiteAdd, uiedWebsiteEdit, uiedWebsiteDetail, uiedCategoryAll, uiedAiGenerateDetailContent, uiedAiChat, uiedSeoScraperFetch } from '@/api/uied'
 import feedback from '@/utils/feedback'
 import type { FormInstance, FormRules } from 'element-plus'
 import { QuestionFilled, MagicStick, FolderOpened } from '@element-plus/icons-vue'
@@ -337,6 +340,25 @@ const handleCaptureThumbnail = async () => {
         editData.thumbnail = `https://image.thum.io/get/width/1280/crop/800/${editData.url}`
         feedback.msgSuccess('缩略图URL已生成')
     } finally { capturingThumbnail.value = false }
+}
+
+// ==================== 获取图标 ====================
+const fetchingIcon = ref(false)
+const handleFetchIcon = async () => {
+    if (!editData.url) { feedback.msgWarning('请先填写网站URL'); return }
+    fetchingIcon.value = true
+    try {
+        const res = await uiedSeoScraperFetch({ url: editData.url })
+        const favicon = res?.favicon || res?.data?.favicon
+        if (favicon) {
+            editData.iconUrl = favicon
+            feedback.msgSuccess('图标获取成功')
+        } else {
+            feedback.msgWarning('未能获取到图标')
+        }
+    } catch (error: any) {
+        feedback.msgError(error?.msg || error?.message || '获取图标失败')
+    } finally { fetchingIcon.value = false }
 }
 
 // ==================== AI 对话助手 ====================
