@@ -26,6 +26,7 @@ class SeoScraperService extends Service {
       // 使用 curl 获取网页内容
       const response = await ctx.curl(fullUrl, {
         timeout: 10000,
+        rejectUnauthorized: false,
         headers: {
           'User-Agent': 'Mozilla/5.0 (compatible; UIED-Nav/1.0; +https://fsuied.com)',
           'Accept': 'text/html,application/xhtml+xml',

@@ -536,5 +536,5 @@ export function uiedAiChat(params: any) {
 
 // 抓取网站 SEO 信息（含 favicon）
 export function uiedSeoScraperFetch(params: any) {
-    return request.get({ url: '/uied/seoScraper/fetch', params })
+    return request.post({ url: '/uied/seoScraper/fetch', params })
 }
