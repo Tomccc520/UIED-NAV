@@ -284,13 +284,33 @@ class FrontendController extends Controller {
     const { ctx } = this;
     
     try {
-      const exitModalConfig = await ctx.service.uied.setting.get('exitModalConfig');
-      const pageGlobalConfig = await ctx.service.uied.setting.get('pageGlobalConfig');
+      const [
+        exitModalConfig,
+        pageGlobalConfig,
+        appearanceConfig,
+        homepageConfig,
+        cardStyleConfig,
+        sidebarConfig,
+        searchConfig,
+      ] = await Promise.all([
+        ctx.service.uied.setting.get('exitModalConfig'),
+        ctx.service.uied.setting.get('pageGlobalConfig'),
+        ctx.service.uied.setting.get('appearanceConfig'),
+        ctx.service.uied.setting.get('homepageConfig'),
+        ctx.service.uied.setting.get('cardStyleConfig'),
+        ctx.service.uied.setting.get('sidebarConfig'),
+        ctx.service.uied.setting.get('searchConfig'),
+      ]);
       
       ctx.body = {
         exitModalEnabled: true,
         exitModalConfig: exitModalConfig || {},
         pageGlobalConfig: pageGlobalConfig || {},
+        appearanceConfig: appearanceConfig || {},
+        homepageConfig: homepageConfig || {},
+        cardStyleConfig: cardStyleConfig || {},
+        sidebarConfig: sidebarConfig || {},
+        searchConfig: searchConfig || {},
       };
     } catch (error) {
       ctx.logger.error('获取前端配置失败:', error);
@@ -298,6 +318,11 @@ class FrontendController extends Controller {
         exitModalEnabled: true,
         exitModalConfig: {},
         pageGlobalConfig: {},
+        appearanceConfig: {},
+        homepageConfig: {},
+        cardStyleConfig: {},
+        sidebarConfig: {},
+        searchConfig: {},
       };
     }
   }
