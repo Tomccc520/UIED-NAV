@@ -173,7 +173,8 @@ class SettingService extends Service {
       showDirectArrow: true,
       directArrowNewWindow: true,
       detailPageNewWindow: false,
-      pageSize: 20
+      pageSize: 20,
+      hotRecommendationClickMode: 'direct' // 热门推荐独立配置
     };
     
     const defaultAppearance = {

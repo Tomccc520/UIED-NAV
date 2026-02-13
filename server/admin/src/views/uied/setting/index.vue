@@ -254,11 +254,21 @@
                     <div class="setting-header">
                         <h2 class="setting-title">页面配置</h2>
                         <p class="setting-desc">控制前端网站卡片的点击行为、直达箭头、窗口打开方式等全局页面交互配置。</p>
+                        <el-alert 
+                            type="info" 
+                            :closable="false" 
+                            show-icon
+                            style="margin-top: 12px"
+                        >
+                            <template #title>
+                                <span style="font-weight: 500;">注意：此配置仅对「分类区域」的网站卡片生效，「热门推荐」区域有独立配置</span>
+                            </template>
+                        </el-alert>
                     </div>
                     <el-form :model="pageConfigData" label-width="140px" style="max-width: 650px">
-                        <el-divider content-position="left">点击行为</el-divider>
+                        <el-divider content-position="left">分类区域点击行为</el-divider>
                         <el-form-item>
-                            <template #label><span>网站点击行为</span><el-tooltip placement="top"><template #content>设置用户点击网站卡片时的行为：<br/>「跳转详情页」- 进入网站介绍页面<br/>「弹窗确认后跳转」- 弹窗提示后跳转外部网站<br/>「直达网站」- 直接打开外部网站</template><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>网站点击行为</span><el-tooltip placement="top"><template #content>设置用户点击「分类区域」网站卡片时的行为：<br/>「跳转详情页」- 进入网站介绍页面<br/>「弹窗确认后跳转」- 弹窗提示后跳转外部网站<br/>「直达网站」- 直接打开外部网站<br/><br/>注意：热门推荐区域有独立配置</template><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-select v-model="pageConfigData.websiteClickMode" style="width:100%">
                                 <el-option label="跳转详情页" value="detail" />
                                 <el-option label="弹窗确认后跳转" value="direct" />
@@ -283,6 +293,15 @@
                         <el-form-item>
                             <template #label><span>每页显示数量</span><el-tooltip content="每页显示的网站数量，建议20-50之间" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-input-number v-model="pageConfigData.pageSize" :min="10" :max="100" />
+                        </el-form-item>
+                        <el-divider content-position="left">热门推荐点击行为</el-divider>
+                        <p class="section-desc">热门推荐区域使用独立的点击行为配置，不受上方「分类区域」配置影响。</p>
+                        <el-form-item>
+                            <template #label><span>热门推荐点击</span><el-tooltip placement="top"><template #content>设置用户点击「热门推荐」区域卡片时的行为：<br/>「直达网站」- 直接打开外部网站（推荐）<br/>「弹窗确认」- 弹窗提示后跳转</template><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <el-select v-model="pageConfigData.hotRecommendationClickMode" style="width:100%">
+                                <el-option label="直达网站（推荐）" value="direct" />
+                                <el-option label="弹窗确认后跳转" value="modal" />
+                            </el-select>
                         </el-form-item>
                         <el-form-item>
                             <el-button type="primary" :loading="pageConfigLoading" @click="handleSavePageConfig">保存</el-button>
@@ -579,6 +598,7 @@ const pageConfigData = reactive({
     detailPageNewWindow: false,
     directArrowNewWindow: true,
     pageSize: 20,
+    hotRecommendationClickMode: 'direct', // 热门推荐独立配置
 })
 
 // ==================== 卡片样式 ====================
