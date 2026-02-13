@@ -13,6 +13,18 @@
 const Service = require('egg').Service;
 
 class BannerService extends Service {
+  /**
+   * 规范化广告位置参数，兼容前后端不同命名
+   */
+  normalizePosition(position) {
+    const map = {
+      top: 'home',
+      bottom: 'footer',
+      popup: 'detail',
+    };
+    return map[position] || position || '';
+  }
+
   async list(params = {}) {
     const { app } = this;
     const page = parseInt(params.pageNo) || 1;
@@ -98,6 +110,54 @@ class BannerService extends Service {
       replacements: [now, id],
       type: app.Sequelize.QueryTypes.UPDATE,
     });
+  }
+
+  /**
+   * 获取前端可用的激活广告
+   */
+  async active(params = {}) {
+    const { app } = this;
+    const now = Math.floor(Date.now() / 1000);
+    const limit = parseInt(params.limit) || 20;
+    const position = this.normalizePosition(params.position);
+    const pageSlug = params.pageSlug || '';
+
+    let whereSql = 'is_delete = 0 AND is_show = 1';
+    const replacements = [];
+
+    // 生效时间控制：为空或0表示不限制
+    whereSql += ' AND (start_time IS NULL OR start_time = 0 OR start_time <= ?)';
+    whereSql += ' AND (end_time IS NULL OR end_time = 0 OR end_time >= ?)';
+    replacements.push(now, now);
+
+    if (position) {
+      whereSql += ' AND position = ?';
+      replacements.push(position);
+    }
+
+    // page_slug 为空表示全局；支持 all 作为通配值
+    if (pageSlug) {
+      whereSql += ' AND (page_slug IS NULL OR page_slug = \'\' OR page_slug = ? OR page_slug = \'all\')';
+      replacements.push(pageSlug);
+    }
+
+    const lists = await app.model.query(
+      `SELECT * FROM uied_banner WHERE ${whereSql} ORDER BY sort ASC, id ASC LIMIT ?`,
+      { replacements: [ ...replacements, limit ], type: app.Sequelize.QueryTypes.SELECT }
+    );
+
+    return lists.map(this.formatItem);
+  }
+
+  /**
+   * 记录广告点击
+   */
+  async recordClick(id) {
+    const { app } = this;
+    await app.model.query(
+      'UPDATE uied_banner SET click_count = click_count + 1 WHERE id = ? AND is_delete = 0',
+      { replacements: [ id ], type: app.Sequelize.QueryTypes.UPDATE }
+    );
   }
 
   formatItem(item) {

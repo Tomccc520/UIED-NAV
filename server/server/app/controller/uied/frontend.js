@@ -588,6 +588,42 @@ class FrontendController extends Controller {
   }
 
   /**
+   * 获取激活广告（前端调用）
+   * GET /api/banners/active
+   */
+  async bannersActive() {
+    const { ctx } = this;
+    const { pageSlug, position, limit } = ctx.query;
+
+    try {
+      const result = await ctx.service.uied.banner.active({ pageSlug, position, limit });
+      ctx.body = { success: true, data: result };
+    } catch (error) {
+      ctx.logger.error('获取激活广告失败:', error);
+      ctx.status = 500;
+      ctx.body = { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * 记录广告点击
+   * POST /api/banners/:id/click
+   */
+  async bannerClick() {
+    const { ctx } = this;
+    const { id } = ctx.params;
+
+    try {
+      await ctx.service.uied.banner.recordClick(id);
+      ctx.body = { success: true };
+    } catch (error) {
+      ctx.logger.error('记录广告点击失败:', error);
+      ctx.status = 500;
+      ctx.body = { success: false, error: error.message };
+    }
+  }
+
+  /**
    * 获取站点信息
    * GET /api/site-info
    */

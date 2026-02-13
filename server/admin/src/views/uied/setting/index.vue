@@ -10,6 +10,19 @@
 <template>
     <div class="site-setting">
         <el-card class="!border-none" shadow="never">
+            <div class="setting-toolbar">
+                <div class="toolbar-left">
+                    <el-tag :type="hasPendingChanges ? 'warning' : 'success'" effect="plain">
+                        {{ hasPendingChanges ? '有未保存改动' : '已与服务器保持一致' }}
+                    </el-tag>
+                    <span class="toolbar-time">最近保存：{{ lastSavedAtText }}</span>
+                </div>
+                <div class="toolbar-right">
+                    <el-button size="small" :disabled="!hasCurrentTabChanges" @click="handleResetCurrentTab">重置当前标签</el-button>
+                    <el-button size="small" :loading="reloadLoading" @click="handleReloadAll">重新加载</el-button>
+                    <el-button type="primary" size="small" :loading="saveAllLoading" @click="handleSaveAll">保存全部配置</el-button>
+                </div>
+            </div>
             <el-tabs v-model="activeTab" tab-position="left" class="setting-tabs">
 
                 <!-- ==================== 站点信息 ==================== -->
@@ -302,6 +315,16 @@
                                 <el-option label="直达网站" value="direct" />
                             </el-select>
                         </el-form-item>
+                        <el-alert type="success" :closable="false" show-icon style="margin-bottom: 16px;">
+                            <template #title>
+                                <span style="font-weight: 500;">点击行为预览</span>
+                            </template>
+                            <div class="behavior-preview">
+                                <p>分类区域卡片：{{ pageConfigData.websiteClickMode === 'direct' ? '直达网站' : '跳转详情页' }}</p>
+                                <p>热门推荐卡片：{{ pageConfigData.hotRecommendationClickMode === 'direct' ? '直达网站' : '跳转详情页' }}</p>
+                                <p>卡片箭头：{{ pageConfigData.websiteClickMode === 'direct' ? '进入详情页' : '直达外部网站' }}</p>
+                            </div>
+                        </el-alert>
                         <el-form-item>
                             <el-button type="primary" :loading="pageConfigLoading" @click="handleSavePageConfig">保存</el-button>
                         </el-form-item>
@@ -545,11 +568,14 @@
  * @license MIT
  * @version 2.0.0
  */
-import { uiedSiteInfo, uiedSaveSiteInfo, uiedSettingGet, uiedSettingSave } from '@/api/uied'
+import { uiedPublicSettings, uiedSiteInfo, uiedSaveSiteInfo, uiedSettingGet, uiedSettingSave } from '@/api/uied'
 import { QuestionFilled } from '@element-plus/icons-vue'
 import feedback from '@/utils/feedback'
 
 const activeTab = ref('siteInfo')
+const reloadLoading = ref(false)
+const saveAllLoading = ref(false)
+const lastSavedAt = ref<number | null>(null)
 
 // ==================== 站点信息 ====================
 const siteInfoLoading = ref(false)
@@ -672,7 +698,147 @@ const exitModalData = reactive({
     countdown: 5,
 })
 
+// ==================== 快照与比对 ====================
+const snapshotData = reactive({
+    siteInfo: '',
+    appearance: '',
+    homepage: '',
+    pageConfig: '',
+    cardStyle: '',
+    sidebar: '',
+    search: '',
+    exitModal: '',
+})
+
+/**
+ * 深拷贝配置对象，避免响应式引用污染快照
+ */
+const cloneConfig = <T,>(data: T): T => JSON.parse(JSON.stringify(data))
+
+/**
+ * 序列化配置对象，用于判断是否有改动
+ */
+const serializeConfig = (data: unknown): string => JSON.stringify(data ?? {})
+
+/**
+ * 获取当前页面配置的标准化序列化值
+ */
+const getSerializedPageConfig = (): string => {
+    const normalized = normalizePageConfigData(cloneConfig(pageConfigData))
+    return serializeConfig(normalized)
+}
+
+/**
+ * 刷新本地快照
+ */
+const refreshSnapshot = () => {
+    snapshotData.siteInfo = serializeConfig(cloneConfig(siteInfoData))
+    snapshotData.appearance = serializeConfig(cloneConfig(appearanceData))
+    snapshotData.homepage = serializeConfig(cloneConfig(homepageData))
+    snapshotData.pageConfig = getSerializedPageConfig()
+    snapshotData.cardStyle = serializeConfig(cloneConfig(cardStyleData))
+    snapshotData.sidebar = serializeConfig(cloneConfig(sidebarData))
+    snapshotData.search = serializeConfig(cloneConfig(searchData))
+    snapshotData.exitModal = serializeConfig(cloneConfig(exitModalData))
+}
+
+/**
+ * 读取指定快照对象
+ */
+const readSnapshotObject = (value: string): Record<string, any> => {
+    try {
+        return value ? JSON.parse(value) : {}
+    } catch (error) {
+        console.warn('解析配置快照失败:', error)
+        return {}
+    }
+}
+
+/**
+ * 判断指定标签是否有改动
+ */
+const hasTabChanges = (tab: string): boolean => {
+    if (tab === 'siteInfo') return serializeConfig(cloneConfig(siteInfoData)) !== snapshotData.siteInfo
+    if (tab === 'appearance') return serializeConfig(cloneConfig(appearanceData)) !== snapshotData.appearance
+    if (tab === 'homepage') return serializeConfig(cloneConfig(homepageData)) !== snapshotData.homepage
+    if (tab === 'pageConfig') return getSerializedPageConfig() !== snapshotData.pageConfig
+    if (tab === 'cardStyle') return serializeConfig(cloneConfig(cardStyleData)) !== snapshotData.cardStyle
+    if (tab === 'sidebar') return serializeConfig(cloneConfig(sidebarData)) !== snapshotData.sidebar
+    if (tab === 'search') return serializeConfig(cloneConfig(searchData)) !== snapshotData.search
+    if (tab === 'exitModal') return serializeConfig(cloneConfig(exitModalData)) !== snapshotData.exitModal
+    return false
+}
+
+const hasPendingChanges = computed(() => (
+    hasTabChanges('siteInfo') ||
+    hasTabChanges('appearance') ||
+    hasTabChanges('homepage') ||
+    hasTabChanges('pageConfig') ||
+    hasTabChanges('cardStyle') ||
+    hasTabChanges('sidebar') ||
+    hasTabChanges('search') ||
+    hasTabChanges('exitModal')
+))
+
+const hasCurrentTabChanges = computed(() => hasTabChanges(activeTab.value))
+
+const lastSavedAtText = computed(() => {
+    if (!lastSavedAt.value) return '未保存'
+    return new Date(lastSavedAt.value).toLocaleString()
+})
+
+/**
+ * 标记已保存并更新快照
+ */
+const markSaved = () => {
+    lastSavedAt.value = Date.now()
+    refreshSnapshot()
+}
+
 // ==================== 加载函数 ====================
+/**
+ * 应用公开设置到本地表单
+ */
+const applyPublicSettings = (settings: Record<string, any>) => {
+    if (settings.siteInfo) Object.assign(siteInfoData, settings.siteInfo)
+    if (settings.appearance) Object.assign(appearanceData, settings.appearance)
+    if (settings.homepage) Object.assign(homepageData, settings.homepage)
+    if (settings.pageGlobal) Object.assign(pageConfigData, normalizePageConfigData(settings.pageGlobal))
+    if (settings.cardStyle) Object.assign(cardStyleData, settings.cardStyle)
+    if (settings.sidebar) Object.assign(sidebarData, settings.sidebar)
+    if (settings.search) Object.assign(searchData, settings.search)
+    if (settings.exitModal) Object.assign(exitModalData, settings.exitModal)
+}
+
+/**
+ * 一次性加载全部站点配置
+ */
+const loadAllSettings = async (silent = false) => {
+    reloadLoading.value = true
+    try {
+        const settings = await uiedPublicSettings()
+        if (settings) applyPublicSettings(settings)
+        refreshSnapshot()
+        if (!silent) feedback.msgSuccess('配置已刷新')
+    } catch (error) {
+        console.error('加载公开设置失败，回退分项加载:', error)
+        await Promise.all([
+            loadSiteInfo(),
+            loadAppearance(),
+            loadHomepage(),
+            loadPageConfig(),
+            loadCardStyle(),
+            loadSidebar(),
+            loadSearch(),
+            loadExitModal(),
+        ])
+        refreshSnapshot()
+        if (!silent) feedback.msgWarning('公开配置加载失败，已使用分项加载')
+    } finally {
+        reloadLoading.value = false
+    }
+}
+
 const loadSiteInfo = async () => {
     try {
         const res = await uiedSiteInfo()
@@ -725,55 +891,158 @@ const loadExitModal = async () => {
 // ==================== 保存函数 ====================
 const handleSaveSiteInfo = async () => {
     siteInfoLoading.value = true
-    try { await uiedSaveSiteInfo(siteInfoData); feedback.msgSuccess('保存成功') }
+    try {
+        await uiedSaveSiteInfo(siteInfoData)
+        markSaved()
+        feedback.msgSuccess('保存成功')
+    } catch (error) {
+        console.error('保存站点信息失败:', error)
+        feedback.msgError('保存失败')
+    }
     finally { siteInfoLoading.value = false }
 }
 const handleSaveAppearance = async () => {
     appearanceLoading.value = true
-    try { await uiedSettingSave({ appearanceConfig: appearanceData }); feedback.msgSuccess('保存成功') }
+    try {
+        await uiedSettingSave({ appearanceConfig: appearanceData })
+        markSaved()
+        feedback.msgSuccess('保存成功')
+    } catch (error) {
+        console.error('保存外观配置失败:', error)
+        feedback.msgError('保存失败')
+    }
     finally { appearanceLoading.value = false }
 }
 const handleSaveHomepage = async () => {
     homepageLoading.value = true
-    try { await uiedSettingSave({ homepageConfig: homepageData }); feedback.msgSuccess('保存成功') }
+    try {
+        await uiedSettingSave({ homepageConfig: homepageData })
+        markSaved()
+        feedback.msgSuccess('保存成功')
+    } catch (error) {
+        console.error('保存首页配置失败:', error)
+        feedback.msgError('保存失败')
+    }
     finally { homepageLoading.value = false }
 }
 const handleSavePageConfig = async () => {
     pageConfigLoading.value = true
-    try { await uiedSettingSave({ pageGlobalConfig: normalizePageConfigData(pageConfigData) }); feedback.msgSuccess('保存成功') }
+    try {
+        await uiedSettingSave({ pageGlobalConfig: normalizePageConfigData(pageConfigData) })
+        markSaved()
+        feedback.msgSuccess('保存成功')
+    } catch (error) {
+        console.error('保存页面配置失败:', error)
+        feedback.msgError('保存失败')
+    }
     finally { pageConfigLoading.value = false }
 }
 const handleSaveCardStyle = async () => {
     cardStyleLoading.value = true
-    try { await uiedSettingSave({ cardStyleConfig: cardStyleData }); feedback.msgSuccess('保存成功') }
+    try {
+        await uiedSettingSave({ cardStyleConfig: cardStyleData })
+        markSaved()
+        feedback.msgSuccess('保存成功')
+    } catch (error) {
+        console.error('保存卡片样式失败:', error)
+        feedback.msgError('保存失败')
+    }
     finally { cardStyleLoading.value = false }
 }
 const handleSaveSidebar = async () => {
     sidebarLoading.value = true
-    try { await uiedSettingSave({ sidebarConfig: sidebarData }); feedback.msgSuccess('保存成功') }
+    try {
+        await uiedSettingSave({ sidebarConfig: sidebarData })
+        markSaved()
+        feedback.msgSuccess('保存成功')
+    } catch (error) {
+        console.error('保存侧边栏配置失败:', error)
+        feedback.msgError('保存失败')
+    }
     finally { sidebarLoading.value = false }
 }
 const handleSaveSearch = async () => {
     searchLoading.value = true
-    try { await uiedSettingSave({ searchConfig: searchData }); feedback.msgSuccess('保存成功') }
+    try {
+        await uiedSettingSave({ searchConfig: searchData })
+        markSaved()
+        feedback.msgSuccess('保存成功')
+    } catch (error) {
+        console.error('保存搜索配置失败:', error)
+        feedback.msgError('保存失败')
+    }
     finally { searchLoading.value = false }
 }
 const handleSaveExitModal = async () => {
     exitModalLoading.value = true
-    try { await uiedSettingSave({ exitModalConfig: exitModalData }); feedback.msgSuccess('保存成功') }
+    try {
+        await uiedSettingSave({ exitModalConfig: exitModalData })
+        markSaved()
+        feedback.msgSuccess('保存成功')
+    } catch (error) {
+        console.error('保存跳转提醒配置失败:', error)
+        feedback.msgError('保存失败')
+    }
     finally { exitModalLoading.value = false }
+}
+
+/**
+ * 保存全部配置（售卖版推荐工作流）
+ */
+const handleSaveAll = async () => {
+    saveAllLoading.value = true
+    try {
+        await Promise.all([
+            uiedSaveSiteInfo(siteInfoData),
+            uiedSettingSave({
+                appearanceConfig: appearanceData,
+                homepageConfig: homepageData,
+                pageGlobalConfig: normalizePageConfigData(pageConfigData),
+                cardStyleConfig: cardStyleData,
+                sidebarConfig: sidebarData,
+                searchConfig: searchData,
+                exitModalConfig: exitModalData,
+            }),
+        ])
+        markSaved()
+        feedback.msgSuccess('全部配置保存成功')
+    } catch (error) {
+        console.error('保存全部配置失败:', error)
+        feedback.msgError('保存失败，请检查配置后重试')
+    } finally {
+        saveAllLoading.value = false
+    }
+}
+
+/**
+ * 重置当前标签配置为最近一次快照
+ */
+const handleResetCurrentTab = () => {
+    const tab = activeTab.value
+    if (!hasTabChanges(tab)) return
+
+    if (tab === 'siteInfo') Object.assign(siteInfoData, readSnapshotObject(snapshotData.siteInfo))
+    if (tab === 'appearance') Object.assign(appearanceData, readSnapshotObject(snapshotData.appearance))
+    if (tab === 'homepage') Object.assign(homepageData, readSnapshotObject(snapshotData.homepage))
+    if (tab === 'pageConfig') Object.assign(pageConfigData, normalizePageConfigData(readSnapshotObject(snapshotData.pageConfig)))
+    if (tab === 'cardStyle') Object.assign(cardStyleData, readSnapshotObject(snapshotData.cardStyle))
+    if (tab === 'sidebar') Object.assign(sidebarData, readSnapshotObject(snapshotData.sidebar))
+    if (tab === 'search') Object.assign(searchData, readSnapshotObject(snapshotData.search))
+    if (tab === 'exitModal') Object.assign(exitModalData, readSnapshotObject(snapshotData.exitModal))
+
+    feedback.msgSuccess('当前标签已重置')
+}
+
+/**
+ * 重新加载全部配置
+ */
+const handleReloadAll = async () => {
+    await loadAllSettings(false)
 }
 
 // ==================== 初始化 ====================
 onMounted(() => {
-    loadSiteInfo()
-    loadAppearance()
-    loadHomepage()
-    loadPageConfig()
-    loadCardStyle()
-    loadSidebar()
-    loadSearch()
-    loadExitModal()
+    loadAllSettings(true)
 })
 </script>
 
@@ -832,5 +1101,40 @@ onMounted(() => {
     color: #409eff;
     opacity: 1;
     transform: scale(1.1);
+}
+
+.setting-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding: 12px 14px;
+    border: 1px solid #ebeef5;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.toolbar-time {
+    color: #909399;
+    font-size: 12px;
+}
+
+.behavior-preview p {
+    margin: 2px 0;
+    line-height: 1.6;
+    color: #606266;
 }
 </style>
