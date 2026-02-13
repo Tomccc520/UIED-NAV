@@ -156,11 +156,123 @@ class SettingService extends Service {
    */
   async getPublicSettings() {
     const siteInfo = await this.getSiteInfo();
-    const settings = await this.getAll();
     
+    // 从数据库读取各项配置
+    const pageGlobalConfig = await this.get('pageGlobalConfig');
+    const appearanceConfig = await this.get('appearanceConfig');
+    const homepageConfig = await this.get('homepageConfig');
+    const cardStyleConfig = await this.get('cardStyleConfig');
+    const sidebarConfig = await this.get('sidebarConfig');
+    const searchConfig = await this.get('searchConfig');
+    const exitModalConfig = await this.get('exitModalConfig');
+    const detailPageConfig = await this.get('detailPageConfig');
+    
+    // 默认配置
+    const defaultPageGlobal = {
+      websiteClickMode: 'detail',
+      showDirectArrow: true,
+      directArrowNewWindow: true,
+      detailPageNewWindow: false,
+      pageSize: 20
+    };
+    
+    const defaultAppearance = {
+      primaryColor: '#0066ff',
+      backgroundColor: '#f6f8fb',
+      cardBackgroundColor: '#ffffff',
+      textPrimaryColor: '#333333',
+      fontFamily: 'Lexend, -apple-system, sans-serif',
+      baseFontSize: 16,
+      borderRadius: 12,
+      contentMaxWidth: 1200,
+      customCss: ''
+    };
+    
+    const defaultHomepage = {
+      heroBannerEnabled: true,
+      heroBgType: 'default',
+      heroBgValue: '',
+      heroDisplayMode: 'search',
+      heroShowStats: true,
+      heroShowHotTags: true,
+      bannerCardsEnabled: true,
+      hotRecommendationsEnabled: true,
+      hotRecommendationsTitle: '热门推荐',
+      topAdEnabled: false,
+      topAdCode: ''
+    };
+    
+    const defaultCardStyle = {
+      defaultLayout: 'grid',
+      gridColumns: 4,
+      showDescription: true,
+      maxDescriptionLines: 2,
+      showTags: true,
+      showFavicon: true,
+      showUrl: false,
+      hoverEffect: 'translateUp'
+    };
+    
+    const defaultSidebar = {
+      enabled: true,
+      position: 'left',
+      width: 240,
+      showCategories: true,
+      showCategoryCount: true,
+      expandSubCategories: false,
+      sticky: true
+    };
+    
+    const defaultSearch = {
+      placeholder: '搜索网站名称...',
+      debounceDelay: 300,
+      aiSearchEnabled: true,
+      aiSearchBtnText: 'AI 搜索',
+      highlightKeyword: true,
+      resultsPerPage: 20
+    };
+    
+    const defaultExitModal = {
+      enabled: true,
+      title: '即将离开本站',
+      description: '您即将访问外部网站，请注意安全',
+      autoRedirect: true,
+      countdown: 5
+    };
+    
+    const defaultDetailPage = {
+      screenshotsEnabled: true,
+      ratingsEnabled: true,
+      commentsEnabled: true,
+      sharingEnabled: true,
+      favoritesEnabled: true,
+      relatedEnabled: true,
+      tagsEnabled: true,
+      visitArrowEnabled: true,
+      visitArrowText: '直达网站',
+      copyrightEnabled: true,
+      copyrightText: '版权归原作者所有',
+      copyrightLink: '',
+      disclaimerEnabled: true,
+      disclaimerText: '本站仅收录和推荐，不对第三方网站内容负责。',
+      reportEnabled: true,
+      reportText: '如发现违规内容，请发送邮件举报',
+      reportEmail: '',
+      visitBtnText: '访问网站',
+      visitBtnNewWindow: true
+    };
+    
+    // 返回完整的配置结构（注意字段名要和前端期望的一致）
     return {
       siteInfo,
-      ...settings,
+      pageGlobal: pageGlobalConfig || defaultPageGlobal,
+      appearance: appearanceConfig || defaultAppearance,
+      homepage: homepageConfig || defaultHomepage,
+      cardStyle: cardStyleConfig || defaultCardStyle,
+      sidebar: sidebarConfig || defaultSidebar,
+      search: searchConfig || defaultSearch,
+      exitModal: exitModalConfig || defaultExitModal,
+      detailPage: detailPageConfig || defaultDetailPage,
     };
   }
 

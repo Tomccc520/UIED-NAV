@@ -14,48 +14,70 @@
 
                 <!-- ==================== 站点信息 ==================== -->
                 <el-tab-pane label="站点信息" name="siteInfo">
-                    <el-alert type="info" :closable="false" style="margin-bottom: 20px">
-                        <template #title>配置网站的基本信息，包括名称、SEO、备案等。修改后保存即可生效。</template>
-                    </el-alert>
+                    <div class="setting-header">
+                        <h2 class="setting-title">站点信息</h2>
+                        <p class="setting-desc">配置网站的基本信息，包括名称、SEO、备案等。修改后保存即可生效。</p>
+                    </div>
                     <el-form :model="siteInfoData" label-width="120px" style="max-width: 600px">
                         <el-form-item>
-                            <template #label><span>站点名称</span><el-tooltip content="显示在浏览器标签页和页面顶部的网站名称" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label>
+                                <span>站点名称</span>
+                                <el-tooltip content="显示在浏览器标签页和页面顶部的网站名称" placement="top">
+                                    <el-icon class="label-tip-icon"><QuestionFilled /></el-icon>
+                                </el-tooltip>
+                            </template>
                             <el-input v-model="siteInfoData.siteName" placeholder="请输入站点名称" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>站点标题</span><el-tooltip content="用于SEO的页面标题，建议30字以内" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>站点标题</span><el-tooltip content="用于SEO的页面标题，建议30字以内" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-input v-model="siteInfoData.siteTitle" placeholder="请输入站点标题" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>站点描述</span><el-tooltip content="用于SEO的页面描述，建议120字以内" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>站点描述</span><el-tooltip content="用于SEO的页面描述，建议120字以内" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-input v-model="siteInfoData.siteDescription" type="textarea" :rows="3" placeholder="请输入站点描述" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>站点关键词</span><el-tooltip content="多个关键词用英文逗号分隔" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>站点关键词</span><el-tooltip content="多个关键词用英文逗号分隔" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-input v-model="siteInfoData.siteKeywords" placeholder="多个关键词用逗号分隔" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>Logo</span><el-tooltip content="网站Logo图片地址，支持PNG/SVG格式" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
-                            <el-input v-model="siteInfoData.logo" placeholder="Logo URL" />
+                            <template #label><span>Logo</span><el-tooltip content="网站Logo图片地址，支持PNG/SVG格式，推荐尺寸200x50px" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <div style="display: flex; gap: 12px; align-items: flex-start;">
+                                <el-input v-model="siteInfoData.logo" placeholder="Logo URL" style="flex: 1;" />
+                                <material-picker v-model="siteInfoData.logo" :limit="1">
+                                    <el-button>选择图片</el-button>
+                                </material-picker>
+                            </div>
+                            <div v-if="siteInfoData.logo" style="margin-top: 8px;">
+                                <img :src="siteInfoData.logo" alt="Logo预览" style="max-width: 200px; max-height: 50px; border: 1px solid #dcdfe6; border-radius: 4px; padding: 4px;" />
+                            </div>
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>Favicon</span><el-tooltip content="浏览器标签页小图标，建议32x32" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
-                            <el-input v-model="siteInfoData.favicon" placeholder="Favicon URL" />
+                            <template #label><span>Favicon</span><el-tooltip content="浏览器标签页小图标，建议32x32px，支持ICO/PNG格式" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <div style="display: flex; gap: 12px; align-items: flex-start;">
+                                <el-input v-model="siteInfoData.favicon" placeholder="Favicon URL" style="flex: 1;" />
+                                <material-picker v-model="siteInfoData.favicon" :limit="1">
+                                    <el-button>选择图片</el-button>
+                                </material-picker>
+                            </div>
+                            <div v-if="siteInfoData.favicon" style="margin-top: 8px;">
+                                <img :src="siteInfoData.favicon" alt="Favicon预览" style="width: 32px; height: 32px; border: 1px solid #dcdfe6; border-radius: 4px; padding: 2px;" />
+                            </div>
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>ICP备案号</span><el-tooltip content="显示在页面底部，如：京ICP备XXXXXXXX号" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>ICP备案号</span><el-tooltip content="显示在页面底部，如：京ICP备XXXXXXXX号" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-input v-model="siteInfoData.icp" placeholder="请输入ICP备案号" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>版权信息</span><el-tooltip content="显示在页面底部的版权声明文字" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>版权信息</span><el-tooltip content="显示在页面底部的版权声明文字" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-input v-model="siteInfoData.copyright" placeholder="请输入版权信息" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>联系邮箱</span><el-tooltip content="用于接收用户反馈和举报的邮箱地址" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>联系邮箱</span><el-tooltip content="用于接收用户反馈和举报的邮箱地址" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-input v-model="siteInfoData.contactEmail" placeholder="请输入联系邮箱" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>统计代码</span><el-tooltip content="第三方统计代码（如百度统计），将插入到页面底部" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>统计代码</span><el-tooltip content="第三方统计代码（如百度统计），将插入到页面底部" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-input v-model="siteInfoData.analyticsCode" type="textarea" :rows="4" placeholder="请输入统计代码" />
                         </el-form-item>
                         <el-form-item>
@@ -66,14 +88,15 @@
 
                 <!-- ==================== 外观配置 ==================== -->
                 <el-tab-pane label="外观配置" name="appearance">
-                    <el-alert type="info" :closable="false" style="margin-bottom: 20px">
-                        <template #title>自定义网站的视觉风格，包括主题色、字体、圆角、间距等。类似WordPress主题自定义器。</template>
-                    </el-alert>
+                    <div class="setting-header">
+                        <h2 class="setting-title">外观配置</h2>
+                        <p class="setting-desc">自定义网站的视觉风格，包括主题色、字体、圆角、间距等。类似WordPress主题自定义器。</p>
+                    </div>
                     <el-form :model="appearanceData" label-width="140px" style="max-width: 650px">
                         <el-divider content-position="left">主题色彩</el-divider>
                         <p class="section-desc">设置网站的主色调和辅助色彩，影响按钮、链接、高亮等元素的颜色。</p>
                         <el-form-item>
-                            <template #label><span>主题色</span><el-tooltip content="网站的主色调，用于按钮、链接、高亮等元素" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>主题色</span><el-tooltip content="网站的主色调，用于按钮、链接、高亮等元素" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <div style="display:flex;align-items:center;gap:12px">
                                 <el-color-picker v-model="appearanceData.primaryColor" />
                                 <el-input v-model="appearanceData.primaryColor" style="width:140px" placeholder="#0066ff" />
@@ -81,7 +104,7 @@
                             </div>
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>背景色</span><el-tooltip content="页面整体背景色，建议使用浅色" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>背景色</span><el-tooltip content="页面整体背景色，建议使用浅色" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <div style="display:flex;align-items:center;gap:12px">
                                 <el-color-picker v-model="appearanceData.backgroundColor" />
                                 <el-input v-model="appearanceData.backgroundColor" style="width:140px" placeholder="#f6f8fb" />
@@ -89,14 +112,14 @@
                             </div>
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>卡片背景色</span><el-tooltip content="网站卡片和内容区块的背景色" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>卡片背景色</span><el-tooltip content="网站卡片和内容区块的背景色" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <div style="display:flex;align-items:center;gap:12px">
                                 <el-color-picker v-model="appearanceData.cardBackgroundColor" />
                                 <el-input v-model="appearanceData.cardBackgroundColor" style="width:140px" placeholder="#ffffff" />
                             </div>
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>文字主色</span><el-tooltip content="正文和标题的主要文字颜色" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>文字主色</span><el-tooltip content="正文和标题的主要文字颜色" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <div style="display:flex;align-items:center;gap:12px">
                                 <el-color-picker v-model="appearanceData.textPrimaryColor" />
                                 <el-input v-model="appearanceData.textPrimaryColor" style="width:140px" placeholder="#333333" />
@@ -105,23 +128,23 @@
                         <el-divider content-position="left">字体设置</el-divider>
                         <p class="section-desc">自定义网站使用的字体。留空则使用系统默认字体。</p>
                         <el-form-item>
-                            <template #label><span>主字体</span><el-tooltip content="网站正文使用的字体名称" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>主字体</span><el-tooltip content="网站正文使用的字体名称" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-input v-model="appearanceData.fontFamily" placeholder="Lexend, -apple-system, sans-serif" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>基础字号</span><el-tooltip content="网站正文的基础字号（px）" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>基础字号</span><el-tooltip content="网站正文的基础字号（px）" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-input-number v-model="appearanceData.baseFontSize" :min="12" :max="20" />
                             <span class="form-tip">px</span>
                         </el-form-item>
                         <el-divider content-position="left">圆角和布局</el-divider>
                         <p class="section-desc">调整卡片圆角大小和内容区域宽度。</p>
                         <el-form-item>
-                            <template #label><span>卡片圆角</span><el-tooltip content="网站卡片的圆角大小（px），0为直角" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>卡片圆角</span><el-tooltip content="网站卡片的圆角大小（px），0为直角" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-slider v-model="appearanceData.borderRadius" :min="0" :max="24" :step="2" show-stops style="width:300px" />
                             <span class="form-tip">{{ appearanceData.borderRadius }}px</span>
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>内容最大宽度</span><el-tooltip content="页面内容区域的最大宽度" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>内容最大宽度</span><el-tooltip content="页面内容区域的最大宽度" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-select v-model="appearanceData.contentMaxWidth" style="width:200px">
                                 <el-option label="窄版 (1000px)" :value="1000" />
                                 <el-option label="标准 (1200px)" :value="1200" />
@@ -133,7 +156,7 @@
                         <el-divider content-position="left">自定义CSS</el-divider>
                         <p class="section-desc">高级用户可以在此添加自定义CSS代码。</p>
                         <el-form-item>
-                            <template #label><span>自定义CSS</span><el-tooltip content="输入自定义CSS代码，将注入到前端页面" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>自定义CSS</span><el-tooltip content="输入自定义CSS代码，将注入到前端页面" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-input v-model="appearanceData.customCss" type="textarea" :rows="6" placeholder="/* 在此输入自定义CSS */" />
                         </el-form-item>
                         <el-form-item>
@@ -144,18 +167,19 @@
 
                 <!-- ==================== 首页配置 ==================== -->
                 <el-tab-pane label="首页配置" name="homepage">
-                    <el-alert type="info" :closable="false" style="margin-bottom: 20px">
-                        <template #title>配置首页各区块的显示、顺序和内容。可以自由开关和排列首页的各个模块。</template>
-                    </el-alert>
+                    <div class="setting-header">
+                        <h2 class="setting-title">首页配置</h2>
+                        <p class="setting-desc">配置首页各区块的显示、顺序和内容。可以自由开关和排列首页的各个模块。</p>
+                    </div>
                     <el-form :model="homepageData" label-width="140px" style="max-width: 700px">
                         <el-divider content-position="left">横幅区域 (Hero Banner)</el-divider>
                         <p class="section-desc">首页顶部的大横幅区域，包含标题、搜索框和热门标签。</p>
                         <el-form-item>
-                            <template #label><span>显示横幅</span><el-tooltip content="关闭后首页将不显示顶部横幅区域" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>显示横幅</span><el-tooltip content="关闭后首页将不显示顶部横幅区域" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-switch v-model="homepageData.heroBannerEnabled" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>横幅背景类型</span><el-tooltip content="选择横幅区域的背景样式" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>横幅背景类型</span><el-tooltip content="选择横幅区域的背景样式" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-select v-model="homepageData.heroBgType" style="width:200px" :disabled="!homepageData.heroBannerEnabled">
                                 <el-option label="默认背景图" value="default" />
                                 <el-option label="纯色背景" value="color" />
@@ -179,40 +203,40 @@
                             <el-input v-model="homepageData.heroBgValue" placeholder="https://example.com/bg.jpg" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>显示模式</span><el-tooltip content="搜索模式显示搜索框，图标滚动模式显示网站图标墙" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>显示模式</span><el-tooltip content="搜索模式显示搜索框，图标滚动模式显示网站图标墙" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-select v-model="homepageData.heroDisplayMode" style="width:200px" :disabled="!homepageData.heroBannerEnabled">
                                 <el-option label="搜索模式" value="search" />
                                 <el-option label="图标滚动" value="iconScroll" />
                             </el-select>
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>显示收录统计</span><el-tooltip content="显示「已收录 XXX+ 个优质网站」的统计信息" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>显示收录统计</span><el-tooltip content="显示「已收录 XXX+ 个优质网站」的统计信息" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-switch v-model="homepageData.heroShowStats" :disabled="!homepageData.heroBannerEnabled" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>显示热门标签</span><el-tooltip content="在搜索框下方显示热门搜索标签" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>显示热门标签</span><el-tooltip content="在搜索框下方显示热门搜索标签" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-switch v-model="homepageData.heroShowHotTags" :disabled="!homepageData.heroBannerEnabled" />
                         </el-form-item>
                         <el-divider content-position="left">推荐卡片区域</el-divider>
                         <p class="section-desc">横幅下方的推荐卡片区域，用于展示重点推荐内容。</p>
                         <el-form-item>
-                            <template #label><span>显示推荐卡片</span><el-tooltip content="开启后在横幅下方显示推荐卡片区域" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>显示推荐卡片</span><el-tooltip content="开启后在横幅下方显示推荐卡片区域" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-switch v-model="homepageData.bannerCardsEnabled" />
                         </el-form-item>
                         <el-divider content-position="left">热门推荐区域</el-divider>
                         <p class="section-desc">展示热门推荐的网站列表，数据来源于「热门推荐」管理。</p>
                         <el-form-item>
-                            <template #label><span>显示热门推荐</span><el-tooltip content="开启后在首页显示热门推荐区域" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>显示热门推荐</span><el-tooltip content="开启后在首页显示热门推荐区域" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-switch v-model="homepageData.hotRecommendationsEnabled" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>推荐区标题</span><el-tooltip content="热门推荐区域的标题文字" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>推荐区标题</span><el-tooltip content="热门推荐区域的标题文字" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-input v-model="homepageData.hotRecommendationsTitle" placeholder="热门推荐" :disabled="!homepageData.hotRecommendationsEnabled" />
                         </el-form-item>
                         <el-divider content-position="left">广告位</el-divider>
                         <p class="section-desc">在首页指定位置插入广告代码。</p>
                         <el-form-item>
-                            <template #label><span>顶部广告</span><el-tooltip content="显示在横幅下方、内容区域上方的广告位" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>顶部广告</span><el-tooltip content="显示在横幅下方、内容区域上方的广告位" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-switch v-model="homepageData.topAdEnabled" />
                         </el-form-item>
                         <el-form-item v-if="homepageData.topAdEnabled">
@@ -227,13 +251,14 @@
 
                 <!-- ==================== 页面配置 ==================== -->
                 <el-tab-pane label="页面配置" name="pageConfig">
-                    <el-alert type="info" :closable="false" style="margin-bottom: 20px">
-                        <template #title>控制前端网站卡片的点击行为、直达箭头、窗口打开方式等全局页面交互配置。</template>
-                    </el-alert>
+                    <div class="setting-header">
+                        <h2 class="setting-title">页面配置</h2>
+                        <p class="setting-desc">控制前端网站卡片的点击行为、直达箭头、窗口打开方式等全局页面交互配置。</p>
+                    </div>
                     <el-form :model="pageConfigData" label-width="140px" style="max-width: 650px">
                         <el-divider content-position="left">点击行为</el-divider>
                         <el-form-item>
-                            <template #label><span>网站点击行为</span><el-tooltip placement="top"><template #content>设置用户点击网站卡片时的行为：<br/>「跳转详情页」- 进入网站介绍页面<br/>「弹窗确认后跳转」- 弹窗提示后跳转外部网站<br/>「直达网站」- 直接打开外部网站</template><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>网站点击行为</span><el-tooltip placement="top"><template #content>设置用户点击网站卡片时的行为：<br/>「跳转详情页」- 进入网站介绍页面<br/>「弹窗确认后跳转」- 弹窗提示后跳转外部网站<br/>「直达网站」- 直接打开外部网站</template><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-select v-model="pageConfigData.websiteClickMode" style="width:100%">
                                 <el-option label="跳转详情页" value="detail" />
                                 <el-option label="弹窗确认后跳转" value="direct" />
@@ -242,21 +267,21 @@
                         </el-form-item>
                         <el-divider content-position="left">直达箭头</el-divider>
                         <el-form-item>
-                            <template #label><span>卡片直达箭头</span><el-tooltip placement="top"><template #content>开启后，网站卡片右侧显示快捷按钮（鼠标移入时出现）。</template><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>卡片直达箭头</span><el-tooltip placement="top"><template #content>开启后，网站卡片右侧显示快捷按钮（鼠标移入时出现）。</template><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-switch v-model="pageConfigData.showDirectArrow" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>箭头新窗口打开</span><el-tooltip content="开启后，点击直达箭头时在新标签页中打开" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>箭头新窗口打开</span><el-tooltip content="开启后，点击直达箭头时在新标签页中打开" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-switch v-model="pageConfigData.directArrowNewWindow" />
                         </el-form-item>
                         <el-divider content-position="left">窗口行为</el-divider>
                         <el-form-item>
-                            <template #label><span>详情页新窗口</span><el-tooltip content="开启后，点击卡片进入详情页时在新标签页打开" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>详情页新窗口</span><el-tooltip content="开启后，点击卡片进入详情页时在新标签页打开" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-switch v-model="pageConfigData.detailPageNewWindow" />
                         </el-form-item>
                         <el-divider content-position="left">分页</el-divider>
                         <el-form-item>
-                            <template #label><span>每页显示数量</span><el-tooltip content="每页显示的网站数量，建议20-50之间" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>每页显示数量</span><el-tooltip content="每页显示的网站数量，建议20-50之间" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-input-number v-model="pageConfigData.pageSize" :min="10" :max="100" />
                         </el-form-item>
                         <el-form-item>
@@ -267,21 +292,22 @@
 
                 <!-- ==================== 卡片样式 ==================== -->
                 <el-tab-pane label="卡片样式" name="cardStyle">
-                    <el-alert type="info" :closable="false" style="margin-bottom: 20px">
-                        <template #title>自定义网站卡片的展示样式，控制卡片上显示哪些信息。</template>
-                    </el-alert>
+                    <div class="setting-header">
+                        <h2 class="setting-title">卡片样式</h2>
+                        <p class="setting-desc">自定义网站卡片的展示样式，控制卡片上显示哪些信息。</p>
+                    </div>
                     <el-form :model="cardStyleData" label-width="140px" style="max-width: 650px">
                         <el-divider content-position="left">卡片布局</el-divider>
                         <p class="section-desc">设置网站列表的默认展示方式和列数。</p>
                         <el-form-item>
-                            <template #label><span>默认布局</span><el-tooltip content="网站列表的默认展示方式" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>默认布局</span><el-tooltip content="网站列表的默认展示方式" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-select v-model="cardStyleData.defaultLayout" style="width:200px">
                                 <el-option label="网格布局" value="grid" />
                                 <el-option label="列表布局" value="list" />
                             </el-select>
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>网格列数</span><el-tooltip content="网格布局时每行显示的卡片数量（桌面端）" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>网格列数</span><el-tooltip content="网格布局时每行显示的卡片数量（桌面端）" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-select v-model="cardStyleData.gridColumns" style="width:200px">
                                 <el-option label="3列" :value="3" />
                                 <el-option label="4列（推荐）" :value="4" />
@@ -292,29 +318,29 @@
                         <el-divider content-position="left">卡片信息显示</el-divider>
                         <p class="section-desc">控制网站卡片上显示哪些信息元素。</p>
                         <el-form-item>
-                            <template #label><span>显示描述</span><el-tooltip content="在卡片上显示网站的简短描述文字" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>显示描述</span><el-tooltip content="在卡片上显示网站的简短描述文字" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-switch v-model="cardStyleData.showDescription" />
                         </el-form-item>
                         <el-form-item v-if="cardStyleData.showDescription">
-                            <template #label><span>描述行数</span><el-tooltip content="描述文字最多显示的行数，超出部分省略" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>描述行数</span><el-tooltip content="描述文字最多显示的行数，超出部分省略" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-input-number v-model="cardStyleData.maxDescriptionLines" :min="1" :max="5" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>显示标签</span><el-tooltip content="在卡片上显示网站的标签（如：热门、新上线等）" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>显示标签</span><el-tooltip content="在卡片上显示网站的标签（如：热门、新上线等）" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-switch v-model="cardStyleData.showTags" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>显示图标</span><el-tooltip content="在卡片上显示网站的Favicon图标" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>显示图标</span><el-tooltip content="在卡片上显示网站的Favicon图标" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-switch v-model="cardStyleData.showFavicon" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>显示URL</span><el-tooltip content="在卡片上显示网站的域名地址" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>显示URL</span><el-tooltip content="在卡片上显示网站的域名地址" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-switch v-model="cardStyleData.showUrl" />
                         </el-form-item>
                         <el-divider content-position="left">悬浮效果</el-divider>
                         <p class="section-desc">鼠标悬浮在卡片上时的视觉效果。</p>
                         <el-form-item>
-                            <template #label><span>悬浮效果</span><el-tooltip content="鼠标悬浮时卡片的动画效果" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>悬浮效果</span><el-tooltip content="鼠标悬浮时卡片的动画效果" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-select v-model="cardStyleData.hoverEffect" style="width:200px">
                                 <el-option label="上移 + 边框变色" value="translateUp" />
                                 <el-option label="仅边框变色" value="borderOnly" />
@@ -330,44 +356,45 @@
 
                 <!-- ==================== 侧边栏配置 ==================== -->
                 <el-tab-pane label="侧边栏配置" name="sidebar">
-                    <el-alert type="info" :closable="false" style="margin-bottom: 20px">
-                        <template #title>配置前端页面的侧边栏显示方式和内容。侧边栏用于展示分类导航。</template>
-                    </el-alert>
+                    <div class="setting-header">
+                        <h2 class="setting-title">侧边栏配置</h2>
+                        <p class="setting-desc">配置前端页面的侧边栏显示方式和内容。侧边栏用于展示分类导航。</p>
+                    </div>
                     <el-form :model="sidebarData" label-width="140px" style="max-width: 650px">
                         <el-divider content-position="left">侧边栏基础</el-divider>
                         <p class="section-desc">控制侧边栏的显示和位置。</p>
                         <el-form-item>
-                            <template #label><span>显示侧边栏</span><el-tooltip content="关闭后页面将不显示侧边栏，内容区域占满全宽" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>显示侧边栏</span><el-tooltip content="关闭后页面将不显示侧边栏，内容区域占满全宽" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-switch v-model="sidebarData.enabled" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>侧边栏位置</span><el-tooltip content="侧边栏显示在页面的左侧还是右侧" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>侧边栏位置</span><el-tooltip content="侧边栏显示在页面的左侧还是右侧" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-select v-model="sidebarData.position" style="width:200px" :disabled="!sidebarData.enabled">
                                 <el-option label="左侧" value="left" />
                                 <el-option label="右侧" value="right" />
                             </el-select>
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>侧边栏宽度</span><el-tooltip content="侧边栏的宽度（px）" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>侧边栏宽度</span><el-tooltip content="侧边栏的宽度（px）" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-input-number v-model="sidebarData.width" :min="180" :max="360" :step="20" :disabled="!sidebarData.enabled" />
                             <span class="form-tip">px</span>
                         </el-form-item>
                         <el-divider content-position="left">侧边栏内容</el-divider>
                         <p class="section-desc">控制侧边栏中显示哪些内容模块。</p>
                         <el-form-item>
-                            <template #label><span>显示分类导航</span><el-tooltip content="在侧边栏中显示分类树形导航" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>显示分类导航</span><el-tooltip content="在侧边栏中显示分类树形导航" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-switch v-model="sidebarData.showCategories" :disabled="!sidebarData.enabled" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>显示网站数量</span><el-tooltip content="在分类名称旁显示该分类下的网站数量" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>显示网站数量</span><el-tooltip content="在分类名称旁显示该分类下的网站数量" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-switch v-model="sidebarData.showCategoryCount" :disabled="!sidebarData.enabled" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>默认展开子分类</span><el-tooltip content="页面加载时是否默认展开所有子分类" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>默认展开子分类</span><el-tooltip content="页面加载时是否默认展开所有子分类" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-switch v-model="sidebarData.expandSubCategories" :disabled="!sidebarData.enabled" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>侧边栏吸顶</span><el-tooltip content="开启后，滚动页面时侧边栏会固定在顶部" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>侧边栏吸顶</span><el-tooltip content="开启后，滚动页面时侧边栏会固定在顶部" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-switch v-model="sidebarData.sticky" :disabled="!sidebarData.enabled" />
                         </el-form-item>
                         <el-form-item>
@@ -378,39 +405,40 @@
 
                 <!-- ==================== 搜索配置 ==================== -->
                 <el-tab-pane label="搜索配置" name="search">
-                    <el-alert type="info" :closable="false" style="margin-bottom: 20px">
-                        <template #title>配置前端搜索功能的行为和展示方式。</template>
-                    </el-alert>
+                    <div class="setting-header">
+                        <h2 class="setting-title">搜索配置</h2>
+                        <p class="setting-desc">配置前端搜索功能的行为和展示方式。</p>
+                    </div>
                     <el-form :model="searchData" label-width="140px" style="max-width: 650px">
                         <el-divider content-position="left">搜索基础</el-divider>
                         <p class="section-desc">控制搜索功能的基本行为。</p>
                         <el-form-item>
-                            <template #label><span>搜索占位文字</span><el-tooltip content="搜索框中的提示文字" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>搜索占位文字</span><el-tooltip content="搜索框中的提示文字" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-input v-model="searchData.placeholder" placeholder="搜索网站名称..." />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>搜索防抖延迟</span><el-tooltip content="用户停止输入后多少毫秒触发搜索，避免频繁请求" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>搜索防抖延迟</span><el-tooltip content="用户停止输入后多少毫秒触发搜索，避免频繁请求" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-input-number v-model="searchData.debounceDelay" :min="100" :max="1000" :step="100" />
                             <span class="form-tip">毫秒</span>
                         </el-form-item>
                         <el-divider content-position="left">AI 搜索</el-divider>
                         <p class="section-desc">AI搜索使用人工智能理解用户搜索意图，提供更精准的结果。需要先在「AI配置」中配置AI服务。</p>
                         <el-form-item>
-                            <template #label><span>启用AI搜索</span><el-tooltip content="开启后搜索框旁显示AI搜索按钮" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>启用AI搜索</span><el-tooltip content="开启后搜索框旁显示AI搜索按钮" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-switch v-model="searchData.aiSearchEnabled" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>AI搜索按钮文字</span><el-tooltip content="AI搜索按钮上显示的文字" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>AI搜索按钮文字</span><el-tooltip content="AI搜索按钮上显示的文字" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-input v-model="searchData.aiSearchBtnText" placeholder="AI 搜索" :disabled="!searchData.aiSearchEnabled" />
                         </el-form-item>
                         <el-divider content-position="left">搜索结果</el-divider>
                         <p class="section-desc">控制搜索结果页面的展示方式。</p>
                         <el-form-item>
-                            <template #label><span>高亮关键词</span><el-tooltip content="在搜索结果中高亮显示匹配的关键词" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>高亮关键词</span><el-tooltip content="在搜索结果中高亮显示匹配的关键词" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-switch v-model="searchData.highlightKeyword" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>每页结果数</span><el-tooltip content="搜索结果每页显示的数量" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>每页结果数</span><el-tooltip content="搜索结果每页显示的数量" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-input-number v-model="searchData.resultsPerPage" :min="10" :max="100" />
                         </el-form-item>
                         <el-form-item>
@@ -421,28 +449,62 @@
 
                 <!-- ==================== 跳转提醒 ==================== -->
                 <el-tab-pane label="跳转提醒" name="exitModal">
-                    <el-alert type="info" :closable="false" style="margin-bottom: 20px">
-                        <template #title>配置用户点击外部链接时的跳转确认弹窗。仅在点击行为为「弹窗确认后跳转」时生效。</template>
+                    <div class="setting-header">
+                        <h2 class="setting-title">跳转提醒</h2>
+                        <p class="setting-desc">配置用户点击外部链接时的跳转确认弹窗。</p>
+                        <el-alert 
+                            type="warning" 
+                            :closable="false" 
+                            show-icon
+                            style="margin-top: 12px"
+                        >
+                            <template #title>
+                                <span style="font-weight: 500;">注意：此功能仅在「页面配置」中的「网站点击行为」设置为「弹窗确认后跳转」时生效</span>
+                            </template>
                     </el-alert>
+                    </div>
                     <el-form :model="exitModalData" label-width="120px" style="max-width: 600px">
+                        <!-- 动态提示：当点击行为不是 direct 时显示警告 -->
+                        <el-alert 
+                            v-if="pageConfigData.websiteClickMode !== 'direct'"
+                            type="warning" 
+                            :closable="false"
+                            show-icon
+                            style="margin-bottom: 20px"
+                        >
+                            <template #title>
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                    <span>当前「网站点击行为」未设置为「弹窗确认后跳转」，此配置不会生效</span>
+                                    <el-button 
+                                        type="primary" 
+                                        size="small" 
+                                        @click="activeTab = 'pageConfig'"
+                                        style="margin-left: 12px;"
+                                    >
+                                        前往设置
+                                    </el-button>
+                                </div>
+                            </template>
+                        </el-alert>
+                        
                         <el-form-item>
-                            <template #label><span>启用弹窗</span><el-tooltip content="开启后，用户点击外部链接时会弹出确认提示" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>启用弹窗</span><el-tooltip content="开启后，用户点击外部链接时会弹出确认提示" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-switch v-model="exitModalData.enabled" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>弹窗标题</span><el-tooltip content="弹窗顶部显示的标题文字" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>弹窗标题</span><el-tooltip content="弹窗顶部显示的标题文字" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-input v-model="exitModalData.title" placeholder="即将离开本站" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>弹窗描述</span><el-tooltip content="弹窗中显示的提示说明文字" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>弹窗描述</span><el-tooltip content="弹窗中显示的提示说明文字" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-input v-model="exitModalData.description" type="textarea" :rows="2" placeholder="您即将访问外部网站，请注意安全" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>自动跳转</span><el-tooltip content="开启后，倒计时结束将自动跳转到目标网站" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>自动跳转</span><el-tooltip content="开启后，倒计时结束将自动跳转到目标网站" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-switch v-model="exitModalData.autoRedirect" />
                         </el-form-item>
                         <el-form-item>
-                            <template #label><span>倒计时(秒)</span><el-tooltip content="自动跳转前的等待秒数，建议3-10秒" placement="top"><el-icon style="margin-left:4px;cursor:help;color:#909399"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>倒计时(秒)</span><el-tooltip content="自动跳转前的等待秒数，建议3-10秒" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-input-number v-model="exitModalData.countdown" :min="1" :max="30" />
                         </el-form-item>
                         <el-form-item>
@@ -690,5 +752,40 @@ onMounted(() => {
     margin: -8px 0 16px 0;
     padding-left: 2px;
     line-height: 1.6;
+}
+
+/* 新增：设置页面头部样式 */
+.setting-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e4e7ed;
+}
+.setting-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #303133;
+    margin: 0 0 8px 0;
+}
+.setting-desc {
+    font-size: 14px;
+    color: #606266;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* 优化：问号提示图标样式 */
+.label-tip-icon {
+    margin-left: 6px;
+    cursor: help;
+    color: #c0c4cc;
+    font-size: 15px;
+    vertical-align: -2px;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+}
+.label-tip-icon:hover {
+    color: #409eff;
+    opacity: 1;
+    transform: scale(1.1);
 }
 </style>

@@ -10,19 +10,10 @@
 <template>
     <div class="detail-page-setting">
         <el-card class="!border-none" shadow="never">
-            <template #header>
-                <span>网站详情页配置</span>
-            </template>
-
-            <el-alert
-                type="info"
-                :closable="false"
-                style="margin-bottom: 20px"
-            >
-                <template #title>
-                    此页面用于配置前端「网站详情页」的各项功能和显示内容。修改后保存即可实时生效，无需重启服务。
-                </template>
-            </el-alert>
+            <div class="setting-header">
+                <h2 class="setting-title">网站详情页配置</h2>
+                <p class="setting-desc">配置前端「网站详情页」的各项功能和显示内容。修改后保存即可实时生效，无需重启服务。</p>
+            </div>
 
             <el-form :model="config" label-width="160px" style="max-width: 700px">
                 <!-- 区块显示控制 -->
@@ -272,5 +263,40 @@ onMounted(() => {
     margin: -8px 0 16px 0;
     padding-left: 2px;
     line-height: 1.6;
+}
+
+/* 设置页面头部样式 */
+.setting-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e4e7ed;
+}
+.setting-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #303133;
+    margin: 0 0 8px 0;
+}
+.setting-desc {
+    font-size: 14px;
+    color: #606266;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* 优化：问号提示图标样式 */
+.label-tip-icon {
+    margin-left: 6px;
+    cursor: help;
+    color: #c0c4cc;
+    font-size: 15px;
+    vertical-align: -2px;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+}
+.label-tip-icon:hover {
+    color: #409eff;
+    opacity: 1;
+    transform: scale(1.1);
 }
 </style>
