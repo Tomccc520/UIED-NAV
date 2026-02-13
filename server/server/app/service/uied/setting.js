@@ -14,6 +14,38 @@ const Service = require('egg').Service;
 
 class SettingService extends Service {
   /**
+   * 规范化分类区域点击模式
+   * 兼容历史值：directExternal -> direct
+   */
+  normalizeWebsiteClickMode(mode) {
+    if (mode === 'direct' || mode === 'directExternal') {
+      return 'direct';
+    }
+    return 'detail';
+  }
+
+  /**
+   * 规范化热门推荐点击模式
+   * 兼容历史值：modal -> detail
+   */
+  normalizeHotRecommendationClickMode(mode) {
+    if (mode === 'direct') {
+      return 'direct';
+    }
+    return 'detail';
+  }
+
+  /**
+   * 规范化页面全局配置，确保分类与热门推荐为独立且统一语义
+   */
+  normalizePageGlobalConfig(config = {}) {
+    const normalized = { ...config };
+    normalized.websiteClickMode = this.normalizeWebsiteClickMode(config.websiteClickMode);
+    normalized.hotRecommendationClickMode = this.normalizeHotRecommendationClickMode(config.hotRecommendationClickMode);
+    return normalized;
+  }
+
+  /**
    * 获取单个设置
    */
   async get(key) {
@@ -63,7 +95,10 @@ class SettingService extends Service {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
     
-    for (const [key, value] of Object.entries(data)) {
+    for (const [key, rawValue] of Object.entries(data)) {
+      const value = key === 'pageGlobalConfig' && rawValue && typeof rawValue === 'object'
+        ? this.normalizePageGlobalConfig(rawValue)
+        : rawValue;
       const valueStr = typeof value === 'object' ? JSON.stringify(value) : String(value);
       
       await app.model.query(
@@ -174,7 +209,7 @@ class SettingService extends Service {
       directArrowNewWindow: true,
       detailPageNewWindow: false,
       pageSize: 20,
-      hotRecommendationClickMode: 'direct' // 热门推荐独立配置
+      hotRecommendationClickMode: 'detail', // 热门推荐独立配置，默认进详情页
     };
     
     const defaultAppearance = {
@@ -263,10 +298,12 @@ class SettingService extends Service {
       visitBtnNewWindow: true
     };
     
+    const normalizedPageGlobalConfig = this.normalizePageGlobalConfig(pageGlobalConfig || {});
+
     // 返回完整的配置结构（注意字段名要和前端期望的一致）
     return {
       siteInfo,
-      pageGlobal: pageGlobalConfig || defaultPageGlobal,
+      pageGlobal: { ...defaultPageGlobal, ...normalizedPageGlobalConfig },
       appearance: appearanceConfig || defaultAppearance,
       homepage: homepageConfig || defaultHomepage,
       cardStyle: cardStyleConfig || defaultCardStyle,

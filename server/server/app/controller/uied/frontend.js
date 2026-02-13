@@ -301,11 +301,18 @@ class FrontendController extends Controller {
         ctx.service.uied.setting.get('sidebarConfig'),
         ctx.service.uied.setting.get('searchConfig'),
       ]);
+
+      /**
+       * 规范化页面点击配置，兼容历史值并确保前端行为稳定
+       */
+      const normalizedPageGlobalConfig = ctx.service.uied.setting.normalizePageGlobalConfig(
+        pageGlobalConfig || {}
+      );
       
       ctx.body = {
         exitModalEnabled: true,
         exitModalConfig: exitModalConfig || {},
-        pageGlobalConfig: pageGlobalConfig || {},
+        pageGlobalConfig: normalizedPageGlobalConfig,
         appearanceConfig: appearanceConfig || {},
         homepageConfig: homepageConfig || {},
         cardStyleConfig: cardStyleConfig || {},

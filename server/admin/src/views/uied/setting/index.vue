@@ -268,11 +268,10 @@
                     <el-form :model="pageConfigData" label-width="140px" style="max-width: 650px">
                         <el-divider content-position="left">分类区域点击行为</el-divider>
                         <el-form-item>
-                            <template #label><span>网站点击行为</span><el-tooltip placement="top"><template #content>设置用户点击「分类区域」网站卡片时的行为：<br/>「跳转详情页」- 进入网站介绍页面<br/>「弹窗确认后跳转」- 弹窗提示后跳转外部网站<br/>「直达网站」- 直接打开外部网站<br/><br/>注意：热门推荐区域有独立配置</template><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>网站点击行为</span><el-tooltip placement="top"><template #content>设置用户点击「分类区域」网站卡片时的行为：<br/>「跳转详情页」- 进入网站介绍页面<br/>「直达网站」- 直接打开外部网站<br/><br/>注意：热门推荐区域有独立配置</template><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-select v-model="pageConfigData.websiteClickMode" style="width:100%">
                                 <el-option label="跳转详情页" value="detail" />
-                                <el-option label="弹窗确认后跳转" value="direct" />
-                                <el-option label="直达网站" value="directExternal" />
+                                <el-option label="直达网站" value="direct" />
                             </el-select>
                         </el-form-item>
                         <el-divider content-position="left">直达箭头</el-divider>
@@ -297,10 +296,10 @@
                         <el-divider content-position="left">热门推荐点击行为</el-divider>
                         <p class="section-desc">热门推荐区域使用独立的点击行为配置，不受上方「分类区域」配置影响。</p>
                         <el-form-item>
-                            <template #label><span>热门推荐点击</span><el-tooltip placement="top"><template #content>设置用户点击「热门推荐」区域卡片时的行为：<br/>「直达网站」- 直接打开外部网站（推荐）<br/>「弹窗确认」- 弹窗提示后跳转</template><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <template #label><span>热门推荐点击</span><el-tooltip placement="top"><template #content>设置用户点击「热门推荐」区域卡片时的行为：<br/>「跳转详情页」- 进入网站介绍页面<br/>「直达网站」- 直接打开外部网站</template><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-select v-model="pageConfigData.hotRecommendationClickMode" style="width:100%">
-                                <el-option label="直达网站（推荐）" value="direct" />
-                                <el-option label="弹窗确认后跳转" value="modal" />
+                                <el-option label="跳转详情页" value="detail" />
+                                <el-option label="直达网站" value="direct" />
                             </el-select>
                         </el-form-item>
                         <el-form-item>
@@ -478,14 +477,13 @@
                             style="margin-top: 12px"
                         >
                             <template #title>
-                                <span style="font-weight: 500;">注意：此功能仅在「页面配置」中的「网站点击行为」设置为「弹窗确认后跳转」时生效</span>
+                                <span style="font-weight: 500;">注意：分类区域与热门推荐区域已使用独立的「详情页/直达」逻辑，跳转提醒不参与这两类卡片点击行为</span>
                             </template>
                     </el-alert>
                     </div>
                     <el-form :model="exitModalData" label-width="120px" style="max-width: 600px">
-                        <!-- 动态提示：当点击行为不是 direct 时显示警告 -->
+                        <!-- 提示：当前跳转提醒不参与分类区域与热门推荐卡片点击行为 -->
                         <el-alert 
-                            v-if="pageConfigData.websiteClickMode !== 'direct'"
                             type="warning" 
                             :closable="false"
                             show-icon
@@ -493,7 +491,7 @@
                         >
                             <template #title>
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                                    <span>当前「网站点击行为」未设置为「弹窗确认后跳转」，此配置不会生效</span>
+                                    <span>当前配置仅用于其他扩展跳转场景，分类区域与热门推荐卡片点击不会触发此弹窗</span>
                                     <el-button 
                                         type="primary" 
                                         size="small" 
@@ -598,7 +596,34 @@ const pageConfigData = reactive({
     detailPageNewWindow: false,
     directArrowNewWindow: true,
     pageSize: 20,
-    hotRecommendationClickMode: 'direct', // 热门推荐独立配置
+    hotRecommendationClickMode: 'detail', // 热门推荐独立配置
+})
+
+/**
+ * 规范化分类区域点击模式
+ * 兼容历史值：directExternal -> direct
+ */
+const normalizeWebsiteClickMode = (mode: unknown): 'detail' | 'direct' => {
+    if (mode === 'direct' || mode === 'directExternal') return 'direct'
+    return 'detail'
+}
+
+/**
+ * 规范化热门推荐点击模式
+ * 兼容历史值：modal -> detail
+ */
+const normalizeHotRecommendationClickMode = (mode: unknown): 'detail' | 'direct' => {
+    if (mode === 'direct') return 'direct'
+    return 'detail'
+}
+
+/**
+ * 规范化页面配置，确保分类区域与热门推荐点击行为独立且语义一致
+ */
+const normalizePageConfigData = (config: any) => ({
+    ...config,
+    websiteClickMode: normalizeWebsiteClickMode(config?.websiteClickMode),
+    hotRecommendationClickMode: normalizeHotRecommendationClickMode(config?.hotRecommendationClickMode),
 })
 
 // ==================== 卡片样式 ====================
@@ -669,7 +694,7 @@ const loadHomepage = async () => {
 const loadPageConfig = async () => {
     try {
         const res = await uiedSettingGet({ key: 'pageGlobalConfig' })
-        if (res) Object.assign(pageConfigData, res)
+        if (res) Object.assign(pageConfigData, normalizePageConfigData(res))
     } catch (e) { console.error('加载页面配置失败', e) }
 }
 const loadCardStyle = async () => {
@@ -715,7 +740,7 @@ const handleSaveHomepage = async () => {
 }
 const handleSavePageConfig = async () => {
     pageConfigLoading.value = true
-    try { await uiedSettingSave({ pageGlobalConfig: pageConfigData }); feedback.msgSuccess('保存成功') }
+    try { await uiedSettingSave({ pageGlobalConfig: normalizePageConfigData(pageConfigData) }); feedback.msgSuccess('保存成功') }
     finally { pageConfigLoading.value = false }
 }
 const handleSaveCardStyle = async () => {
