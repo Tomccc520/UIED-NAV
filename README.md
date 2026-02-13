@@ -148,6 +148,18 @@ npm start
 
 ```
 uied-nav/
+├── docs/              # 📚 项目文档
+│   ├── 项目结构说明.md
+│   ├── 详情页跳转问题修复记录.md
+│   ├── 修复说明.md
+│   ├── 代码重构总结.md
+│   ├── 开发指南.md
+│   ├── 数据库说明.md
+│   └── ...
+├── scripts/           # 🔧 工具脚本
+│   ├── restart-frontend.sh      # 重启前端服务
+│   ├── diagnose.sh              # 诊断端口和 API 连接
+│   └── test_setting_api.sh     # 测试设置 API
 ├── server/            # likeadmin 后端和管理后台
 │   ├── server/        # Egg.js API 服务 (端口 8002)
 │   │   ├── app/
@@ -162,13 +174,15 @@ uied-nav/
 │   │   ├── components/    # 可复用组件
 │   │   ├── pages/         # 页面组件
 │   │   ├── hooks/         # 自定义 hooks
-│   │   └── services/      # API 调用服务
+│   │   ├── services/      # API 调用服务
+│   │   └── utils/         # 工具函数
+│   │       └── urlUtils.ts  # ⭐ 统一 URL 处理工具
 │   └── public/
 ├── docker/            # Docker 配置
 │   └── docker-compose.mysql.yml
 ├── data/              # 数据备份
 │   └── mysql_backup_*.sql
-├── docs/              # 文档
+├── start.sh           # 🚀 一键启动脚本
 └── README.md
 ```
 
@@ -202,14 +216,42 @@ uied-nav/
 
 ## 📚 文档
 
+### 开发文档
+- 📖 [项目结构说明](docs/项目结构说明.md) - 目录结构、重要文件、开发规范
 - 📖 [开发指南](docs/开发指南.md) - 项目结构、API说明、学习要点
 - 🗄️ [数据库说明](docs/数据库说明.md) - 数据表结构、备份方案
 - 🔐 [登录系统说明](docs/登录系统说明.md) - 认证流程、安全措施
+
+### 部署文档
 - 🚀 [宝塔部署指南](docs/宝塔部署教程.md) - 生产环境部署步骤
 - 🐳 [Docker部署指南](docs/Docker部署教程.md) - Docker 部署步骤
+
+### 测试文档
 - 🧪 [测试指南](docs/测试指南.md) - 功能测试、API测试
+
+### 问题修复记录
+- 🔧 [详情页跳转问题修复记录](docs/详情页跳转问题修复记录.md) - 详情页功能修复过程
+- 🔧 [修复说明](docs/修复说明.md) - CORS 错误和端口配置修复
+- 🔧 [代码重构总结](docs/代码重构总结.md) - 代码架构优化说明
+
+### 其他文档
 - 📊 [项目总结](docs/项目总结.md) - 功能清单、技术栈
 - 💼 [商业化规划](docs/商业化规划.md) - 开源+商业化策略
+
+## 🔧 工具脚本
+
+项目提供了一些实用脚本，位于 `scripts/` 目录：
+
+```bash
+# 重启前端服务
+./scripts/restart-frontend.sh
+
+# 诊断端口和 API 连接问题
+./scripts/diagnose.sh
+
+# 测试设置 API
+./scripts/test_setting_api.sh
+```
 
 ---
 

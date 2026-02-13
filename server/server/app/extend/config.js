@@ -142,6 +142,7 @@ const rsa = {
     'settings:nav-menus', // GET /api/settings/nav-menus
     'settings:footer-groups', // GET /api/settings/footer-groups
     'settings:friend-links', // GET /api/settings/friend-links
+    'settings:hot-recommendation-click', // GET /api/settings/hot-recommendation-click
     'nav-menus', // GET /api/nav-menus
     'friend-links', // GET /api/friend-links
     'footer', // GET /api/footer
