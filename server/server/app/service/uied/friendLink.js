@@ -19,14 +19,14 @@ class FriendLinkService extends Service {
     const pageSize = parseInt(params.pageSize) || 15;
     const offset = (page - 1) * pageSize;
 
-    const [countResult] = await app.model.query(
+    const [ countResult ] = await app.model.query(
       'SELECT COUNT(*) as total FROM uied_friend_link WHERE is_delete = 0',
       { type: app.Sequelize.QueryTypes.SELECT }
     );
 
     const lists = await app.model.query(
-      `SELECT * FROM uied_friend_link WHERE is_delete = 0 ORDER BY sort ASC, id ASC LIMIT ? OFFSET ?`,
-      { replacements: [pageSize, offset], type: app.Sequelize.QueryTypes.SELECT }
+      'SELECT * FROM uied_friend_link WHERE is_delete = 0 ORDER BY sort ASC, id ASC LIMIT ? OFFSET ?',
+      { replacements: [ pageSize, offset ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     return {
@@ -39,9 +39,9 @@ class FriendLinkService extends Service {
 
   async detail(id) {
     const { app } = this;
-    const [item] = await app.model.query(
+    const [ item ] = await app.model.query(
       'SELECT * FROM uied_friend_link WHERE id = ? AND is_delete = 0',
-      { replacements: [id], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ id ], type: app.Sequelize.QueryTypes.SELECT }
     );
     return item ? this.formatItem(item) : null;
   }
@@ -50,7 +50,7 @@ class FriendLinkService extends Service {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
 
-    const [result] = await app.model.query(
+    const [ result ] = await app.model.query(
       `INSERT INTO uied_friend_link (name, url, sort, is_show, create_time, update_time)
        VALUES (?, ?, ?, ?, ?, ?)`,
       {
@@ -70,7 +70,7 @@ class FriendLinkService extends Service {
     const now = Math.floor(Date.now() / 1000);
 
     await app.model.query(
-      `UPDATE uied_friend_link SET name = ?, url = ?, sort = ?, is_show = ?, update_time = ? WHERE id = ?`,
+      'UPDATE uied_friend_link SET name = ?, url = ?, sort = ?, is_show = ?, update_time = ? WHERE id = ?',
       {
         replacements: [
           data.name || '', data.url || '',
@@ -86,7 +86,7 @@ class FriendLinkService extends Service {
     const now = Math.floor(Date.now() / 1000);
     // 软删除
     await app.model.query('UPDATE uied_friend_link SET is_delete = 1, delete_time = ? WHERE id = ?', {
-      replacements: [now, id],
+      replacements: [ now, id ],
       type: app.Sequelize.QueryTypes.UPDATE,
     });
   }

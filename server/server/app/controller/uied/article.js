@@ -20,7 +20,7 @@ class ArticleController extends Controller {
   async list() {
     const { ctx } = this;
     const params = ctx.query;
-    
+
     try {
       const result = await ctx.service.uied.article.list(params);
       ctx.body = {
@@ -168,7 +168,7 @@ class ArticleController extends Controller {
       return;
     }
 
-    if (!status || !['published', 'draft'].includes(status)) {
+    if (!status || ![ 'published', 'draft' ].includes(status)) {
       ctx.body = { code: 400, msg: '状态值无效，仅支持 published 或 draft' };
       return;
     }

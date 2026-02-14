@@ -41,10 +41,10 @@ class SubmissionController extends baseController {
       if (!data.name || !data.url) {
         return this.result({ code: 400, message: '网站名称和URL为必填项' });
       }
-      
+
       // 获取提交者 IP
       data.submitterIp = ctx.ip || ctx.request.ip;
-      
+
       const result = await ctx.service.uied.submission.submit(data);
       this.result({ data: result, message: '提交成功，等待审核' });
     } catch (error) {

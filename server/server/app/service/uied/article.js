@@ -44,7 +44,7 @@ class ArticleService extends Service {
     }
 
     // 查询总数
-    const [countResult] = await app.model.query(
+    const [ countResult ] = await app.model.query(
       `SELECT COUNT(*) as total FROM uied_article 
        WHERE is_delete = 0${statusCondition}${categoryCondition}${keywordCondition}`,
       { replacements, type: app.Sequelize.QueryTypes.SELECT }
@@ -58,9 +58,9 @@ class ArticleService extends Service {
        WHERE is_delete = 0${statusCondition}${categoryCondition}${keywordCondition}
        ORDER BY create_time DESC
        LIMIT ? OFFSET ?`,
-      { 
-        replacements: [...replacements, parseInt(pageSize), offset], 
-        type: app.Sequelize.QueryTypes.SELECT 
+      {
+        replacements: [ ...replacements, parseInt(pageSize), offset ],
+        type: app.Sequelize.QueryTypes.SELECT,
       }
     );
 
@@ -87,17 +87,17 @@ class ArticleService extends Service {
    */
   async detail(id) {
     const { app } = this;
-    
-    const [article] = await app.model.query(
-      `SELECT * FROM uied_article WHERE id = ? AND is_delete = 0`,
-      { replacements: [id], type: app.Sequelize.QueryTypes.SELECT }
+
+    const [ article ] = await app.model.query(
+      'SELECT * FROM uied_article WHERE id = ? AND is_delete = 0',
+      { replacements: [ id ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     if (!article) return null;
     const formatted = this.formatArticle(article, true);
 
     // 获取文章标签
-    const tagsMap = await this.batchGetArticleTags([article.id]);
+    const tagsMap = await this.batchGetArticleTags([ article.id ]);
     formatted.tags = tagsMap[article.id] || [];
 
     return formatted;
@@ -108,17 +108,17 @@ class ArticleService extends Service {
    */
   async detailBySlug(slug) {
     const { app } = this;
-    
-    const [article] = await app.model.query(
-      `SELECT * FROM uied_article WHERE slug = ? AND is_delete = 0 AND status = 'published'`,
-      { replacements: [slug], type: app.Sequelize.QueryTypes.SELECT }
+
+    const [ article ] = await app.model.query(
+      'SELECT * FROM uied_article WHERE slug = ? AND is_delete = 0 AND status = \'published\'',
+      { replacements: [ slug ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     if (!article) return null;
     const formatted = this.formatArticle(article, true);
 
     // 获取文章标签
-    const tagsMap = await this.batchGetArticleTags([article.id]);
+    const tagsMap = await this.batchGetArticleTags([ article.id ]);
     formatted.tags = tagsMap[article.id] || [];
 
     return formatted;
@@ -135,16 +135,16 @@ class ArticleService extends Service {
     const slug = data.slug || this.generateSlug(data.title);
 
     // 检查 slug 唯一性
-    const [existing] = await app.model.query(
+    const [ existing ] = await app.model.query(
       'SELECT id FROM uied_article WHERE slug = ? AND is_delete = 0',
-      { replacements: [slug], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ slug ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     if (existing) {
       throw new Error('URL标识已存在');
     }
 
-    const [result] = await app.model.query(
+    const [ result ] = await app.model.query(
       `INSERT INTO uied_article 
        (title, content, excerpt, cover_image, author, category, category_id, slug, status, 
         seo_title, seo_description, published_at, create_time, update_time)
@@ -186,9 +186,9 @@ class ArticleService extends Service {
     const now = Math.floor(Date.now() / 1000);
 
     // 检查文章是否存在
-    const [existing] = await app.model.query(
+    const [ existing ] = await app.model.query(
       'SELECT id, status, published_at, category_id, slug FROM uied_article WHERE id = ? AND is_delete = 0',
-      { replacements: [id], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ id ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     if (!existing) {
@@ -197,9 +197,9 @@ class ArticleService extends Service {
 
     // 如果修改了 slug，检查唯一性
     if (data.slug) {
-      const [slugExists] = await app.model.query(
+      const [ slugExists ] = await app.model.query(
         'SELECT id FROM uied_article WHERE slug = ? AND id != ? AND is_delete = 0',
-        { replacements: [data.slug, id], type: app.Sequelize.QueryTypes.SELECT }
+        { replacements: [ data.slug, id ], type: app.Sequelize.QueryTypes.SELECT }
       );
       if (slugExists) {
         throw new Error('URL标识已存在');
@@ -253,12 +253,12 @@ class ArticleService extends Service {
   async del(ids) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    const idList = Array.isArray(ids) ? ids : [ids];
+    const idList = Array.isArray(ids) ? ids : [ ids ];
     const placeholders = idList.map(() => '?').join(',');
 
     await app.model.query(
       `UPDATE uied_article SET is_delete = 1, delete_time = ? WHERE id IN (${placeholders})`,
-      { replacements: [now, ...idList], type: app.Sequelize.QueryTypes.UPDATE }
+      { replacements: [ now, ...idList ], type: app.Sequelize.QueryTypes.UPDATE }
     );
 
     return true;
@@ -268,12 +268,12 @@ class ArticleService extends Service {
    * 批量更新文章状态（发布/取消发布）
    * @param {number[]} ids - 文章ID数组
    * @param {string} status - 目标状态 ('published' 或 'draft')
-   * @returns {number} 更新的文章数量
+   * @return {number} 更新的文章数量
    */
   async batchUpdateStatus(ids, status) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    const idList = Array.isArray(ids) ? ids : [ids];
+    const idList = Array.isArray(ids) ? ids : [ ids ];
 
     if (idList.length === 0) {
       return 0;
@@ -289,7 +289,7 @@ class ArticleService extends Service {
              published_at = CASE WHEN published_at IS NULL THEN ? ELSE published_at END,
              update_time = ?
          WHERE id IN (${placeholders}) AND is_delete = 0`,
-        { replacements: [now, now, ...idList], type: app.Sequelize.QueryTypes.UPDATE }
+        { replacements: [ now, now, ...idList ], type: app.Sequelize.QueryTypes.UPDATE }
       );
     } else {
       // 取消发布：仅更新状态
@@ -297,15 +297,15 @@ class ArticleService extends Service {
         `UPDATE uied_article 
          SET status = ?, update_time = ?
          WHERE id IN (${placeholders}) AND is_delete = 0`,
-        { replacements: [status, now, ...idList], type: app.Sequelize.QueryTypes.UPDATE }
+        { replacements: [ status, now, ...idList ], type: app.Sequelize.QueryTypes.UPDATE }
       );
     }
 
     // 查询实际更新的数量
-    const [countResult] = await app.model.query(
+    const [ countResult ] = await app.model.query(
       `SELECT COUNT(*) as count FROM uied_article 
        WHERE id IN (${placeholders}) AND is_delete = 0 AND status = ?`,
-      { replacements: [...idList, status], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ ...idList, status ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     return countResult.count;
@@ -338,7 +338,7 @@ class ArticleService extends Service {
     }
 
     // 查询总数
-    const [countResult] = await app.model.query(
+    const [ countResult ] = await app.model.query(
       `SELECT COUNT(DISTINCT a.id) as total FROM uied_article a${tagJoin}
        WHERE a.is_delete = 0 AND a.status = 'published'${categoryCondition}`,
       { replacements: countReplacements, type: app.Sequelize.QueryTypes.SELECT }
@@ -352,9 +352,9 @@ class ArticleService extends Service {
        WHERE a.is_delete = 0 AND a.status = 'published'${categoryCondition}
        ORDER BY a.published_at DESC, a.create_time DESC
        LIMIT ? OFFSET ?`,
-      { 
-        replacements: [...replacements, parseInt(pageSize), offset], 
-        type: app.Sequelize.QueryTypes.SELECT 
+      {
+        replacements: [ ...replacements, parseInt(pageSize), offset ],
+        type: app.Sequelize.QueryTypes.SELECT,
       }
     );
 
@@ -381,7 +381,7 @@ class ArticleService extends Service {
    */
   async categories() {
     const { app } = this;
-    
+
     const results = await app.model.query(
       `SELECT DISTINCT category FROM uied_article 
        WHERE is_delete = 0 AND status = 'published' AND category != ''
@@ -425,10 +425,10 @@ class ArticleService extends Service {
    */
   async recordView(id) {
     const { app } = this;
-    
+
     await app.model.query(
       'UPDATE uied_article SET view_count = view_count + 1 WHERE id = ?',
-      { replacements: [id], type: app.Sequelize.QueryTypes.UPDATE }
+      { replacements: [ id ], type: app.Sequelize.QueryTypes.UPDATE }
     );
 
     return true;
@@ -437,7 +437,7 @@ class ArticleService extends Service {
   /**
    * 批量获取多篇文章的标签
    * @param {number[]} articleIds - 文章ID数组
-   * @returns {Object} 以 article_id 为 key，标签数组为 value 的映射
+   * @return {Object} 以 article_id 为 key，标签数组为 value 的映射
    */
   async batchGetArticleTags(articleIds) {
     const { app } = this;
@@ -508,7 +508,7 @@ class ArticleService extends Service {
    */
   generateSlug(text) {
     if (!text) return `article-${Date.now().toString(36)}`;
-    
+
     return text
       .toLowerCase()
       .replace(/[^\w\u4e00-\u9fa5]+/g, '-')

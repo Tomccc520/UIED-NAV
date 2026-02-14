@@ -22,14 +22,14 @@ class NavMenuService extends Service {
     const pageSize = parseInt(params.pageSize) || 20;
     const offset = (page - 1) * pageSize;
 
-    const [countResult] = await app.model.query(
+    const [ countResult ] = await app.model.query(
       'SELECT COUNT(*) as total FROM uied_nav_menu WHERE is_delete = 0',
       { type: app.Sequelize.QueryTypes.SELECT }
     );
 
     const lists = await app.model.query(
-      `SELECT * FROM uied_nav_menu WHERE is_delete = 0 ORDER BY sort ASC, id ASC LIMIT ? OFFSET ?`,
-      { replacements: [pageSize, offset], type: app.Sequelize.QueryTypes.SELECT }
+      'SELECT * FROM uied_nav_menu WHERE is_delete = 0 ORDER BY sort ASC, id ASC LIMIT ? OFFSET ?',
+      { replacements: [ pageSize, offset ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     return {
@@ -57,9 +57,9 @@ class NavMenuService extends Service {
    */
   async detail(id) {
     const { app } = this;
-    const [item] = await app.model.query(
+    const [ item ] = await app.model.query(
       'SELECT * FROM uied_nav_menu WHERE id = ? AND is_delete = 0',
-      { replacements: [id], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ id ], type: app.Sequelize.QueryTypes.SELECT }
     );
     return item ? this.formatItem(item) : null;
   }
@@ -71,18 +71,18 @@ class NavMenuService extends Service {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
 
-    const [result] = await app.model.query(
+    const [ result ] = await app.model.query(
       `INSERT INTO uied_nav_menu (text, link, icon, parent_id, sort, is_show, external, label, label_type, create_time, update_time)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       {
         replacements: [
-          data.text || data.name || '', 
-          data.link || data.url || '', 
+          data.text || data.name || '',
+          data.link || data.url || '',
           data.icon || '',
-          data.parentId || null, 
-          data.sort || data.sortOrder || 0, 
+          data.parentId || null,
+          data.sort || data.sortOrder || 0,
           data.isShow !== false ? 1 : 0,
-          data.external || data.openInNewTab ? 1 : 0, 
+          data.external || data.openInNewTab ? 1 : 0,
           data.label || null,
           data.labelType || null,
           now, now,
@@ -106,13 +106,13 @@ class NavMenuService extends Service {
        sort = ?, is_show = ?, external = ?, label = ?, label_type = ?, update_time = ? WHERE id = ?`,
       {
         replacements: [
-          data.text || data.name || '', 
-          data.link || data.url || '', 
+          data.text || data.name || '',
+          data.link || data.url || '',
           data.icon || '',
-          data.parentId || null, 
-          data.sort || data.sortOrder || 0, 
+          data.parentId || null,
+          data.sort || data.sortOrder || 0,
           data.isShow !== false ? 1 : 0,
-          data.external || data.openInNewTab ? 1 : 0, 
+          data.external || data.openInNewTab ? 1 : 0,
           data.label || null,
           data.labelType || null,
           now, data.id,
@@ -130,9 +130,9 @@ class NavMenuService extends Service {
     const now = Math.floor(Date.now() / 1000);
     // 软删除，同时删除子菜单
     await app.model.query(
-      'UPDATE uied_nav_menu SET is_delete = 1, delete_time = ? WHERE id = ? OR parent_id = ?', 
+      'UPDATE uied_nav_menu SET is_delete = 1, delete_time = ? WHERE id = ? OR parent_id = ?',
       {
-        replacements: [now, id, id],
+        replacements: [ now, id, id ],
         type: app.Sequelize.QueryTypes.UPDATE,
       }
     );
@@ -145,7 +145,7 @@ class NavMenuService extends Service {
     const { app } = this;
     for (const item of items) {
       await app.model.query('UPDATE uied_nav_menu SET sort = ? WHERE id = ?', {
-        replacements: [item.sort || item.sortOrder, item.id],
+        replacements: [ item.sort || item.sortOrder, item.id ],
         type: app.Sequelize.QueryTypes.UPDATE,
       });
     }

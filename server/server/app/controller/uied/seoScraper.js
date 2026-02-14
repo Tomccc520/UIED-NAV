@@ -20,18 +20,18 @@ class SeoScraperController extends baseController {
     const { ctx } = this;
     try {
       const { url } = ctx.request.body;
-      
+
       if (!url) {
         return this.result({ code: 400, message: '请提供URL' });
       }
-      
+
       // 验证 URL 格式
       try {
         new URL(url.startsWith('http') ? url : `https://${url}`);
       } catch (e) {
         return this.result({ code: 400, message: '无效的URL格式' });
       }
-      
+
       const result = await ctx.service.uied.seoScraper.fetch(url);
       this.result({ data: result });
     } catch (error) {

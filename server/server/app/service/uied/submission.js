@@ -18,17 +18,17 @@ class SubmissionService extends Service {
    */
   async checkUrl(url) {
     const { app } = this;
-    
+
     // 标准化 URL
     const normalizedUrl = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
-    
+
     // 检查网站表
-    const [existingWebsite] = await app.model.query(
+    const [ existingWebsite ] = await app.model.query(
       `SELECT id, name, url FROM uied_website 
        WHERE url LIKE ? AND is_delete = 0`,
-      { replacements: [`%${normalizedUrl}%`], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ `%${normalizedUrl}%` ], type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     if (existingWebsite) {
       return {
         exists: true,
@@ -37,14 +37,14 @@ class SubmissionService extends Service {
         website: existingWebsite,
       };
     }
-    
+
     // 检查待审核队列
-    const [existingSubmission] = await app.model.query(
+    const [ existingSubmission ] = await app.model.query(
       `SELECT id, name, url, create_time as createdAt FROM uied_website_submission 
        WHERE url LIKE ? AND status = 'pending'`,
-      { replacements: [`%${normalizedUrl}%`], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ `%${normalizedUrl}%` ], type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     if (existingSubmission) {
       return {
         exists: true,
@@ -53,7 +53,7 @@ class SubmissionService extends Service {
         submission: existingSubmission,
       };
     }
-    
+
     return { exists: false };
   }
 
@@ -63,14 +63,14 @@ class SubmissionService extends Service {
   async submit(data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    
+
     // 检查 URL 是否已存在
     const checkResult = await this.checkUrl(data.url);
     if (checkResult.exists) {
       throw new Error(checkResult.message);
     }
-    
-    const [result] = await app.model.query(
+
+    const [ result ] = await app.model.query(
       `INSERT INTO uied_website_submission 
        (name, description, url, icon_url, category_id, tags, submitter_name, submitter_email, submitter_ip, status, create_time, update_time)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)`,
@@ -91,7 +91,7 @@ class SubmissionService extends Service {
         type: app.Sequelize.QueryTypes.INSERT,
       }
     );
-    
+
     return { id: result, message: '提交成功，等待审核' };
   }
 
@@ -100,14 +100,14 @@ class SubmissionService extends Service {
    */
   async getStatus(id) {
     const { app } = this;
-    
-    const [submission] = await app.model.query(
+
+    const [ submission ] = await app.model.query(
       `SELECT id, name, url, status, reject_reason as rejectReason, 
               create_time as createdAt, reviewed_at as reviewedAt
        FROM uied_website_submission WHERE id = ?`,
-      { replacements: [id], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ id ], type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     return submission || null;
   }
 
@@ -117,28 +117,28 @@ class SubmissionService extends Service {
   async list({ page = 1, pageSize = 20, status }) {
     const { app } = this;
     const offset = (page - 1) * pageSize;
-    
+
     let whereClause = '1=1';
     const replacements = [];
-    
+
     if (status) {
       whereClause += ' AND status = ?';
       replacements.push(status);
     }
-    
-    const [countResult] = await app.model.query(
+
+    const [ countResult ] = await app.model.query(
       `SELECT COUNT(*) as total FROM uied_website_submission WHERE ${whereClause}`,
       { replacements, type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     const submissions = await app.model.query(
       `SELECT * FROM uied_website_submission
        WHERE ${whereClause}
        ORDER BY create_time DESC
        LIMIT ? OFFSET ?`,
-      { replacements: [...replacements, pageSize, offset], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ ...replacements, pageSize, offset ], type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     return {
       lists: submissions.map(s => ({
         id: s.id,
@@ -167,12 +167,12 @@ class SubmissionService extends Service {
    */
   async getPendingCount() {
     const { app } = this;
-    
-    const [result] = await app.model.query(
+
+    const [ result ] = await app.model.query(
       "SELECT COUNT(*) as count FROM uied_website_submission WHERE status = 'pending'",
       { type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     return result.count;
   }
 
@@ -182,26 +182,26 @@ class SubmissionService extends Service {
   async approve(id, categoryId) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    
+
     // 获取提交记录
-    const [submission] = await app.model.query(
+    const [ submission ] = await app.model.query(
       'SELECT * FROM uied_website_submission WHERE id = ?',
-      { replacements: [id], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ id ], type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     if (!submission) {
       throw new Error('未找到提交记录');
     }
-    
+
     if (submission.status !== 'pending') {
       throw new Error('该提交已被处理');
     }
-    
+
     const finalCategoryId = categoryId || submission.category_id;
     if (!finalCategoryId) {
       throw new Error('请选择分类');
     }
-    
+
     // 创建网站
     await app.model.query(
       `INSERT INTO uied_website 
@@ -221,13 +221,13 @@ class SubmissionService extends Service {
         type: app.Sequelize.QueryTypes.INSERT,
       }
     );
-    
+
     // 更新提交状态
     await app.model.query(
       "UPDATE uied_website_submission SET status = 'approved', reviewed_at = ?, update_time = ? WHERE id = ?",
-      { replacements: [now, now, id], type: app.Sequelize.QueryTypes.UPDATE }
+      { replacements: [ now, now, id ], type: app.Sequelize.QueryTypes.UPDATE }
     );
-    
+
     return { message: '审核通过，网站已添加' };
   }
 
@@ -237,26 +237,26 @@ class SubmissionService extends Service {
   async reject(id, reason) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    
+
     // 检查提交记录
-    const [submission] = await app.model.query(
+    const [ submission ] = await app.model.query(
       'SELECT status FROM uied_website_submission WHERE id = ?',
-      { replacements: [id], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ id ], type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     if (!submission) {
       throw new Error('未找到提交记录');
     }
-    
+
     if (submission.status !== 'pending') {
       throw new Error('该提交已被处理');
     }
-    
+
     await app.model.query(
       "UPDATE uied_website_submission SET status = 'rejected', reject_reason = ?, reviewed_at = ?, update_time = ? WHERE id = ?",
-      { replacements: [reason || '不符合收录标准', now, now, id], type: app.Sequelize.QueryTypes.UPDATE }
+      { replacements: [ reason || '不符合收录标准', now, now, id ], type: app.Sequelize.QueryTypes.UPDATE }
     );
-    
+
     return { message: '已拒绝' };
   }
 
@@ -265,10 +265,10 @@ class SubmissionService extends Service {
    */
   async del(id) {
     const { app } = this;
-    
+
     await app.model.query(
       'DELETE FROM uied_website_submission WHERE id = ?',
-      { replacements: [id], type: app.Sequelize.QueryTypes.DELETE }
+      { replacements: [ id ], type: app.Sequelize.QueryTypes.DELETE }
     );
   }
 
@@ -278,26 +278,26 @@ class SubmissionService extends Service {
   async edit(data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    
+
     const updates = [];
     const values = [];
-    
+
     if (data.name !== undefined) { updates.push('name = ?'); values.push(data.name); }
     if (data.description !== undefined) { updates.push('description = ?'); values.push(data.description); }
     if (data.url !== undefined) { updates.push('url = ?'); values.push(data.url); }
     if (data.iconUrl !== undefined) { updates.push('icon_url = ?'); values.push(data.iconUrl); }
     if (data.categoryId !== undefined) { updates.push('category_id = ?'); values.push(data.categoryId); }
     if (data.tags !== undefined) { updates.push('tags = ?'); values.push(data.tags); }
-    
+
     updates.push('update_time = ?');
     values.push(now);
     values.push(data.id);
-    
+
     await app.model.query(
       `UPDATE uied_website_submission SET ${updates.join(', ')} WHERE id = ?`,
       { replacements: values, type: app.Sequelize.QueryTypes.UPDATE }
     );
-    
+
     return data;
   }
 }

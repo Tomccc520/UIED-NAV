@@ -20,21 +20,21 @@ class FooterService extends Service {
     const pageSize = parseInt(params.pageSize) || 15;
     const offset = (page - 1) * pageSize;
 
-    const [countResult] = await app.model.query(
+    const [ countResult ] = await app.model.query(
       'SELECT COUNT(*) as total FROM uied_footer_group WHERE is_delete = 0',
       { type: app.Sequelize.QueryTypes.SELECT }
     );
 
     const groups = await app.model.query(
-      `SELECT * FROM uied_footer_group WHERE is_delete = 0 ORDER BY sort ASC, id ASC LIMIT ? OFFSET ?`,
-      { replacements: [pageSize, offset], type: app.Sequelize.QueryTypes.SELECT }
+      'SELECT * FROM uied_footer_group WHERE is_delete = 0 ORDER BY sort ASC, id ASC LIMIT ? OFFSET ?',
+      { replacements: [ pageSize, offset ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     // 获取每个分组的链接
     for (const group of groups) {
       const links = await app.model.query(
         'SELECT * FROM uied_footer_link WHERE group_id = ? AND is_delete = 0 ORDER BY sort ASC',
-        { replacements: [group.id], type: app.Sequelize.QueryTypes.SELECT }
+        { replacements: [ group.id ], type: app.Sequelize.QueryTypes.SELECT }
       );
       group.links = links.map(this.formatLink);
     }
@@ -58,7 +58,7 @@ class FooterService extends Service {
     for (const group of groups) {
       const links = await app.model.query(
         'SELECT * FROM uied_footer_link WHERE group_id = ? AND is_delete = 0 ORDER BY sort ASC',
-        { replacements: [group.id], type: app.Sequelize.QueryTypes.SELECT }
+        { replacements: [ group.id ], type: app.Sequelize.QueryTypes.SELECT }
       );
       group.links = links.map(this.formatLink);
     }
@@ -70,15 +70,15 @@ class FooterService extends Service {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
 
-    const [result] = await app.model.query(
+    const [ result ] = await app.model.query(
       `INSERT INTO uied_footer_group (title, sort, is_show, create_time, update_time)
        VALUES (?, ?, ?, ?, ?)`,
       {
         replacements: [
-          data.title || data.name || '', 
-          data.sort || data.sortOrder || 0, 
-          data.isShow !== false ? 1 : 0, 
-          now, now
+          data.title || data.name || '',
+          data.sort || data.sortOrder || 0,
+          data.isShow !== false ? 1 : 0,
+          now, now,
         ],
         type: app.Sequelize.QueryTypes.INSERT,
       }
@@ -92,13 +92,13 @@ class FooterService extends Service {
     const now = Math.floor(Date.now() / 1000);
 
     await app.model.query(
-      `UPDATE uied_footer_group SET title = ?, sort = ?, is_show = ?, update_time = ? WHERE id = ?`,
+      'UPDATE uied_footer_group SET title = ?, sort = ?, is_show = ?, update_time = ? WHERE id = ?',
       {
         replacements: [
-          data.title || data.name || '', 
-          data.sort || data.sortOrder || 0, 
-          data.isShow !== false ? 1 : 0, 
-          now, data.id
+          data.title || data.name || '',
+          data.sort || data.sortOrder || 0,
+          data.isShow !== false ? 1 : 0,
+          now, data.id,
         ],
         type: app.Sequelize.QueryTypes.UPDATE,
       }
@@ -110,12 +110,12 @@ class FooterService extends Service {
     const now = Math.floor(Date.now() / 1000);
     // 软删除分组及其链接
     await app.model.query(
-      'UPDATE uied_footer_link SET is_delete = 1, delete_time = ? WHERE group_id = ?', 
-      { replacements: [now, id], type: app.Sequelize.QueryTypes.UPDATE }
+      'UPDATE uied_footer_link SET is_delete = 1, delete_time = ? WHERE group_id = ?',
+      { replacements: [ now, id ], type: app.Sequelize.QueryTypes.UPDATE }
     );
     await app.model.query(
-      'UPDATE uied_footer_group SET is_delete = 1, delete_time = ? WHERE id = ?', 
-      { replacements: [now, id], type: app.Sequelize.QueryTypes.UPDATE }
+      'UPDATE uied_footer_group SET is_delete = 1, delete_time = ? WHERE id = ?',
+      { replacements: [ now, id ], type: app.Sequelize.QueryTypes.UPDATE }
     );
   }
 
@@ -134,7 +134,7 @@ class FooterService extends Service {
       replacements.push(groupId);
     }
 
-    const [countResult] = await app.model.query(
+    const [ countResult ] = await app.model.query(
       `SELECT COUNT(*) as total FROM uied_footer_link l WHERE ${whereClause}`,
       { replacements, type: app.Sequelize.QueryTypes.SELECT }
     );
@@ -143,7 +143,7 @@ class FooterService extends Service {
       `SELECT l.*, g.title as group_name FROM uied_footer_link l
        LEFT JOIN uied_footer_group g ON l.group_id = g.id
        WHERE ${whereClause} ORDER BY l.sort ASC, l.id ASC LIMIT ? OFFSET ?`,
-      { replacements: [...replacements, pageSize, offset], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ ...replacements, pageSize, offset ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     return {
@@ -158,17 +158,17 @@ class FooterService extends Service {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
 
-    const [result] = await app.model.query(
+    const [ result ] = await app.model.query(
       `INSERT INTO uied_footer_link (group_id, text, url, external, sort, is_show, create_time, update_time)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       {
         replacements: [
-          data.groupId || 0, 
-          data.text || data.name || '', 
-          data.url || '', 
+          data.groupId || 0,
+          data.text || data.name || '',
+          data.url || '',
           data.external || data.openInNewTab ? 1 : 0,
-          data.sort || data.sortOrder || 0, 
-          data.isShow !== false ? 1 : 0, 
+          data.sort || data.sortOrder || 0,
+          data.isShow !== false ? 1 : 0,
           now, now,
         ],
         type: app.Sequelize.QueryTypes.INSERT,
@@ -187,12 +187,12 @@ class FooterService extends Service {
        sort = ?, is_show = ?, update_time = ? WHERE id = ?`,
       {
         replacements: [
-          data.groupId || 0, 
-          data.text || data.name || '', 
-          data.url || '', 
+          data.groupId || 0,
+          data.text || data.name || '',
+          data.url || '',
           data.external || data.openInNewTab ? 1 : 0,
-          data.sort || data.sortOrder || 0, 
-          data.isShow !== false ? 1 : 0, 
+          data.sort || data.sortOrder || 0,
+          data.isShow !== false ? 1 : 0,
           now, data.id,
         ],
         type: app.Sequelize.QueryTypes.UPDATE,
@@ -204,8 +204,8 @@ class FooterService extends Service {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
     await app.model.query(
-      'UPDATE uied_footer_link SET is_delete = 1, delete_time = ? WHERE id = ?', 
-      { replacements: [now, id], type: app.Sequelize.QueryTypes.UPDATE }
+      'UPDATE uied_footer_link SET is_delete = 1, delete_time = ? WHERE id = ?',
+      { replacements: [ now, id ], type: app.Sequelize.QueryTypes.UPDATE }
     );
   }
 

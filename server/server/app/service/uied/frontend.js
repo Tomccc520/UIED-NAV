@@ -38,7 +38,7 @@ class FrontendService extends Service {
        ORDER BY sort ASC`,
       { type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     return pages.map(p => ({
       ...p,
       searchEnabled: p.searchEnabled === 1,
@@ -55,15 +55,15 @@ class FrontendService extends Service {
    */
   async getPageFullData(slug) {
     const { app } = this;
-    
+
     // 获取页面配置
-    const [page] = await app.model.query(
-      `SELECT * FROM uied_page WHERE slug = ? AND is_delete = 0`,
-      { replacements: [slug], type: app.Sequelize.QueryTypes.SELECT }
+    const [ page ] = await app.model.query(
+      'SELECT * FROM uied_page WHERE slug = ? AND is_delete = 0',
+      { replacements: [ slug ], type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     if (!page) return null;
-    
+
     // 获取页面关联的主分类
     const mainCategories = await app.model.query(
       `SELECT c.id, c.name, c.slug, c.icon, c.color, c.description, pc.sort as sortOrder
@@ -71,31 +71,31 @@ class FrontendService extends Service {
        INNER JOIN uied_page_category pc ON c.id = pc.category_id
        WHERE pc.page_id = ? AND pc.is_delete = 0 AND c.is_delete = 0
        ORDER BY pc.sort ASC`,
-      { replacements: [page.id], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ page.id ], type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     // 收集所有分类ID（主分类 + 子分类）用于查询网站
     const allCategoryIds = [];
     const categoriesWithSubs = [];
-    
+
     for (const cat of mainCategories) {
       // 获取子分类
       const subCategories = await app.model.query(
         `SELECT id, name, slug FROM uied_category
          WHERE parent_id = ? AND is_delete = 0 AND is_show = 1
          ORDER BY sort ASC`,
-        { replacements: [cat.id], type: app.Sequelize.QueryTypes.SELECT }
+        { replacements: [ cat.id ], type: app.Sequelize.QueryTypes.SELECT }
       );
-      
+
       // 收集子分类ID（网站关联的是子分类）
       const subCategoryIds = subCategories.map(s => s.id);
       allCategoryIds.push(...subCategoryIds);
-      
+
       // 如果没有子分类，也把主分类ID加入（兼容直接关联主分类的网站）
       if (subCategoryIds.length === 0) {
         allCategoryIds.push(cat.id);
       }
-      
+
       categoriesWithSubs.push({
         id: String(cat.id),
         name: cat.name,
@@ -112,7 +112,7 @@ class FrontendService extends Service {
         websites: [], // 将在下面填充
       });
     }
-    
+
     // 获取所有相关网站
     let websites = [];
     if (allCategoryIds.length > 0) {
@@ -128,7 +128,7 @@ class FrontendService extends Service {
         { replacements: allCategoryIds, type: app.Sequelize.QueryTypes.SELECT }
       );
     }
-    
+
     // 按分类组织网站（用于 websitesByCategory）
     const websitesByCategory = {};
     for (const website of websites) {
@@ -148,7 +148,7 @@ class FrontendService extends Service {
         tags: this.safeJsonParse(website.tags, []),
       });
     }
-    
+
     // 为每个主分类填充网站（合并其所有子分类的网站）
     for (const cat of categoriesWithSubs) {
       const catWebsites = [];
@@ -164,7 +164,7 @@ class FrontendService extends Service {
       }
       cat.websites = catWebsites;
     }
-    
+
     return {
       page: {
         id: String(page.id),
@@ -202,19 +202,19 @@ class FrontendService extends Service {
    */
   async getPageHotWebsites(slug, limit = 12) {
     const { app } = this;
-    
+
     // 获取页面
-    const [page] = await app.model.query(
+    const [ page ] = await app.model.query(
       'SELECT id FROM uied_page WHERE slug = ? AND is_delete = 0',
-      { replacements: [slug], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ slug ], type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     if (!page) return [];
-    
+
     // 获取页面关联的分类ID
     const categoryIds = await this.getPageCategoryIds(page.id);
     if (categoryIds.length === 0) return [];
-    
+
     // 获取热门网站
     const websites = await app.model.query(
       `SELECT id, name, description, url, icon_url as iconUrl,
@@ -223,9 +223,9 @@ class FrontendService extends Service {
        WHERE category_id IN (?) AND is_delete = 0 AND is_hot = 1
        ORDER BY is_featured DESC, sort ASC
        LIMIT ?`,
-      { replacements: [categoryIds, parseInt(limit)], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ categoryIds, parseInt(limit) ], type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     return websites.map(w => ({
       ...w,
       id: String(w.id),
@@ -241,19 +241,19 @@ class FrontendService extends Service {
    */
   async getPageHotTags(slug, limit = 10) {
     const { app } = this;
-    
+
     // 获取页面
-    const [page] = await app.model.query(
+    const [ page ] = await app.model.query(
       'SELECT id FROM uied_page WHERE slug = ? AND is_delete = 0',
-      { replacements: [slug], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ slug ], type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     if (!page) return { tags: [], websites: [] };
-    
+
     // 获取页面关联的分类ID
     const categoryIds = await this.getPageCategoryIds(page.id);
     if (categoryIds.length === 0) return { tags: [], websites: [] };
-    
+
     // 获取点击量最高的网站
     let topWebsites = await app.model.query(
       `SELECT id, name, click_count as clickCount
@@ -261,9 +261,9 @@ class FrontendService extends Service {
        WHERE category_id IN (?) AND is_delete = 0 AND click_count > 0
        ORDER BY click_count DESC, is_hot DESC, is_featured DESC
        LIMIT ?`,
-      { replacements: [categoryIds, parseInt(limit)], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ categoryIds, parseInt(limit) ], type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     // 如果没有点击量数据，回退到热门网站
     if (topWebsites.length === 0) {
       topWebsites = await app.model.query(
@@ -273,10 +273,10 @@ class FrontendService extends Service {
            AND (is_hot = 1 OR is_featured = 1)
          ORDER BY is_hot DESC, is_featured DESC, sort ASC
          LIMIT ?`,
-        { replacements: [categoryIds, parseInt(limit)], type: app.Sequelize.QueryTypes.SELECT }
+        { replacements: [ categoryIds, parseInt(limit) ], type: app.Sequelize.QueryTypes.SELECT }
       );
     }
-    
+
     return {
       tags: topWebsites.map(w => w.name),
       websites: topWebsites.map(w => ({
@@ -292,27 +292,27 @@ class FrontendService extends Service {
    */
   async searchPageWebsites(slug, query, limit = 50) {
     const { app } = this;
-    
+
     if (!query) {
       return { results: [], total: 0, query: '', suggestions: [], recommendations: [] };
     }
-    
+
     // 获取页面
-    const [page] = await app.model.query(
+    const [ page ] = await app.model.query(
       'SELECT id FROM uied_page WHERE slug = ? AND is_delete = 0',
-      { replacements: [slug], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ slug ], type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     if (!page) {
       return { results: [], total: 0, query, suggestions: [], recommendations: [] };
     }
-    
+
     // 获取页面关联的分类ID
     const categoryIds = await this.getPageCategoryIds(page.id);
     if (categoryIds.length === 0) {
       return { results: [], total: 0, query, suggestions: [], recommendations: [] };
     }
-    
+
     // 搜索网站
     const searchPattern = `%${query}%`;
     const websites = await app.model.query(
@@ -324,9 +324,9 @@ class FrontendService extends Service {
          AND (name LIKE ? OR description LIKE ? OR tags LIKE ?)
        ORDER BY is_hot DESC, is_featured DESC
        LIMIT ?`,
-      { replacements: [categoryIds, searchPattern, searchPattern, searchPattern, parseInt(limit)], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ categoryIds, searchPattern, searchPattern, searchPattern, parseInt(limit) ], type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     const results = websites.map(w => ({
       ...w,
       id: String(w.id),
@@ -336,16 +336,16 @@ class FrontendService extends Service {
       tags: this.safeJsonParse(w.tags, []),
       score: this.calculateRelevanceScore(w, query),
     }));
-    
+
     // 按相关性排序
     results.sort((a, b) => b.score - a.score);
-    
+
     // 如果没有结果，获取热门推荐
     let recommendations = [];
     if (results.length === 0) {
       recommendations = await this.getPageHotWebsites(slug, 8);
     }
-    
+
     return {
       results,
       total: results.length,
@@ -360,18 +360,18 @@ class FrontendService extends Service {
    */
   async getPageCategoryIds(pageId) {
     const { app } = this;
-    
+
     // 获取主分类
     const mainCategories = await app.model.query(
       `SELECT c.id FROM uied_category c
        INNER JOIN uied_page_category pc ON c.id = pc.category_id
        WHERE pc.page_id = ? AND pc.is_delete = 0 AND c.is_delete = 0`,
-      { replacements: [pageId], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ pageId ], type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     const mainCategoryIds = mainCategories.map(c => c.id);
     const allCategoryIds = [];
-    
+
     // 获取子分类（网站主要关联子分类）
     if (mainCategoryIds.length > 0) {
       const placeholders = mainCategoryIds.map(() => '?').join(',');
@@ -380,17 +380,17 @@ class FrontendService extends Service {
          WHERE parent_id IN (${placeholders}) AND is_delete = 0`,
         { replacements: mainCategoryIds, type: app.Sequelize.QueryTypes.SELECT }
       );
-      
+
       for (const sub of subCategories) {
         allCategoryIds.push(sub.id);
       }
     }
-    
+
     // 如果没有子分类，使用主分类ID
     if (allCategoryIds.length === 0) {
       allCategoryIds.push(...mainCategoryIds);
     }
-    
+
     return allCategoryIds;
   }
 
@@ -400,22 +400,22 @@ class FrontendService extends Service {
   calculateRelevanceScore(website, keyword) {
     const lowerKeyword = keyword.toLowerCase();
     let score = 0;
-    
+
     if (website.name) {
       const lowerName = website.name.toLowerCase();
       if (lowerName === lowerKeyword) score += 100;
       else if (lowerName.startsWith(lowerKeyword)) score += 50;
       else if (lowerName.includes(lowerKeyword)) score += 30;
     }
-    
+
     if (website.description && website.description.toLowerCase().includes(lowerKeyword)) {
       score += 10;
     }
-    
+
     if (website.isHot) score += 3;
     if (website.isFeatured) score += 2;
     if (website.isNew) score += 1;
-    
+
     return score;
   }
 
@@ -424,13 +424,13 @@ class FrontendService extends Service {
    */
   async getWebsitesByIds(ids) {
     const { app } = this;
-    
+
     if (!ids || ids.length === 0) return [];
-    
+
     // 分离数字ID和字符串ID（旧cuid格式）
     const numericIds = [];
     const stringIds = [];
-    
+
     for (const id of ids) {
       if (typeof id === 'number' || /^\d+$/.test(String(id))) {
         numericIds.push(parseInt(id));
@@ -438,9 +438,9 @@ class FrontendService extends Service {
         stringIds.push(String(id));
       }
     }
-    
-    let websites = [];
-    
+
+    const websites = [];
+
     // 查询数字ID
     if (numericIds.length > 0) {
       const placeholders = numericIds.map(() => '?').join(',');
@@ -453,7 +453,7 @@ class FrontendService extends Service {
       );
       websites.push(...result);
     }
-    
+
     // 查询旧cuid格式ID
     if (stringIds.length > 0) {
       const placeholders = stringIds.map(() => '?').join(',');
@@ -466,7 +466,7 @@ class FrontendService extends Service {
       );
       websites.push(...result);
     }
-    
+
     return websites.map(w => ({
       id: String(w.id),
       oldId: w.oldId,
@@ -486,7 +486,7 @@ class FrontendService extends Service {
    */
   async getHotWebsites(limit = 100) {
     const { app } = this;
-    
+
     const websites = await app.model.query(
       `SELECT id, name, description, url, icon_url as iconUrl,
               is_hot as isHot, is_featured as isFeatured, is_new as isNew, tags
@@ -494,9 +494,9 @@ class FrontendService extends Service {
        WHERE is_delete = 0 AND (is_hot = 1 OR is_featured = 1)
        ORDER BY is_hot DESC, is_featured DESC, click_count DESC
        LIMIT ?`,
-      { replacements: [limit], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ limit ], type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     return websites.map(w => ({
       id: String(w.id),
       name: w.name,
@@ -516,42 +516,42 @@ class FrontendService extends Service {
    */
   async getWebsiteDetail(idOrSlug) {
     const { app } = this;
-    
+
     // 先尝试按 ID 查询，再按 slug 查询
     let website;
     if (/^\d+$/.test(String(idOrSlug))) {
-      [website] = await app.model.query(
+      [ website ] = await app.model.query(
         `SELECT w.*, c.name as category_name, c.slug as category_slug, c.id as cat_id,
                 c.parent_id as category_parent_id
          FROM uied_website w
          LEFT JOIN uied_category c ON w.category_id = c.id
          WHERE w.id = ? AND w.is_delete = 0`,
-        { replacements: [idOrSlug], type: app.Sequelize.QueryTypes.SELECT }
+        { replacements: [ idOrSlug ], type: app.Sequelize.QueryTypes.SELECT }
       );
     }
-    
+
     if (!website) {
-      [website] = await app.model.query(
+      [ website ] = await app.model.query(
         `SELECT w.*, c.name as category_name, c.slug as category_slug, c.id as cat_id,
                 c.parent_id as category_parent_id
          FROM uied_website w
          LEFT JOIN uied_category c ON w.category_id = c.id
          WHERE w.slug = ? AND w.is_delete = 0`,
-        { replacements: [idOrSlug], type: app.Sequelize.QueryTypes.SELECT }
+        { replacements: [ idOrSlug ], type: app.Sequelize.QueryTypes.SELECT }
       );
     }
-    
+
     if (!website) return null;
-    
+
     // 获取父分类信息
     let parentCategory = null;
     if (website.category_parent_id) {
-      [parentCategory] = await app.model.query(
-        `SELECT id, name, slug FROM uied_category WHERE id = ? AND is_delete = 0`,
-        { replacements: [website.category_parent_id], type: app.Sequelize.QueryTypes.SELECT }
+      [ parentCategory ] = await app.model.query(
+        'SELECT id, name, slug FROM uied_category WHERE id = ? AND is_delete = 0',
+        { replacements: [ website.category_parent_id ], type: app.Sequelize.QueryTypes.SELECT }
       );
     }
-    
+
     return {
       id: String(website.id),
       name: website.name,
@@ -589,15 +589,15 @@ class FrontendService extends Service {
    */
   async getRelatedWebsites(websiteId, limit = 6) {
     const { app } = this;
-    
+
     // 获取当前网站的分类
-    const [website] = await app.model.query(
-      `SELECT category_id FROM uied_website WHERE id = ? AND is_delete = 0`,
-      { replacements: [websiteId], type: app.Sequelize.QueryTypes.SELECT }
+    const [ website ] = await app.model.query(
+      'SELECT category_id FROM uied_website WHERE id = ? AND is_delete = 0',
+      { replacements: [ websiteId ], type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     if (!website) return [];
-    
+
     // 获取同分类的其他网站
     const related = await app.model.query(
       `SELECT id, name, slug, description, url, icon_url as iconUrl, category_id
@@ -605,9 +605,9 @@ class FrontendService extends Service {
        WHERE category_id = ? AND id != ? AND is_delete = 0
        ORDER BY is_hot DESC, is_featured DESC, click_count DESC
        LIMIT ?`,
-      { replacements: [website.category_id, websiteId, limit], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ website.category_id, websiteId, limit ], type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     return related.map(w => ({
       id: String(w.id),
       name: w.name,
@@ -624,7 +624,7 @@ class FrontendService extends Service {
    */
   async getFaviconApis() {
     const { app } = this;
-    
+
     const apis = await app.model.query(
       `SELECT id, name, url_template as urlTemplate, description
        FROM uied_favicon_api
@@ -632,7 +632,7 @@ class FrontendService extends Service {
        ORDER BY sort ASC, id ASC`,
       { type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     return apis;
   }
 
@@ -643,7 +643,7 @@ class FrontendService extends Service {
     if (!str) return defaultValue;
     try {
       return JSON.parse(str);
-    } catch {
+    } catch (error) {
       // 如果不是 JSON，按逗号分隔处理
       if (typeof str === 'string') {
         return str.split(',').map(s => s.trim()).filter(Boolean);

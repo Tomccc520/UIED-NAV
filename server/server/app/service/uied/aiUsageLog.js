@@ -45,7 +45,7 @@ class AiUsageLogService extends Service {
     }
 
     // 查询总数
-    const [countResult] = await app.model.query(
+    const [ countResult ] = await app.model.query(
       `SELECT COUNT(*) as total FROM uied_ai_usage_log WHERE ${whereClause}`,
       { replacements, type: app.Sequelize.QueryTypes.SELECT }
     );
@@ -57,7 +57,7 @@ class AiUsageLogService extends Service {
        ORDER BY create_time DESC
        LIMIT ? OFFSET ?`,
       {
-        replacements: [...replacements, pageSize, offset],
+        replacements: [ ...replacements, pageSize, offset ],
         type: app.Sequelize.QueryTypes.SELECT,
       }
     );
@@ -87,7 +87,7 @@ class AiUsageLogService extends Service {
     const { app } = this;
 
     // 总调用次数和总 Token 消耗
-    const [totalResult] = await app.model.query(
+    const [ totalResult ] = await app.model.query(
       `SELECT 
         COUNT(*) as totalCalls,
         COALESCE(SUM(tokens_used), 0) as totalTokens
@@ -97,7 +97,7 @@ class AiUsageLogService extends Service {
     );
 
     // 成功率
-    const [successResult] = await app.model.query(
+    const [ successResult ] = await app.model.query(
       `SELECT COUNT(*) as successCount
        FROM uied_ai_usage_log
        WHERE is_delete = 0 AND response_status = 'success'`,
@@ -113,13 +113,13 @@ class AiUsageLogService extends Service {
 
     // 今日统计
     const todayStart = Math.floor(new Date().setHours(0, 0, 0, 0) / 1000);
-    const [todayResult] = await app.model.query(
+    const [ todayResult ] = await app.model.query(
       `SELECT 
         COUNT(*) as todayCalls,
         COALESCE(SUM(tokens_used), 0) as todayTokens
        FROM uied_ai_usage_log
        WHERE is_delete = 0 AND create_time >= ?`,
-      { replacements: [todayStart], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ todayStart ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     // 按类型统计
@@ -167,7 +167,7 @@ class AiUsageLogService extends Service {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
 
-    const [result] = await app.model.query(
+    const [ result ] = await app.model.query(
       `INSERT INTO uied_ai_usage_log 
        (config_id, feature_type, request_content, response_status, error_message, tokens_used, duration_ms, is_delete, create_time, update_time, delete_time)
        VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, 0)`,

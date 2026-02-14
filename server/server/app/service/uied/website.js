@@ -22,11 +22,11 @@ class WebsiteService extends Service {
   async list({ page = 1, pageSize = 20, categoryId, keyword, status, includeChildren }) {
     const { app } = this;
     const offset = (page - 1) * pageSize;
-    
+
     // 构建查询条件
     let whereClause = 'w.is_delete = 0';
     const replacements = [];
-    
+
     if (categoryId) {
       if (includeChildren) {
         // 包含子分类：查询该分类及其所有子分类的网站
@@ -37,25 +37,25 @@ class WebsiteService extends Service {
         replacements.push(categoryId);
       }
     }
-    
+
     if (keyword) {
       whereClause += ' AND (w.name LIKE ? OR w.description LIKE ? OR w.url LIKE ?)';
       const likeKeyword = `%${keyword}%`;
       replacements.push(likeKeyword, likeKeyword, likeKeyword);
     }
-    
+
     if (status) {
       whereClause += ' AND w.status = ?';
       replacements.push(status);
     }
-    
+
     // 获取总数
-    const [countResult] = await app.model.query(
+    const [ countResult ] = await app.model.query(
       `SELECT COUNT(*) as total FROM uied_website w WHERE ${whereClause}`,
       { replacements, type: app.Sequelize.QueryTypes.SELECT }
     );
     const total = countResult.total;
-    
+
     // 获取列表
     const websites = await app.model.query(
       `SELECT w.id, w.name, w.slug, w.description, w.url, w.icon_url as iconUrl,
@@ -68,9 +68,9 @@ class WebsiteService extends Service {
        WHERE ${whereClause}
        ORDER BY w.is_pinned DESC, w.sort ASC, w.id DESC
        LIMIT ? OFFSET ?`,
-      { replacements: [...replacements, pageSize, offset], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ ...replacements, pageSize, offset ], type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     // 转换布尔值和解析 tags
     const list = websites.map(w => ({
       ...w,
@@ -81,7 +81,7 @@ class WebsiteService extends Service {
       isActive: w.isActive !== 'disabled',
       tags: w.tags ? JSON.parse(w.tags) : [],
     }));
-    
+
     return {
       lists: list,
       count: total,
@@ -97,10 +97,10 @@ class WebsiteService extends Service {
    */
   async detail(id, slug) {
     const { app } = this;
-    
+
     let whereClause = 'w.is_delete = 0';
     const replacements = [];
-    
+
     if (id) {
       whereClause += ' AND w.id = ?';
       replacements.push(id);
@@ -108,17 +108,17 @@ class WebsiteService extends Service {
       whereClause += ' AND w.slug = ?';
       replacements.push(slug);
     }
-    
-    const [website] = await app.model.query(
+
+    const [ website ] = await app.model.query(
       `SELECT w.*, c.name as categoryName, c.slug as categorySlug
        FROM uied_website w
        LEFT JOIN uied_category c ON w.category_id = c.id
        WHERE ${whereClause}`,
       { replacements, type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     if (!website) return null;
-    
+
     // 转换字段名和类型
     return {
       id: website.id,
@@ -156,19 +156,19 @@ class WebsiteService extends Service {
   async add(data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    
+
     // 检查 slug 是否已存在
     if (data.slug) {
-      const [existing] = await app.model.query(
+      const [ existing ] = await app.model.query(
         'SELECT id FROM uied_website WHERE slug = ? AND is_delete = 0',
-        { replacements: [data.slug], type: app.Sequelize.QueryTypes.SELECT }
+        { replacements: [ data.slug ], type: app.Sequelize.QueryTypes.SELECT }
       );
       if (existing) {
         throw new Error('网站别名已存在');
       }
     }
-    
-    const [result] = await app.model.query(
+
+    const [ result ] = await app.model.query(
       `INSERT INTO uied_website (name, slug, description, url, icon_url, category_id,
         is_new, is_featured, is_hot, is_pinned, tags, sort, click_count,
         seo_title, seo_description, seo_keywords, detail_content, screenshots, thumbnail, visit_btn_text,
@@ -203,7 +203,7 @@ class WebsiteService extends Service {
         type: app.Sequelize.QueryTypes.INSERT,
       }
     );
-    
+
     return { id: result, ...data };
   }
 
@@ -214,31 +214,31 @@ class WebsiteService extends Service {
   async edit(data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    
+
     // 检查网站是否存在
-    const [existing] = await app.model.query(
+    const [ existing ] = await app.model.query(
       'SELECT id FROM uied_website WHERE id = ? AND is_delete = 0',
-      { replacements: [data.id], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ data.id ], type: app.Sequelize.QueryTypes.SELECT }
     );
     if (!existing) {
       throw new Error('网站不存在');
     }
-    
+
     // 检查 slug 是否被其他网站使用
     if (data.slug) {
-      const [slugExists] = await app.model.query(
+      const [ slugExists ] = await app.model.query(
         'SELECT id FROM uied_website WHERE slug = ? AND id != ? AND is_delete = 0',
-        { replacements: [data.slug, data.id], type: app.Sequelize.QueryTypes.SELECT }
+        { replacements: [ data.slug, data.id ], type: app.Sequelize.QueryTypes.SELECT }
       );
       if (slugExists) {
         throw new Error('网站别名已存在');
       }
     }
-    
+
     // 构建更新字段
     const updates = [];
     const values = [];
-    
+
     if (data.name !== undefined) { updates.push('name = ?'); values.push(data.name); }
     if (data.slug !== undefined) { updates.push('slug = ?'); values.push(data.slug); }
     if (data.description !== undefined) { updates.push('description = ?'); values.push(data.description); }
@@ -258,16 +258,16 @@ class WebsiteService extends Service {
     if (data.screenshots !== undefined) { updates.push('screenshots = ?'); values.push(JSON.stringify(data.screenshots)); }
     if (data.thumbnail !== undefined) { updates.push('thumbnail = ?'); values.push(data.thumbnail); }
     if (data.visitBtnText !== undefined) { updates.push('visit_btn_text = ?'); values.push(data.visitBtnText); }
-    
+
     updates.push('update_time = ?');
     values.push(now);
     values.push(data.id);
-    
+
     await app.model.query(
       `UPDATE uied_website SET ${updates.join(', ')} WHERE id = ?`,
       { replacements: values, type: app.Sequelize.QueryTypes.UPDATE }
     );
-    
+
     return data;
   }
 
@@ -277,10 +277,10 @@ class WebsiteService extends Service {
   async del(id) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    
+
     await app.model.query(
       'UPDATE uied_website SET is_delete = 1, delete_time = ? WHERE id = ?',
-      { replacements: [now, id], type: app.Sequelize.QueryTypes.UPDATE }
+      { replacements: [ now, id ], type: app.Sequelize.QueryTypes.UPDATE }
     );
   }
 
@@ -290,10 +290,10 @@ class WebsiteService extends Service {
   async batchDel(ids) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    
+
     await app.model.query(
       `UPDATE uied_website SET is_delete = 1, delete_time = ? WHERE id IN (${ids.join(',')})`,
-      { replacements: [now], type: app.Sequelize.QueryTypes.UPDATE }
+      { replacements: [ now ], type: app.Sequelize.QueryTypes.UPDATE }
     );
   }
 
@@ -304,7 +304,7 @@ class WebsiteService extends Service {
     const { app } = this;
     await app.model.query(
       'UPDATE uied_website SET click_count = click_count + 1 WHERE id = ?',
-      { replacements: [id], type: app.Sequelize.QueryTypes.UPDATE }
+      { replacements: [ id ], type: app.Sequelize.QueryTypes.UPDATE }
     );
   }
 
@@ -315,10 +315,10 @@ class WebsiteService extends Service {
     const { app } = this;
     const offset = (page - 1) * pageSize;
     const likeKeyword = `%${keyword}%`;
-    
+
     let whereClause = 'w.is_delete = 0 AND (w.name LIKE ? OR w.description LIKE ? OR w.tags LIKE ?)';
-    const replacements = [likeKeyword, likeKeyword, likeKeyword];
-    
+    const replacements = [ likeKeyword, likeKeyword, likeKeyword ];
+
     // 如果指定了页面，只搜索该页面的分类下的网站
     if (pageSlug) {
       whereClause += ` AND w.category_id IN (
@@ -328,13 +328,13 @@ class WebsiteService extends Service {
       )`;
       replacements.push(pageSlug);
     }
-    
+
     // 获取总数
-    const [countResult] = await app.model.query(
+    const [ countResult ] = await app.model.query(
       `SELECT COUNT(*) as total FROM uied_website w WHERE ${whereClause}`,
       { replacements, type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     // 获取列表
     const websites = await app.model.query(
       `SELECT w.id, w.name, w.slug, w.description, w.url, w.icon_url as iconUrl,
@@ -346,9 +346,9 @@ class WebsiteService extends Service {
        WHERE ${whereClause}
        ORDER BY w.click_count DESC, w.id DESC
        LIMIT ? OFFSET ?`,
-      { replacements: [...replacements, pageSize, offset], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ ...replacements, pageSize, offset ], type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     const list = websites.map(w => ({
       ...w,
       isNew: w.isNew === 1,
@@ -356,7 +356,7 @@ class WebsiteService extends Service {
       isHot: w.isHot === 1,
       tags: w.tags ? JSON.parse(w.tags) : [],
     }));
-    
+
     return {
       lists: list,
       count: countResult.total,
@@ -371,26 +371,26 @@ class WebsiteService extends Service {
   async getByIds(ids) {
     const { app } = this;
     if (!ids || ids.length === 0) return [];
-    
+
     // 分离数字ID和字符串ID（旧cuid格式）
     const numericIds = ids.filter(id => /^\d+$/.test(String(id)));
     const stringIds = ids.filter(id => !/^\d+$/.test(String(id)));
-    
-    let whereConditions = [];
+
+    const whereConditions = [];
     const replacements = [];
-    
+
     if (numericIds.length > 0) {
       whereConditions.push(`w.id IN (${numericIds.join(',')})`);
     }
-    
+
     if (stringIds.length > 0) {
       const placeholders = stringIds.map(() => '?').join(',');
       whereConditions.push(`w.old_id IN (${placeholders})`);
       replacements.push(...stringIds);
     }
-    
+
     if (whereConditions.length === 0) return [];
-    
+
     const websites = await app.model.query(
       `SELECT w.id, w.old_id as oldId, w.name, w.slug, w.description, w.url, w.icon_url as iconUrl,
               w.category_id as categoryId, c.name as categoryName,
@@ -401,7 +401,7 @@ class WebsiteService extends Service {
        WHERE w.is_delete = 0 AND (${whereConditions.join(' OR ')})`,
       { replacements, type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     return websites.map(w => ({
       ...w,
       isNew: w.isNew === 1,

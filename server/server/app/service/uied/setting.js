@@ -119,17 +119,17 @@ class SettingService extends Service {
    */
   async get(key) {
     const { app } = this;
-    
-    const [setting] = await app.model.query(
+
+    const [ setting ] = await app.model.query(
       'SELECT `key`, `value`, description FROM uied_site_setting WHERE `key` = ?',
-      { replacements: [key], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ key ], type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     if (!setting) return null;
-    
+
     try {
       return JSON.parse(setting.value);
-    } catch {
+    } catch (error) {
       return setting.value;
     }
   }
@@ -139,21 +139,21 @@ class SettingService extends Service {
    */
   async getAll() {
     const { app } = this;
-    
+
     const settings = await app.model.query(
       'SELECT `key`, `value`, description FROM uied_site_setting',
       { type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     const result = {};
     for (const setting of settings) {
       try {
         result[setting.key] = JSON.parse(setting.value);
-      } catch {
+      } catch (error) {
         result[setting.key] = setting.value;
       }
     }
-    
+
     return result;
   }
 
@@ -163,20 +163,20 @@ class SettingService extends Service {
   async save(data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    
-    for (const [key, rawValue] of Object.entries(data)) {
+
+    for (const [ key, rawValue ] of Object.entries(data)) {
       const value = key === 'pageGlobalConfig' && rawValue && typeof rawValue === 'object'
         ? this.normalizePageGlobalConfig(rawValue)
         : key === 'homepageConfig' && rawValue && typeof rawValue === 'object'
           ? this.normalizeHomepageConfig(rawValue)
-        : rawValue;
+          : rawValue;
       const valueStr = typeof value === 'object' ? JSON.stringify(value) : String(value);
-      
+
       await app.model.query(
         `INSERT INTO uied_site_setting (\`key\`, \`value\`, create_time, update_time)
          VALUES (?, ?, ?, ?)
          ON DUPLICATE KEY UPDATE \`value\` = ?, update_time = ?`,
-        { replacements: [key, valueStr, now, now, valueStr, now], type: app.Sequelize.QueryTypes.INSERT }
+        { replacements: [ key, valueStr, now, now, valueStr, now ], type: app.Sequelize.QueryTypes.INSERT }
       );
     }
   }
@@ -186,14 +186,14 @@ class SettingService extends Service {
    */
   async getSiteInfo() {
     const { app } = this;
-    
-    const [info] = await app.model.query(
+
+    const [ info ] = await app.model.query(
       'SELECT * FROM uied_site_info LIMIT 1',
       { type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     if (!info) return null;
-    
+
     return {
       id: info.id,
       siteName: info.site_name,
@@ -215,13 +215,13 @@ class SettingService extends Service {
   async saveSiteInfo(data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    
+
     // 检查是否存在记录
-    const [existing] = await app.model.query(
+    const [ existing ] = await app.model.query(
       'SELECT id FROM uied_site_info LIMIT 1',
       { type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     if (existing) {
       await app.model.query(
         `UPDATE uied_site_info SET
@@ -262,7 +262,7 @@ class SettingService extends Service {
    */
   async getPublicSettings() {
     const siteInfo = await this.getSiteInfo();
-    
+
     // 从数据库读取各项配置
     const pageGlobalConfig = await this.get('pageGlobalConfig');
     const appearanceConfig = await this.get('appearanceConfig');
@@ -272,7 +272,7 @@ class SettingService extends Service {
     const searchConfig = await this.get('searchConfig');
     const exitModalConfig = await this.get('exitModalConfig');
     const detailPageConfig = await this.get('detailPageConfig');
-    
+
     // 默认配置
     const defaultPageGlobal = {
       websiteClickMode: 'detail',
@@ -282,7 +282,7 @@ class SettingService extends Service {
       pageSize: 20,
       hotRecommendationClickMode: 'detail', // 热门推荐独立配置，默认进详情页
     };
-    
+
     const defaultAppearance = {
       primaryColor: '#0066ff',
       backgroundColor: '#f6f8fb',
@@ -292,9 +292,9 @@ class SettingService extends Service {
       baseFontSize: 16,
       borderRadius: 12,
       contentMaxWidth: 1200,
-      customCss: ''
+      customCss: '',
     };
-    
+
     const defaultHomepage = {
       heroBannerEnabled: true,
       heroBgType: 'default',
@@ -313,7 +313,7 @@ class SettingService extends Service {
       homeRecommendationSort: 20,
       navSwitchItems: this.getDefaultNavSwitchItems(),
     };
-    
+
     const defaultCardStyle = {
       defaultLayout: 'grid',
       gridColumns: 4,
@@ -322,9 +322,9 @@ class SettingService extends Service {
       showTags: true,
       showFavicon: true,
       showUrl: false,
-      hoverEffect: 'translateUp'
+      hoverEffect: 'translateUp',
     };
-    
+
     const defaultSidebar = {
       enabled: true,
       position: 'left',
@@ -332,26 +332,26 @@ class SettingService extends Service {
       showCategories: true,
       showCategoryCount: true,
       expandSubCategories: false,
-      sticky: true
+      sticky: true,
     };
-    
+
     const defaultSearch = {
       placeholder: '搜索网站名称...',
       debounceDelay: 300,
       aiSearchEnabled: true,
       aiSearchBtnText: 'AI 搜索',
       highlightKeyword: true,
-      resultsPerPage: 20
+      resultsPerPage: 20,
     };
-    
+
     const defaultExitModal = {
       enabled: true,
       title: '即将离开本站',
       description: '您即将访问外部网站，请注意安全',
       autoRedirect: true,
-      countdown: 5
+      countdown: 5,
     };
-    
+
     const defaultDetailPage = {
       screenshotsEnabled: true,
       ratingsEnabled: true,
@@ -371,9 +371,9 @@ class SettingService extends Service {
       reportText: '如发现违规内容，请发送邮件举报',
       reportEmail: '',
       visitBtnText: '访问网站',
-      visitBtnNewWindow: true
+      visitBtnNewWindow: true,
     };
-    
+
     const normalizedPageGlobalConfig = this.normalizePageGlobalConfig(pageGlobalConfig || {});
 
     // 返回完整的配置结构（注意字段名要和前端期望的一致）

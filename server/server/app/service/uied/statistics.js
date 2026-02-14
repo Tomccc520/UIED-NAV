@@ -31,8 +31,8 @@ class StatisticsService extends Service {
     );
 
     // 获取总点击量
-    const [totalResult] = await app.model.query(
-      `SELECT SUM(click_count) as total FROM uied_website WHERE is_delete = 0`,
+    const [ totalResult ] = await app.model.query(
+      'SELECT SUM(click_count) as total FROM uied_website WHERE is_delete = 0',
       { type: app.Sequelize.QueryTypes.SELECT }
     );
 
@@ -75,7 +75,7 @@ class StatisticsService extends Service {
     const startTime = Math.floor(Date.now() / 1000) - days * 24 * 60 * 60;
 
     // 检查搜索日志表是否存在
-    const [tableExists] = await app.model.query(
+    const [ tableExists ] = await app.model.query(
       `SELECT COUNT(*) as count FROM information_schema.tables 
        WHERE table_schema = DATABASE() AND table_name = 'uied_search_log'`,
       { type: app.Sequelize.QueryTypes.SELECT }
@@ -99,19 +99,19 @@ class StatisticsService extends Service {
        GROUP BY query 
        ORDER BY count DESC 
        LIMIT 20`,
-      { replacements: [startTime], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ startTime ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     // 总搜索次数
-    const [totalResult] = await app.model.query(
-      `SELECT COUNT(*) as total FROM uied_search_log WHERE create_time >= ?`,
-      { replacements: [startTime], type: app.Sequelize.QueryTypes.SELECT }
+    const [ totalResult ] = await app.model.query(
+      'SELECT COUNT(*) as total FROM uied_search_log WHERE create_time >= ?',
+      { replacements: [ startTime ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     // AI 搜索次数
-    const [aiResult] = await app.model.query(
-      `SELECT COUNT(*) as total FROM uied_search_log WHERE create_time >= ? AND is_ai = 1`,
-      { replacements: [startTime], type: app.Sequelize.QueryTypes.SELECT }
+    const [ aiResult ] = await app.model.query(
+      'SELECT COUNT(*) as total FROM uied_search_log WHERE create_time >= ? AND is_ai = 1',
+      { replacements: [ startTime ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     // 每日搜索趋势
@@ -121,7 +121,7 @@ class StatisticsService extends Service {
        WHERE create_time >= ?
        GROUP BY DATE(FROM_UNIXTIME(create_time))
        ORDER BY date`,
-      { replacements: [startTime], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ startTime ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     const totalSearches = totalResult.total || 0;
@@ -144,7 +144,7 @@ class StatisticsService extends Service {
     const { app } = this;
 
     // 网站统计
-    const [websiteStats] = await app.model.query(
+    const [ websiteStats ] = await app.model.query(
       `SELECT 
         COUNT(*) as total,
         SUM(CASE WHEN is_hot = 1 THEN 1 ELSE 0 END) as hotCount,
@@ -158,7 +158,7 @@ class StatisticsService extends Service {
     );
 
     // 分类统计
-    const [categoryStats] = await app.model.query(
+    const [ categoryStats ] = await app.model.query(
       `SELECT 
         COUNT(*) as total,
         SUM(CASE WHEN parent_id IS NULL OR parent_id = 0 THEN 1 ELSE 0 END) as mainCount,
@@ -168,7 +168,7 @@ class StatisticsService extends Service {
     );
 
     // 文章统计
-    const [articleStats] = await app.model.query(
+    const [ articleStats ] = await app.model.query(
       `SELECT 
         COUNT(*) as total,
         SUM(CASE WHEN status = 'published' THEN 1 ELSE 0 END) as publishedCount,
@@ -178,13 +178,13 @@ class StatisticsService extends Service {
     );
 
     // 评论统计
-    const [websiteCommentStats] = await app.model.query(
+    const [ websiteCommentStats ] = await app.model.query(
       `SELECT COUNT(*) as total, SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pendingCount
        FROM uied_website_comment WHERE is_delete = 0`,
       { type: app.Sequelize.QueryTypes.SELECT }
     );
 
-    const [articleCommentStats] = await app.model.query(
+    const [ articleCommentStats ] = await app.model.query(
       `SELECT COUNT(*) as total, SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pendingCount
        FROM uied_article_comment WHERE is_delete = 0`,
       { type: app.Sequelize.QueryTypes.SELECT }
@@ -236,7 +236,7 @@ class StatisticsService extends Service {
        WHERE w.is_delete = 0
        ORDER BY w.create_time DESC
        LIMIT ?`,
-      { replacements: [limit], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ limit ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     return websites.map(w => ({

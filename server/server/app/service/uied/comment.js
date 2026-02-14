@@ -17,7 +17,7 @@ class CommentService extends Service {
    * 获取评论列表（管理后台）
    */
   async list(params = {}) {
-    const { ctx, app } = this;
+    const { app } = this;
     const { page = 1, pageSize = 15, type = 'website', status, keyword } = params;
     const offset = (page - 1) * pageSize;
 
@@ -41,7 +41,7 @@ class CommentService extends Service {
     }
 
     // 查询总数
-    const [countResult] = await app.model.query(
+    const [ countResult ] = await app.model.query(
       `SELECT COUNT(*) as total FROM ${tableName} c WHERE ${conditions}`,
       { replacements, type: app.Sequelize.QueryTypes.SELECT }
     );
@@ -54,9 +54,9 @@ class CommentService extends Service {
        WHERE ${conditions}
        ORDER BY c.create_time DESC
        LIMIT ? OFFSET ?`,
-      { 
-        replacements: [...replacements, parseInt(pageSize), offset], 
-        type: app.Sequelize.QueryTypes.SELECT 
+      {
+        replacements: [ ...replacements, parseInt(pageSize), offset ],
+        type: app.Sequelize.QueryTypes.SELECT,
       }
     );
 
@@ -74,10 +74,10 @@ class CommentService extends Service {
   async detail(id, type = 'website') {
     const { app } = this;
     const tableName = type === 'article' ? 'uied_article_comment' : 'uied_website_comment';
-    
-    const [comment] = await app.model.query(
+
+    const [ comment ] = await app.model.query(
       `SELECT * FROM ${tableName} WHERE id = ? AND is_delete = 0`,
-      { replacements: [id], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ id ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     if (!comment) return null;
@@ -94,7 +94,7 @@ class CommentService extends Service {
 
     await app.model.query(
       `UPDATE ${tableName} SET status = 'approved', update_time = ? WHERE id = ?`,
-      { replacements: [now, id], type: app.Sequelize.QueryTypes.UPDATE }
+      { replacements: [ now, id ], type: app.Sequelize.QueryTypes.UPDATE }
     );
 
     return true;
@@ -110,7 +110,7 @@ class CommentService extends Service {
 
     await app.model.query(
       `UPDATE ${tableName} SET status = 'rejected', update_time = ? WHERE id = ?`,
-      { replacements: [now, id], type: app.Sequelize.QueryTypes.UPDATE }
+      { replacements: [ now, id ], type: app.Sequelize.QueryTypes.UPDATE }
     );
 
     return true;
@@ -123,12 +123,12 @@ class CommentService extends Service {
     const { app } = this;
     const tableName = type === 'article' ? 'uied_article_comment' : 'uied_website_comment';
     const now = Math.floor(Date.now() / 1000);
-    const idList = Array.isArray(ids) ? ids : [ids];
+    const idList = Array.isArray(ids) ? ids : [ ids ];
     const placeholders = idList.map(() => '?').join(',');
 
     await app.model.query(
       `UPDATE ${tableName} SET is_delete = 1, delete_time = ? WHERE id IN (${placeholders})`,
-      { replacements: [now, ...idList], type: app.Sequelize.QueryTypes.UPDATE }
+      { replacements: [ now, ...idList ], type: app.Sequelize.QueryTypes.UPDATE }
     );
 
     return true;
@@ -140,13 +140,13 @@ class CommentService extends Service {
   async pendingCount() {
     const { app } = this;
 
-    const [websiteCount] = await app.model.query(
-      `SELECT COUNT(*) as count FROM uied_website_comment WHERE status = 'pending' AND is_delete = 0`,
+    const [ websiteCount ] = await app.model.query(
+      'SELECT COUNT(*) as count FROM uied_website_comment WHERE status = \'pending\' AND is_delete = 0',
       { type: app.Sequelize.QueryTypes.SELECT }
     );
 
-    const [articleCount] = await app.model.query(
-      `SELECT COUNT(*) as count FROM uied_article_comment WHERE status = 'pending' AND is_delete = 0`,
+    const [ articleCount ] = await app.model.query(
+      'SELECT COUNT(*) as count FROM uied_article_comment WHERE status = \'pending\' AND is_delete = 0',
       { type: app.Sequelize.QueryTypes.SELECT }
     );
 
@@ -165,17 +165,17 @@ class CommentService extends Service {
 
     // 网站评论统计
     const websiteStats = await app.model.query(
-      `SELECT status, COUNT(*) as count FROM uied_website_comment WHERE is_delete = 0 GROUP BY status`,
+      'SELECT status, COUNT(*) as count FROM uied_website_comment WHERE is_delete = 0 GROUP BY status',
       { type: app.Sequelize.QueryTypes.SELECT }
     );
 
     // 文章评论统计
     const articleStats = await app.model.query(
-      `SELECT status, COUNT(*) as count FROM uied_article_comment WHERE is_delete = 0 GROUP BY status`,
+      'SELECT status, COUNT(*) as count FROM uied_article_comment WHERE is_delete = 0 GROUP BY status',
       { type: app.Sequelize.QueryTypes.SELECT }
     );
 
-    const formatStats = (stats) => {
+    const formatStats = stats => {
       const result = { pending: 0, approved: 0, rejected: 0, total: 0 };
       stats.forEach(s => {
         result[s.status] = s.count;
@@ -203,7 +203,7 @@ class CommentService extends Service {
     const ip = ctx.ip || ctx.request.ip || '';
     const userAgent = ctx.get('user-agent') || '';
 
-    const [result] = await app.model.query(
+    const [ result ] = await app.model.query(
       `INSERT INTO ${tableName} 
        (${targetIdField}, user_id, nickname, email, content, status, ip, user_agent, create_time, update_time)
        VALUES (?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?)`,
@@ -237,10 +237,10 @@ class CommentService extends Service {
     const targetIdField = type === 'article' ? 'article_id' : 'website_id';
 
     // 查询总数
-    const [countResult] = await app.model.query(
+    const [ countResult ] = await app.model.query(
       `SELECT COUNT(*) as total FROM ${tableName} 
        WHERE ${targetIdField} = ? AND status = 'approved' AND is_delete = 0`,
-      { replacements: [targetId], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ targetId ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     // 查询列表
@@ -249,9 +249,9 @@ class CommentService extends Service {
        WHERE ${targetIdField} = ? AND status = 'approved' AND is_delete = 0
        ORDER BY create_time DESC
        LIMIT ? OFFSET ?`,
-      { 
-        replacements: [targetId, parseInt(pageSize), offset], 
-        type: app.Sequelize.QueryTypes.SELECT 
+      {
+        replacements: [ targetId, parseInt(pageSize), offset ],
+        type: app.Sequelize.QueryTypes.SELECT,
       }
     );
 
@@ -310,7 +310,7 @@ class CommentService extends Service {
     const ip = ctx.ip || ctx.request.ip || '';
     const userAgent = ctx.get('user-agent') || '';
 
-    const [result] = await app.model.query(
+    const [ result ] = await app.model.query(
       `INSERT INTO uied_article_comment 
        (article_id, user_id, nickname, email, content, status, ip, user_agent, create_time, update_time)
        VALUES (?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?)`,

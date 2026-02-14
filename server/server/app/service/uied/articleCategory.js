@@ -31,7 +31,7 @@ class ArticleCategoryService extends Service {
     }
 
     // 获取总数
-    const [countResult] = await app.model.query(
+    const [ countResult ] = await app.model.query(
       `SELECT COUNT(*) as total FROM uied_article_category c WHERE ${whereClause}`,
       { replacements, type: app.Sequelize.QueryTypes.SELECT }
     );
@@ -45,7 +45,7 @@ class ArticleCategoryService extends Service {
        WHERE ${whereClause}
        ORDER BY c.sort_order ASC, c.id ASC
        LIMIT ? OFFSET ?`,
-      { replacements: [...replacements, pageSize, offset], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ ...replacements, pageSize, offset ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     return {
@@ -99,15 +99,15 @@ class ArticleCategoryService extends Service {
     const now = Math.floor(Date.now() / 1000);
 
     // 检查 slug 是否已存在
-    const [existingSlug] = await app.model.query(
+    const [ existingSlug ] = await app.model.query(
       'SELECT id FROM uied_article_category WHERE slug = ? AND is_delete = 0',
-      { replacements: [data.slug], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ data.slug ], type: app.Sequelize.QueryTypes.SELECT }
     );
     if (existingSlug) {
       throw new Error('分类标识已存在');
     }
 
-    const [result] = await app.model.query(
+    const [ result ] = await app.model.query(
       `INSERT INTO uied_article_category (name, slug, description, sort_order, is_delete, create_time, update_time)
        VALUES (?, ?, ?, ?, 0, ?, ?)`,
       {
@@ -135,9 +135,9 @@ class ArticleCategoryService extends Service {
     const now = Math.floor(Date.now() / 1000);
 
     // 检查分类是否存在
-    const [existing] = await app.model.query(
+    const [ existing ] = await app.model.query(
       'SELECT id FROM uied_article_category WHERE id = ? AND is_delete = 0',
-      { replacements: [data.id], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ data.id ], type: app.Sequelize.QueryTypes.SELECT }
     );
     if (!existing) {
       throw new Error('分类不存在');
@@ -145,9 +145,9 @@ class ArticleCategoryService extends Service {
 
     // 检查 slug 是否与其他分类冲突
     if (data.slug) {
-      const [existingSlug] = await app.model.query(
+      const [ existingSlug ] = await app.model.query(
         'SELECT id FROM uied_article_category WHERE slug = ? AND id != ? AND is_delete = 0',
-        { replacements: [data.slug, data.id], type: app.Sequelize.QueryTypes.SELECT }
+        { replacements: [ data.slug, data.id ], type: app.Sequelize.QueryTypes.SELECT }
       );
       if (existingSlug) {
         throw new Error('分类标识已存在');
@@ -185,7 +185,7 @@ class ArticleCategoryService extends Service {
     // 软删除分类
     await app.model.query(
       'UPDATE uied_article_category SET is_delete = 1, update_time = ? WHERE id = ?',
-      { replacements: [now, id], type: app.Sequelize.QueryTypes.UPDATE }
+      { replacements: [ now, id ], type: app.Sequelize.QueryTypes.UPDATE }
     );
   }
 }

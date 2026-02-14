@@ -19,14 +19,14 @@ class PageService extends Service {
   async list({ page = 1, pageSize = 20 }) {
     const { app } = this;
     const offset = (page - 1) * pageSize;
-    
+
     // 获取总数
-    const [countResult] = await app.model.query(
+    const [ countResult ] = await app.model.query(
       'SELECT COUNT(*) as total FROM uied_page WHERE is_delete = 0',
       { type: app.Sequelize.QueryTypes.SELECT }
     );
     const total = countResult.total;
-    
+
     // 获取列表（包含所有 Hero 配置字段）
     const pages = await app.model.query(
       `SELECT id, name, slug, type, description, icon,
@@ -42,9 +42,9 @@ class PageService extends Service {
        WHERE is_delete = 0
        ORDER BY sort ASC, id ASC
        LIMIT ? OFFSET ?`,
-      { replacements: [pageSize, offset], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ pageSize, offset ], type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     const lists = pages.map(p => ({
       ...p,
       isActive: p.isActive === 1,
@@ -55,7 +55,7 @@ class PageService extends Service {
       hotSearchTags: p.hotSearchTags ? this.safeJsonParse(p.hotSearchTags, []) : [],
       heroScrollWebsites: p.heroScrollWebsites ? this.safeJsonParse(p.heroScrollWebsites, []) : [],
     }));
-    
+
     return { lists, count: total, page, pageSize };
   }
 
@@ -79,10 +79,10 @@ class PageService extends Service {
    */
   async detail(id, slug) {
     const { app } = this;
-    
+
     let whereClause = 'is_delete = 0';
     const replacements = [];
-    
+
     if (id) {
       whereClause += ' AND id = ?';
       replacements.push(id);
@@ -90,14 +90,14 @@ class PageService extends Service {
       whereClause += ' AND slug = ?';
       replacements.push(slug);
     }
-    
-    const [page] = await app.model.query(
+
+    const [ page ] = await app.model.query(
       `SELECT * FROM uied_page WHERE ${whereClause}`,
       { replacements, type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     if (!page) return null;
-    
+
     return {
       id: page.id,
       name: page.name,
@@ -131,17 +131,17 @@ class PageService extends Service {
   async add(data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    
+
     // 检查 slug 是否已存在
-    const [existing] = await app.model.query(
+    const [ existing ] = await app.model.query(
       'SELECT id FROM uied_page WHERE slug = ? AND is_delete = 0',
-      { replacements: [data.slug], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ data.slug ], type: app.Sequelize.QueryTypes.SELECT }
     );
     if (existing) {
       throw new Error('页面别名已存在');
     }
-    
-    const [result] = await app.model.query(
+
+    const [ result ] = await app.model.query(
       `INSERT INTO uied_page (name, slug, type, description, icon, hero_title, hero_highlight_text,
         hero_subtitle, hot_search_tags, hero_bg_type, hero_bg_value, hero_display_mode,
         hero_scroll_websites, search_placeholder, search_enabled, show_hot_recommendations,
@@ -162,7 +162,7 @@ class PageService extends Service {
         type: app.Sequelize.QueryTypes.INSERT,
       }
     );
-    
+
     return { id: result, ...data };
   }
 
@@ -172,10 +172,10 @@ class PageService extends Service {
   async edit(data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    
+
     const updates = [];
     const values = [];
-    
+
     if (data.name !== undefined) { updates.push('name = ?'); values.push(data.name); }
     if (data.slug !== undefined) { updates.push('slug = ?'); values.push(data.slug); }
     if (data.type !== undefined) { updates.push('type = ?'); values.push(data.type); }
@@ -197,16 +197,16 @@ class PageService extends Service {
     if (data.themeColor !== undefined) { updates.push('theme_color = ?'); values.push(data.themeColor); }
     if (data.sortOrder !== undefined) { updates.push('sort = ?'); values.push(data.sortOrder); }
     if (data.isActive !== undefined) { updates.push('is_show = ?'); values.push(data.isActive ? 1 : 0); }
-    
+
     updates.push('update_time = ?');
     values.push(now);
     values.push(data.id);
-    
+
     await app.model.query(
       `UPDATE uied_page SET ${updates.join(', ')} WHERE id = ?`,
       { replacements: values, type: app.Sequelize.QueryTypes.UPDATE }
     );
-    
+
     return data;
   }
 
@@ -216,10 +216,10 @@ class PageService extends Service {
   async del(id) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    
+
     await app.model.query(
       'UPDATE uied_page SET is_delete = 1, delete_time = ? WHERE id = ?',
-      { replacements: [now, id], type: app.Sequelize.QueryTypes.UPDATE }
+      { replacements: [ now, id ], type: app.Sequelize.QueryTypes.UPDATE }
     );
   }
 
@@ -230,7 +230,7 @@ class PageService extends Service {
     if (!str) return defaultValue;
     try {
       return JSON.parse(str);
-    } catch {
+    } catch (error) {
       // 如果不是 JSON，按逗号分隔处理
       if (typeof str === 'string') {
         return str.split(',').map(s => s.trim()).filter(Boolean);
@@ -244,7 +244,7 @@ class PageService extends Service {
    */
   async getCategories(pageId, pageSlug) {
     const { app } = this;
-    
+
     let query = `
       SELECT c.id, c.name, c.slug, pc.sort as sortOrder
       FROM uied_category c
@@ -253,7 +253,7 @@ class PageService extends Service {
       WHERE pc.is_delete = 0 AND c.is_delete = 0
     `;
     const replacements = [];
-    
+
     if (pageId) {
       query += ' AND p.id = ?';
       replacements.push(pageId);
@@ -261,9 +261,9 @@ class PageService extends Service {
       query += ' AND p.slug = ?';
       replacements.push(pageSlug);
     }
-    
+
     query += ' ORDER BY pc.sort ASC';
-    
+
     return await app.model.query(query, { replacements, type: app.Sequelize.QueryTypes.SELECT });
   }
 
@@ -273,20 +273,20 @@ class PageService extends Service {
   async updateCategories(pageId, categoryIds) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    
+
     // 软删除现有关联
     await app.model.query(
       'UPDATE uied_page_category SET is_delete = 1, delete_time = ? WHERE page_id = ?',
-      { replacements: [now, pageId], type: app.Sequelize.QueryTypes.UPDATE }
+      { replacements: [ now, pageId ], type: app.Sequelize.QueryTypes.UPDATE }
     );
-    
+
     // 添加新关联
     for (let i = 0; i < categoryIds.length; i++) {
       await app.model.query(
         `INSERT INTO uied_page_category (page_id, category_id, sort, create_time, update_time)
          VALUES (?, ?, ?, ?, ?)
          ON DUPLICATE KEY UPDATE is_delete = 0, sort = ?, update_time = ?`,
-        { replacements: [pageId, categoryIds[i], i, now, now, i, now], type: app.Sequelize.QueryTypes.INSERT }
+        { replacements: [ pageId, categoryIds[i], i, now, now, i, now ], type: app.Sequelize.QueryTypes.INSERT }
       );
     }
   }

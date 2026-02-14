@@ -66,7 +66,7 @@ class ExportController extends baseController {
         'uied_nav_menu', 'uied_footer_group', 'uied_footer_link', 'uied_friend_link',
         'uied_social_media_group', 'uied_social_media_item', 'uied_favicon_api',
       ];
-      
+
       const backup = {};
       for (const table of tables) {
         try {
@@ -79,7 +79,7 @@ class ExportController extends baseController {
           backup[table] = [];
         }
       }
-      
+
       ctx.set('Content-Type', 'application/json');
       ctx.set('Content-Disposition', `attachment; filename=uied_backup_${Date.now()}.json`);
       ctx.body = JSON.stringify(backup, null, 2);

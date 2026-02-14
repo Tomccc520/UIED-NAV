@@ -36,7 +36,7 @@ class FrontendController extends Controller {
   async pageDetail() {
     const { ctx } = this;
     const { slug } = ctx.params;
-    
+
     try {
       const page = await ctx.service.uied.page.detail(null, slug);
       if (!page) {
@@ -59,7 +59,7 @@ class FrontendController extends Controller {
   async pageFullData() {
     const { ctx } = this;
     const { slug } = ctx.params;
-    
+
     try {
       const data = await ctx.service.uied.frontend.getPageFullData(slug);
       if (!data) {
@@ -83,7 +83,7 @@ class FrontendController extends Controller {
     const { ctx } = this;
     const { slug } = ctx.params;
     const { limit = 12 } = ctx.query;
-    
+
     try {
       const websites = await ctx.service.uied.frontend.getPageHotWebsites(slug, limit);
       ctx.body = websites;
@@ -102,7 +102,7 @@ class FrontendController extends Controller {
     const { ctx } = this;
     const { slug } = ctx.params;
     const { limit = 10 } = ctx.query;
-    
+
     try {
       const data = await ctx.service.uied.frontend.getPageHotTags(slug, limit);
       ctx.body = data;
@@ -121,7 +121,7 @@ class FrontendController extends Controller {
     const { ctx } = this;
     const { slug } = ctx.params;
     const { q, limit = 50 } = ctx.query;
-    
+
     try {
       const data = await ctx.service.uied.frontend.searchPageWebsites(slug, q, limit);
       ctx.body = data;
@@ -140,7 +140,7 @@ class FrontendController extends Controller {
   async websites() {
     const { ctx } = this;
     const { ids, limit = 100 } = ctx.query;
-    
+
     try {
       if (ids) {
         // 通过 ids 批量获取（支持新数字ID和旧cuid格式）
@@ -170,7 +170,7 @@ class FrontendController extends Controller {
   async websiteDetail() {
     const { ctx } = this;
     const { idOrSlug } = ctx.params;
-    
+
     try {
       const website = await ctx.service.uied.frontend.getWebsiteDetail(idOrSlug);
       if (!website) {
@@ -194,14 +194,14 @@ class FrontendController extends Controller {
     const { ctx } = this;
     const { id } = ctx.params;
     const { limit = 6 } = ctx.query;
-    
+
     try {
       const websites = await ctx.service.uied.frontend.getRelatedWebsites(id, parseInt(limit));
-      ctx.body = { success: true, data: websites };
+      ctx.body = websites;
     } catch (error) {
       ctx.logger.error('获取相关推荐失败:', error);
       ctx.status = 500;
-      ctx.body = { success: false, error: error.message };
+      ctx.body = { error: error.message };
     }
   }
 
@@ -212,10 +212,10 @@ class FrontendController extends Controller {
   async websiteClick() {
     const { ctx } = this;
     const { id } = ctx.params;
-    
+
     try {
       await ctx.service.uied.website.click(id);
-      ctx.body = { success: true };
+      ctx.body = {};
     } catch (error) {
       ctx.logger.error('记录点击失败:', error);
       ctx.status = 500;
@@ -229,7 +229,7 @@ class FrontendController extends Controller {
    */
   async publicSettings() {
     const { ctx } = this;
-    
+
     try {
       const settings = await ctx.service.uied.setting.getPublicSettings();
       ctx.body = settings;
@@ -246,16 +246,13 @@ class FrontendController extends Controller {
    */
   async detailPageConfig() {
     const { ctx } = this;
-    
+
     try {
       const config = await ctx.service.uied.setting.getSettingByKey('detailPageConfig');
-      ctx.body = {
-        success: true,
-        data: config || {},
-      };
+      ctx.body = config || {};
     } catch (error) {
       ctx.logger.error('获取详情页配置失败:', error);
-      ctx.body = { success: true, data: {} };
+      ctx.body = {};
     }
   }
 
@@ -266,13 +263,13 @@ class FrontendController extends Controller {
   async websiteTags() {
     const { ctx } = this;
     const { id } = ctx.params;
-    
+
     try {
       const tags = await ctx.service.uied.websiteTag.getWebsiteTags(id);
-      ctx.body = { success: true, data: tags || [] };
+      ctx.body = tags || [];
     } catch (error) {
       ctx.logger.error('获取网站标签失败:', error);
-      ctx.body = { success: true, data: [] };
+      ctx.body = [];
     }
   }
 
@@ -282,7 +279,7 @@ class FrontendController extends Controller {
    */
   async frontendConfig() {
     const { ctx } = this;
-    
+
     try {
       const [
         exitModalConfig,
@@ -308,7 +305,7 @@ class FrontendController extends Controller {
       const normalizedPageGlobalConfig = ctx.service.uied.setting.normalizePageGlobalConfig(
         pageGlobalConfig || {}
       );
-      
+
       ctx.body = {
         exitModalEnabled: true,
         exitModalConfig: exitModalConfig || {},
@@ -340,19 +337,13 @@ class FrontendController extends Controller {
    */
   async permalinkConfig() {
     const { ctx } = this;
-    
+
     try {
       const config = await ctx.service.uied.setting.get('permalink_config');
-      ctx.body = {
-        success: true,
-        data: config || { structure: 'plain', customPattern: '' },
-      };
+      ctx.body = config || { structure: 'plain', customPattern: '' };
     } catch (error) {
       ctx.logger.error('获取固定链接配置失败:', error);
-      ctx.body = {
-        success: true,
-        data: { structure: 'plain', customPattern: '' },
-      };
+      ctx.body = { structure: 'plain', customPattern: '' };
     }
   }
 
@@ -362,13 +353,13 @@ class FrontendController extends Controller {
    */
   async faviconApis() {
     const { ctx } = this;
-    
+
     try {
       const apis = await ctx.service.uied.frontend.getFaviconApis();
-      ctx.body = { success: true, data: apis };
+      ctx.body = apis;
     } catch (error) {
       ctx.logger.error('获取 Favicon API 列表失败:', error);
-      ctx.body = { success: true, data: [] };
+      ctx.body = [];
     }
   }
 
@@ -378,7 +369,7 @@ class FrontendController extends Controller {
    */
   async hotRecommendations() {
     const { ctx } = this;
-    
+
     try {
       const result = await ctx.service.uied.hotRecommendation.list({ page: 1, pageSize: 100 });
       ctx.body = result.lists;
@@ -396,7 +387,7 @@ class FrontendController extends Controller {
   async hotRecommendationsActive() {
     const { ctx } = this;
     const { position, limit = 20 } = ctx.query;
-    
+
     try {
       const result = await ctx.service.uied.hotRecommendation.getActive(position, parseInt(limit));
       ctx.body = result;
@@ -414,10 +405,10 @@ class FrontendController extends Controller {
   async hotRecommendationClick() {
     const { ctx } = this;
     const { id } = ctx.params;
-    
+
     try {
       await ctx.service.uied.hotRecommendation.recordClick(id);
-      ctx.body = { success: true };
+      ctx.body = {};
     } catch (error) {
       ctx.logger.error('记录热门推荐点击失败:', error);
       ctx.status = 500;
@@ -432,12 +423,12 @@ class FrontendController extends Controller {
    */
   async navMenus() {
     const { ctx } = this;
-    
+
     try {
       const menus = await ctx.service.uied.navMenu.all();
-      
+
       // 转换为前端期望的格式
-      const transformMenu = (menu) => ({
+      const transformMenu = menu => ({
         id: String(menu.id),
         text: menu.text,
         link: menu.link || null,
@@ -450,7 +441,7 @@ class FrontendController extends Controller {
         visible: menu.isShow !== false,
         children: (menu.children || []).map(transformMenu),
       });
-      
+
       ctx.body = menus.map(transformMenu);
     } catch (error) {
       ctx.logger.error('获取导航菜单失败:', error);
@@ -466,10 +457,10 @@ class FrontendController extends Controller {
    */
   async friendLinks() {
     const { ctx } = this;
-    
+
     try {
       const result = await ctx.service.uied.friendLink.list({ page: 1, pageSize: 100 });
-      
+
       // 转换为前端期望的格式，只返回可见的链接
       const links = result.lists
         .filter(link => link.isShow !== false)
@@ -480,7 +471,7 @@ class FrontendController extends Controller {
           order: link.sort || 0,
           visible: link.isShow !== false,
         }));
-      
+
       ctx.body = links;
     } catch (error) {
       ctx.logger.error('获取友情链接失败:', error);
@@ -496,10 +487,10 @@ class FrontendController extends Controller {
    */
   async footer() {
     const { ctx } = this;
-    
+
     try {
       const groups = await ctx.service.uied.footer.groupAll();
-      
+
       // 转换为前端期望的格式
       const result = groups.map(group => ({
         id: String(group.id),
@@ -515,7 +506,7 @@ class FrontendController extends Controller {
           visible: link.isShow !== false,
         })),
       }));
-      
+
       ctx.body = result;
     } catch (error) {
       ctx.logger.error('获取页脚设置失败:', error);
@@ -531,14 +522,14 @@ class FrontendController extends Controller {
    */
   async socialMedia() {
     const { ctx } = this;
-    
+
     try {
       const groups = await ctx.service.uied.socialMedia.groupAll();
       const result = [];
-      
+
       for (const group of groups) {
         const items = await ctx.service.uied.socialMedia.itemList({ groupId: group.id });
-        
+
         // 转换为前端期望的格式
         result.push({
           id: String(group.id),
@@ -560,7 +551,7 @@ class FrontendController extends Controller {
           })),
         });
       }
-      
+
       ctx.body = result;
     } catch (error) {
       ctx.logger.error('获取社交媒体失败:', error);
@@ -576,7 +567,7 @@ class FrontendController extends Controller {
   async banners() {
     const { ctx } = this;
     const { position } = ctx.query;
-    
+
     try {
       const result = await ctx.service.uied.banner.list({ page: 1, pageSize: 100, position });
       ctx.body = result.lists;
@@ -597,11 +588,11 @@ class FrontendController extends Controller {
 
     try {
       const result = await ctx.service.uied.banner.active({ pageSlug, position, limit });
-      ctx.body = { success: true, data: result };
+      ctx.body = result;
     } catch (error) {
       ctx.logger.error('获取激活广告失败:', error);
       ctx.status = 500;
-      ctx.body = { success: false, error: error.message };
+      ctx.body = { error: error.message };
     }
   }
 
@@ -615,11 +606,11 @@ class FrontendController extends Controller {
 
     try {
       await ctx.service.uied.banner.recordClick(id);
-      ctx.body = { success: true };
+      ctx.body = {};
     } catch (error) {
       ctx.logger.error('记录广告点击失败:', error);
       ctx.status = 500;
-      ctx.body = { success: false, error: error.message };
+      ctx.body = { error: error.message };
     }
   }
 
@@ -629,7 +620,7 @@ class FrontendController extends Controller {
    */
   async siteInfo() {
     const { ctx } = this;
-    
+
     try {
       const info = await ctx.service.uied.setting.getSiteInfo();
       ctx.body = info;
@@ -647,12 +638,11 @@ class FrontendController extends Controller {
   async articles() {
     const { ctx } = this;
     const { page = 1, pageSize = 10, category, tag } = ctx.query;
-    
+
     try {
       const result = await ctx.service.uied.article.publicList({ page, pageSize, category, tag });
       ctx.body = {
-        success: true,
-        data: result.lists,
+        lists: result.lists,
         total: result.total,
         page: result.page,
         pageSize: result.pageSize,
@@ -661,7 +651,7 @@ class FrontendController extends Controller {
     } catch (error) {
       ctx.logger.error('获取文章列表失败:', error);
       ctx.status = 500;
-      ctx.body = { success: false, error: error.message };
+      ctx.body = { error: error.message };
     }
   }
 
@@ -671,17 +661,14 @@ class FrontendController extends Controller {
    */
   async articleCategories() {
     const { ctx } = this;
-    
+
     try {
       const categories = await ctx.service.uied.article.categories();
-      ctx.body = {
-        success: true,
-        data: categories,
-      };
+      ctx.body = categories;
     } catch (error) {
       ctx.logger.error('获取文章分类失败:', error);
       ctx.status = 500;
-      ctx.body = { success: false, error: error.message };
+      ctx.body = { error: error.message };
     }
   }
 
@@ -692,22 +679,19 @@ class FrontendController extends Controller {
   async articleDetail() {
     const { ctx } = this;
     const { slug } = ctx.params;
-    
+
     try {
       const article = await ctx.service.uied.article.detailBySlug(slug);
       if (!article) {
         ctx.status = 404;
-        ctx.body = { success: false, error: '文章不存在' };
+        ctx.body = { error: '文章不存在' };
         return;
       }
-      ctx.body = {
-        success: true,
-        data: article,
-      };
+      ctx.body = article;
     } catch (error) {
       ctx.logger.error('获取文章详情失败:', error);
       ctx.status = 500;
-      ctx.body = { success: false, error: error.message };
+      ctx.body = { error: error.message };
     }
   }
 
@@ -718,14 +702,14 @@ class FrontendController extends Controller {
   async articleView() {
     const { ctx } = this;
     const { id } = ctx.params;
-    
+
     try {
       await ctx.service.uied.article.recordView(id);
-      ctx.body = { success: true };
+      ctx.body = {};
     } catch (error) {
       ctx.logger.error('记录文章浏览失败:', error);
       ctx.status = 500;
-      ctx.body = { success: false, error: error.message };
+      ctx.body = { error: error.message };
     }
   }
 
@@ -735,17 +719,14 @@ class FrontendController extends Controller {
    */
   async articleTags() {
     const { ctx } = this;
-    
+
     try {
       const tags = await ctx.service.uied.article.tags();
-      ctx.body = {
-        success: true,
-        data: tags,
-      };
+      ctx.body = tags;
     } catch (error) {
       ctx.logger.error('获取文章标签失败:', error);
       ctx.status = 500;
-      ctx.body = { success: false, error: error.message };
+      ctx.body = { error: error.message };
     }
   }
 
@@ -757,12 +738,11 @@ class FrontendController extends Controller {
     const { ctx } = this;
     const { id } = ctx.params;
     const { page = 1, pageSize = 10 } = ctx.query;
-    
+
     try {
       const result = await ctx.service.uied.comment.articleComments(id, { page, pageSize });
       ctx.body = {
-        success: true,
-        data: result.lists,
+        lists: result.lists,
         total: result.total,
         page: result.page,
         pageSize: result.pageSize,
@@ -770,7 +750,7 @@ class FrontendController extends Controller {
     } catch (error) {
       ctx.logger.error('获取文章评论失败:', error);
       ctx.status = 500;
-      ctx.body = { success: false, error: error.message };
+      ctx.body = { error: error.message };
     }
   }
 
@@ -782,36 +762,33 @@ class FrontendController extends Controller {
     const { ctx } = this;
     const { id } = ctx.params;
     const { text, userId, userName } = ctx.request.body;
-    
+
     try {
       // 验证评论内容
       if (!text || text.trim().length === 0) {
         ctx.status = 400;
-        ctx.body = { success: false, error: '评论内容不能为空' };
+        ctx.body = { error: '评论内容不能为空' };
         return;
       }
-      
+
       if (text.length > 1000) {
         ctx.status = 400;
-        ctx.body = { success: false, error: '评论内容不能超过1000字符' };
+        ctx.body = { error: '评论内容不能超过1000字符' };
         return;
       }
-      
+
       const comment = await ctx.service.uied.comment.addArticleComment({
         articleId: id,
         content: text.trim(),
         userId: userId || 'anonymous',
         userName: userName || '匿名用户',
       });
-      
-      ctx.body = {
-        success: true,
-        data: comment,
-      };
+
+      ctx.body = comment;
     } catch (error) {
       ctx.logger.error('提交文章评论失败:', error);
       ctx.status = 500;
-      ctx.body = { success: false, error: error.message };
+      ctx.body = { error: error.message };
     }
   }
   /**
@@ -820,7 +797,7 @@ class FrontendController extends Controller {
    */
   async categories() {
     const { ctx } = this;
-    
+
     try {
       // 获取所有可见的主分类（parent_id IS NULL）及其子分类和网站数量
       const categories = await ctx.app.model.query(
@@ -833,7 +810,7 @@ class FrontendController extends Controller {
          ORDER BY c.sort ASC, c.id ASC`,
         { type: ctx.app.Sequelize.QueryTypes.SELECT }
       );
-      
+
       // 构建树形结构
       const rootCategories = categories.filter(c => !c.parentId);
       const childMap = {};
@@ -843,7 +820,7 @@ class FrontendController extends Controller {
           childMap[cat.parentId].push(cat);
         }
       }
-      
+
       const tree = rootCategories.map(cat => {
         const children = childMap[cat.id] || [];
         const totalWebsites = children.reduce((sum, c) => sum + (c.websiteCount || 0), 0) + (cat.websiteCount || 0);
@@ -872,12 +849,12 @@ class FrontendController extends Controller {
           })),
         };
       });
-      
-      ctx.body = { success: true, data: tree };
+
+      ctx.body = tree;
     } catch (error) {
       ctx.logger.error('获取分类列表失败:', error);
       ctx.status = 500;
-      ctx.body = { success: false, error: error.message };
+      ctx.body = { error: error.message };
     }
   }
 
@@ -890,53 +867,53 @@ class FrontendController extends Controller {
     const { idOrSlug } = ctx.params;
     const { page = 1, pageSize = 24 } = ctx.query;
     const offset = (parseInt(page) - 1) * parseInt(pageSize);
-    
+
     try {
       // 按 ID 或 slug 查找分类
       let category;
       if (/^\d+$/.test(String(idOrSlug))) {
-        [category] = await ctx.app.model.query(
+        [ category ] = await ctx.app.model.query(
           `SELECT id, name, slug, icon, color, description,
                   seo_title as seoTitle, seo_description as seoDescription, seo_keywords as seoKeywords,
                   parent_id as parentId
            FROM uied_category WHERE id = ? AND is_delete = 0`,
-          { replacements: [idOrSlug], type: ctx.app.Sequelize.QueryTypes.SELECT }
+          { replacements: [ idOrSlug ], type: ctx.app.Sequelize.QueryTypes.SELECT }
         );
       }
       if (!category) {
-        [category] = await ctx.app.model.query(
+        [ category ] = await ctx.app.model.query(
           `SELECT id, name, slug, icon, color, description,
                   seo_title as seoTitle, seo_description as seoDescription, seo_keywords as seoKeywords,
                   parent_id as parentId
            FROM uied_category WHERE slug = ? AND is_delete = 0`,
-          { replacements: [idOrSlug], type: ctx.app.Sequelize.QueryTypes.SELECT }
+          { replacements: [ idOrSlug ], type: ctx.app.Sequelize.QueryTypes.SELECT }
         );
       }
-      
+
       if (!category) {
         ctx.status = 404;
-        ctx.body = { success: false, error: '分类不存在' };
+        ctx.body = { error: '分类不存在' };
         return;
       }
-      
+
       // 收集该分类及其子分类的所有ID
       const subCategories = await ctx.app.model.query(
         `SELECT id, name, slug FROM uied_category
          WHERE parent_id = ? AND is_delete = 0 AND is_show = 1
          ORDER BY sort ASC`,
-        { replacements: [category.id], type: ctx.app.Sequelize.QueryTypes.SELECT }
+        { replacements: [ category.id ], type: ctx.app.Sequelize.QueryTypes.SELECT }
       );
-      
-      const allCategoryIds = [category.id, ...subCategories.map(s => s.id)];
+
+      const allCategoryIds = [ category.id, ...subCategories.map(s => s.id) ];
       const placeholders = allCategoryIds.map(() => '?').join(',');
-      
+
       // 获取网站总数
-      const [countResult] = await ctx.app.model.query(
+      const [ countResult ] = await ctx.app.model.query(
         `SELECT COUNT(*) as total FROM uied_website
          WHERE category_id IN (${placeholders}) AND is_delete = 0`,
         { replacements: allCategoryIds, type: ctx.app.Sequelize.QueryTypes.SELECT }
       );
-      
+
       // 获取分页网站
       const websites = await ctx.app.model.query(
         `SELECT id, name, slug, description, url, icon_url as iconUrl,
@@ -945,55 +922,52 @@ class FrontendController extends Controller {
          WHERE category_id IN (${placeholders}) AND is_delete = 0
          ORDER BY is_pinned DESC, is_hot DESC, is_featured DESC, sort ASC
          LIMIT ? OFFSET ?`,
-        { replacements: [...allCategoryIds, parseInt(pageSize), offset], type: ctx.app.Sequelize.QueryTypes.SELECT }
+        { replacements: [ ...allCategoryIds, parseInt(pageSize), offset ], type: ctx.app.Sequelize.QueryTypes.SELECT }
       );
-      
+
       // 获取父分类信息
       let parentCategory = null;
       if (category.parentId) {
-        [parentCategory] = await ctx.app.model.query(
-          `SELECT id, name, slug FROM uied_category WHERE id = ? AND is_delete = 0`,
-          { replacements: [category.parentId], type: ctx.app.Sequelize.QueryTypes.SELECT }
+        [ parentCategory ] = await ctx.app.model.query(
+          'SELECT id, name, slug FROM uied_category WHERE id = ? AND is_delete = 0',
+          { replacements: [ category.parentId ], type: ctx.app.Sequelize.QueryTypes.SELECT }
         );
       }
-      
+
       ctx.body = {
-        success: true,
-        data: {
-          category: {
-            id: String(category.id),
-            name: category.name,
-            slug: category.slug,
-            icon: category.icon,
-            color: category.color,
-            description: category.description,
-            seoTitle: category.seoTitle,
-            seoDescription: category.seoDescription,
-            seoKeywords: category.seoKeywords,
-            parent: parentCategory ? { id: String(parentCategory.id), name: parentCategory.name, slug: parentCategory.slug } : null,
-            subCategories: subCategories.map(s => ({ id: String(s.id), name: s.name, slug: s.slug })),
-          },
-          websites: websites.map(w => ({
-            id: String(w.id),
-            name: w.name,
-            slug: w.slug,
-            description: w.description || '',
-            url: w.url,
-            iconUrl: w.iconUrl,
-            isHot: w.isHot === 1,
-            isFeatured: w.isFeatured === 1,
-            isNew: w.isNew === 1,
-            tags: this.safeJsonParse(w.tags, []),
-          })),
-          total: countResult.total,
-          page: parseInt(page),
-          pageSize: parseInt(pageSize),
+        category: {
+          id: String(category.id),
+          name: category.name,
+          slug: category.slug,
+          icon: category.icon,
+          color: category.color,
+          description: category.description,
+          seoTitle: category.seoTitle,
+          seoDescription: category.seoDescription,
+          seoKeywords: category.seoKeywords,
+          parent: parentCategory ? { id: String(parentCategory.id), name: parentCategory.name, slug: parentCategory.slug } : null,
+          subCategories: subCategories.map(s => ({ id: String(s.id), name: s.name, slug: s.slug })),
         },
+        websites: websites.map(w => ({
+          id: String(w.id),
+          name: w.name,
+          slug: w.slug,
+          description: w.description || '',
+          url: w.url,
+          iconUrl: w.iconUrl,
+          isHot: w.isHot === 1,
+          isFeatured: w.isFeatured === 1,
+          isNew: w.isNew === 1,
+          tags: this.safeJsonParse(w.tags, []),
+        })),
+        total: countResult.total,
+        page: parseInt(page),
+        pageSize: parseInt(pageSize),
       };
     } catch (error) {
       ctx.logger.error('获取分类详情失败:', error);
       ctx.status = 500;
-      ctx.body = { success: false, error: error.message };
+      ctx.body = { error: error.message };
     }
   }
 
@@ -1003,7 +977,7 @@ class FrontendController extends Controller {
    */
   async tags() {
     const { ctx } = this;
-    
+
     try {
       const tags = await ctx.app.model.query(
         `SELECT t.id, t.name, t.slug, t.color, t.description,
@@ -1014,25 +988,22 @@ class FrontendController extends Controller {
          ORDER BY t.sort ASC, t.name ASC`,
         { type: ctx.app.Sequelize.QueryTypes.SELECT }
       );
-      
-      ctx.body = {
-        success: true,
-        data: tags.map(t => ({
-          id: String(t.id),
-          name: t.name,
-          slug: t.slug,
-          color: t.color,
-          description: t.description,
-          seoTitle: t.seoTitle,
-          seoDescription: t.seoDescription,
-          seoKeywords: t.seoKeywords,
-          websiteCount: t.websiteCount || 0,
-        })),
-      };
+
+      ctx.body = tags.map(t => ({
+        id: String(t.id),
+        name: t.name,
+        slug: t.slug,
+        color: t.color,
+        description: t.description,
+        seoTitle: t.seoTitle,
+        seoDescription: t.seoDescription,
+        seoKeywords: t.seoKeywords,
+        websiteCount: t.websiteCount || 0,
+      }));
     } catch (error) {
       ctx.logger.error('获取标签列表失败:', error);
       ctx.status = 500;
-      ctx.body = { success: false, error: error.message };
+      ctx.body = { error: error.message };
     }
   }
 
@@ -1045,41 +1016,41 @@ class FrontendController extends Controller {
     const { idOrSlug } = ctx.params;
     const { page = 1, pageSize = 24 } = ctx.query;
     const offset = (parseInt(page) - 1) * parseInt(pageSize);
-    
+
     try {
       // 按 ID 或 slug 查找标签
       let tag;
       if (/^\d+$/.test(String(idOrSlug))) {
-        [tag] = await ctx.app.model.query(
+        [ tag ] = await ctx.app.model.query(
           `SELECT id, name, slug, color, description,
                   seo_title as seoTitle, seo_description as seoDescription, seo_keywords as seoKeywords
            FROM uied_website_tag WHERE id = ? AND is_delete = 0`,
-          { replacements: [idOrSlug], type: ctx.app.Sequelize.QueryTypes.SELECT }
+          { replacements: [ idOrSlug ], type: ctx.app.Sequelize.QueryTypes.SELECT }
         );
       }
       if (!tag) {
-        [tag] = await ctx.app.model.query(
+        [ tag ] = await ctx.app.model.query(
           `SELECT id, name, slug, color, description,
                   seo_title as seoTitle, seo_description as seoDescription, seo_keywords as seoKeywords
            FROM uied_website_tag WHERE slug = ? AND is_delete = 0`,
-          { replacements: [idOrSlug], type: ctx.app.Sequelize.QueryTypes.SELECT }
+          { replacements: [ idOrSlug ], type: ctx.app.Sequelize.QueryTypes.SELECT }
         );
       }
-      
+
       if (!tag) {
         ctx.status = 404;
-        ctx.body = { success: false, error: '标签不存在' };
+        ctx.body = { error: '标签不存在' };
         return;
       }
-      
+
       // 获取网站总数
-      const [countResult] = await ctx.app.model.query(
+      const [ countResult ] = await ctx.app.model.query(
         `SELECT COUNT(*) as total FROM uied_website_tag_relation r
          INNER JOIN uied_website w ON r.website_id = w.id
          WHERE r.tag_id = ? AND w.is_delete = 0`,
-        { replacements: [tag.id], type: ctx.app.Sequelize.QueryTypes.SELECT }
+        { replacements: [ tag.id ], type: ctx.app.Sequelize.QueryTypes.SELECT }
       );
-      
+
       // 获取分页网站
       const websites = await ctx.app.model.query(
         `SELECT w.id, w.name, w.slug, w.description, w.url, w.icon_url as iconUrl,
@@ -1089,43 +1060,40 @@ class FrontendController extends Controller {
          WHERE r.tag_id = ? AND w.is_delete = 0
          ORDER BY w.is_pinned DESC, w.is_hot DESC, w.sort ASC
          LIMIT ? OFFSET ?`,
-        { replacements: [tag.id, parseInt(pageSize), offset], type: ctx.app.Sequelize.QueryTypes.SELECT }
+        { replacements: [ tag.id, parseInt(pageSize), offset ], type: ctx.app.Sequelize.QueryTypes.SELECT }
       );
-      
+
       ctx.body = {
-        success: true,
-        data: {
-          tag: {
-            id: String(tag.id),
-            name: tag.name,
-            slug: tag.slug,
-            color: tag.color,
-            description: tag.description,
-            seoTitle: tag.seoTitle,
-            seoDescription: tag.seoDescription,
-            seoKeywords: tag.seoKeywords,
-          },
-          websites: websites.map(w => ({
-            id: String(w.id),
-            name: w.name,
-            slug: w.slug,
-            description: w.description || '',
-            url: w.url,
-            iconUrl: w.iconUrl,
-            isHot: w.isHot === 1,
-            isFeatured: w.isFeatured === 1,
-            isNew: w.isNew === 1,
-            tags: this.safeJsonParse(w.tags, []),
-          })),
-          total: countResult.total,
-          page: parseInt(page),
-          pageSize: parseInt(pageSize),
+        tag: {
+          id: String(tag.id),
+          name: tag.name,
+          slug: tag.slug,
+          color: tag.color,
+          description: tag.description,
+          seoTitle: tag.seoTitle,
+          seoDescription: tag.seoDescription,
+          seoKeywords: tag.seoKeywords,
         },
+        websites: websites.map(w => ({
+          id: String(w.id),
+          name: w.name,
+          slug: w.slug,
+          description: w.description || '',
+          url: w.url,
+          iconUrl: w.iconUrl,
+          isHot: w.isHot === 1,
+          isFeatured: w.isFeatured === 1,
+          isNew: w.isNew === 1,
+          tags: this.safeJsonParse(w.tags, []),
+        })),
+        total: countResult.total,
+        page: parseInt(page),
+        pageSize: parseInt(pageSize),
       };
     } catch (error) {
       ctx.logger.error('获取标签详情失败:', error);
       ctx.status = 500;
-      ctx.body = { success: false, error: error.message };
+      ctx.body = { error: error.message };
     }
   }
 
@@ -1136,7 +1104,7 @@ class FrontendController extends Controller {
     if (!str) return defaultValue;
     try {
       return JSON.parse(str);
-    } catch {
+    } catch (error) {
       if (typeof str === 'string') {
         return str.split(',').map(s => s.trim()).filter(Boolean);
       }

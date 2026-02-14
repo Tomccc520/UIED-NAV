@@ -160,14 +160,14 @@ class WebsiteController extends baseController {
     const { ctx } = this;
     try {
       const { keyword, pageSlug, page = 1, pageSize = 20, ids } = ctx.query;
-      
+
       // 如果传入了 ids，通过ID列表查询
       if (ids) {
         const idList = ids.split(',').map(id => id.trim()).filter(Boolean);
         const websites = await ctx.service.uied.website.getByIds(idList);
         return this.result({ data: { lists: websites, count: websites.length } });
       }
-      
+
       // 否则按关键词搜索
       if (!keyword) {
         return this.result({ code: 400, message: '请输入搜索关键词' });

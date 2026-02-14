@@ -20,12 +20,12 @@ class WordpressConfigService extends Service {
    */
   async listConfigs() {
     const { app } = this;
-    
+
     const configs = await app.model.query(
       'SELECT * FROM uied_wordpress_config ORDER BY create_time DESC',
       { type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     return configs.map(c => ({
       id: c.id,
       name: c.name,
@@ -42,21 +42,21 @@ class WordpressConfigService extends Service {
    */
   async getDefaultConfig() {
     const { app } = this;
-    
-    let [config] = await app.model.query(
+
+    let [ config ] = await app.model.query(
       'SELECT * FROM uied_wordpress_config WHERE enabled = 1 AND is_default = 1 LIMIT 1',
       { type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     if (!config) {
-      [config] = await app.model.query(
+      [ config ] = await app.model.query(
         'SELECT * FROM uied_wordpress_config WHERE enabled = 1 LIMIT 1',
         { type: app.Sequelize.QueryTypes.SELECT }
       );
     }
-    
+
     if (!config) return null;
-    
+
     return {
       id: config.id,
       name: config.name,
@@ -71,15 +71,15 @@ class WordpressConfigService extends Service {
   async addConfig(data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    
+
     if (data.isDefault) {
       await app.model.query(
         'UPDATE uied_wordpress_config SET is_default = 0',
         { type: app.Sequelize.QueryTypes.UPDATE }
       );
     }
-    
-    const [result] = await app.model.query(
+
+    const [ result ] = await app.model.query(
       `INSERT INTO uied_wordpress_config (name, api_url, enabled, is_default, cache_time, create_time, update_time)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
       {
@@ -95,7 +95,7 @@ class WordpressConfigService extends Service {
         type: app.Sequelize.QueryTypes.INSERT,
       }
     );
-    
+
     return { id: result, ...data };
   }
 
@@ -105,32 +105,32 @@ class WordpressConfigService extends Service {
   async editConfig(data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    
+
     if (data.isDefault) {
       await app.model.query(
         'UPDATE uied_wordpress_config SET is_default = 0 WHERE id != ?',
-        { replacements: [data.id], type: app.Sequelize.QueryTypes.UPDATE }
+        { replacements: [ data.id ], type: app.Sequelize.QueryTypes.UPDATE }
       );
     }
-    
+
     const updates = [];
     const values = [];
-    
+
     if (data.name !== undefined) { updates.push('name = ?'); values.push(data.name); }
     if (data.apiUrl !== undefined) { updates.push('api_url = ?'); values.push(data.apiUrl); }
     if (data.enabled !== undefined) { updates.push('enabled = ?'); values.push(data.enabled ? 1 : 0); }
     if (data.isDefault !== undefined) { updates.push('is_default = ?'); values.push(data.isDefault ? 1 : 0); }
     if (data.cacheTime !== undefined) { updates.push('cache_time = ?'); values.push(data.cacheTime); }
-    
+
     updates.push('update_time = ?');
     values.push(now);
     values.push(data.id);
-    
+
     await app.model.query(
       `UPDATE uied_wordpress_config SET ${updates.join(', ')} WHERE id = ?`,
       { replacements: values, type: app.Sequelize.QueryTypes.UPDATE }
     );
-    
+
     return data;
   }
 
@@ -139,10 +139,10 @@ class WordpressConfigService extends Service {
    */
   async delConfig(id) {
     const { app } = this;
-    
+
     await app.model.query(
       'DELETE FROM uied_wordpress_config WHERE id = ?',
-      { replacements: [id], type: app.Sequelize.QueryTypes.DELETE }
+      { replacements: [ id ], type: app.Sequelize.QueryTypes.DELETE }
     );
   }
 
@@ -153,20 +153,20 @@ class WordpressConfigService extends Service {
    */
   async listCategories(pageSlug) {
     const { app } = this;
-    
+
     let whereClause = '1=1';
     const replacements = [];
-    
+
     if (pageSlug) {
       whereClause += ' AND page_slug = ?';
       replacements.push(pageSlug);
     }
-    
+
     const categories = await app.model.query(
       `SELECT * FROM uied_wordpress_category WHERE ${whereClause} ORDER BY sort ASC, create_time DESC`,
       { replacements, type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     return categories.map(c => ({
       id: c.id,
       configId: c.config_id,
@@ -187,8 +187,8 @@ class WordpressConfigService extends Service {
   async addCategory(data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    
-    const [result] = await app.model.query(
+
+    const [ result ] = await app.model.query(
       `INSERT INTO uied_wordpress_category 
        (config_id, wp_category_id, wp_category_name, display_name, slug, description, sort, visible, page_slug, create_time, update_time)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -209,7 +209,7 @@ class WordpressConfigService extends Service {
         type: app.Sequelize.QueryTypes.INSERT,
       }
     );
-    
+
     return { id: result, ...data };
   }
 
@@ -219,10 +219,10 @@ class WordpressConfigService extends Service {
   async editCategory(data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    
+
     const updates = [];
     const values = [];
-    
+
     if (data.wpCategoryId !== undefined) { updates.push('wp_category_id = ?'); values.push(data.wpCategoryId); }
     if (data.wpCategoryName !== undefined) { updates.push('wp_category_name = ?'); values.push(data.wpCategoryName); }
     if (data.displayName !== undefined) { updates.push('display_name = ?'); values.push(data.displayName); }
@@ -231,16 +231,16 @@ class WordpressConfigService extends Service {
     if (data.order !== undefined) { updates.push('sort = ?'); values.push(data.order); }
     if (data.visible !== undefined) { updates.push('visible = ?'); values.push(data.visible ? 1 : 0); }
     if (data.pageSlug !== undefined) { updates.push('page_slug = ?'); values.push(data.pageSlug); }
-    
+
     updates.push('update_time = ?');
     values.push(now);
     values.push(data.id);
-    
+
     await app.model.query(
       `UPDATE uied_wordpress_category SET ${updates.join(', ')} WHERE id = ?`,
       { replacements: values, type: app.Sequelize.QueryTypes.UPDATE }
     );
-    
+
     return data;
   }
 
@@ -249,10 +249,10 @@ class WordpressConfigService extends Service {
    */
   async delCategory(id) {
     const { app } = this;
-    
+
     await app.model.query(
       'DELETE FROM uied_wordpress_category WHERE id = ?',
-      { replacements: [id], type: app.Sequelize.QueryTypes.DELETE }
+      { replacements: [ id ], type: app.Sequelize.QueryTypes.DELETE }
     );
   }
 
@@ -263,18 +263,18 @@ class WordpressConfigService extends Service {
    */
   async getPosts({ categoryId, tagId, page = 1, perPage = 10, orderBy = 'date', order = 'desc', search }) {
     const { ctx } = this;
-    
+
     const config = await this.getDefaultConfig();
     if (!config) {
       throw new Error('没有可用的 WordPress 配置');
     }
-    
+
     // 构建 WordPress API URL
     let url = `${config.apiUrl}/posts?page=${page}&per_page=${perPage}&orderby=${orderBy}&order=${order}&_embed=true`;
     if (categoryId) url += `&categories=${categoryId}`;
     if (tagId) url += `&tags=${tagId}`;
     if (search) url += `&search=${encodeURIComponent(search)}`;
-    
+
     const response = await ctx.curl(url, {
       timeout: 15000,
       headers: {
@@ -283,13 +283,13 @@ class WordpressConfigService extends Service {
       },
       dataType: 'json',
     });
-    
+
     if (response.status !== 200) {
       throw new Error(`WordPress API 错误: ${response.status}`);
     }
-    
+
     const posts = response.data;
-    
+
     // 处理文章数据
     return posts.map(post => {
       let thumbnail = '';
@@ -302,15 +302,15 @@ class WordpressConfigService extends Service {
           thumbnail = media.media_details.sizes.medium.source_url;
         }
       }
-      
+
       let authorName = '';
       if (post._embedded?.author?.[0]) {
         authorName = post._embedded.author[0].name || '';
       }
-      
+
       let description = post.excerpt?.rendered || '';
       description = description.replace(/<\/?[^>]+(>|$)/g, '').trim();
-      
+
       return {
         id: post.id.toString(),
         name: post.title.rendered,

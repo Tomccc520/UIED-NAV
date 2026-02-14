@@ -59,6 +59,7 @@
         "test-local": "egg-bin test",
         "cov": "egg-bin cov",
         "lint": "eslint --fix .",
+        "lint:uied": "eslint --fix app/controller/uied app/service/uied",
         "ci": "npm run lint && npm run cov",
         "autod": "autod"
     },

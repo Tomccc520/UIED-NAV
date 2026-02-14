@@ -18,12 +18,12 @@ class AiConfigService extends Service {
    */
   async list() {
     const { app } = this;
-    
+
     const configs = await app.model.query(
       'SELECT * FROM uied_ai_config ORDER BY create_time DESC',
       { type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     // 隐藏 API Key 的部分内容
     return configs.map(c => ({
       id: c.id,
@@ -43,21 +43,21 @@ class AiConfigService extends Service {
    */
   async getDefault() {
     const { app } = this;
-    
-    let [config] = await app.model.query(
+
+    let [ config ] = await app.model.query(
       'SELECT * FROM uied_ai_config WHERE is_enabled = 1 AND is_default = 1 LIMIT 1',
       { type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     if (!config) {
-      [config] = await app.model.query(
+      [ config ] = await app.model.query(
         'SELECT * FROM uied_ai_config WHERE is_enabled = 1 LIMIT 1',
         { type: app.Sequelize.QueryTypes.SELECT }
       );
     }
-    
+
     if (!config) return null;
-    
+
     return {
       id: config.id,
       name: config.name,
@@ -74,7 +74,7 @@ class AiConfigService extends Service {
   async add(data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    
+
     // 如果设为默认，取消其他默认配置
     if (data.isDefault) {
       await app.model.query(
@@ -82,8 +82,8 @@ class AiConfigService extends Service {
         { type: app.Sequelize.QueryTypes.UPDATE }
       );
     }
-    
-    const [result] = await app.model.query(
+
+    const [ result ] = await app.model.query(
       `INSERT INTO uied_ai_config (name, provider, api_url, api_key, model, is_enabled, is_default, create_time, update_time)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       {
@@ -101,7 +101,7 @@ class AiConfigService extends Service {
         type: app.Sequelize.QueryTypes.INSERT,
       }
     );
-    
+
     return { id: result, ...data };
   }
 
@@ -111,18 +111,18 @@ class AiConfigService extends Service {
   async edit(data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    
+
     // 如果设为默认，取消其他默认配置
     if (data.isDefault) {
       await app.model.query(
         'UPDATE uied_ai_config SET is_default = 0 WHERE id != ?',
-        { replacements: [data.id], type: app.Sequelize.QueryTypes.UPDATE }
+        { replacements: [ data.id ], type: app.Sequelize.QueryTypes.UPDATE }
       );
     }
-    
+
     const updates = [];
     const values = [];
-    
+
     if (data.name !== undefined) { updates.push('name = ?'); values.push(data.name); }
     if (data.provider !== undefined) { updates.push('provider = ?'); values.push(data.provider); }
     if (data.apiUrl !== undefined) { updates.push('api_url = ?'); values.push(data.apiUrl); }
@@ -130,16 +130,16 @@ class AiConfigService extends Service {
     if (data.model !== undefined) { updates.push('model = ?'); values.push(data.model); }
     if (data.enabled !== undefined) { updates.push('is_enabled = ?'); values.push(data.enabled ? 1 : 0); }
     if (data.isDefault !== undefined) { updates.push('is_default = ?'); values.push(data.isDefault ? 1 : 0); }
-    
+
     updates.push('update_time = ?');
     values.push(now);
     values.push(data.id);
-    
+
     await app.model.query(
       `UPDATE uied_ai_config SET ${updates.join(', ')} WHERE id = ?`,
       { replacements: values, type: app.Sequelize.QueryTypes.UPDATE }
     );
-    
+
     return data;
   }
 
@@ -148,10 +148,10 @@ class AiConfigService extends Service {
    */
   async del(id) {
     const { app } = this;
-    
+
     await app.model.query(
       'DELETE FROM uied_ai_config WHERE id = ?',
-      { replacements: [id], type: app.Sequelize.QueryTypes.DELETE }
+      { replacements: [ id ], type: app.Sequelize.QueryTypes.DELETE }
     );
   }
 
@@ -160,20 +160,20 @@ class AiConfigService extends Service {
    */
   async getConfig() {
     const { app } = this;
-    
+
     // 获取默认配置或第一个配置
-    let [config] = await app.model.query(
+    let [ config ] = await app.model.query(
       'SELECT * FROM uied_ai_config WHERE is_default = 1 LIMIT 1',
       { type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     if (!config) {
-      [config] = await app.model.query(
+      [ config ] = await app.model.query(
         'SELECT * FROM uied_ai_config LIMIT 1',
         { type: app.Sequelize.QueryTypes.SELECT }
       );
     }
-    
+
     if (!config) {
       return {
         enabled: false,
@@ -185,7 +185,7 @@ class AiConfigService extends Service {
         temperature: 0.7,
       };
     }
-    
+
     return {
       id: config.id,
       enabled: config.is_enabled === 1,
@@ -204,13 +204,13 @@ class AiConfigService extends Service {
   async saveConfig(data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    
+
     // 检查是否有现有配置
-    const [existing] = await app.model.query(
+    const [ existing ] = await app.model.query(
       'SELECT id FROM uied_ai_config WHERE is_default = 1 LIMIT 1',
       { type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     if (existing) {
       // 更新现有配置
       await app.model.query(
@@ -231,27 +231,27 @@ class AiConfigService extends Service {
         }
       );
       return { id: existing.id, ...data };
-    } else {
-      // 创建新配置
-      const [result] = await app.model.query(
-        `INSERT INTO uied_ai_config (name, provider, api_url, api_key, model, is_enabled, is_default, create_time, update_time)
-         VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?)`,
-        {
-          replacements: [
-            'default',
-            data.provider || 'openai',
-            data.apiUrl || '',
-            data.apiKey || '',
-            data.model || 'gpt-3.5-turbo',
-            data.enabled ? 1 : 0,
-            now,
-            now,
-          ],
-          type: app.Sequelize.QueryTypes.INSERT,
-        }
-      );
-      return { id: result, ...data };
     }
+    // 创建新配置
+    const [ result ] = await app.model.query(
+      `INSERT INTO uied_ai_config (name, provider, api_url, api_key, model, is_enabled, is_default, create_time, update_time)
+         VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?)`,
+      {
+        replacements: [
+          'default',
+          data.provider || 'openai',
+          data.apiUrl || '',
+          data.apiKey || '',
+          data.model || 'gpt-3.5-turbo',
+          data.enabled ? 1 : 0,
+          now,
+          now,
+        ],
+        type: app.Sequelize.QueryTypes.INSERT,
+      }
+    );
+    return { id: result, ...data };
+
   }
 
   /**
@@ -259,14 +259,14 @@ class AiConfigService extends Service {
    */
   async testConnection(provider, apiKey, apiUrl) {
     const { ctx } = this;
-    
+
     if (!apiKey) {
       return { success: false, message: '请提供 API Key' };
     }
-    
+
     try {
       const testUrl = apiUrl || 'https://api.openai.com/v1/chat/completions';
-      
+
       const response = await ctx.curl(testUrl, {
         method: 'POST',
         contentType: 'json',
@@ -281,12 +281,12 @@ class AiConfigService extends Service {
         timeout: 10000,
         dataType: 'json',
       });
-      
+
       if (response.status === 200) {
         return { success: true };
-      } else {
-        return { success: false, message: `API 返回错误: ${response.status}` };
       }
+      return { success: false, message: `API 返回错误: ${response.status}` };
+
     } catch (error) {
       return { success: false, message: error.message || '连接失败' };
     }
@@ -297,30 +297,30 @@ class AiConfigService extends Service {
    */
   async generateWebsiteInfo(url, testMode = false) {
     const { ctx } = this;
-    
+
     // 测试模式 - 返回模拟数据
     if (testMode) {
       let domain = '';
       try {
         const urlObj = new URL(url);
         domain = urlObj.hostname.replace('www.', '');
-      } catch {
+      } catch (error) {
         domain = url;
       }
-      
+
       return {
         name: `${domain} 网站`,
         description: `这是 ${domain} 的网站描述。该网站提供优质的服务和内容，是用户的理想选择。`,
         tags: '工具,在线服务,推荐',
       };
     }
-    
+
     // 获取 AI 配置
     const config = await this.getDefault();
     if (!config) {
       throw new Error('没有可用的 AI 配置，请先在系统设置中配置 AI');
     }
-    
+
     // 构建提示词
     const prompt = `请根据以下网站URL，生成网站的相关信息。请直接返回JSON格式，不要有其他内容。
 
@@ -334,8 +334,6 @@ class AiConfigService extends Service {
 }`;
 
     const startTime = Date.now();
-    let responseStatus = 'success';
-    let errorMessage = '';
     let tokensUsed = 0;
 
     try {
@@ -355,25 +353,25 @@ class AiConfigService extends Service {
         timeout: 30000,
         dataType: 'json',
       });
-      
+
       if (response.status !== 200) {
         throw new Error('AI API 调用失败');
       }
-      
+
       const content = response.data.choices?.[0]?.message?.content;
       if (!content) {
         throw new Error('AI 返回内容为空');
       }
 
       tokensUsed = response.data.usage?.total_tokens || 0;
-      
+
       // 解析 JSON
       let jsonStr = content;
       const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
       if (jsonMatch) {
         jsonStr = jsonMatch[1].trim();
       }
-      
+
       const result = JSON.parse(jsonStr);
       const generated = {
         name: result.name || '',
@@ -432,9 +430,9 @@ class AiConfigService extends Service {
       aiChat: true,
     };
 
-    const [setting] = await app.model.query(
+    const [ setting ] = await app.model.query(
       'SELECT `value` FROM uied_site_setting WHERE `key` = ?',
-      { replacements: ['ai_feature_toggle'], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ 'ai_feature_toggle' ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     if (!setting) return defaultToggle;
@@ -447,7 +445,7 @@ class AiConfigService extends Service {
         aiGenerate: parsed.aiGenerate !== undefined ? parsed.aiGenerate : defaultToggle.aiGenerate,
         aiChat: parsed.aiChat !== undefined ? parsed.aiChat : defaultToggle.aiChat,
       };
-    } catch {
+    } catch (error) {
       return defaultToggle;
     }
   }
@@ -474,7 +472,7 @@ class AiConfigService extends Service {
        VALUES (?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE \`value\` = ?, update_time = ?`,
       {
-        replacements: ['ai_feature_toggle', valueStr, now, now, valueStr, now],
+        replacements: [ 'ai_feature_toggle', valueStr, now, now, valueStr, now ],
         type: app.Sequelize.QueryTypes.INSERT,
       }
     );
@@ -488,9 +486,9 @@ class AiConfigService extends Service {
    * 失败项记录错误继续处理，不持久化结果（等待确认）
    * @param {number[]} websiteIds - 要生成的网站 ID 列表
    * @param {string[]} fields - 要生成的字段列表，如 ['description', 'tags']
-   * @returns {Object} 包含 taskId、total 和 results 的结果对象
+   * @return {Object} 包含 taskId、total 和 results 的结果对象
    */
-  async batchGenerate(websiteIds, fields = ['description', 'tags']) {
+  async batchGenerate(websiteIds, fields = [ 'description', 'tags' ]) {
     const { ctx, app } = this;
     const taskId = `batch_${Date.now()}`;
     const results = [];
@@ -501,8 +499,8 @@ class AiConfigService extends Service {
 
     // 查询所有目标网站的基本信息
     const websites = await app.model.query(
-      `SELECT id, name, url, description, tags FROM uied_website WHERE id IN (?) AND is_delete = 0`,
-      { replacements: [websiteIds.length > 0 ? websiteIds : [0]], type: app.Sequelize.QueryTypes.SELECT }
+      'SELECT id, name, url, description, tags FROM uied_website WHERE id IN (?) AND is_delete = 0',
+      { replacements: [ websiteIds.length > 0 ? websiteIds : [ 0 ] ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     // 建立 id -> website 映射，方便查找
@@ -600,7 +598,7 @@ class AiConfigService extends Service {
    * 批量确认生成结果
    * 将管理员确认的批量生成结果保存到数据库
    * @param {Array<{websiteId: number, description?: string, tags?: string}>} results - 确认的结果列表
-   * @returns {Object} 包含 updated（成功数）和 failed（失败数）的结果
+   * @return {Object} 包含 updated（成功数）和 failed（失败数）的结果
    */
   async batchConfirm(results) {
     const { app } = this;
@@ -649,15 +647,15 @@ class AiConfigService extends Service {
    * AI 生成网站详情内容
    * 根据网站信息生成富文本 HTML 详情内容
    * @param {number} websiteId - 网站ID
-   * @returns {Object} 包含 content 的结果
+   * @return {Object} 包含 content 的结果
    */
   async generateDetailContent(websiteId) {
     const { ctx, app } = this;
 
     // 获取网站信息
-    const [website] = await app.model.query(
+    const [ website ] = await app.model.query(
       'SELECT id, name, url, description, tags FROM uied_website WHERE id = ? AND is_delete = 0',
-      { replacements: [websiteId], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ websiteId ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     if (!website) {
@@ -670,7 +668,7 @@ class AiConfigService extends Service {
       throw new Error('没有可用的 AI 配置，请先在系统设置中配置 AI');
     }
 
-    const tags = website.tags ? (() => { try { return JSON.parse(website.tags); } catch { return []; } })() : [];
+    const tags = website.tags ? (() => { try { return JSON.parse(website.tags); } catch (error) { return []; } })() : [];
 
     const prompt = `请为以下网站生成一篇详细的介绍内容，用于网站详情页展示。请直接返回 HTML 格式内容，不要包含 \`\`\` 代码块标记。
 
@@ -758,14 +756,14 @@ class AiConfigService extends Service {
    */
   async chat(message, context = []) {
     const { ctx } = this;
-    
+
     const config = await this.getDefault();
     if (!config) {
       throw new Error('没有可用的 AI 配置');
     }
-    
-    const systemPrompt = `你是 UIED 设计导航的 AI 助手，专注于帮助设计师解决问题。`;
-    
+
+    const systemPrompt = '你是 UIED 设计导航的 AI 助手，专注于帮助设计师解决问题。';
+
     const messages = [
       { role: 'system', content: systemPrompt },
       ...context.slice(-6),
@@ -773,7 +771,7 @@ class AiConfigService extends Service {
     ];
 
     const startTime = Date.now();
-    
+
     try {
       const response = await ctx.curl(config.apiUrl, {
         method: 'POST',
@@ -790,11 +788,11 @@ class AiConfigService extends Service {
         timeout: 30000,
         dataType: 'json',
       });
-      
+
       if (response.status !== 200) {
         throw new Error('AI 服务暂时不可用');
       }
-      
+
       const content = response.data.choices?.[0]?.message?.content;
       if (!content) {
         throw new Error('AI 返回内容为空');
@@ -816,7 +814,7 @@ class AiConfigService extends Service {
       } catch (logErr) {
         ctx.logger.error('AI日志记录失败:', logErr);
       }
-      
+
       return {
         reply: content,
         usage: response.data.usage || null,

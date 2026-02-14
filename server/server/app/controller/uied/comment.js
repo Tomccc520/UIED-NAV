@@ -20,7 +20,7 @@ class CommentController extends Controller {
   async list() {
     const { ctx } = this;
     const params = ctx.query;
-    
+
     try {
       const result = await ctx.service.uied.comment.list(params);
       ctx.body = {

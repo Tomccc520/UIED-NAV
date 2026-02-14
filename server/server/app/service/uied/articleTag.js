@@ -31,7 +31,7 @@ class ArticleTagService extends Service {
     }
 
     // 获取总数
-    const [countResult] = await app.model.query(
+    const [ countResult ] = await app.model.query(
       `SELECT COUNT(*) as total FROM uied_article_tag t WHERE ${whereClause}`,
       { replacements, type: app.Sequelize.QueryTypes.SELECT }
     );
@@ -45,7 +45,7 @@ class ArticleTagService extends Service {
        WHERE ${whereClause}
        ORDER BY t.sort_order ASC, t.id ASC
        LIMIT ? OFFSET ?`,
-      { replacements: [...replacements, pageSize, offset], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ ...replacements, pageSize, offset ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     return {
@@ -99,15 +99,15 @@ class ArticleTagService extends Service {
     const now = Math.floor(Date.now() / 1000);
 
     // 检查 slug 是否已存在
-    const [existingSlug] = await app.model.query(
+    const [ existingSlug ] = await app.model.query(
       'SELECT id FROM uied_article_tag WHERE slug = ? AND is_delete = 0',
-      { replacements: [data.slug], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ data.slug ], type: app.Sequelize.QueryTypes.SELECT }
     );
     if (existingSlug) {
       throw new Error('标签标识已存在');
     }
 
-    const [result] = await app.model.query(
+    const [ result ] = await app.model.query(
       `INSERT INTO uied_article_tag (name, slug, color, sort_order, is_delete, create_time, update_time)
        VALUES (?, ?, ?, ?, 0, ?, ?)`,
       {
@@ -135,9 +135,9 @@ class ArticleTagService extends Service {
     const now = Math.floor(Date.now() / 1000);
 
     // 检查标签是否存在
-    const [existing] = await app.model.query(
+    const [ existing ] = await app.model.query(
       'SELECT id FROM uied_article_tag WHERE id = ? AND is_delete = 0',
-      { replacements: [data.id], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ data.id ], type: app.Sequelize.QueryTypes.SELECT }
     );
     if (!existing) {
       throw new Error('标签不存在');
@@ -145,9 +145,9 @@ class ArticleTagService extends Service {
 
     // 检查 slug 是否与其他标签冲突
     if (data.slug) {
-      const [existingSlug] = await app.model.query(
+      const [ existingSlug ] = await app.model.query(
         'SELECT id FROM uied_article_tag WHERE slug = ? AND id != ? AND is_delete = 0',
-        { replacements: [data.slug, data.id], type: app.Sequelize.QueryTypes.SELECT }
+        { replacements: [ data.slug, data.id ], type: app.Sequelize.QueryTypes.SELECT }
       );
       if (existingSlug) {
         throw new Error('标签标识已存在');
@@ -185,13 +185,13 @@ class ArticleTagService extends Service {
     // 删除标签关联
     await app.model.query(
       'DELETE FROM uied_article_tag_relation WHERE tag_id = ?',
-      { replacements: [id], type: app.Sequelize.QueryTypes.DELETE }
+      { replacements: [ id ], type: app.Sequelize.QueryTypes.DELETE }
     );
 
     // 软删除标签
     await app.model.query(
       'UPDATE uied_article_tag SET is_delete = 1, update_time = ? WHERE id = ?',
-      { replacements: [now, id], type: app.Sequelize.QueryTypes.UPDATE }
+      { replacements: [ now, id ], type: app.Sequelize.QueryTypes.UPDATE }
     );
   }
 
@@ -208,7 +208,7 @@ class ArticleTagService extends Service {
        INNER JOIN uied_article_tag_relation r ON t.id = r.tag_id
        WHERE r.article_id = ? AND t.is_delete = 0
        ORDER BY t.sort_order ASC`,
-      { replacements: [articleId], type: app.Sequelize.QueryTypes.SELECT }
+      { replacements: [ articleId ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     return tags.map(t => ({
@@ -231,7 +231,7 @@ class ArticleTagService extends Service {
     // 删除现有关联
     await app.model.query(
       'DELETE FROM uied_article_tag_relation WHERE article_id = ?',
-      { replacements: [articleId], type: app.Sequelize.QueryTypes.DELETE }
+      { replacements: [ articleId ], type: app.Sequelize.QueryTypes.DELETE }
     );
 
     // 批量创建新关联
