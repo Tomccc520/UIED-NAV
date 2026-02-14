@@ -14,6 +14,75 @@ const Service = require('egg').Service;
 
 class SettingService extends Service {
   /**
+   * 获取默认导航切换项配置
+   */
+  getDefaultNavSwitchItems() {
+    return [
+      { slug: 'uiux', name: 'UI导航', icon: 'Figma', visible: true, sort: 10 },
+      { slug: 'ai', name: 'AI导航', icon: 'AI', visible: true, sort: 20 },
+      { slug: 'design', name: '平面导航', icon: 'Design', visible: true, sort: 30 },
+      { slug: '3d', name: '三维导航', icon: '3D', visible: true, sort: 40 },
+      { slug: 'ecommerce', name: '电商导航', icon: 'Ecommerce', visible: true, sort: 50 },
+      { slug: 'interior', name: '室内导航', icon: 'Design', visible: true, sort: 60 },
+      { slug: 'font', name: '字体导航', icon: 'Font', visible: true, sort: 70 },
+    ];
+  }
+
+  /**
+   * 规范化导航切换项，确保前端有稳定的显示/排序结构
+   */
+  normalizeNavSwitchItems(items) {
+    const defaults = this.getDefaultNavSwitchItems();
+    const list = Array.isArray(items) && items.length > 0 ? items : defaults;
+    return list
+      .map((item, index) => {
+        const fallback = defaults[index] || defaults[0];
+        return {
+          slug: String(item?.slug || fallback.slug),
+          name: String(item?.name || fallback.name),
+          icon: String(item?.icon || fallback.icon),
+          visible: item?.visible !== false,
+          sort: Number.isFinite(Number(item?.sort)) ? Number(item.sort) : (index + 1) * 10,
+        };
+      })
+      .sort((a, b) => a.sort - b.sort);
+  }
+
+  /**
+   * 规范化首页配置
+   * 新增：轮播区/推荐区显示与排序、导航切换项后台化配置
+   */
+  normalizeHomepageConfig(config = {}) {
+    const defaults = {
+      heroBannerEnabled: true,
+      heroBgType: 'default',
+      heroBgValue: '',
+      heroDisplayMode: 'search',
+      heroShowStats: true,
+      heroShowHotTags: true,
+      bannerCardsEnabled: true,
+      hotRecommendationsEnabled: true,
+      hotRecommendationsTitle: '热门推荐',
+      topAdEnabled: false,
+      topAdCode: '',
+      homeCarouselEnabled: true,
+      homeCarouselSort: 10,
+      homeRecommendationEnabled: true,
+      homeRecommendationSort: 20,
+      navSwitchItems: this.getDefaultNavSwitchItems(),
+    };
+    const merged = { ...defaults, ...(config || {}) };
+    return {
+      ...merged,
+      homeCarouselEnabled: merged.homeCarouselEnabled !== false,
+      homeRecommendationEnabled: merged.homeRecommendationEnabled !== false,
+      homeCarouselSort: Number.isFinite(Number(merged.homeCarouselSort)) ? Number(merged.homeCarouselSort) : 10,
+      homeRecommendationSort: Number.isFinite(Number(merged.homeRecommendationSort)) ? Number(merged.homeRecommendationSort) : 20,
+      navSwitchItems: this.normalizeNavSwitchItems(merged.navSwitchItems),
+    };
+  }
+
+  /**
    * 规范化分类区域点击模式
    * 兼容历史值：directExternal -> direct
    */
@@ -98,6 +167,8 @@ class SettingService extends Service {
     for (const [key, rawValue] of Object.entries(data)) {
       const value = key === 'pageGlobalConfig' && rawValue && typeof rawValue === 'object'
         ? this.normalizePageGlobalConfig(rawValue)
+        : key === 'homepageConfig' && rawValue && typeof rawValue === 'object'
+          ? this.normalizeHomepageConfig(rawValue)
         : rawValue;
       const valueStr = typeof value === 'object' ? JSON.stringify(value) : String(value);
       
@@ -235,7 +306,12 @@ class SettingService extends Service {
       hotRecommendationsEnabled: true,
       hotRecommendationsTitle: '热门推荐',
       topAdEnabled: false,
-      topAdCode: ''
+      topAdCode: '',
+      homeCarouselEnabled: true,
+      homeCarouselSort: 10,
+      homeRecommendationEnabled: true,
+      homeRecommendationSort: 20,
+      navSwitchItems: this.getDefaultNavSwitchItems(),
     };
     
     const defaultCardStyle = {
@@ -305,7 +381,7 @@ class SettingService extends Service {
       siteInfo,
       pageGlobal: { ...defaultPageGlobal, ...normalizedPageGlobalConfig },
       appearance: appearanceConfig || defaultAppearance,
-      homepage: homepageConfig || defaultHomepage,
+      homepage: this.normalizeHomepageConfig(homepageConfig || defaultHomepage),
       cardStyle: cardStyleConfig || defaultCardStyle,
       sidebar: sidebarConfig || defaultSidebar,
       search: searchConfig || defaultSearch,

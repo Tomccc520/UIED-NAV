@@ -236,15 +236,57 @@
                             <template #label><span>显示推荐卡片</span><el-tooltip content="开启后在横幅下方显示推荐卡片区域" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
                             <el-switch v-model="homepageData.bannerCardsEnabled" />
                         </el-form-item>
-                        <el-divider content-position="left">热门推荐区域</el-divider>
-                        <p class="section-desc">展示热门推荐的网站列表，数据来源于「热门推荐」管理。</p>
+                        <el-divider content-position="left">首页轮播区域</el-divider>
+                        <p class="section-desc">控制首页顶部轮播区显示与排序，支持和推荐区自由排布。</p>
                         <el-form-item>
-                            <template #label><span>显示热门推荐</span><el-tooltip content="开启后在首页显示热门推荐区域" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
-                            <el-switch v-model="homepageData.hotRecommendationsEnabled" />
+                            <template #label><span>显示首页轮播</span><el-tooltip content="关闭后首页不显示轮播模块" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <el-switch v-model="homepageData.homeCarouselEnabled" />
+                        </el-form-item>
+                        <el-form-item>
+                            <template #label><span>轮播区排序</span><el-tooltip content="数字越小越靠前，建议 10、20 递增" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <el-input-number v-model="homepageData.homeCarouselSort" :min="1" :max="999" />
+                        </el-form-item>
+                        <el-divider content-position="left">热门推荐区域</el-divider>
+                        <p class="section-desc">展示热门推荐的网站列表，数据来源于「热门推荐」管理；可独立设置显示与排序。</p>
+                        <el-form-item>
+                            <template #label><span>显示推荐区模块</span><el-tooltip content="关闭后首页不渲染推荐区模块" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <el-switch v-model="homepageData.homeRecommendationEnabled" />
+                        </el-form-item>
+                        <el-form-item>
+                            <template #label><span>推荐区排序</span><el-tooltip content="数字越小越靠前，建议 10、20 递增" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <el-input-number v-model="homepageData.homeRecommendationSort" :min="1" :max="999" />
+                        </el-form-item>
+                        <el-form-item>
+                            <template #label><span>显示推荐内容</span><el-tooltip content="关闭后推荐区模块保留，但不展示推荐内容列表" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
+                            <el-switch v-model="homepageData.hotRecommendationsEnabled" :disabled="!homepageData.homeRecommendationEnabled" />
                         </el-form-item>
                         <el-form-item>
                             <template #label><span>推荐区标题</span><el-tooltip content="热门推荐区域的标题文字" placement="top"><el-icon class="label-tip-icon"><QuestionFilled /></el-icon></el-tooltip></template>
-                            <el-input v-model="homepageData.hotRecommendationsTitle" placeholder="热门推荐" :disabled="!homepageData.hotRecommendationsEnabled" />
+                            <el-input v-model="homepageData.hotRecommendationsTitle" placeholder="热门推荐" :disabled="!homepageData.homeRecommendationEnabled || !homepageData.hotRecommendationsEnabled" />
+                        </el-form-item>
+                        <el-divider content-position="left">导航切换配置</el-divider>
+                        <p class="section-desc">控制顶部 navSwitchItems 的显示开关与排序。可直接改文案与图标关键字。</p>
+                        <el-form-item label-width="0">
+                            <div class="nav-switch-setting-table">
+                                <div class="nav-switch-setting-header">
+                                    <span>Slug</span>
+                                    <span>名称</span>
+                                    <span>图标</span>
+                                    <span>显示</span>
+                                    <span>排序</span>
+                                </div>
+                                <div
+                                    v-for="(item, idx) in homepageData.navSwitchItems"
+                                    :key="`${item.slug}-${idx}`"
+                                    class="nav-switch-setting-row"
+                                >
+                                    <el-input v-model="item.slug" placeholder="slug" />
+                                    <el-input v-model="item.name" placeholder="显示名称" />
+                                    <el-input v-model="item.icon" placeholder="图标关键字（如 AI/Figma）" />
+                                    <el-switch v-model="item.visible" />
+                                    <el-input-number v-model="item.sort" :min="1" :max="999" />
+                                </div>
+                            </div>
                         </el-form-item>
                         <el-divider content-position="left">广告位</el-divider>
                         <p class="section-desc">在首页指定位置插入广告代码。</p>
@@ -600,6 +642,15 @@ const appearanceData = reactive({
 
 // ==================== 首页配置 ====================
 const homepageLoading = ref(false)
+const defaultNavSwitchItems = [
+    { slug: 'uiux', name: 'UI导航', icon: 'Figma', visible: true, sort: 10 },
+    { slug: 'ai', name: 'AI导航', icon: 'AI', visible: true, sort: 20 },
+    { slug: 'design', name: '平面导航', icon: 'Design', visible: true, sort: 30 },
+    { slug: '3d', name: '三维导航', icon: '3D', visible: true, sort: 40 },
+    { slug: 'ecommerce', name: '电商导航', icon: 'Ecommerce', visible: true, sort: 50 },
+    { slug: 'interior', name: '室内导航', icon: 'Design', visible: true, sort: 60 },
+    { slug: 'font', name: '字体导航', icon: 'Font', visible: true, sort: 70 },
+]
 const homepageData = reactive({
     heroBannerEnabled: true,
     heroBgType: 'default',
@@ -612,6 +663,40 @@ const homepageData = reactive({
     hotRecommendationsTitle: '热门推荐',
     topAdEnabled: false,
     topAdCode: '',
+    homeCarouselEnabled: true,
+    homeCarouselSort: 10,
+    homeRecommendationEnabled: true,
+    homeRecommendationSort: 20,
+    navSwitchItems: defaultNavSwitchItems.map(item => ({ ...item })),
+})
+
+/**
+ * 规范化导航切换配置项，确保显示开关和排序字段完整
+ */
+const normalizeNavSwitchItems = (items: unknown) => {
+    const list = Array.isArray(items) && items.length > 0 ? items : defaultNavSwitchItems
+    return list
+        .map((item: any, index: number) => ({
+            slug: String(item?.slug || defaultNavSwitchItems[index % defaultNavSwitchItems.length].slug),
+            name: String(item?.name || defaultNavSwitchItems[index % defaultNavSwitchItems.length].name),
+            icon: String(item?.icon || defaultNavSwitchItems[index % defaultNavSwitchItems.length].icon),
+            visible: item?.visible !== false,
+            sort: Number.isFinite(Number(item?.sort)) ? Number(item.sort) : (index + 1) * 10,
+        }))
+        .sort((a, b) => a.sort - b.sort)
+}
+
+/**
+ * 规范化首页配置，确保轮播/推荐区和导航切换项可后台控制
+ */
+const normalizeHomepageConfigData = (config: any) => ({
+    ...homepageData,
+    ...config,
+    homeCarouselEnabled: config?.homeCarouselEnabled !== false,
+    homeRecommendationEnabled: config?.homeRecommendationEnabled !== false,
+    homeCarouselSort: Number.isFinite(Number(config?.homeCarouselSort)) ? Number(config.homeCarouselSort) : 10,
+    homeRecommendationSort: Number.isFinite(Number(config?.homeRecommendationSort)) ? Number(config.homeRecommendationSort) : 20,
+    navSwitchItems: normalizeNavSwitchItems(config?.navSwitchItems),
 })
 
 // ==================== 页面配置 ====================
@@ -802,7 +887,7 @@ const markSaved = () => {
 const applyPublicSettings = (settings: Record<string, any>) => {
     if (settings.siteInfo) Object.assign(siteInfoData, settings.siteInfo)
     if (settings.appearance) Object.assign(appearanceData, settings.appearance)
-    if (settings.homepage) Object.assign(homepageData, settings.homepage)
+    if (settings.homepage) Object.assign(homepageData, normalizeHomepageConfigData(settings.homepage))
     if (settings.pageGlobal) Object.assign(pageConfigData, normalizePageConfigData(settings.pageGlobal))
     if (settings.cardStyle) Object.assign(cardStyleData, settings.cardStyle)
     if (settings.sidebar) Object.assign(sidebarData, settings.sidebar)
@@ -854,7 +939,7 @@ const loadAppearance = async () => {
 const loadHomepage = async () => {
     try {
         const res = await uiedSettingGet({ key: 'homepageConfig' })
-        if (res) Object.assign(homepageData, res)
+        if (res) Object.assign(homepageData, normalizeHomepageConfigData(res))
     } catch (e) { console.error('加载首页配置失败', e) }
 }
 const loadPageConfig = async () => {
@@ -916,7 +1001,7 @@ const handleSaveAppearance = async () => {
 const handleSaveHomepage = async () => {
     homepageLoading.value = true
     try {
-        await uiedSettingSave({ homepageConfig: homepageData })
+        await uiedSettingSave({ homepageConfig: normalizeHomepageConfigData(cloneConfig(homepageData)) })
         markSaved()
         feedback.msgSuccess('保存成功')
     } catch (error) {
@@ -996,7 +1081,7 @@ const handleSaveAll = async () => {
             uiedSaveSiteInfo(siteInfoData),
             uiedSettingSave({
                 appearanceConfig: appearanceData,
-                homepageConfig: homepageData,
+                homepageConfig: normalizeHomepageConfigData(cloneConfig(homepageData)),
                 pageGlobalConfig: normalizePageConfigData(pageConfigData),
                 cardStyleConfig: cardStyleData,
                 sidebarConfig: sidebarData,
@@ -1023,7 +1108,7 @@ const handleResetCurrentTab = () => {
 
     if (tab === 'siteInfo') Object.assign(siteInfoData, readSnapshotObject(snapshotData.siteInfo))
     if (tab === 'appearance') Object.assign(appearanceData, readSnapshotObject(snapshotData.appearance))
-    if (tab === 'homepage') Object.assign(homepageData, readSnapshotObject(snapshotData.homepage))
+    if (tab === 'homepage') Object.assign(homepageData, normalizeHomepageConfigData(readSnapshotObject(snapshotData.homepage)))
     if (tab === 'pageConfig') Object.assign(pageConfigData, normalizePageConfigData(readSnapshotObject(snapshotData.pageConfig)))
     if (tab === 'cardStyle') Object.assign(cardStyleData, readSnapshotObject(snapshotData.cardStyle))
     if (tab === 'sidebar') Object.assign(sidebarData, readSnapshotObject(snapshotData.sidebar))
@@ -1136,5 +1221,32 @@ onMounted(() => {
     margin: 2px 0;
     line-height: 1.6;
     color: #606266;
+}
+
+.nav-switch-setting-table {
+    width: 100%;
+    border: 1px solid #ebeef5;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.nav-switch-setting-header,
+.nav-switch-setting-row {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr 1.2fr 90px 120px;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 12px;
+}
+
+.nav-switch-setting-header {
+    background: #f5f7fa;
+    color: #606266;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.nav-switch-setting-row {
+    border-top: 1px solid #f0f2f5;
 }
 </style>
