@@ -1,0 +1,48 @@
+{
+  "name": "content-manage",
+  "version": "1.1.0",
+  "description": "LikeAdmin 内容管理可复用模块（文章/分类/标签/专题/评论/投稿/互动）",
+  "createdAt": "2026-02-14",
+  "backendRequired": [
+    "server/app/controller/article.js",
+    "server/app/controller/user.js",
+    "server/app/service/article.js",
+    "server/app/service/user.js",
+    "server/app/middleware/auth.js",
+    "server/app/extend/config.js",
+    "server/app/router/system.js",
+    "server/app/model/article.js",
+    "server/app/model/articleCategory.js",
+    "server/app/model/articleTag.js",
+    "server/app/model/articleTagRel.js",
+    "server/app/model/articleTopic.js",
+    "server/app/model/articleTopicRel.js",
+    "server/app/model/articleCollect.js",
+    "server/app/model/articleLike.js",
+    "server/app/model/articleComment.js",
+    "server/app/model/articleAuthorRel.js",
+    "server/app/model/userMessage.js",
+    "server/app/model/userAuthorProfile.js",
+    "server/app/model/userIdentity.js"
+  ],
+  "adminRequired": [
+    "admin/src/api/article.ts",
+    "admin/src/views/article/comment/index.vue",
+    "admin/src/views/article/lists/index.vue",
+    "admin/src/views/article/lists/edit.vue",
+    "admin/src/views/article/tag/index.vue",
+    "admin/src/views/article/tag/edit.vue",
+    "admin/src/views/article/topic/index.vue",
+    "admin/src/views/article/topic/edit.vue",
+    "admin/src/components/editor/index.vue",
+    "admin/src/components/ai-editor/index.vue",
+    "admin/src/components/material/index.vue",
+    "admin/src/components/material/hook.ts"
+  ],
+  "sqlPatches": [
+    "sql/patch_2026_0214_article_tag_topic_slug.sql"
+  ],
+  "docs": [
+    "docs/api/CONTENT_MANAGE_ARTICLE_API_2026-02-09.md"
+  ]
+}

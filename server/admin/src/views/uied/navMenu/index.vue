@@ -25,12 +25,12 @@
                     {{ isExpanded ? '全部收起' : '全部展开' }}
                 </el-button>
             </div>
-            <el-table 
+            <el-table
                 ref="tableRef"
-                size="large" 
-                v-loading="loading" 
-                :data="menuTree" 
-                row-key="id" 
+                size="large"
+                v-loading="loading"
+                :data="menuTree"
+                row-key="id"
                 :default-expand-all="isExpanded"
                 :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
                 border
@@ -38,15 +38,35 @@
                 <el-table-column label="菜单名称" prop="name" min-width="200">
                     <template #default="{ row }">
                         <div class="flex items-center gap-2">
-                            <el-icon v-if="row.icon" class="text-gray-500"><component :is="row.icon" /></el-icon>
+                            <icon
+                                v-if="resolveMenuIcon(row.icon)"
+                                :name="resolveMenuIcon(row.icon)"
+                                :size="16"
+                            />
                             <span :class="{ 'font-medium': !row.parentId }">{{ row.name }}</span>
-                            <el-tag v-if="row.label" :type="row.labelType === 'shop' ? 'success' : 'info'" size="small">
+                            <el-tag
+                                v-if="row.label"
+                                :type="row.labelType === 'shop' ? 'success' : 'info'"
+                                size="small"
+                            >
                                 {{ row.label }}
                             </el-tag>
-                            <el-tag v-if="row.children?.length" type="info" size="small" class="ml-1">
+                            <el-tag
+                                v-if="row.children?.length"
+                                type="info"
+                                size="small"
+                                class="ml-1"
+                            >
                                 {{ row.children.length }}个子菜单
                             </el-tag>
                         </div>
+                    </template>
+                </el-table-column>
+                <el-table-column label="分类层级" width="100" align="center">
+                    <template #default="{ row }">
+                        <el-tag :type="row.parentId ? 'info' : 'success'" size="small">
+                            {{ row.parentId ? '子菜单' : '分类' }}
+                        </el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column label="链接" prop="url" min-width="200" show-overflow-tooltip />
@@ -67,7 +87,9 @@
                 </el-table-column>
                 <el-table-column label="操作" width="200" fixed="right" align="center">
                     <template #default="{ row }">
-                        <el-button type="primary" link @click="handleAdd(row.id)">添加子菜单</el-button>
+                        <el-button type="primary" link @click="handleAdd(row.id)"
+                            >添加子菜单</el-button
+                        >
                         <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
                         <el-button type="danger" link @click="handleDelete(row.id)">删除</el-button>
                     </template>
@@ -79,8 +101,14 @@
         <el-dialog v-model="showEdit" :title="editData.id ? '编辑菜单' : '添加菜单'" width="500px">
             <el-form ref="editFormRef" :model="editData" :rules="editRules" label-width="80px">
                 <el-form-item label="上级菜单">
-                    <el-tree-select v-model="editData.parentId" :data="menuTreeOptions" check-strictly
-                        :render-after-expand="false" placeholder="顶级菜单" style="width: 100%" />
+                    <el-tree-select
+                        v-model="editData.parentId"
+                        :data="menuTreeOptions"
+                        check-strictly
+                        :render-after-expand="false"
+                        placeholder="顶级菜单"
+                        style="width: 100%"
+                    />
                 </el-form-item>
                 <el-form-item label="菜单名称" prop="name">
                     <el-input v-model="editData.name" placeholder="请输入菜单名称" />
@@ -89,7 +117,12 @@
                     <el-input v-model="editData.url" placeholder="请输入链接地址" />
                 </el-form-item>
                 <el-form-item label="图标">
-                    <el-input v-model="editData.icon" placeholder="图标类名" />
+                    <div class="w-full">
+                        <icon-picker v-model="editData.icon" />
+                        <div class="text-xs text-gray-400 mt-1">
+                            推荐使用图标选择器，系统会自动保存标准图标名
+                        </div>
+                    </div>
                 </el-form-item>
                 <el-form-item label="排序">
                     <el-input-number v-model="editData.sortOrder" :min="0" />
@@ -98,7 +131,12 @@
                     <el-input v-model="editData.label" placeholder="如: New, 热门" />
                 </el-form-item>
                 <el-form-item label="标签类型">
-                    <el-select v-model="editData.labelType" placeholder="选择标签样式" clearable style="width: 100%">
+                    <el-select
+                        v-model="editData.labelType"
+                        placeholder="选择标签样式"
+                        clearable
+                        style="width: 100%"
+                    >
                         <el-option label="信息(蓝色)" value="info" />
                         <el-option label="成功(绿色)" value="shop" />
                         <el-option label="警告(橙色)" value="warning" />
@@ -114,7 +152,9 @@
             </el-form>
             <template #footer>
                 <el-button @click="showEdit = false">取消</el-button>
-                <el-button type="primary" :loading="editLoading" @click="handleSubmit">确定</el-button>
+                <el-button type="primary" :loading="editLoading" @click="handleSubmit"
+                    >确定</el-button
+                >
             </template>
         </el-dialog>
     </div>
@@ -124,12 +164,33 @@
 import { uiedNavMenuAll, uiedNavMenuAdd, uiedNavMenuEdit, uiedNavMenuDelete } from '@/api/uied'
 import feedback from '@/utils/feedback'
 import type { FormInstance, FormRules, TableInstance } from 'element-plus'
+import {
+    EL_ICON_PREFIX,
+    LOCAL_ICON_PREFIX,
+    getElementPlusIconNames,
+    getLocalIconNames
+} from '@/components/icon'
+
+interface NavMenuItem {
+    id: number
+    parentId: number
+    name: string
+    url: string
+    icon: string
+    sortOrder: number
+    label: string
+    labelType: string
+    openInNewTab: boolean
+    isActive: boolean
+    children?: NavMenuItem[]
+}
 
 const loading = ref(false)
-const menuTree = ref<any[]>([])
+const menuTree = ref<NavMenuItem[]>([])
 const menuTreeOptions = ref<any[]>([])
 const isExpanded = ref(true)
 const tableRef = ref<TableInstance>()
+const iconNameSet = new Set<string>([...getElementPlusIconNames(), ...getLocalIconNames()])
 
 // 计算菜单统计
 const totalMenus = computed(() => {
@@ -144,45 +205,136 @@ const topLevelMenus = computed(() => menuTree.value.length)
 const showEdit = ref(false)
 const editLoading = ref(false)
 const editFormRef = ref<FormInstance>()
-const editData = reactive({ id: 0, parentId: 0, name: '', url: '', icon: '', sortOrder: 0, label: '', labelType: '', openInNewTab: false, isActive: true })
-const editRules: FormRules = { name: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }] }
+const editData = reactive({
+    id: 0,
+    parentId: 0,
+    name: '',
+    url: '',
+    icon: '',
+    sortOrder: 0,
+    label: '',
+    labelType: '',
+    openInNewTab: false,
+    isActive: true
+})
+const editRules: FormRules = {
+    name: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }]
+}
 
+/**
+ * 解析并规范化图标名称，兼容历史无前缀图标值
+ */
+const normalizeIconName = (icon?: string): string => {
+    if (!icon) return ''
+    const iconName = String(icon).trim()
+    if (!iconName) return ''
+    if (iconName.startsWith(EL_ICON_PREFIX) || iconName.startsWith(LOCAL_ICON_PREFIX))
+        return iconName
+    return `${EL_ICON_PREFIX}${iconName}`
+}
+
+/**
+ * 获取可安全渲染的图标名，避免无效图标导致组件渲染异常
+ */
+const resolveMenuIcon = (icon?: string): string => {
+    const normalized = normalizeIconName(icon)
+    return iconNameSet.has(normalized) ? normalized : ''
+}
+
+/**
+ * 获取导航菜单树数据
+ */
 const getLists = async () => {
     loading.value = true
     try {
         const res = await uiedNavMenuAll()
         // request interceptor 已解包 data，res 直接就是数组
-        menuTree.value = Array.isArray(res) ? res : (res || [])
-        menuTreeOptions.value = [{ value: 0, label: '顶级菜单' }, ...buildTreeOptions(menuTree.value)]
+        menuTree.value = (Array.isArray(res) ? res : res || []).map((item: NavMenuItem) => ({
+            ...item,
+            icon: normalizeIconName(item.icon)
+        }))
+        menuTreeOptions.value = [
+            { value: 0, label: '顶级菜单' },
+            ...buildTreeOptions(menuTree.value)
+        ]
     } finally {
         loading.value = false
     }
 }
 
-const buildTreeOptions = (items: any[]): any[] => {
-    return items.map(item => ({
+/**
+ * 构建树形选择数据
+ */
+const buildTreeOptions = (items: NavMenuItem[]): any[] => {
+    return items.map((item) => ({
         value: item.id,
         label: item.name,
-        children: item.children?.length ? buildTreeOptions(item.children) : undefined,
+        children: item.children?.length ? buildTreeOptions(item.children) : undefined
     }))
 }
 
-const resetEditData = () => Object.assign(editData, { id: 0, parentId: 0, name: '', url: '', icon: '', sortOrder: 0, label: '', labelType: '', openInNewTab: false, isActive: true })
+/**
+ * 重置编辑表单数据
+ */
+const resetEditData = () =>
+    Object.assign(editData, {
+        id: 0,
+        parentId: 0,
+        name: '',
+        url: '',
+        icon: '',
+        sortOrder: 0,
+        label: '',
+        labelType: '',
+        openInNewTab: false,
+        isActive: true
+    })
 
-const handleAdd = (parentId: number) => { resetEditData(); editData.parentId = parentId; showEdit.value = true }
-const handleEdit = (row: any) => { Object.assign(editData, row); showEdit.value = true }
+/**
+ * 打开新增菜单弹窗
+ */
+const handleAdd = (parentId: number) => {
+    resetEditData()
+    editData.parentId = parentId
+    showEdit.value = true
+}
 
+/**
+ * 打开编辑菜单弹窗
+ */
+const handleEdit = (row: NavMenuItem) => {
+    Object.assign(editData, row, { icon: normalizeIconName(row.icon) })
+    showEdit.value = true
+}
+
+/**
+ * 提交菜单编辑数据
+ */
 const handleSubmit = async () => {
     await editFormRef.value?.validate()
     editLoading.value = true
     try {
-        if (editData.id) { await uiedNavMenuEdit(editData); feedback.msgSuccess('编辑成功') }
-        else { await uiedNavMenuAdd(editData); feedback.msgSuccess('添加成功') }
+        const submitData = {
+            ...editData,
+            icon: normalizeIconName(editData.icon)
+        }
+        if (editData.id) {
+            await uiedNavMenuEdit(submitData)
+            feedback.msgSuccess('编辑成功')
+        } else {
+            await uiedNavMenuAdd(submitData)
+            feedback.msgSuccess('添加成功')
+        }
         showEdit.value = false
         getLists()
-    } finally { editLoading.value = false }
+    } finally {
+        editLoading.value = false
+    }
 }
 
+/**
+ * 删除菜单
+ */
 const handleDelete = async (id: number) => {
     await feedback.confirm('确定要删除该菜单吗？子菜单也会被删除')
     await uiedNavMenuDelete({ id })
