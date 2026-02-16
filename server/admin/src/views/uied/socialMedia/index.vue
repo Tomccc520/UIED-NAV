@@ -33,8 +33,12 @@
                         </el-table-column>
                         <el-table-column label="操作" width="120" fixed="right">
                             <template #default="{ row }">
-                                <el-button type="primary" link @click="handleEditGroup(row)">编辑</el-button>
-                                <el-button type="danger" link @click="handleDeleteGroup(row.id)">删除</el-button>
+                                <el-button type="primary" link @click="handleEditGroup(row)"
+                                    >编辑</el-button
+                                >
+                                <el-button type="danger" link @click="handleDeleteGroup(row.id)"
+                                    >删除</el-button
+                                >
                             </template>
                         </el-table-column>
                     </el-table>
@@ -47,8 +51,18 @@
                             <template #icon><icon name="el-icon-Plus" /></template>
                             添加社交媒体
                         </el-button>
-                        <el-select v-model="itemGroupFilter" placeholder="筛选分组" clearable @change="getItemLists">
-                            <el-option v-for="g in groupOptions" :key="g.id" :label="g.name" :value="g.id" />
+                        <el-select
+                            v-model="itemGroupFilter"
+                            placeholder="筛选分组"
+                            clearable
+                            @change="getItemLists"
+                        >
+                            <el-option
+                                v-for="g in groupOptions"
+                                :key="g.id"
+                                :label="g.name"
+                                :value="g.id"
+                            />
                         </el-select>
                     </div>
                     <el-table size="large" v-loading="itemPager.loading" :data="itemPager.lists">
@@ -56,7 +70,12 @@
                         <el-table-column label="所属分组" prop="groupName" width="120" />
                         <el-table-column label="平台" prop="platform" width="100" />
                         <el-table-column label="名称" prop="name" min-width="120" />
-                        <el-table-column label="链接" prop="url" min-width="200" show-overflow-tooltip />
+                        <el-table-column
+                            label="链接"
+                            prop="url"
+                            min-width="200"
+                            show-overflow-tooltip
+                        />
                         <el-table-column label="图标" prop="icon" width="100" />
                         <el-table-column label="排序" prop="sortOrder" width="80" />
                         <el-table-column label="状态" width="80">
@@ -68,8 +87,12 @@
                         </el-table-column>
                         <el-table-column label="操作" width="120" fixed="right">
                             <template #default="{ row }">
-                                <el-button type="primary" link @click="handleEditItem(row)">编辑</el-button>
-                                <el-button type="danger" link @click="handleDeleteItem(row.id)">删除</el-button>
+                                <el-button type="primary" link @click="handleEditItem(row)"
+                                    >编辑</el-button
+                                >
+                                <el-button type="danger" link @click="handleDeleteItem(row.id)"
+                                    >删除</el-button
+                                >
                             </template>
                         </el-table-column>
                     </el-table>
@@ -81,7 +104,11 @@
         </el-card>
 
         <!-- 分组编辑弹窗 -->
-        <el-dialog v-model="showGroupEdit" :title="groupData.id ? '编辑分组' : '添加分组'" width="400px">
+        <el-dialog
+            v-model="showGroupEdit"
+            :title="groupData.id ? '编辑分组' : '添加分组'"
+            width="400px"
+        >
             <el-form ref="groupFormRef" :model="groupData" :rules="groupRules" label-width="80px">
                 <el-form-item label="分组名称" prop="name">
                     <el-input v-model="groupData.name" placeholder="请输入分组名称" />
@@ -102,20 +129,41 @@
             </el-form>
             <template #footer>
                 <el-button @click="showGroupEdit = false">取消</el-button>
-                <el-button type="primary" :loading="groupLoading" @click="handleSubmitGroup">确定</el-button>
+                <el-button type="primary" :loading="groupLoading" @click="handleSubmitGroup"
+                    >确定</el-button
+                >
             </template>
         </el-dialog>
 
         <!-- 项目编辑弹窗 -->
-        <el-dialog v-model="showItemEdit" :title="itemData.id ? '编辑社交媒体' : '添加社交媒体'" width="500px">
+        <el-dialog
+            v-model="showItemEdit"
+            :title="itemData.id ? '编辑社交媒体' : '添加社交媒体'"
+            width="500px"
+        >
             <el-form ref="itemFormRef" :model="itemData" :rules="itemRules" label-width="80px">
                 <el-form-item label="所属分组" prop="groupId">
-                    <el-select v-model="itemData.groupId" placeholder="请选择分组" style="width: 100%">
-                        <el-option v-for="g in groupOptions" :key="g.id" :label="g.name" :value="g.id" />
+                    <el-select
+                        v-model="itemData.groupId"
+                        placeholder="请选择分组"
+                        style="width: 100%"
+                    >
+                        <el-option
+                            v-for="g in groupOptions"
+                            :key="g.id"
+                            :label="g.name"
+                            :value="g.id"
+                        />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="平台">
-                    <el-select v-model="itemData.platform" placeholder="选择平台" style="width: 100%" allow-create filterable>
+                    <el-select
+                        v-model="itemData.platform"
+                        placeholder="选择平台"
+                        style="width: 100%"
+                        allow-create
+                        filterable
+                    >
                         <el-option label="微信" value="wechat" />
                         <el-option label="微博" value="weibo" />
                         <el-option label="抖音" value="douyin" />
@@ -146,15 +194,25 @@
             </el-form>
             <template #footer>
                 <el-button @click="showItemEdit = false">取消</el-button>
-                <el-button type="primary" :loading="itemLoading" @click="handleSubmitItem">确定</el-button>
+                <el-button type="primary" :loading="itemLoading" @click="handleSubmitItem"
+                    >确定</el-button
+                >
             </template>
         </el-dialog>
     </div>
 </template>
 
 <script lang="ts" setup name="uiedSocialMedia">
-import { uiedSocialMediaGroupList, uiedSocialMediaGroupAdd, uiedSocialMediaGroupEdit, uiedSocialMediaGroupDelete,
-    uiedSocialMediaItemList, uiedSocialMediaItemAdd, uiedSocialMediaItemEdit, uiedSocialMediaItemDelete } from '@/api/uied'
+import {
+    uiedSocialMediaGroupList,
+    uiedSocialMediaGroupAdd,
+    uiedSocialMediaGroupEdit,
+    uiedSocialMediaGroupDelete,
+    uiedSocialMediaItemList,
+    uiedSocialMediaItemAdd,
+    uiedSocialMediaItemEdit,
+    uiedSocialMediaItemDelete
+} from '@/api/uied'
 import { usePaging } from '@/hooks/usePaging'
 import feedback from '@/utils/feedback'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -162,25 +220,51 @@ import type { FormInstance, FormRules } from 'element-plus'
 const activeTab = ref('groups')
 const groupOptions = ref<any[]>([])
 const itemGroupFilter = ref<number | undefined>()
+const itemQueryParams = reactive({
+    groupId: '' as number | ''
+})
 
 // 分组
-const { pager: groupPager, getLists: getGroupLists } = usePaging({ fetchFun: uiedSocialMediaGroupList })
+const { pager: groupPager, getLists: getGroupLists } = usePaging({
+    fetchFun: uiedSocialMediaGroupList
+})
 const showGroupEdit = ref(false)
 const groupLoading = ref(false)
 const groupFormRef = ref<FormInstance>()
 const groupData = reactive({ id: 0, name: '', position: 'footer', sortOrder: 0, isActive: true })
-const groupRules: FormRules = { name: [{ required: true, message: '请输入分组名称', trigger: 'blur' }] }
+const groupRules: FormRules = {
+    name: [{ required: true, message: '请输入分组名称', trigger: 'blur' }]
+}
 
 // 项目
-const { pager: itemPager, getLists: getItemListsBase } = usePaging({ fetchFun: uiedSocialMediaItemList })
-const getItemLists = () => getItemListsBase({ groupId: itemGroupFilter.value })
+const { pager: itemPager, getLists: getItemListsBase } = usePaging({
+    fetchFun: uiedSocialMediaItemList,
+    params: itemQueryParams
+})
+/**
+ * 获取社交媒体项目列表（按分组筛选）
+ */
+const getItemLists = () => {
+    itemQueryParams.groupId = itemGroupFilter.value ?? ''
+    return getItemListsBase()
+}
 const showItemEdit = ref(false)
 const itemLoading = ref(false)
 const itemFormRef = ref<FormInstance>()
-const itemData = reactive({ id: 0, groupId: undefined as number | undefined, platform: '', name: '', url: '', icon: '', qrCode: '', sortOrder: 0, isActive: true })
+const itemData = reactive({
+    id: 0,
+    groupId: undefined as number | undefined,
+    platform: '',
+    name: '',
+    url: '',
+    icon: '',
+    qrCode: '',
+    sortOrder: 0,
+    isActive: true
+})
 const itemRules: FormRules = {
     groupId: [{ required: true, message: '请选择分组', trigger: 'change' }],
-    name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
+    name: [{ required: true, message: '请输入名称', trigger: 'blur' }]
 }
 
 const loadGroupOptions = async () => {
@@ -189,18 +273,31 @@ const loadGroupOptions = async () => {
 }
 
 // 分组操作
-const handleAddGroup = () => { Object.assign(groupData, { id: 0, name: '', position: 'footer', sortOrder: 0, isActive: true }); showGroupEdit.value = true }
-const handleEditGroup = (row: any) => { Object.assign(groupData, row); showGroupEdit.value = true }
+const handleAddGroup = () => {
+    Object.assign(groupData, { id: 0, name: '', position: 'footer', sortOrder: 0, isActive: true })
+    showGroupEdit.value = true
+}
+const handleEditGroup = (row: any) => {
+    Object.assign(groupData, row)
+    showGroupEdit.value = true
+}
 const handleSubmitGroup = async () => {
     await groupFormRef.value?.validate()
     groupLoading.value = true
     try {
-        if (groupData.id) { await uiedSocialMediaGroupEdit(groupData); feedback.msgSuccess('编辑成功') }
-        else { await uiedSocialMediaGroupAdd(groupData); feedback.msgSuccess('添加成功') }
+        if (groupData.id) {
+            await uiedSocialMediaGroupEdit(groupData)
+            feedback.msgSuccess('编辑成功')
+        } else {
+            await uiedSocialMediaGroupAdd(groupData)
+            feedback.msgSuccess('添加成功')
+        }
         showGroupEdit.value = false
         getGroupLists()
         loadGroupOptions()
-    } finally { groupLoading.value = false }
+    } finally {
+        groupLoading.value = false
+    }
 }
 const handleDeleteGroup = async (id: number) => {
     await feedback.confirm('确定要删除该分组吗？分组下的项目也会被删除')
@@ -211,17 +308,40 @@ const handleDeleteGroup = async (id: number) => {
 }
 
 // 项目操作
-const handleAddItem = () => { Object.assign(itemData, { id: 0, groupId: undefined, platform: '', name: '', url: '', icon: '', qrCode: '', sortOrder: 0, isActive: true }); showItemEdit.value = true }
-const handleEditItem = (row: any) => { Object.assign(itemData, row); showItemEdit.value = true }
+const handleAddItem = () => {
+    Object.assign(itemData, {
+        id: 0,
+        groupId: undefined,
+        platform: '',
+        name: '',
+        url: '',
+        icon: '',
+        qrCode: '',
+        sortOrder: 0,
+        isActive: true
+    })
+    showItemEdit.value = true
+}
+const handleEditItem = (row: any) => {
+    Object.assign(itemData, row)
+    showItemEdit.value = true
+}
 const handleSubmitItem = async () => {
     await itemFormRef.value?.validate()
     itemLoading.value = true
     try {
-        if (itemData.id) { await uiedSocialMediaItemEdit(itemData); feedback.msgSuccess('编辑成功') }
-        else { await uiedSocialMediaItemAdd(itemData); feedback.msgSuccess('添加成功') }
+        if (itemData.id) {
+            await uiedSocialMediaItemEdit(itemData)
+            feedback.msgSuccess('编辑成功')
+        } else {
+            await uiedSocialMediaItemAdd(itemData)
+            feedback.msgSuccess('添加成功')
+        }
         showItemEdit.value = false
         getItemLists()
-    } finally { itemLoading.value = false }
+    } finally {
+        itemLoading.value = false
+    }
 }
 const handleDeleteItem = async (id: number) => {
     await feedback.confirm('确定要删除该项目吗？')

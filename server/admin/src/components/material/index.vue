@@ -1,3 +1,11 @@
+<!--
+/**
+ * @copyright Tomda (https://www.tomda.top)
+ * @copyright UIED技术团队 (https://fsuied.com)
+ * @author UIED技术团队
+ * @createDate 2026-02-16
+ */
+-->
 <template>
     <div class="material" v-loading="pager.loading">
         <div class="material__left">
@@ -190,6 +198,11 @@
                 </el-checkbox>
             </div>
             <div class="material-center__content flex flex-col flex-1 mb-1 min-h-0">
+                <div v-if="canViewAll" class="mb-2">
+                    <el-tag type="warning" effect="plain"
+                        >管理员视图：可查看全部素材及上传者</el-tag
+                    >
+                </div>
                 <el-scrollbar v-if="pager.lists.length" v-show="listShowType == 'normal'">
                     <ul class="file-list flex flex-wrap mt-4">
                         <li
@@ -212,6 +225,9 @@
                             </del-wrap>
 
                             <overflow-tooltip class="mt-1" :content="item.name" />
+                            <div v-if="canViewUploader" class="text-xs text-info truncate">
+                                上传者：{{ item.uploaderName || '-' }}
+                            </div>
                             <div class="operation-btns flex items-center">
                                 <popover-input
                                     v-perms="['common:album:albumRename']"
@@ -261,6 +277,11 @@
                         </template>
                     </el-table-column>
                     <el-table-column prop="createTime" label="上传时间" min-width="100" />
+                    <el-table-column v-if="canViewUploader" label="上传者" min-width="120">
+                        <template #default="{ row }">
+                            <span>{{ row.uploaderName || '-' }}</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column label="操作" width="150" fixed="right">
                         <template #default="{ row }">
                             <div class="inline-block" v-perms="['common:album:albumRename']">
@@ -448,6 +469,8 @@ const {
     select,
     isCheckAll,
     isIndeterminate,
+    canViewUploader,
+    canViewAll,
     getFileList,
     refresh,
     batchFileDelete,

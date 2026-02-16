@@ -23,12 +23,21 @@
             <el-tabs v-model="activeTab" class="website-edit-tabs">
                 <!-- 基础信息 -->
                 <el-tab-pane label="基础信息" name="basic">
-                    <el-form ref="editFormRef" :model="editData" :rules="editRules" label-width="100px" style="max-width: 800px;">
+                    <el-form
+                        ref="editFormRef"
+                        :model="editData"
+                        :rules="editRules"
+                        label-width="100px"
+                        style="max-width: 800px"
+                    >
                         <el-form-item label="网站名称" prop="name">
                             <el-input v-model="editData.name" placeholder="请输入网站名称" />
                         </el-form-item>
                         <el-form-item label="固定链接">
-                            <el-input v-model="editData.slug" placeholder="留空自动生成，用于详情页URL">
+                            <el-input
+                                v-model="editData.slug"
+                                placeholder="留空自动生成，用于详情页URL"
+                            >
                                 <template #prepend>/website/</template>
                             </el-input>
                         </el-form-item>
@@ -36,36 +45,77 @@
                             <el-input v-model="editData.url" placeholder="请输入网站URL" />
                         </el-form-item>
                         <el-form-item label="所属分类" prop="categoryId">
-                            <el-select v-model="editData.categoryId" placeholder="请选择分类" style="width: 100%">
-                                <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id" />
+                            <el-select
+                                v-model="editData.categoryId"
+                                placeholder="请选择分类"
+                                style="width: 100%"
+                            >
+                                <el-option
+                                    v-for="item in categoryList"
+                                    :key="item.id"
+                                    :label="item.name"
+                                    :value="item.id"
+                                />
                             </el-select>
                         </el-form-item>
                         <el-form-item label="网站描述">
-                            <el-input v-model="editData.description" type="textarea" :rows="3" placeholder="请输入网站描述" />
+                            <el-input
+                                v-model="editData.description"
+                                type="textarea"
+                                :rows="3"
+                                placeholder="请输入网站描述"
+                            />
                         </el-form-item>
                         <el-form-item label="图标URL">
                             <div class="flex gap-2" style="width: 100%">
-                                <el-input v-model="editData.iconUrl" placeholder="请输入图标URL" clearable />
-                                <el-button :loading="fetchingIcon" @click="handleFetchIcon">获取图标</el-button>
+                                <el-input
+                                    v-model="editData.iconUrl"
+                                    placeholder="请输入图标URL"
+                                    clearable
+                                />
+                                <el-button :loading="fetchingIcon" @click="handleFetchIcon"
+                                    >获取图标</el-button
+                                >
                             </div>
                         </el-form-item>
                         <el-form-item label="标签">
-                            <el-select v-model="editData.tags" multiple filterable allow-create default-first-option placeholder="输入标签后回车添加" style="width: 100%" />
+                            <el-select
+                                v-model="editData.tags"
+                                multiple
+                                filterable
+                                allow-create
+                                default-first-option
+                                placeholder="输入标签后回车添加"
+                                style="width: 100%"
+                            />
                         </el-form-item>
                         <el-row :gutter="16">
                             <el-col :span="8">
                                 <el-form-item label="排序">
-                                    <el-input-number v-model="editData.sortOrder" :min="0" :max="9999" style="width: 100%" />
+                                    <el-input-number
+                                        v-model="editData.sortOrder"
+                                        :min="0"
+                                        :max="9999"
+                                        style="width: 100%"
+                                    />
                                 </el-form-item>
                             </el-col>
                             <el-col :span="8">
                                 <el-form-item label="状态">
-                                    <el-switch v-model="editData.isActive" :active-value="1" :inactive-value="0" />
+                                    <el-switch
+                                        v-model="editData.isActive"
+                                        :active-value="1"
+                                        :inactive-value="0"
+                                    />
                                 </el-form-item>
                             </el-col>
                             <el-col :span="8">
                                 <el-form-item label="置顶">
-                                    <el-switch v-model="editData.isPinned" :active-value="1" :inactive-value="0" />
+                                    <el-switch
+                                        v-model="editData.isPinned"
+                                        :active-value="1"
+                                        :inactive-value="0"
+                                    />
                                 </el-form-item>
                             </el-col>
                         </el-row>
@@ -76,32 +126,58 @@
                 <el-tab-pane label="详情页" name="detail">
                     <el-form :model="editData" label-width="100px">
                         <el-form-item label="访问按钮">
-                            <el-input v-model="editData.visitBtnText" placeholder="默认：访问网站" style="max-width: 400px;" />
+                            <el-input
+                                v-model="editData.visitBtnText"
+                                placeholder="默认：访问网站"
+                                style="max-width: 400px"
+                            />
                         </el-form-item>
                     </el-form>
 
                     <el-divider content-position="left">缩略图</el-divider>
-                    <el-form :model="editData" label-width="100px" style="max-width: 900px;">
+                    <el-form :model="editData" label-width="100px" style="max-width: 900px">
                         <el-form-item>
                             <template #label>
                                 <span>缩略图</span>
-                                <el-tooltip content="网站预览缩略图，支持从素材中心选择或输入URL" placement="top">
-                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                                <el-tooltip
+                                    content="网站预览缩略图，支持从素材中心选择或输入URL"
+                                    placement="top"
+                                >
+                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399"
+                                        ><QuestionFilled
+                                    /></el-icon>
                                 </el-tooltip>
                             </template>
                             <div style="width: 100%">
                                 <div class="flex gap-2 mb-2">
-                                    <el-input v-model="editData.thumbnail" placeholder="输入缩略图URL或从素材中心选择" clearable />
+                                    <el-input
+                                        v-model="editData.thumbnail"
+                                        placeholder="输入缩略图URL或从素材中心选择"
+                                        clearable
+                                    />
                                     <el-button @click="openThumbnailPicker">
                                         <el-icon class="mr-1"><FolderOpened /></el-icon>
                                         素材中心
                                     </el-button>
-                                    <el-button @click="handleCaptureThumbnail" :loading="capturingThumbnail">
+                                    <el-button
+                                        @click="handleCaptureThumbnail"
+                                        :loading="capturingThumbnail"
+                                    >
                                         截图获取
                                     </el-button>
                                 </div>
                                 <div v-if="editData.thumbnail" class="mt-2">
-                                    <el-image :src="editData.thumbnail" style="max-width: 320px; max-height: 200px; border-radius: 4px; border: 1px solid #eee;" fit="contain" :preview-src-list="[editData.thumbnail]" />
+                                    <el-image
+                                        :src="editData.thumbnail"
+                                        style="
+                                            max-width: 320px;
+                                            max-height: 200px;
+                                            border-radius: 4px;
+                                            border: 1px solid #eee;
+                                        "
+                                        fit="contain"
+                                        :preview-src-list="[editData.thumbnail]"
+                                    />
                                 </div>
                             </div>
                         </el-form-item>
@@ -118,18 +194,37 @@
                                 <div class="ai-chat__header">
                                     <div>
                                         <div class="ai-chat__title">AI 写作助手</div>
-                                        <div class="ai-chat__sub-title">对话式创作，输出可直接落稿</div>
+                                        <div class="ai-chat__sub-title">
+                                            对话式创作，输出可直接落稿
+                                        </div>
                                     </div>
                                     <el-tag size="small" type="success">对话模式</el-tag>
                                 </div>
                                 <div class="ai-chat__shortcut">
-                                    <el-button type="primary" plain size="small" :loading="aiGenerating" @click="handleAiGenerate('replace')">
+                                    <el-button
+                                        type="primary"
+                                        plain
+                                        size="small"
+                                        :loading="aiGenerating"
+                                        @click="handleAiGenerate('replace')"
+                                    >
                                         生成正文
                                     </el-button>
-                                    <el-button type="success" plain size="small" :loading="aiGenerating" @click="handleAiGenerate('append')">
+                                    <el-button
+                                        type="success"
+                                        plain
+                                        size="small"
+                                        :loading="aiGenerating"
+                                        @click="handleAiGenerate('append')"
+                                    >
                                         续写正文
                                     </el-button>
-                                    <el-button type="warning" size="small" :loading="aiGenerating" @click="handleAiGenerate('polish')">
+                                    <el-button
+                                        type="warning"
+                                        size="small"
+                                        :loading="aiGenerating"
+                                        @click="handleAiGenerate('polish')"
+                                    >
                                         润色正文
                                     </el-button>
                                 </div>
@@ -139,12 +234,20 @@
                                             v-for="item in chatMessages"
                                             :key="item.id"
                                             class="ai-chat__message"
-                                            :class="item.role === 'user' ? 'ai-chat__message--user' : 'ai-chat__message--assistant'"
+                                            :class="
+                                                item.role === 'user'
+                                                    ? 'ai-chat__message--user'
+                                                    : 'ai-chat__message--assistant'
+                                            "
                                         >
-                                            <div class="ai-chat__message-role">{{ item.role === 'user' ? '我' : 'AI' }}</div>
+                                            <div class="ai-chat__message-role">
+                                                {{ item.role === 'user' ? '我' : 'AI' }}
+                                            </div>
                                             <div class="ai-chat__message-content">
                                                 <span>{{ item.content }}</span>
-                                                <span v-if="item.streaming" class="ai-chat__cursor">|</span>
+                                                <span v-if="item.streaming" class="ai-chat__cursor"
+                                                    >|</span
+                                                >
                                             </div>
                                         </div>
                                     </template>
@@ -163,10 +266,19 @@
                                         @keydown="handleComposerKeydown"
                                     />
                                     <div class="ai-chat__composer-actions">
-                                        <el-button type="primary" size="small" :loading="aiGenerating" @click="handleSendChatPrompt">
+                                        <el-button
+                                            type="primary"
+                                            size="small"
+                                            :loading="aiGenerating"
+                                            @click="handleSendChatPrompt"
+                                        >
                                             发送
                                         </el-button>
-                                        <el-button size="small" :disabled="!chatMessages.length || aiGenerating" @click="clearChatMessages">
+                                        <el-button
+                                            size="small"
+                                            :disabled="!chatMessages.length || aiGenerating"
+                                            @click="clearChatMessages"
+                                        >
                                             清空
                                         </el-button>
                                     </div>
@@ -174,19 +286,39 @@
                                 <div class="ai-chat__apply-bar">
                                     <div class="ai-chat__apply-title">
                                         最近输出：{{ lastGenerateModeLabel }}
-                                        <el-tag v-if="aiGenerating" size="small" type="warning">生成中</el-tag>
+                                        <el-tag v-if="aiGenerating" size="small" type="warning"
+                                            >生成中</el-tag
+                                        >
                                     </div>
                                     <el-space wrap>
-                                        <el-button size="small" type="primary" :disabled="!hasDraft || aiGenerating" @click="applyAiDraft('replace')">
+                                        <el-button
+                                            size="small"
+                                            type="primary"
+                                            :disabled="!hasDraft || aiGenerating"
+                                            @click="applyAiDraft('replace')"
+                                        >
                                             替换全文
                                         </el-button>
-                                        <el-button size="small" type="success" :disabled="!hasDraft || aiGenerating" @click="applyAiDraft('append')">
+                                        <el-button
+                                            size="small"
+                                            type="success"
+                                            :disabled="!hasDraft || aiGenerating"
+                                            @click="applyAiDraft('append')"
+                                        >
                                             追加全文
                                         </el-button>
-                                        <el-button size="small" :disabled="!hasDraft || aiGenerating" @click="copyAiDraft">
+                                        <el-button
+                                            size="small"
+                                            :disabled="!hasDraft || aiGenerating"
+                                            @click="copyAiDraft"
+                                        >
                                             复制输出
                                         </el-button>
-                                        <el-button size="small" :disabled="!hasDraft || aiGenerating" @click="clearAiDraft">
+                                        <el-button
+                                            size="small"
+                                            :disabled="!hasDraft || aiGenerating"
+                                            @click="clearAiDraft"
+                                        >
                                             清空
                                         </el-button>
                                     </el-space>
@@ -196,16 +328,26 @@
                     </div>
 
                     <el-divider content-position="left">产品截图</el-divider>
-                    <el-form :model="editData" label-width="100px" style="max-width: 900px;">
+                    <el-form :model="editData" label-width="100px" style="max-width: 900px">
                         <el-form-item>
                             <template #label>
                                 <span>产品截图</span>
-                                <el-tooltip content="从素材中心选择产品截图，将在详情页展示为图片画廊" placement="top">
-                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                                <el-tooltip
+                                    content="从素材中心选择产品截图，将在详情页展示为图片画廊"
+                                    placement="top"
+                                >
+                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399"
+                                        ><QuestionFilled
+                                    /></el-icon>
                                 </el-tooltip>
                             </template>
                             <div style="width: 100%">
-                                <material-picker v-model="screenshotList" type="image" :limit="20" size="120px" />
+                                <material-picker
+                                    v-model="screenshotList"
+                                    type="image"
+                                    :limit="20"
+                                    size="120px"
+                                />
                             </div>
                         </el-form-item>
                     </el-form>
@@ -213,15 +355,32 @@
 
                 <!-- SEO 设置 -->
                 <el-tab-pane label="SEO" name="seo">
-                    <el-form :model="editData" label-width="100px" style="max-width: 800px;">
+                    <el-form :model="editData" label-width="100px" style="max-width: 800px">
                         <el-form-item label="SEO 标题">
-                            <el-input v-model="editData.seoTitle" placeholder="留空使用网站名称" maxlength="100" show-word-limit />
+                            <el-input
+                                v-model="editData.seoTitle"
+                                placeholder="留空使用网站名称"
+                                maxlength="100"
+                                show-word-limit
+                            />
                         </el-form-item>
                         <el-form-item label="SEO 描述">
-                            <el-input v-model="editData.seoDescription" type="textarea" :rows="3" placeholder="留空使用网站描述" maxlength="300" show-word-limit />
+                            <el-input
+                                v-model="editData.seoDescription"
+                                type="textarea"
+                                :rows="3"
+                                placeholder="留空使用网站描述"
+                                maxlength="300"
+                                show-word-limit
+                            />
                         </el-form-item>
                         <el-form-item label="SEO 关键词">
-                            <el-input v-model="editData.seoKeywords" placeholder="多个关键词用逗号分隔" maxlength="200" show-word-limit />
+                            <el-input
+                                v-model="editData.seoKeywords"
+                                placeholder="多个关键词用逗号分隔"
+                                maxlength="200"
+                                show-word-limit
+                            />
                         </el-form-item>
                     </el-form>
                 </el-tab-pane>
@@ -231,16 +390,32 @@
         <!-- 底部操作栏 -->
         <div class="website-edit-footer">
             <el-button @click="handleBack">取消</el-button>
-            <el-button type="primary" :loading="submitLoading" @click="handleSubmit">保存</el-button>
+            <el-button type="primary" :loading="submitLoading" @click="handleSubmit"
+                >保存</el-button
+            >
         </div>
 
         <!-- 缩略图素材选择器（隐藏触发器模式） -->
-        <material-picker ref="thumbnailPickerRef" type="image" :limit="1" hidden-upload @change="handleThumbnailSelect" />
+        <material-picker
+            ref="thumbnailPickerRef"
+            type="image"
+            :limit="1"
+            hidden-upload
+            @change="handleThumbnailSelect"
+        />
     </div>
 </template>
 
 <script lang="ts" setup name="uiedWebsiteEdit">
-import { uiedWebsiteAdd, uiedWebsiteEdit, uiedWebsiteDetail, uiedCategoryAll, uiedAiGenerateDetailContent, uiedAiChat, uiedSeoScraperFetch } from '@/api/uied'
+import {
+    uiedWebsiteAdd,
+    uiedWebsiteEdit,
+    uiedWebsiteDetail,
+    uiedCategoryAll,
+    uiedAiGenerateDetailContent,
+    uiedAiChat,
+    uiedSeoScraperFetch
+} from '@/api/uied'
 import feedback from '@/utils/feedback'
 import type { FormInstance, FormRules } from 'element-plus'
 import { QuestionFilled, MagicStick, FolderOpened } from '@element-plus/icons-vue'
@@ -249,7 +424,12 @@ import MaterialPicker from '@/components/material/picker.vue'
 
 type AiGenerateMode = 'replace' | 'append' | 'polish'
 type ChatRole = 'user' | 'assistant'
-interface ChatMessage { id: number; role: ChatRole; content: string; streaming?: boolean }
+interface ChatMessage {
+    id: number
+    role: ChatRole
+    content: string
+    streaming?: boolean
+}
 
 const route = useRoute()
 const router = useRouter()
@@ -277,13 +457,23 @@ const screenshotList = ref<string[]>([])
 
 // 表单数据
 const editData = reactive({
-    id: 0, name: '', slug: '', url: '',
+    id: 0,
+    name: '',
+    slug: '',
+    url: '',
     categoryId: '' as string | number,
-    description: '', iconUrl: '',
+    description: '',
+    iconUrl: '',
     tags: [] as string[],
-    sortOrder: 0, isActive: 1, isPinned: 0,
-    detailContent: '', visitBtnText: '', thumbnail: '',
-    seoTitle: '', seoDescription: '', seoKeywords: '',
+    sortOrder: 0,
+    isActive: 1,
+    isPinned: 0,
+    detailContent: '',
+    visitBtnText: '',
+    thumbnail: '',
+    seoTitle: '',
+    seoDescription: '',
+    seoKeywords: ''
 })
 
 const editRules: FormRules = {
@@ -307,7 +497,7 @@ const loadDetail = async (id: string | number) => {
         editData.iconUrl = data.iconUrl || data.icon_url || ''
         editData.tags = Array.isArray(data.tags) ? data.tags : []
         editData.sortOrder = data.order || data.sortOrder || data.sort || 0
-        editData.isActive = (data.isActive || data.status !== 'disabled') ? 1 : 0
+        editData.isActive = data.isActive || data.status !== 'disabled' ? 1 : 0
         editData.isPinned = data.isPinned ? 1 : 0
         editData.detailContent = data.detailContent || data.detail_content || ''
         editData.visitBtnText = data.visitBtnText || data.visit_btn_text || ''
@@ -327,25 +517,35 @@ const loadDetail = async (id: string | number) => {
 
 // ==================== 缩略图 ====================
 const thumbnailPickerRef = ref<InstanceType<typeof MaterialPicker>>()
-const openThumbnailPicker = () => { thumbnailPickerRef.value?.showPopup(-1) }
+const openThumbnailPicker = () => {
+    thumbnailPickerRef.value?.showPopup(-1)
+}
 const handleThumbnailSelect = (urls: string | string[]) => {
     const url = Array.isArray(urls) ? urls[0] : urls
     if (url) editData.thumbnail = url
 }
 const capturingThumbnail = ref(false)
 const handleCaptureThumbnail = async () => {
-    if (!editData.url) { feedback.msgWarning('请先填写网站URL'); return }
+    if (!editData.url) {
+        feedback.msgWarning('请先填写网站URL')
+        return
+    }
     capturingThumbnail.value = true
     try {
         editData.thumbnail = `https://image.thum.io/get/width/1280/crop/800/${editData.url}`
         feedback.msgSuccess('缩略图URL已生成')
-    } finally { capturingThumbnail.value = false }
+    } finally {
+        capturingThumbnail.value = false
+    }
 }
 
 // ==================== 获取图标 ====================
 const fetchingIcon = ref(false)
 const handleFetchIcon = async () => {
-    if (!editData.url) { feedback.msgWarning('请先填写网站URL'); return }
+    if (!editData.url) {
+        feedback.msgWarning('请先填写网站URL')
+        return
+    }
     fetchingIcon.value = true
     try {
         const res = await uiedSeoScraperFetch({ url: editData.url })
@@ -358,7 +558,9 @@ const handleFetchIcon = async () => {
         }
     } catch (error: any) {
         feedback.msgError(error?.msg || error?.message || '获取图标失败')
-    } finally { fetchingIcon.value = false }
+    } finally {
+        fetchingIcon.value = false
+    }
 }
 
 // ==================== AI 对话助手 ====================
@@ -380,7 +582,8 @@ const lastGenerateModeLabel = computed(() => {
 // 滚动到底部
 const scrollChatToBottom = () => {
     nextTick(() => {
-        if (chatMessagesRef.value) chatMessagesRef.value.scrollTop = chatMessagesRef.value.scrollHeight
+        if (chatMessagesRef.value)
+            chatMessagesRef.value.scrollTop = chatMessagesRef.value.scrollHeight
     })
 }
 
@@ -395,8 +598,13 @@ const appendChatMessage = (role: ChatRole, content: string, streaming = false) =
 
 // 停止流式输出
 const stopStream = () => {
-    if (streamTimer.value !== null) { window.clearInterval(streamTimer.value); streamTimer.value = null }
-    chatMessages.value.forEach(m => { if (m.streaming) m.streaming = false })
+    if (streamTimer.value !== null) {
+        window.clearInterval(streamTimer.value)
+        streamTimer.value = null
+    }
+    chatMessages.value.forEach((m) => {
+        if (m.streaming) m.streaming = false
+    })
 }
 
 // 流式输出效果
@@ -404,35 +612,64 @@ const startStreamReply = (fullText: string) => {
     stopStream()
     const text = fullText.trim()
     const msg = appendChatMessage('assistant', '', true)
-    if (!text) { msg.streaming = false; return Promise.resolve() }
+    if (!text) {
+        msg.streaming = false
+        return Promise.resolve()
+    }
     const total = text.length
     const chunkSize = Math.max(1, Math.ceil(total / 100))
     let cursor = 0
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve) => {
         streamTimer.value = window.setInterval(() => {
             cursor = Math.min(total, cursor + chunkSize)
             msg.content = text.slice(0, cursor)
             scrollChatToBottom()
-            if (cursor >= total) { msg.streaming = false; stopStream(); resolve() }
+            if (cursor >= total) {
+                msg.streaming = false
+                stopStream()
+                resolve()
+            }
         }, 20)
     })
 }
 
-const clearChatMessages = () => { stopStream(); chatMessages.value = [] }
-const clearAiDraft = () => { aiDraftText.value = '' }
+const clearChatMessages = () => {
+    stopStream()
+    chatMessages.value = []
+}
+const clearAiDraft = () => {
+    aiDraftText.value = ''
+}
 
 // 纯文本转 HTML
 const plainTextToHtml = (text: string) => {
     if (!text.trim()) return ''
-    const escape = (s: string) => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] || c))
-    return text.split(/\n{2,}/).map(b => `<p>${escape(b).replace(/\n/g, '<br/>')}</p>`).join('')
+    const escape = (s: string) =>
+        s.replace(
+            /[&<>"']/g,
+            (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] || c)
+        )
+    return text
+        .split(/\n{2,}/)
+        .map((b) => `<p>${escape(b).replace(/\n/g, '<br/>')}</p>`)
+        .join('')
 }
 
 // 富文本转纯文本
-const toPlainText = (html: string) => (html || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()
+const toPlainText = (html: string) =>
+    (html || '')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
 
 // 清理 Markdown 围栏
-const normalizeDraft = (text: string) => (text || '').replace(/\r\n/g, '\n').replace(/```[\w-]*\n?/g, '').replace(/```/g, '').trim()
+const normalizeDraft = (text: string) =>
+    (text || '')
+        .replace(/\r\n/g, '\n')
+        .replace(/```[\w-]*\n?/g, '')
+        .replace(/```/g, '')
+        .trim()
 
 // 构建 AI 提示
 const buildPrompt = (mode: AiGenerateMode, userPrompt = '') => {
@@ -461,7 +698,10 @@ const requestAiDraft = async (mode: AiGenerateMode, userPrompt = '') => {
     const res = await uiedAiChat({ message, context: '网站详情内容编辑' })
     const reply = res?.reply || res?.content || res?.data?.reply || ''
     const draft = normalizeDraft(reply)
-    if (!draft) { feedback.msgWarning('AI 未返回可用结果，请调整后重试'); return '' }
+    if (!draft) {
+        feedback.msgWarning('AI 未返回可用结果，请调整后重试')
+        return ''
+    }
     aiDraftText.value = draft
     lastGenerateMode.value = mode
     await startStreamReply(draft)
@@ -470,7 +710,11 @@ const requestAiDraft = async (mode: AiGenerateMode, userPrompt = '') => {
 
 // 快捷生成
 const handleAiGenerate = async (mode: AiGenerateMode) => {
-    const labels: Record<AiGenerateMode, string> = { replace: '请生成完整正文', append: '请续写正文', polish: '请润色正文' }
+    const labels: Record<AiGenerateMode, string> = {
+        replace: '请生成完整正文',
+        append: '请续写正文',
+        polish: '请润色正文'
+    }
     appendChatMessage('user', labels[mode])
     aiGenerating.value = true
     try {
@@ -478,14 +722,23 @@ const handleAiGenerate = async (mode: AiGenerateMode) => {
         if (draft) feedback.msgSuccess('AI 已返回结果')
     } catch (error: any) {
         feedback.msgError(error?.msg || error?.message || 'AI 处理失败')
-    } finally { aiGenerating.value = false }
+    } finally {
+        aiGenerating.value = false
+    }
 }
 
 // 发送自定义指令
 const handleSendChatPrompt = async () => {
     const prompt = chatPrompt.value.trim()
-    if (!prompt) { feedback.msgWarning('请输入处理诉求'); return }
-    const mode: AiGenerateMode = /续写|扩写/.test(prompt) ? 'append' : /润色|优化|改写/.test(prompt) ? 'polish' : 'replace'
+    if (!prompt) {
+        feedback.msgWarning('请输入处理诉求')
+        return
+    }
+    const mode: AiGenerateMode = /续写|扩写/.test(prompt)
+        ? 'append'
+        : /润色|优化|改写/.test(prompt)
+        ? 'polish'
+        : 'replace'
     appendChatMessage('user', prompt)
     chatPrompt.value = ''
     aiGenerating.value = true
@@ -494,18 +747,27 @@ const handleSendChatPrompt = async () => {
         if (draft) feedback.msgSuccess('AI 已返回结果')
     } catch (error: any) {
         feedback.msgError(error?.msg || error?.message || 'AI 处理失败')
-    } finally { aiGenerating.value = false }
+    } finally {
+        aiGenerating.value = false
+    }
 }
 
 // 键盘快捷发送
-const handleComposerKeydown = (event: KeyboardEvent) => {
-    if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); handleSendChatPrompt() }
+const handleComposerKeydown = (event: Event | KeyboardEvent) => {
+    const keyboardEvent = event as KeyboardEvent
+    if (keyboardEvent.key === 'Enter' && !keyboardEvent.shiftKey) {
+        keyboardEvent.preventDefault()
+        handleSendChatPrompt()
+    }
 }
 
 // 应用 AI 草稿
 const applyAiDraft = (mode: 'replace' | 'append') => {
     const draft = aiDraftText.value.trim()
-    if (!draft) { feedback.msgWarning('没有可用的 AI 草稿'); return }
+    if (!draft) {
+        feedback.msgWarning('没有可用的 AI 草稿')
+        return
+    }
     const html = plainTextToHtml(draft)
     if (mode === 'append' && editData.detailContent.trim()) {
         editData.detailContent = `${editData.detailContent}<p><br/></p>${html}`
@@ -522,7 +784,9 @@ const copyAiDraft = async () => {
     try {
         await navigator.clipboard.writeText(draft)
         feedback.msgSuccess('已复制到剪贴板')
-    } catch { feedback.msgError('复制失败') }
+    } catch {
+        feedback.msgError('复制失败')
+    }
 }
 
 // ==================== 提交保存 ====================
@@ -531,7 +795,12 @@ const handleSubmit = async () => {
     submitLoading.value = true
     try {
         const screenshots = screenshotList.value.filter((url: string) => url?.trim())
-        const submitData = { ...editData, screenshots, thumbnail: editData.thumbnail || null, order: editData.sortOrder }
+        const submitData = {
+            ...editData,
+            screenshots,
+            thumbnail: editData.thumbnail || null,
+            order: editData.sortOrder
+        }
         if (editData.id) {
             await uiedWebsiteEdit(submitData)
             feedback.msgSuccess('编辑成功')
@@ -542,10 +811,14 @@ const handleSubmit = async () => {
         handleBack()
     } catch (error: any) {
         feedback.msgError(error?.msg || error?.message || '保存失败')
-    } finally { submitLoading.value = false }
+    } finally {
+        submitLoading.value = false
+    }
 }
 
-const handleBack = () => { router.back() }
+const handleBack = () => {
+    router.back()
+}
 
 // AI 悬浮菜单事件（编辑器选中文本 → AI 改写）
 const aiRewriting = ref(false)
@@ -559,10 +832,15 @@ const handleAiHover = async (e: Event) => {
             context: '网站详情内容编辑'
         })
         const newText = res?.reply || res?.content || res?.data?.reply
-        if (newText && ed) { ed.insertText(newText); feedback.msgSuccess('AI 改写完成') }
+        if (newText && ed) {
+            ed.insertText(newText)
+            feedback.msgSuccess('AI 改写完成')
+        }
     } catch (error: any) {
         feedback.msgError(error?.msg || 'AI 改写失败')
-    } finally { aiRewriting.value = false }
+    } finally {
+        aiRewriting.value = false
+    }
 }
 
 onMounted(async () => {
@@ -704,8 +982,14 @@ onBeforeUnmount(() => {
 }
 
 @keyframes ai-cursor-blink {
-    0%, 45% { opacity: 1; }
-    46%, 100% { opacity: 0; }
+    0%,
+    45% {
+        opacity: 1;
+    }
+    46%,
+    100% {
+        opacity: 0;
+    }
 }
 
 @media (max-width: 1400px) {

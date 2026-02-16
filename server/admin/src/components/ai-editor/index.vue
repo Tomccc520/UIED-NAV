@@ -224,9 +224,9 @@
 </template>
 
 <script lang="ts" setup>
-import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { aiEditorGenerate } from '@/api/ai/editor'
 import feedback from '@/utils/feedback'
+import { fetchEventSource, type FetchEventSourceMessage } from '@/utils/fetchEventSourceCompat'
 import useUserStore from '@/stores/modules/user'
 
 type AiGenerateMode = 'replace' | 'append' | 'polish'
@@ -417,7 +417,7 @@ const requestEditorStream = async (
             ...params,
             stream: true
         }),
-        async onopen(response) {
+        async onopen(response: Response) {
             const contentType = String(response.headers.get('content-type') || '')
             if (response.ok && contentType.includes('text/event-stream')) {
                 return
@@ -428,26 +428,32 @@ const requestEditorStream = async (
             }
             throw new Error('流式连接失败')
         },
-        onmessage(event) {
+        onmessage(event: FetchEventSourceMessage) {
             if (!event.data || event.data === '[DONE]') return
             try {
                 const payload = JSON.parse(event.data)
                 const delta = payload?.choices?.[0]?.delta || {}
                 const contentRaw = delta?.content
                 const reasoningRaw = delta?.reasoning_content
-                const normalizeChunk = (value: any) => {
+                const normalizeChunk = (value: unknown) => {
                     if (!value) return ''
                     if (typeof value === 'string') return value
                     if (Array.isArray(value)) {
                         return value
                             .map((item) => {
                                 if (typeof item === 'string') return item
-                                if (typeof item?.text === 'string') return item.text
+                                if (typeof item === 'object' && item !== null && 'text' in item) {
+                                    const maybeText = (item as { text?: unknown }).text
+                                    if (typeof maybeText === 'string') return maybeText
+                                }
                                 return ''
                             })
                             .join('')
                     }
-                    if (typeof value?.text === 'string') return value.text
+                    if (typeof value === 'object' && value !== null && 'text' in value) {
+                        const maybeText = (value as { text?: unknown }).text
+                        if (typeof maybeText === 'string') return maybeText
+                    }
                     return ''
                 }
                 const content = normalizeChunk(contentRaw)
@@ -457,11 +463,11 @@ const requestEditorStream = async (
                     chunkCount += 1
                     onChunk(chunkText)
                 }
-            } catch (error) {
+            } catch (error: unknown) {
                 console.warn('editor stream parse error:', error)
             }
         },
-        onerror(error) {
+        onerror(error: unknown) {
             if (error instanceof Error) {
                 throw error
             }
@@ -710,10 +716,11 @@ const handleSendChatPrompt = async () => {
 /**
  * 处理输入区快捷发送
  */
-const handleComposerKeydown = (event: KeyboardEvent) => {
-    if (event.key !== 'Enter') return
-    if (event.shiftKey) return
-    event.preventDefault()
+const handleComposerKeydown = (event: Event | KeyboardEvent) => {
+    const keyboardEvent = event as KeyboardEvent
+    if (keyboardEvent.key !== 'Enter') return
+    if (keyboardEvent.shiftKey) return
+    keyboardEvent.preventDefault()
     handleSendChatPrompt()
 }
 

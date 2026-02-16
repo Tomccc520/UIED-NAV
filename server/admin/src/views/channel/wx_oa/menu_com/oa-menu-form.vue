@@ -54,6 +54,7 @@ const emit = defineEmits([
     'update:menuType',
     'update:visitType',
     'update:url',
+    'update:appId',
     'update:pagePath'
 ])
 

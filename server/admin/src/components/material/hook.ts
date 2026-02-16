@@ -98,6 +98,8 @@ export function useFile(
     const tableRef = shallowRef()
     const listShowType = ref('normal')
     const moveId = ref(0)
+    const canViewUploader = ref(false)
+    const canViewAll = ref(false)
     const select = ref<any[]>([])
     const isCheckAll = ref(false)
     const isIndeterminate = ref(false)
@@ -106,18 +108,28 @@ export function useFile(
         type: type,
         cid: cateId
     })
-    const { pager, getLists, resetPage } = usePaging({
+    const { pager, getLists } = usePaging({
         fetchFun: fileList,
         params: fileParams,
         firstLoading: true,
         size
     })
 
-    const getFileList = () => {
-        getLists()
+    /**
+     * 获取文件列表并同步后端返回的可见性能力标记
+     */
+    const getFileList = async () => {
+        const data = await getLists()
+        canViewUploader.value = Boolean(data?.canViewUploader)
+        canViewAll.value = Boolean(data?.canViewAll)
     }
+
+    /**
+     * 刷新文件列表并重置到第一页
+     */
     const refresh = () => {
-        resetPage()
+        pager.page = 1
+        getFileList()
     }
 
     const isSelect = (id: number) => {
@@ -194,6 +206,8 @@ export function useFile(
         select,
         isCheckAll,
         isIndeterminate,
+        canViewUploader,
+        canViewAll,
         getFileList,
         refresh,
         batchFileDelete,

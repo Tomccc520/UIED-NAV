@@ -1,4 +1,4 @@
-import { reactive, toRaw } from 'vue'
+import { computed, reactive, toRaw } from 'vue'
 
 // 分页钩子函数
 interface Options {
@@ -21,6 +21,12 @@ export function usePaging(options: Options) {
         count: 0,
         lists: [] as any[]
     })
+
+    /**
+     * 兼容历史页面直接解构 lists/loading 的写法
+     */
+    const lists = computed(() => pager.lists)
+    const loading = computed(() => pager.loading)
     // 请求分页接口
     const getLists = () => {
         pager.loading = true
@@ -55,6 +61,8 @@ export function usePaging(options: Options) {
     }
     return {
         pager,
+        lists,
+        loading,
         getLists,
         resetParams,
         resetPage
