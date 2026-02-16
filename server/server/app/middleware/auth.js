@@ -198,6 +198,8 @@ module.exports = options => {
       'article:comment:manage:mute:list': [ 'article:comment:manage:list' ],
       'article:comment:manage:mute:add': [ 'article:comment:manage:change' ],
       'article:comment:manage:mute:del': [ 'article:comment:manage:del' ],
+      // 内容管理：作者下拉接口复用文章编辑权限
+      'user:author:options': [ 'article:edit', 'article:add', 'article:list' ],
     };
     if (perms.some(item => item && (auths === item || auths.startsWith(item + ':')))) {
       return true;

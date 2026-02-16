@@ -1,3 +1,11 @@
+<!--
+/**
+ * @copyright Tomda (https://www.tomda.top)
+ * @copyright UIED技术团队 (https://fsuied.com)
+ * @author UIED技术团队
+ * @createDate 2026-02-16
+ */
+-->
 <template>
     <div class="article-lists">
         <el-card class="!border-none" shadow="never">
@@ -36,19 +44,17 @@
         </el-card>
         <el-card class="!border-none mt-4" shadow="never">
             <div>
-                <router-link
+                <el-button
                     v-perms="['article:add', 'article:add/edit']"
-                    :to="{
-                        path: getRoutePath('article:add/edit')
-                    }"
+                    type="primary"
+                    class="mb-4"
+                    @click="handleCreate"
                 >
-                    <el-button type="primary" class="mb-4">
-                        <template #icon>
-                            <icon name="el-icon-Plus" />
-                        </template>
-                        发布文章
-                    </el-button>
-                </router-link>
+                    <template #icon>
+                        <icon name="el-icon-Plus" />
+                    </template>
+                    发布文章
+                </el-button>
             </div>
             <el-table size="large" v-loading="pager.loading" :data="pager.lists">
                 <el-table-column label="ID" prop="id" min-width="80" />
@@ -77,7 +83,7 @@
                 <el-table-column label="状态" min-width="100">
                     <template #default="{ row }">
                         <el-switch
-                            v-perms="['article:cate:change']"
+                            v-perms="['article:change']"
                             v-model="row.isShow"
                             :active-value="1"
                             :inactive-value="0"
@@ -89,17 +95,13 @@
                 <el-table-column label="发布时间" prop="createTime" min-width="120" />
                 <el-table-column label="操作" width="120" fixed="right">
                     <template #default="{ row }">
-                        <el-button v-perms="['article:edit','article:add/edit']" type="primary" link>
-                            <router-link
-                                :to="{
-                                    path: getRoutePath('article:add/edit'),
-                                    query: {
-                                        id: row.id
-                                    }
-                                }"
-                            >
-                                编辑
-                            </router-link>
+                        <el-button
+                            v-perms="['article:edit', 'article:add/edit']"
+                            type="primary"
+                            link
+                            @click="handleEdit(row.id)"
+                        >
+                            编辑
                         </el-button>
                         <el-button
                             v-perms="['article:del']"
@@ -124,11 +126,13 @@ import { useDictOptions } from '@/hooks/useDictOptions'
 import { usePaging } from '@/hooks/usePaging'
 import { getRoutePath } from '@/router'
 import feedback from '@/utils/feedback'
+
 const queryParams = reactive({
     title: '',
     cid: '',
     isShow: ''
 })
+const router = useRouter()
 
 const { pager, getLists, resetPage, resetParams } = usePaging({
     fetchFun: articleLists,
@@ -143,6 +147,41 @@ const { optionsData } = useDictOptions<{
     }
 })
 
+/**
+ * 解析文章编辑路由，优先使用动态菜单路由，缺失时使用兜底路径
+ */
+const resolveEditPath = () => getRoutePath('article:add/edit') || '/article-manage/article/add/edit'
+
+/**
+ * 跳转到文章发布页
+ */
+const handleCreate = async () => {
+    const path = resolveEditPath()
+    if (!path) {
+        feedback.msgError('未找到文章编辑路由，请在角色权限中授权 article:add/edit')
+        return
+    }
+    await router.push({ path })
+}
+
+/**
+ * 跳转到文章编辑页
+ */
+const handleEdit = async (id: number) => {
+    const path = resolveEditPath()
+    if (!path) {
+        feedback.msgError('未找到文章编辑路由，请在角色权限中授权 article:add/edit')
+        return
+    }
+    await router.push({
+        path,
+        query: { id }
+    })
+}
+
+/**
+ * 修改文章显示状态
+ */
 const changeStatus = async (id: number) => {
     try {
         await articleStatus({ id })
@@ -153,6 +192,9 @@ const changeStatus = async (id: number) => {
     }
 }
 
+/**
+ * 删除文章
+ */
 const handleDelete = async (id: number) => {
     await feedback.confirm('确定要删除？')
     await articleDelete({ id })
