@@ -2654,6 +2654,186 @@ class ArticleService extends Service {
   }
 
   /**
+   * 生成文章管理测试数据（用于联调与演示）
+   * 说明：
+   * 1. 自动补齐基础分类/标签/专题（不存在则创建）
+   * 2. 批量写入测试文章，并关联标签与专题
+   * 3. 不依赖前台用户表，作者字段直接写入展示名称
+   */
+  async seedTestData(params = {}) {
+    const { ctx } = this;
+    await this.ensureArticleReviewColumns();
+    await this.ensureTagAndTopicSlugColumns();
+
+    const count = Math.max(1, Math.min(50, Number(params.count || 12)));
+    const now = Math.floor(Date.now() / 1000);
+    const seedPrefix = Number(params.prefixTs || now);
+
+    const categoryTemplates = [ 'AI设计', '产品运营', '效率工具' ];
+    const tagTemplates = [ 'AI', '教程', '实战', '导航', '效率', '产品' ];
+    const topicTemplates = [
+      { name: '售卖版上线指南', intro: '围绕可配置主题系统的上线实践与经验沉淀。' },
+      { name: '内容增长实践', intro: '聚焦内容分发、SEO 与转化优化。' },
+      { name: '前后端规范收敛', intro: '沉淀模块化规范与可维护工程实践。' },
+    ];
+
+    /**
+     * 获取或创建文章分类
+     */
+    const ensureCategory = async (name, sort) => {
+      const exists = await ctx.model.ArticleCategory.findOne({
+        where: { name, is_delete: 0 },
+        attributes: [ 'id', 'name' ],
+      });
+      if (exists) return exists;
+      return ctx.model.ArticleCategory.create({
+        name,
+        sort,
+        is_show: 1,
+        is_delete: 0,
+        create_time: now,
+        update_time: now,
+      });
+    };
+
+    /**
+     * 获取或创建文章标签
+     */
+    const ensureTag = async (name, sort) => {
+      const exists = await ctx.model.ArticleTag.findOne({
+        where: { name, is_delete: 0 },
+        attributes: [ 'id', 'name', 'slug' ],
+      });
+      if (exists) return exists;
+      const slug = await this.resolveUniqueSlug(ctx.model.ArticleTag, {
+        rawSlug: '',
+        name,
+        prefix: 'tag',
+      });
+      return ctx.model.ArticleTag.create({
+        name,
+        slug,
+        sort,
+        is_show: 1,
+        is_delete: 0,
+        create_time: now,
+        update_time: now,
+      });
+    };
+
+    /**
+     * 获取或创建文章专题
+     */
+    const ensureTopic = async (name, intro, sort) => {
+      const exists = await ctx.model.ArticleTopic.findOne({
+        where: { name, is_delete: 0 },
+        attributes: [ 'id', 'name', 'slug' ],
+      });
+      if (exists) return exists;
+      const slug = await this.resolveUniqueSlug(ctx.model.ArticleTopic, {
+        rawSlug: '',
+        name,
+        prefix: 'topic',
+      });
+      return ctx.model.ArticleTopic.create({
+        name,
+        slug,
+        intro,
+        image: '',
+        sort,
+        is_show: 1,
+        is_delete: 0,
+        create_time: now,
+        update_time: now,
+      });
+    };
+
+    const categories = [];
+    for (let i = 0; i < categoryTemplates.length; i += 1) {
+      const row = await ensureCategory(categoryTemplates[i], 999 - i);
+      categories.push(row);
+    }
+
+    const tags = [];
+    for (let i = 0; i < tagTemplates.length; i += 1) {
+      const row = await ensureTag(tagTemplates[i], 999 - i);
+      tags.push(row);
+    }
+
+    const topics = [];
+    for (let i = 0; i < topicTemplates.length; i += 1) {
+      const row = await ensureTopic(
+        topicTemplates[i].name,
+        topicTemplates[i].intro,
+        999 - i
+      );
+      topics.push(row);
+    }
+
+    const createdIds = [];
+    for (let i = 0; i < count; i += 1) {
+      const category = categories[i % categories.length];
+      const topic = topics[i % topics.length];
+      const tagA = tags[i % tags.length];
+      const tagB = tags[(i + 2) % tags.length];
+      const chosenTagIds = Array.from(new Set([
+        Number(tagA?.id || 0),
+        Number(tagB?.id || 0),
+      ].filter(Boolean)));
+      const isShow = i % 4 === 0 ? 0 : 1;
+      const reviewStatus = isShow === 1 ? 2 : 0;
+      const articleIndex = i + 1;
+      const title = `测试文章 ${seedPrefix}-${articleIndex}`;
+      const intro = `这是用于联调的测试简介（第 ${articleIndex} 篇），可用于列表筛选与详情展示验证。`;
+      const summary = `测试摘要 ${articleIndex}：覆盖分类、标签、专题、发布状态与审核状态。`;
+      const content = [
+        `<h2>${title}</h2>`,
+        '<p>该内容由系统自动生成，用于文章管理页面联调。</p>',
+        `<p>所属栏目：${String(category?.name || '-')}</p>`,
+        `<p>关联标签：${chosenTagIds.map(id => {
+          const row = tags.find(item => Number(item.id || 0) === id);
+          return String(row?.name || '');
+        }).filter(Boolean).join('、') || '-'}</p>`,
+        `<p>所属专题：${String(topic?.name || '-')}</p>`,
+        '<blockquote>你可以直接编辑此文，验证编辑器、AI 助手、发布流程与前台展示。</blockquote>',
+      ].join('');
+
+      const row = await ctx.model.Article.create({
+        cid: Number(category?.id || 0),
+        title,
+        intro,
+        summary,
+        image: '',
+        content,
+        author: `测试作者${(i % 3) + 1}`,
+        visit: 20 + i * 3,
+        sort: 999 - i,
+        is_show: isShow,
+        review_status: reviewStatus,
+        review_remark: '',
+        review_time: reviewStatus === 2 ? now : 0,
+        review_admin_id: reviewStatus === 2 ? Number(ctx.session[reqAdminIdKey] || 0) : 0,
+        is_delete: 0,
+        create_time: now + i,
+        update_time: now + i,
+      });
+      const articleId = Number(row?.id || 0);
+      if (!articleId) continue;
+      createdIds.push(articleId);
+      await this.saveArticleTagRelations(articleId, chosenTagIds);
+      await this.saveArticleTopicRelation(articleId, Number(topic?.id || 0));
+    }
+
+    return {
+      created: createdIds.length,
+      articleIds: createdIds,
+      categoryCount: categories.length,
+      tagCount: tags.length,
+      topicCount: topics.length,
+    };
+  }
+
+  /**
    * 官网前台投稿文章（写入内容管理，默认待发布）
    */
   async frontAdd(params = {}) {

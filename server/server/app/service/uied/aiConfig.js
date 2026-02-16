@@ -14,6 +14,146 @@ const Service = require('egg').Service;
 
 class AiConfigService extends Service {
   /**
+   * 获取提供商默认聊天接口地址
+   * @param {string} provider - 提供商标识
+   * @return {string} 默认 chat completions 地址
+   */
+  resolveProviderDefaultApiUrl(provider = '') {
+    const key = String(provider || '').trim().toLowerCase();
+    const defaultMap = {
+      openai: 'https://api.openai.com/v1/chat/completions',
+      deepseek: 'https://api.deepseek.com/v1/chat/completions',
+      siliconflow: 'https://api.siliconflow.cn/v1/chat/completions',
+      moonshot: 'https://api.moonshot.cn/v1/chat/completions',
+      kimi: 'https://api.moonshot.cn/v1/chat/completions',
+      qwen: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
+      glm: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
+      ollama: 'http://127.0.0.1:11434/v1/chat/completions',
+    };
+    return defaultMap[key] || defaultMap.siliconflow;
+  }
+
+  /**
+   * 获取提供商默认模型
+   * @param {string} provider - 提供商标识
+   * @return {string} 默认模型
+   */
+  resolveProviderDefaultModel(provider = '') {
+    const key = String(provider || '').trim().toLowerCase();
+    const modelMap = {
+      openai: 'gpt-4o-mini',
+      deepseek: 'deepseek-chat',
+      siliconflow: 'deepseek-ai/DeepSeek-V3',
+      moonshot: 'moonshot-v1-8k',
+      kimi: 'moonshot-v1-8k',
+      qwen: 'qwen-plus',
+      glm: 'glm-4-flash',
+      ollama: 'qwen2.5:7b',
+    };
+    return modelMap[key] || modelMap.siliconflow;
+  }
+
+  /**
+   * 规范化聊天接口地址
+   * 兼容只填域名、只填 /v1 的场景，自动补全到 /chat/completions
+   * @param {string} provider - 提供商标识
+   * @param {string} rawUrl - 原始地址
+   * @return {string} 可直接调用的 chat completions 地址
+   */
+  resolveChatApiUrl(provider = '', rawUrl = '') {
+    const input = String(rawUrl || '').trim();
+    const fallback = this.resolveProviderDefaultApiUrl(provider);
+    if (!input) return fallback;
+    if (/\/chat\/completions\/?$/i.test(input)) {
+      return input.replace(/\/+$/, '');
+    }
+    const normalized = input.replace(/\/+$/, '');
+    if (/\/v\d+$/i.test(normalized)) {
+      return `${normalized}/chat/completions`;
+    }
+    if (/^https?:\/\//i.test(normalized) && !/\/v\d+\//i.test(normalized)) {
+      return `${normalized}/v1/chat/completions`;
+    }
+    return `${normalized}/chat/completions`;
+  }
+
+  /**
+   * 规范化模型名称
+   * @param {string} provider - 提供商标识
+   * @param {string} model - 原始模型
+   * @return {string} 可用模型名称
+   */
+  resolveChatModel(provider = '', model = '') {
+    const value = String(model || '').trim();
+    if (value) return value;
+    return this.resolveProviderDefaultModel(provider);
+  }
+
+  /**
+   * 获取所有已启用 AI 配置（默认配置优先）
+   * @return {Promise<Array<{id:number,name:string,provider:string,apiUrl:string,apiKey:string,model:string,isDefault:boolean}>>}
+   */
+  async getEnabledConfigs() {
+    const { app } = this;
+    const rows = await app.model.query(
+      'SELECT * FROM uied_ai_config WHERE is_enabled = 1 ORDER BY is_default DESC, id DESC',
+      { type: app.Sequelize.QueryTypes.SELECT }
+    );
+    return (rows || []).map(item => ({
+      id: Number(item.id || 0),
+      name: String(item.name || ''),
+      provider: String(item.provider || ''),
+      apiUrl: String(item.api_url || ''),
+      apiKey: String(item.api_key || ''),
+      model: String(item.model || ''),
+      isDefault: Number(item.is_default || 0) === 1,
+    }));
+  }
+
+  /**
+   * 判断错误是否为连接类问题
+   * @param {Error|any} error - 异常对象
+   * @return {boolean} 是否连接类错误
+   */
+  isNetworkError(error) {
+    const text = String(error?.message || error || '').toLowerCase();
+    return (
+      text.includes('connect timeout') ||
+      text.includes('socket hang up') ||
+      text.includes('econnrefused') ||
+      text.includes('enotfound') ||
+      text.includes('timed out') ||
+      text.includes('network error')
+    );
+  }
+
+  /**
+   * 将 AI 异常转换为更可读的中文提示
+   * @param {Error|any} error - 原始异常
+   * @param {Array<{name:string,provider:string}>} configs - 已尝试的配置列表
+   * @return {string} 可读错误文案
+   */
+  formatChatError(error, configs = []) {
+    const message = String(error?.message || error || '').trim();
+    const configHint = configs.length
+      ? `已尝试配置：${configs.map(item => `${item.name || '未命名'}(${item.provider || 'unknown'})`).join('、')}`
+      : '请检查 AI 助手配置';
+    if (!message) {
+      return `AI 对话失败。${configHint}`;
+    }
+    if (this.isNetworkError(error)) {
+      return `AI 处理失败：连接超时或网络不可达。${configHint}`;
+    }
+    if (/401|unauthorized|invalid api key/i.test(message)) {
+      return `AI 处理失败：API Key 无效或已失效。${configHint}`;
+    }
+    if (/429|rate limit|too many requests/i.test(message)) {
+      return `AI 处理失败：请求过于频繁，请稍后重试。${configHint}`;
+    }
+    return `AI 处理失败：${message}`;
+  }
+
+  /**
    * 获取所有 AI 配置
    */
   async list() {
@@ -177,10 +317,10 @@ class AiConfigService extends Service {
     if (!config) {
       return {
         enabled: false,
-        provider: 'openai',
+        provider: 'siliconflow',
         apiKey: '',
-        apiUrl: '',
-        model: 'gpt-3.5-turbo',
+        apiUrl: 'https://api.siliconflow.cn/v1/chat/completions',
+        model: 'deepseek-ai/DeepSeek-V3',
         maxTokens: 2000,
         temperature: 0.7,
       };
@@ -219,10 +359,10 @@ class AiConfigService extends Service {
          WHERE id = ?`,
         {
           replacements: [
-            data.provider || 'openai',
+            data.provider || 'siliconflow',
             data.apiUrl || '',
             data.apiKey || '',
-            data.model || 'gpt-3.5-turbo',
+            data.model || this.resolveProviderDefaultModel(data.provider || 'siliconflow'),
             data.enabled ? 1 : 0,
             now,
             existing.id,
@@ -239,10 +379,10 @@ class AiConfigService extends Service {
       {
         replacements: [
           'default',
-          data.provider || 'openai',
+          data.provider || 'siliconflow',
           data.apiUrl || '',
           data.apiKey || '',
-          data.model || 'gpt-3.5-turbo',
+          data.model || this.resolveProviderDefaultModel(data.provider || 'siliconflow'),
           data.enabled ? 1 : 0,
           now,
           now,
@@ -265,13 +405,14 @@ class AiConfigService extends Service {
     }
 
     try {
-      const testUrl = apiUrl || 'https://api.openai.com/v1/chat/completions';
+      const testUrl = this.resolveChatApiUrl(provider, apiUrl);
+      const testModel = this.resolveChatModel(provider, '');
 
       const response = await ctx.curl(testUrl, {
         method: 'POST',
         contentType: 'json',
         data: {
-          model: 'gpt-3.5-turbo',
+          model: testModel,
           messages: [{ role: 'user', content: 'Hello' }],
           max_tokens: 5,
         },
@@ -320,6 +461,8 @@ class AiConfigService extends Service {
     if (!config) {
       throw new Error('没有可用的 AI 配置，请先在系统设置中配置 AI');
     }
+    const requestUrl = this.resolveChatApiUrl(config.provider, config.apiUrl);
+    const requestModel = this.resolveChatModel(config.provider, config.model);
 
     // 构建提示词
     const prompt = `请根据以下网站URL，生成网站的相关信息。请直接返回JSON格式，不要有其他内容。
@@ -338,11 +481,11 @@ class AiConfigService extends Service {
 
     try {
       // 调用 AI API
-      const response = await ctx.curl(config.apiUrl, {
+      const response = await ctx.curl(requestUrl, {
         method: 'POST',
         contentType: 'json',
         data: {
-          model: config.model,
+          model: requestModel,
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.7,
           max_tokens: 500,
@@ -667,6 +810,8 @@ class AiConfigService extends Service {
     if (!config) {
       throw new Error('没有可用的 AI 配置，请先在系统设置中配置 AI');
     }
+    const requestUrl = this.resolveChatApiUrl(config.provider, config.apiUrl);
+    const requestModel = this.resolveChatModel(config.provider, config.model);
 
     const tags = website.tags ? (() => { try { return JSON.parse(website.tags); } catch (error) { return []; } })() : [];
 
@@ -687,11 +832,11 @@ class AiConfigService extends Service {
     const startTime = Date.now();
 
     try {
-      const response = await ctx.curl(config.apiUrl, {
+      const response = await ctx.curl(requestUrl, {
         method: 'POST',
         contentType: 'json',
         data: {
-          model: config.model,
+          model: requestModel,
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.7,
           max_tokens: 2000,
@@ -756,89 +901,125 @@ class AiConfigService extends Service {
    */
   async chat(message, context = []) {
     const { ctx } = this;
-
-    const config = await this.getDefault();
-    if (!config) {
+    const enabledConfigs = await this.getEnabledConfigs();
+    if (!enabledConfigs.length) {
       throw new Error('没有可用的 AI 配置');
     }
+    const availableConfigs = enabledConfigs.filter(item => String(item.apiKey || '').trim());
+    if (!availableConfigs.length) {
+      throw new Error('AI 配置缺少 API Key，请先在后台 AI 助手管理中补全并启用配置');
+    }
+    const safeMessage = String(message || '').trim();
+    if (!safeMessage) {
+      throw new Error('请提供消息内容');
+    }
+    const safeContext = Array.isArray(context)
+      ? context
+        .map(item => ({
+          role: String(item?.role || '').trim(),
+          content: String(item?.content || '').trim(),
+        }))
+        .filter(item => [ 'system', 'user', 'assistant' ].includes(item.role) && item.content)
+        .slice(-6)
+      : [];
 
     const systemPrompt = '你是 UIED 设计导航的 AI 助手，专注于帮助设计师解决问题。';
-
     const messages = [
       { role: 'system', content: systemPrompt },
-      ...context.slice(-6),
-      { role: 'user', content: message },
+      ...safeContext,
+      { role: 'user', content: safeMessage },
     ];
 
     const startTime = Date.now();
+    let finalError = null;
+    let successConfigId = 0;
 
-    try {
-      const response = await ctx.curl(config.apiUrl, {
-        method: 'POST',
-        contentType: 'json',
-        data: {
-          model: config.model,
-          messages,
-          temperature: 0.7,
-          max_tokens: 1000,
-        },
-        headers: {
-          Authorization: `Bearer ${config.apiKey}`,
-        },
-        timeout: 30000,
-        dataType: 'json',
-      });
-
-      if (response.status !== 200) {
-        throw new Error('AI 服务暂时不可用');
-      }
-
-      const content = response.data.choices?.[0]?.message?.content;
-      if (!content) {
-        throw new Error('AI 返回内容为空');
-      }
-
-      const tokensUsed = response.data.usage?.total_tokens || 0;
-      const durationMs = Date.now() - startTime;
-
-      // 记录成功日志
+    for (let i = 0; i < availableConfigs.length; i += 1) {
+      const config = availableConfigs[i];
+      const requestUrl = this.resolveChatApiUrl(config.provider, config.apiUrl);
+      const requestModel = this.resolveChatModel(config.provider, config.model);
       try {
-        await ctx.service.uied.aiUsageLog.add({
-          configId: config.id || 0,
-          featureType: 'chat',
-          requestContent: message.substring(0, 200),
-          responseStatus: 'success',
-          tokensUsed,
-          durationMs,
+        const response = await ctx.curl(requestUrl, {
+          method: 'POST',
+          contentType: 'json',
+          data: {
+            model: requestModel,
+            messages,
+            temperature: 0.7,
+            max_tokens: 1200,
+          },
+          headers: {
+            Authorization: `Bearer ${config.apiKey}`,
+          },
+          timeout: 45000,
+          dataType: 'json',
         });
-      } catch (logErr) {
-        ctx.logger.error('AI日志记录失败:', logErr);
+
+        if (response.status !== 200) {
+          throw new Error(`AI 服务返回异常状态：${response.status}`);
+        }
+
+        const content = String(response.data?.choices?.[0]?.message?.content || '').trim();
+        if (!content) {
+          throw new Error('AI 返回内容为空');
+        }
+
+        const tokensUsed = Number(response.data?.usage?.total_tokens || 0);
+        const durationMs = Date.now() - startTime;
+        successConfigId = Number(config.id || 0);
+        if (i > 0) {
+          ctx.logger.warn(
+            `ai chat fallback success: using config=${successConfigId}, provider=${config.provider}`
+          );
+        }
+
+        // 记录成功日志
+        try {
+          await ctx.service.uied.aiUsageLog.add({
+            configId: successConfigId,
+            featureType: 'chat',
+            requestContent: safeMessage.substring(0, 200),
+            responseStatus: 'success',
+            tokensUsed,
+            durationMs,
+          });
+        } catch (logErr) {
+          ctx.logger.error('AI日志记录失败:', logErr);
+        }
+
+        return {
+          reply: content,
+          usage: response.data?.usage || null,
+        };
+      } catch (error) {
+        finalError = error;
+        ctx.logger.error(
+          `AI对话请求失败: configId=${config.id}, provider=${config.provider}, error=${error.message || error}`
+        );
+        if (i < availableConfigs.length - 1) {
+          continue;
+        }
       }
-
-      return {
-        reply: content,
-        usage: response.data.usage || null,
-      };
-    } catch (error) {
-      const durationMs = Date.now() - startTime;
-
-      // 记录失败日志
-      try {
-        await ctx.service.uied.aiUsageLog.add({
-          configId: config.id || 0,
-          featureType: 'chat',
-          requestContent: message.substring(0, 200),
-          responseStatus: 'failed',
-          errorMessage: error.message || 'AI 对话失败',
-          tokensUsed: 0,
-          durationMs,
-        });
-      } catch (logErr) {
-        ctx.logger.error('AI日志记录失败:', logErr);
-      }
-
-      throw error;
     }
+
+    const durationMs = Date.now() - startTime;
+    const errorMessage = this.formatChatError(finalError, availableConfigs);
+
+    // 记录失败日志
+    try {
+      await ctx.service.uied.aiUsageLog.add({
+        configId: successConfigId || Number(availableConfigs[0]?.id || 0),
+        featureType: 'chat',
+        requestContent: safeMessage.substring(0, 200),
+        responseStatus: 'failed',
+        errorMessage,
+        tokensUsed: 0,
+        durationMs,
+      });
+    } catch (logErr) {
+      ctx.logger.error('AI日志记录失败:', logErr);
+    }
+    throw new Error(errorMessage);
   }
 }
 

@@ -368,6 +368,24 @@ class ArticleController extends baseController {
   }
 
   /**
+   * 生成文章管理测试数据
+   */
+  async seedTestData() {
+    const { ctx } = this;
+    try {
+      const body = ctx.request.body || {};
+      const data = await ctx.service.article.seedTestData(body);
+      this.result({
+        data,
+        message: `已生成 ${Number(data?.created || 0)} 条测试文章`,
+      });
+    } catch (err) {
+      ctx.logger.error(`ArticleController.seedTestData error: ${err.message || err}`);
+      this.result({ data: '', message: err.message, code: 300 });
+    }
+  }
+
+  /**
    * 官网前台投稿文章（默认待发布）
    */
   async frontAdd() {

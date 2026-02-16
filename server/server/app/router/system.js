@@ -137,6 +137,7 @@ module.exports = app => {
   router.all('/api/article/list', controller.article.list);
   router.all('/api/article/all', controller.article.all);
   router.all('/api/article/add', controller.article.add);
+  router.all('/api/article/seed/testData', controller.article.seedTestData);
   router.all('/api/article/front/add', controller.article.frontAdd);
   router.all('/api/article/front/list', controller.article.frontList);
   router.all('/api/article/front/detail', controller.article.frontDetail);

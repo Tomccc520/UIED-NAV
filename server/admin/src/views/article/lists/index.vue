@@ -86,6 +86,14 @@
                     </template>
                     发布文章
                 </el-button>
+                <el-button
+                    v-perms="['article:add', 'article:add/edit']"
+                    class="mb-4 ml-2"
+                    :loading="seedLoading"
+                    @click="handleSeedTestData"
+                >
+                    生成测试数据
+                </el-button>
             </div>
             <div class="article-summary mb-3">
                 <el-tag effect="plain">当前列表 {{ safeLists.length }} 条</el-tag>
@@ -240,6 +248,7 @@ import {
     articleDelete,
     articleStatus,
     articleFrontAudit,
+    articleSeedTestData,
     articleCateAll,
     articleTagAll,
     articleTopicAll
@@ -282,6 +291,7 @@ const queryParams = reactive({
     topicId: ''
 })
 const router = useRouter()
+const seedLoading = ref(false)
 
 const { pager, getLists, resetPage, resetParams } = usePaging({
     fetchFun: articleLists,
@@ -437,6 +447,27 @@ const handleDelete = async (id: number) => {
     await articleDelete({ id })
     feedback.msgSuccess('删除成功')
     getLists()
+}
+
+/**
+ * 一键生成测试数据（文章/分类/标签/专题关联）
+ */
+const handleSeedTestData = async () => {
+    try {
+        await feedback.confirm('将自动生成测试文章用于联调验证，是否继续？')
+    } catch (error) {
+        return
+    }
+    seedLoading.value = true
+    try {
+        const data = await articleSeedTestData({ count: 12 })
+        feedback.msgSuccess(`已生成 ${Number(data?.created || 0)} 条测试文章`)
+        resetPage()
+    } catch (error: any) {
+        feedback.msgError(error?.message || '生成测试数据失败')
+    } finally {
+        seedLoading.value = false
+    }
 }
 
 onActivated(() => {

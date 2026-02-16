@@ -48,6 +48,11 @@ export function articleAdd(params: any) {
     return request.post({ url: '/article/add', params })
 }
 
+// 生成文章测试数据
+export function articleSeedTestData(params?: { count?: number; prefixTs?: number }) {
+    return request.post({ url: '/article/seed/testData', params })
+}
+
 // 编辑文章
 export function articleEdit(params: any) {
     return request.post({ url: '/article/edit', params })

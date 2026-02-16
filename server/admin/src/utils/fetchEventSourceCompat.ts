@@ -72,10 +72,14 @@ export async function fetchEventSource(url: string, options: FetchEventSourceOpt
         const reader = body.getReader()
         const decoder = new TextDecoder('utf-8')
         let buffer = ''
+        let reading = true
 
-        while (true) {
+        while (reading) {
             const { done, value } = await reader.read()
-            if (done) break
+            if (done) {
+                reading = false
+                continue
+            }
             buffer += decoder.decode(value, { stream: true })
             buffer = consumeSseBuffer(buffer, options.onmessage)
         }

@@ -182,6 +182,8 @@ module.exports = options => {
     const aliasPerms = {
       // 内容管理：投稿审核复用“文章状态”权限，避免历史角色漏配新权限点
       'article:front:audit': [ 'article:change' ],
+      // 内容管理：测试数据生成复用文章新增权限
+      'article:seed:testData': [ 'article:add', 'article:edit', 'article:list' ],
       // 内容管理：专题管理兼容旧角色（复用文章权限）
       'article:topic:list': [ 'article:list', 'article:edit', 'article:add' ],
       'article:topic:all': [ 'article:list', 'article:edit', 'article:add' ],
