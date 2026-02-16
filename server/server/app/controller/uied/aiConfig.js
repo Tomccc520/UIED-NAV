@@ -13,6 +13,26 @@
 const baseController = require('../baseController');
 
 /**
+ * 格式化 AI 异常文案，避免将底层网络细节直接暴露给前端
+ * @param {Error|any} error - 原始异常
+ * @return {string} 可读提示
+ */
+const formatAiErrorMessage = error => {
+  const message = String(error?.message || error || '').trim();
+  if (!message) return 'AI 服务暂时不可用，请稍后重试';
+  if (/connect timeout|timed out|socket hang up|econnrefused|enotfound/i.test(message)) {
+    return 'AI 服务连接超时，请检查后台 AI 配置中的 API 地址与网络连通性';
+  }
+  if (/401|unauthorized|invalid api key/i.test(message)) {
+    return 'AI 鉴权失败，请检查 API Key 是否正确';
+  }
+  if (/429|rate limit|too many requests/i.test(message)) {
+    return 'AI 请求过于频繁，请稍后重试';
+  }
+  return message;
+};
+
+/**
  * 规范化上下文消息，确保只保留合法 role/content 结构
  * @param {any} context - 原始上下文
  * @return {Array<{role: string, content: string}>} 规范化后的上下文列表
@@ -399,7 +419,7 @@ class AiConfigController extends baseController {
       this.result({ data: result });
     } catch (error) {
       ctx.logger.error('AI对话失败:', error);
-      this.result({ code: 500, message: error.message || 'AI对话失败' });
+      this.result({ code: 500, message: formatAiErrorMessage(error) });
     }
   }
 
@@ -441,7 +461,7 @@ class AiConfigController extends baseController {
       endSseStream(res);
     } catch (error) {
       ctx.logger.error('编辑器AI流式对话失败:', error);
-      writeSseDeltaChunk(res, `AI 处理失败：${error.message || '未知错误'}`);
+      writeSseDeltaChunk(res, `AI 处理失败：${formatAiErrorMessage(error)}`);
       endSseStream(res);
     }
   }

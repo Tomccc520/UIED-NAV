@@ -43,7 +43,7 @@ class AiConfigService extends Service {
     const modelMap = {
       openai: 'gpt-4o-mini',
       deepseek: 'deepseek-chat',
-      siliconflow: 'deepseek-ai/DeepSeek-V3',
+      siliconflow: 'deepseek-ai/DeepSeek-V3.2',
       moonshot: 'moonshot-v1-8k',
       kimi: 'moonshot-v1-8k',
       qwen: 'qwen-plus',
@@ -128,6 +128,66 @@ class AiConfigService extends Service {
   }
 
   /**
+   * 判断错误是否为 TLS 证书链校验问题
+   * @param {Error|any} error - 异常对象
+   * @return {boolean} 是否证书校验错误
+   */
+  isTlsCertificateError(error) {
+    const text = String(error?.message || error || '').toLowerCase();
+    return (
+      text.includes('unable to get local issuer certificate') ||
+      text.includes('unable to verify the first certificate') ||
+      text.includes('self signed certificate') ||
+      text.includes('self-signed certificate') ||
+      text.includes('certificate has expired') ||
+      text.includes('hostname/ip does not match certificate')
+    );
+  }
+
+  /**
+   * 调用聊天补全接口（证书链失败时自动降级重试一次）
+   * 说明：仅在 TLS 校验错误时，使用 rejectUnauthorized=false 进行一次兜底重试
+   * @param {Object} options - 请求参数
+   * @param {string} options.url - 请求地址
+   * @param {string} options.apiKey - API Key
+   * @param {Object} options.data - 请求体
+   * @param {number} [options.timeout=30000] - 超时时间（毫秒）
+   * @return {Promise<any>} HTTP 响应
+   */
+  async requestChatCompletions(options = {}) {
+    const { ctx } = this;
+    const url = String(options.url || '').trim();
+    const apiKey = String(options.apiKey || '').trim();
+    const timeout = Number(options.timeout || 30000);
+    const data = options.data || {};
+    const baseOptions = {
+      method: 'POST',
+      contentType: 'json',
+      data,
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+      },
+      timeout,
+      dataType: 'json',
+    };
+
+    try {
+      return await ctx.curl(url, baseOptions);
+    } catch (error) {
+      if (!this.isTlsCertificateError(error)) {
+        throw error;
+      }
+      ctx.logger.warn(
+        `AI 请求证书校验失败，准备使用不校验证书模式重试一次: ${error?.message || error}`
+      );
+      return await ctx.curl(url, {
+        ...baseOptions,
+        rejectUnauthorized: false,
+      });
+    }
+  }
+
+  /**
    * 将 AI 异常转换为更可读的中文提示
    * @param {Error|any} error - 原始异常
    * @param {Array<{name:string,provider:string}>} configs - 已尝试的配置列表
@@ -140,6 +200,9 @@ class AiConfigService extends Service {
       : '请检查 AI 助手配置';
     if (!message) {
       return `AI 对话失败。${configHint}`;
+    }
+    if (this.isTlsCertificateError(error)) {
+      return `AI 处理失败：SSL 证书校验失败。${configHint}`;
     }
     if (this.isNetworkError(error)) {
       return `AI 处理失败：连接超时或网络不可达。${configHint}`;
@@ -320,19 +383,20 @@ class AiConfigService extends Service {
         provider: 'siliconflow',
         apiKey: '',
         apiUrl: 'https://api.siliconflow.cn/v1/chat/completions',
-        model: 'deepseek-ai/DeepSeek-V3',
+        model: 'deepseek-ai/DeepSeek-V3.2',
         maxTokens: 2000,
         temperature: 0.7,
       };
     }
 
+    const provider = String(config.provider || 'siliconflow').trim().toLowerCase() || 'siliconflow';
     return {
       id: config.id,
       enabled: config.is_enabled === 1,
-      provider: config.provider,
+      provider,
       apiKey: config.api_key || '',
-      apiUrl: config.api_url || '',
-      model: config.model || 'gpt-3.5-turbo',
+      apiUrl: this.resolveChatApiUrl(provider, config.api_url || ''),
+      model: this.resolveChatModel(provider, config.model || ''),
       maxTokens: 2000,
       temperature: 0.7,
     };
@@ -408,19 +472,15 @@ class AiConfigService extends Service {
       const testUrl = this.resolveChatApiUrl(provider, apiUrl);
       const testModel = this.resolveChatModel(provider, '');
 
-      const response = await ctx.curl(testUrl, {
-        method: 'POST',
-        contentType: 'json',
+      const response = await this.requestChatCompletions({
+        url: testUrl,
+        apiKey,
         data: {
           model: testModel,
           messages: [{ role: 'user', content: 'Hello' }],
           max_tokens: 5,
         },
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-        },
         timeout: 10000,
-        dataType: 'json',
       });
 
       if (response.status === 200) {
@@ -481,20 +541,16 @@ class AiConfigService extends Service {
 
     try {
       // 调用 AI API
-      const response = await ctx.curl(requestUrl, {
-        method: 'POST',
-        contentType: 'json',
+      const response = await this.requestChatCompletions({
+        url: requestUrl,
+        apiKey: config.apiKey,
         data: {
           model: requestModel,
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.7,
           max_tokens: 500,
         },
-        headers: {
-          Authorization: `Bearer ${config.apiKey}`,
-        },
         timeout: 30000,
-        dataType: 'json',
       });
 
       if (response.status !== 200) {
@@ -832,20 +888,16 @@ class AiConfigService extends Service {
     const startTime = Date.now();
 
     try {
-      const response = await ctx.curl(requestUrl, {
-        method: 'POST',
-        contentType: 'json',
+      const response = await this.requestChatCompletions({
+        url: requestUrl,
+        apiKey: config.apiKey,
         data: {
           model: requestModel,
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.7,
           max_tokens: 2000,
         },
-        headers: {
-          Authorization: `Bearer ${config.apiKey}`,
-        },
         timeout: 60000,
-        dataType: 'json',
       });
 
       if (response.status !== 200) {
@@ -939,20 +991,16 @@ class AiConfigService extends Service {
       const requestUrl = this.resolveChatApiUrl(config.provider, config.apiUrl);
       const requestModel = this.resolveChatModel(config.provider, config.model);
       try {
-        const response = await ctx.curl(requestUrl, {
-          method: 'POST',
-          contentType: 'json',
+        const response = await this.requestChatCompletions({
+          url: requestUrl,
+          apiKey: config.apiKey,
           data: {
             model: requestModel,
             messages,
             temperature: 0.7,
             max_tokens: 1200,
           },
-          headers: {
-            Authorization: `Bearer ${config.apiKey}`,
-          },
           timeout: 45000,
-          dataType: 'json',
         });
 
         if (response.status !== 200) {

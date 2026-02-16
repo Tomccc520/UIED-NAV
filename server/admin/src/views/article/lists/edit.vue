@@ -184,7 +184,9 @@
                                     :title="formData.title"
                                     :context="aiEditorContext"
                                 />
-                                <div class="form-tips">支持对话式流式生成，并可一键替换正文。</div>
+                                <div class="form-tips">
+                                    支持对话式流式生成；图片/视频上传与选择统一走素材中心接口。
+                                </div>
                             </el-form-item>
                         </el-card>
 

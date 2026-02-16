@@ -518,7 +518,7 @@
                 <el-form-item label="API 地址" prop="apiUrl">
                     <el-input
                         v-model="editForm.apiUrl"
-                        placeholder="请输入 API 地址，如：https://api.openai.com/v1"
+                        placeholder="请输入 API 地址，如：https://api.siliconflow.cn/v1/chat/completions"
                     />
                 </el-form-item>
                 <el-form-item label="API 密钥" prop="apiKey">
@@ -532,7 +532,7 @@
                 <el-form-item label="模型" prop="model">
                     <el-input
                         v-model="editForm.model"
-                        placeholder="请输入模型名称，如：gpt-3.5-turbo"
+                        placeholder="请输入模型名称，如：deepseek-ai/DeepSeek-V3.2"
                     />
                 </el-form-item>
                 <el-row :gutter="16">
@@ -722,7 +722,7 @@ const editFormRef = ref<FormInstance>()
 const editForm = reactive({
     id: 0,
     name: '',
-    provider: 'openai',
+    provider: 'siliconflow',
     apiUrl: '',
     apiKey: '',
     model: '',
@@ -738,16 +738,54 @@ const editRules: FormRules = {
     model: [{ required: true, message: '请输入模型名称', trigger: 'blur' }]
 }
 
+/**
+ * 获取提供商默认地址与模型
+ */
+const getProviderDefaults = (provider: string) => {
+    const current = String(provider || '')
+        .trim()
+        .toLowerCase()
+    const defaults: Record<string, { apiUrl: string; model: string }> = {
+        siliconflow: {
+            apiUrl: 'https://api.siliconflow.cn/v1/chat/completions',
+            model: 'deepseek-ai/DeepSeek-V3.2'
+        },
+        openai: {
+            apiUrl: 'https://api.openai.com/v1/chat/completions',
+            model: 'gpt-4o-mini'
+        },
+        deepseek: {
+            apiUrl: 'https://api.deepseek.com/v1/chat/completions',
+            model: 'deepseek-chat'
+        }
+    }
+    return defaults[current] || defaults.siliconflow
+}
+
+/**
+ * 按提供商填充默认地址和模型
+ */
+const applyProviderDefaults = (provider: string, force = false) => {
+    const defaults = getProviderDefaults(provider)
+    if (force || !String(editForm.apiUrl || '').trim()) {
+        editForm.apiUrl = defaults.apiUrl
+    }
+    if (force || !String(editForm.model || '').trim()) {
+        editForm.model = defaults.model
+    }
+}
+
 /** 重置编辑表单 */
 const resetEditForm = () => {
     editForm.id = 0
     editForm.name = ''
-    editForm.provider = 'openai'
+    editForm.provider = 'siliconflow'
     editForm.apiUrl = ''
     editForm.apiKey = ''
     editForm.model = ''
     editForm.enabled = true
     editForm.isDefault = false
+    applyProviderDefaults(editForm.provider, true)
 }
 
 /** 新增配置 */
@@ -765,12 +803,13 @@ const handleEdit = (row: any) => {
     resetEditForm()
     editForm.id = row.id
     editForm.name = row.name || ''
-    editForm.provider = row.provider || 'openai'
+    editForm.provider = row.provider || 'siliconflow'
     editForm.apiUrl = row.api_url || ''
     editForm.apiKey = row.api_key || ''
     editForm.model = row.model || ''
     editForm.enabled = row.is_enabled === 1
     editForm.isDefault = row.is_default === 1
+    applyProviderDefaults(editForm.provider, false)
     showEditDialog.value = true
     nextTick(() => {
         editFormRef.value?.clearValidate()
@@ -1142,6 +1181,16 @@ watch(activeTab, (newTab) => {
         loadFeatureToggle()
     }
 })
+
+/**
+ * 提供商切换时自动补齐地址与模型
+ */
+watch(
+    () => editForm.provider,
+    (provider) => {
+        applyProviderDefaults(String(provider || ''), false)
+    }
+)
 
 // ==================== 生命周期 ====================
 

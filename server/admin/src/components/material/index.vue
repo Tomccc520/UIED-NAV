@@ -12,6 +12,16 @@
             <div class="flex-1 min-h-0">
                 <el-scrollbar>
                     <div class="material-left__content pt-4 p-b-4">
+                        <div class="material-left__all-btn-wrap">
+                            <el-button
+                                class="material-left__all-btn"
+                                :class="{ 'is-active': isAllCategorySelected }"
+                                link
+                                @click="handleSelectAllCategory"
+                            >
+                                {{ allCategoryButtonText }}
+                            </el-button>
+                        </div>
                         <el-tree
                             ref="treeRef"
                             node-key="id"
@@ -449,6 +459,12 @@ const typeValue = computed<number>(() => {
 const visible: Ref<boolean> = inject('visible')!
 const previewUrl = ref('')
 const showPreview = ref(false)
+const isAllCategorySelected = computed(() => String(cateId.value || '') === '')
+const allCategoryButtonText = computed(() => {
+    if (props.type === 'image') return '默认全部图片'
+    if (props.type === 'video') return '默认全部视频'
+    return '默认全部素材'
+})
 const {
     treeRef,
     cateId,
@@ -482,6 +498,14 @@ const {
     selectAll,
     handleFileRename
 } = useFile(cateId, typeValue, limit, props.pageSize)
+
+/**
+ * 选择默认“全部素材”分类
+ */
+const handleSelectAllCategory = () => {
+    cateId.value = ''
+    treeRef.value?.setCurrentKey()
+}
 
 const getData = async () => {
     await getCateLists()
@@ -546,6 +570,18 @@ defineExpose({
         @apply border-r border-br flex flex-col w-[200px];
         :deep(.el-tree-node__content) {
             height: 36px;
+        }
+        .material-left__all-btn-wrap {
+            padding: 0 12px 8px;
+        }
+        .material-left__all-btn {
+            width: 100%;
+            justify-content: flex-start;
+            color: var(--el-text-color-regular);
+        }
+        .material-left__all-btn.is-active {
+            color: var(--el-color-primary);
+            font-weight: 600;
         }
     }
     &__center {
