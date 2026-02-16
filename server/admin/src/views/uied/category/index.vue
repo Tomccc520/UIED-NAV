@@ -21,7 +21,12 @@
                     />
                 </el-form-item>
                 <el-form-item label="父级分类">
-                    <el-select class="w-[200px]" v-model="queryParams.parentId" clearable placeholder="全部">
+                    <el-select
+                        class="w-[200px]"
+                        v-model="queryParams.parentId"
+                        clearable
+                        placeholder="全部"
+                    >
                         <el-option label="顶级分类" :value="0" />
                         <el-option
                             v-for="item in topCategories"
@@ -45,13 +50,11 @@
                         添加分类
                     </el-button>
                 </div>
-                <div class="text-gray-400">
-                    共 {{ pager.count }} 个分类
-                </div>
+                <div class="text-gray-400">共 {{ pager.count }} 个分类</div>
             </div>
-            <el-table 
-                size="large" 
-                v-loading="pager.loading" 
+            <el-table
+                size="large"
+                v-loading="pager.loading"
                 :data="pager.lists"
                 row-key="id"
                 :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
@@ -84,7 +87,9 @@
                 </el-table-column>
                 <el-table-column label="操作" width="180" fixed="right">
                     <template #default="{ row }">
-                        <el-button type="primary" link @click="handleAdd(row.id)">添加子分类</el-button>
+                        <el-button type="primary" link @click="handleAdd(row.id)"
+                            >添加子分类</el-button
+                        >
                         <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
                         <el-button type="danger" link @click="handleDelete(row.id)">删除</el-button>
                     </template>
@@ -110,7 +115,11 @@
                     <el-input v-model="editData.slug" placeholder="请输入分类别名（URL友好）" />
                 </el-form-item>
                 <el-form-item label="父级分类">
-                    <el-select v-model="editData.parentId" placeholder="请选择父级分类" style="width: 100%">
+                    <el-select
+                        v-model="editData.parentId"
+                        placeholder="请选择父级分类"
+                        style="width: 100%"
+                    >
                         <el-option label="顶级分类" :value="0" />
                         <el-option
                             v-for="item in topCategories"
@@ -121,14 +130,24 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="分类描述">
-                    <el-input v-model="editData.description" type="textarea" :rows="3" placeholder="请输入分类描述" />
+                    <el-input
+                        v-model="editData.description"
+                        type="textarea"
+                        :rows="3"
+                        placeholder="请输入分类描述"
+                    />
                 </el-form-item>
                 <el-divider content-position="left">SEO 设置（提升搜索引擎排名）</el-divider>
                 <el-form-item label="SEO标题">
                     <template #label>
                         <span>SEO标题</span>
-                        <el-tooltip content="用于搜索引擎展示的页面标题，如「2025年最好的96个AI智能体工具」，建议30字以内，包含核心关键词" placement="top">
-                            <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                        <el-tooltip
+                            content="用于搜索引擎展示的页面标题，如「2025年最好的96个AI智能体工具」，建议30字以内，包含核心关键词"
+                            placement="top"
+                        >
+                            <el-icon style="margin-left: 4px; cursor: help; color: #909399"
+                                ><QuestionFilled
+                            /></el-icon>
                         </el-tooltip>
                     </template>
                     <el-input v-model="editData.seoTitle" placeholder="留空则使用分类名称" />
@@ -136,20 +155,38 @@
                 <el-form-item label="SEO描述">
                     <template #label>
                         <span>SEO描述</span>
-                        <el-tooltip content="用于搜索引擎展示的页面描述，建议150字以内。会显示在分类页面头部，帮助用户和搜索引擎理解该分类内容" placement="top">
-                            <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                        <el-tooltip
+                            content="用于搜索引擎展示的页面描述，建议150字以内。会显示在分类页面头部，帮助用户和搜索引擎理解该分类内容"
+                            placement="top"
+                        >
+                            <el-icon style="margin-left: 4px; cursor: help; color: #909399"
+                                ><QuestionFilled
+                            /></el-icon>
                         </el-tooltip>
                     </template>
-                    <el-input v-model="editData.seoDescription" type="textarea" :rows="3" placeholder="留空则使用分类描述" />
+                    <el-input
+                        v-model="editData.seoDescription"
+                        type="textarea"
+                        :rows="3"
+                        placeholder="留空则使用分类描述"
+                    />
                 </el-form-item>
                 <el-form-item label="SEO关键词">
                     <template #label>
                         <span>SEO关键词</span>
-                        <el-tooltip content="多个关键词用英文逗号分隔，建议5-10个核心关键词，有助于搜索引擎索引" placement="top">
-                            <el-icon style="margin-left: 4px; cursor: help; color: #909399;"><QuestionFilled /></el-icon>
+                        <el-tooltip
+                            content="多个关键词用英文逗号分隔，建议5-10个核心关键词，有助于搜索引擎索引"
+                            placement="top"
+                        >
+                            <el-icon style="margin-left: 4px; cursor: help; color: #909399"
+                                ><QuestionFilled
+                            /></el-icon>
                         </el-tooltip>
                     </template>
-                    <el-input v-model="editData.seoKeywords" placeholder="关键词1,关键词2,关键词3" />
+                    <el-input
+                        v-model="editData.seoKeywords"
+                        placeholder="关键词1,关键词2,关键词3"
+                    />
                 </el-form-item>
                 <el-divider content-position="left">其他设置</el-divider>
                 <el-form-item label="图标URL">
@@ -167,14 +204,22 @@
             </el-form>
             <template #footer>
                 <el-button @click="showEdit = false">取消</el-button>
-                <el-button type="primary" :loading="editLoading" @click="handleSubmit">确定</el-button>
+                <el-button type="primary" :loading="editLoading" @click="handleSubmit"
+                    >确定</el-button
+                >
             </template>
         </el-dialog>
     </div>
 </template>
 
 <script lang="ts" setup name="uiedCategory">
-import { uiedCategoryList, uiedCategoryAll, uiedCategoryAdd, uiedCategoryEdit, uiedCategoryDelete } from '@/api/uied'
+import {
+    uiedCategoryList,
+    uiedCategoryAll,
+    uiedCategoryAdd,
+    uiedCategoryEdit,
+    uiedCategoryDelete
+} from '@/api/uied'
 import { usePaging } from '@/hooks/usePaging'
 import feedback from '@/utils/feedback'
 import { QuestionFilled } from '@element-plus/icons-vue'
@@ -205,7 +250,7 @@ const getTopCategories = async () => {
 }
 
 const getParentName = (parentId: number) => {
-    const parent = allCategories.value.find(item => item.id === parentId)
+    const parent = allCategories.value.find((item) => item.id === parentId)
     return parent?.name || '-'
 }
 

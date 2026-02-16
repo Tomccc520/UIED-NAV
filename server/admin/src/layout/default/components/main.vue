@@ -21,7 +21,6 @@ const tabsStore = useTabsStore()
 const settingStore = useSettingStore()
 const isRouteShow = computed(() => appStore.isRouteShow)
 const includeList = computed(() => (settingStore.openMultipleTabs ? tabsStore.getCacheTabList : []))
-
 </script>
 
 <style></style>

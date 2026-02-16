@@ -182,22 +182,34 @@ module.exports = options => {
     const aliasPerms = {
       // 内容管理：投稿审核复用“文章状态”权限，避免历史角色漏配新权限点
       'article:front:audit': [ 'article:change' ],
+      // 内容管理：专题管理兼容旧角色（复用文章权限）
+      'article:topic:list': [ 'article:list', 'article:edit', 'article:add' ],
+      'article:topic:all': [ 'article:list', 'article:edit', 'article:add' ],
+      'article:topic:detail': [ 'article:list', 'article:edit', 'article:add' ],
+      'article:topic:add': [ 'article:add', 'article:edit' ],
+      'article:topic:edit': [ 'article:edit' ],
+      'article:topic:del': [ 'article:del' ],
+      'article:topic:change': [ 'article:change' ],
+      // 内容管理：评论管理兼容旧角色（复用文章权限）
+      'article:comment:manage:list': [ 'article:list', 'article:edit', 'article:add' ],
+      'article:comment:manage:change': [ 'article:change', 'article:edit' ],
+      'article:comment:manage:del': [ 'article:del' ],
       // 内容管理：评论回复列表复用评论管理列表权限
-      'article:comment:manage:replies': [ 'article:comment:manage:list' ],
+      'article:comment:manage:replies': [ 'article:comment:manage:list', 'article:list', 'article:edit', 'article:add' ],
       // 内容管理：评论批量操作复用评论管理权限
-      'article:comment:manage:batch:change': [ 'article:comment:manage:change' ],
-      'article:comment:manage:batch:del': [ 'article:comment:manage:del' ],
+      'article:comment:manage:batch:change': [ 'article:comment:manage:change', 'article:change' ],
+      'article:comment:manage:batch:del': [ 'article:comment:manage:del', 'article:del' ],
       // 内容管理：评论敏感词配置复用评论管理权限
-      'article:comment:manage:sensitive:detail': [ 'article:comment:manage:list' ],
-      'article:comment:manage:sensitive:save': [ 'article:comment:manage:change' ],
+      'article:comment:manage:sensitive:detail': [ 'article:comment:manage:list', 'article:list', 'article:edit', 'article:add' ],
+      'article:comment:manage:sensitive:save': [ 'article:comment:manage:change', 'article:change' ],
       // 评论置顶接口复用评论状态权限
-      'article:comment:top:toggle': [ 'article:comment:manage:change' ],
+      'article:comment:top:toggle': [ 'article:comment:manage:change', 'article:change' ],
       // 评论举报与禁言管理复用评论管理权限
-      'article:comment:manage:report:list': [ 'article:comment:manage:list' ],
-      'article:comment:manage:report:handle': [ 'article:comment:manage:change' ],
-      'article:comment:manage:mute:list': [ 'article:comment:manage:list' ],
-      'article:comment:manage:mute:add': [ 'article:comment:manage:change' ],
-      'article:comment:manage:mute:del': [ 'article:comment:manage:del' ],
+      'article:comment:manage:report:list': [ 'article:comment:manage:list', 'article:list', 'article:edit', 'article:add' ],
+      'article:comment:manage:report:handle': [ 'article:comment:manage:change', 'article:change' ],
+      'article:comment:manage:mute:list': [ 'article:comment:manage:list', 'article:list', 'article:edit', 'article:add' ],
+      'article:comment:manage:mute:add': [ 'article:comment:manage:change', 'article:change' ],
+      'article:comment:manage:mute:del': [ 'article:comment:manage:del', 'article:del' ],
       // 内容管理：作者下拉接口复用文章编辑权限
       'user:author:options': [ 'article:edit', 'article:add', 'article:list' ],
       // 内容管理：外链图片转存复用文章编辑权限

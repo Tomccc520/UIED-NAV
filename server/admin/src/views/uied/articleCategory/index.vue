@@ -34,9 +34,7 @@
                         添加分类
                     </el-button>
                 </div>
-                <div class="text-gray-400">
-                    共 {{ pager.count }} 个分类
-                </div>
+                <div class="text-gray-400">共 {{ pager.count }} 个分类</div>
             </div>
             <el-table size="large" v-loading="pager.loading" :data="pager.lists">
                 <el-table-column label="ID" prop="id" width="80" />
@@ -45,7 +43,11 @@
                 <el-table-column label="描述" prop="description" min-width="200">
                     <template #default="{ row }">
                         <span v-if="row.description" class="text-gray-500">
-                            {{ row.description.length > 50 ? row.description.substring(0, 50) + '...' : row.description }}
+                            {{
+                                row.description.length > 50
+                                    ? row.description.substring(0, 50) + '...'
+                                    : row.description
+                            }}
                         </span>
                         <span v-else class="text-gray-400">-</span>
                     </template>
@@ -92,7 +94,9 @@
             </el-form>
             <template #footer>
                 <el-button @click="showEdit = false">取消</el-button>
-                <el-button type="primary" :loading="editLoading" @click="handleSubmit">确定</el-button>
+                <el-button type="primary" :loading="editLoading" @click="handleSubmit"
+                    >确定</el-button
+                >
             </template>
         </el-dialog>
     </div>
@@ -108,7 +112,12 @@
  * @license MIT
  * @version 1.0.0
  */
-import { uiedArticleCategoryList, uiedArticleCategoryAdd, uiedArticleCategoryEdit, uiedArticleCategoryDelete } from '@/api/uied'
+import {
+    uiedArticleCategoryList,
+    uiedArticleCategoryAdd,
+    uiedArticleCategoryEdit,
+    uiedArticleCategoryDelete
+} from '@/api/uied'
 import { usePaging } from '@/hooks/usePaging'
 import feedback from '@/utils/feedback'
 import type { FormInstance, FormRules } from 'element-plus'

@@ -30,13 +30,23 @@
 
                     <!-- 配置列表表格 -->
                     <el-table :data="configList" v-loading="configLoading" size="large">
-                        <el-table-column label="名称" prop="name" min-width="120" show-overflow-tooltip />
+                        <el-table-column
+                            label="名称"
+                            prop="name"
+                            min-width="120"
+                            show-overflow-tooltip
+                        />
                         <el-table-column label="提供商" prop="provider" width="120">
                             <template #default="{ row }">
                                 <el-tag size="small">{{ getProviderLabel(row.provider) }}</el-tag>
                             </template>
                         </el-table-column>
-                        <el-table-column label="模型" prop="model" min-width="150" show-overflow-tooltip />
+                        <el-table-column
+                            label="模型"
+                            prop="model"
+                            min-width="150"
+                            show-overflow-tooltip
+                        />
                         <el-table-column label="状态" width="90" align="center">
                             <template #default="{ row }">
                                 <el-switch
@@ -53,26 +63,33 @@
                                     type="success"
                                     size="small"
                                     effect="dark"
-                                >默认</el-tag>
+                                    >默认</el-tag
+                                >
                                 <el-button
                                     v-else
                                     link
                                     type="primary"
                                     size="small"
                                     @click="handleSetDefault(row)"
-                                >设为默认</el-button>
+                                    >设为默认</el-button
+                                >
                             </template>
                         </el-table-column>
                         <el-table-column label="操作" width="200" fixed="right">
                             <template #default="{ row }">
-                                <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
+                                <el-button type="primary" link @click="handleEdit(row)"
+                                    >编辑</el-button
+                                >
                                 <el-button
                                     type="success"
                                     link
                                     :disabled="!row.api_key"
                                     @click="handleTestConnection(row)"
-                                >测试连接</el-button>
-                                <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
+                                    >测试连接</el-button
+                                >
+                                <el-button type="danger" link @click="handleDelete(row)"
+                                    >删除</el-button
+                                >
                             </template>
                         </el-table-column>
                     </el-table>
@@ -104,7 +121,10 @@
                                         :value="item.id"
                                     >
                                         <span>{{ item.title || item.name }}</span>
-                                        <span style="color: #999; font-size: 12px; margin-left: 8px;">{{ item.url }}</span>
+                                        <span
+                                            style="color: #999; font-size: 12px; margin-left: 8px"
+                                            >{{ item.url }}</span
+                                        >
                                     </el-option>
                                 </el-select>
                             </el-form-item>
@@ -121,7 +141,10 @@
                             <el-form-item>
                                 <el-button
                                     type="primary"
-                                    :disabled="selectedWebsiteIds.length === 0 || selectedFields.length === 0"
+                                    :disabled="
+                                        selectedWebsiteIds.length === 0 ||
+                                        selectedFields.length === 0
+                                    "
                                     @click="handleBatchGenerate"
                                 >
                                     开始批量生成（{{ selectedWebsiteIds.length }} 个网站）
@@ -141,8 +164,9 @@
                             />
                         </div>
                         <div class="text-center text-gray-500 mt-2">
-                            正在处理：{{ batchCurrentName || '准备中...' }}
-                            （{{ batchProcessed }}/{{ batchTotal }}）
+                            正在处理：{{ batchCurrentName || '准备中...' }} （{{
+                                batchProcessed
+                            }}/{{ batchTotal }}）
                         </div>
                     </div>
 
@@ -163,16 +187,30 @@
                         </div>
 
                         <el-table :data="batchResults" size="large">
-                            <el-table-column label="网站名称" prop="name" width="160" show-overflow-tooltip />
+                            <el-table-column
+                                label="网站名称"
+                                prop="name"
+                                width="160"
+                                show-overflow-tooltip
+                            />
                             <el-table-column label="状态" width="100" align="center">
                                 <template #default="{ row }">
-                                    <el-tag v-if="row.status === 'success'" type="success" size="small">成功</el-tag>
+                                    <el-tag
+                                        v-if="row.status === 'success'"
+                                        type="success"
+                                        size="small"
+                                        >成功</el-tag
+                                    >
                                     <el-tooltip v-else :content="row.error" placement="top">
                                         <el-tag type="danger" size="small">失败</el-tag>
                                     </el-tooltip>
                                 </template>
                             </el-table-column>
-                            <el-table-column v-if="selectedFields.includes('description')" label="描述" min-width="250">
+                            <el-table-column
+                                v-if="selectedFields.includes('description')"
+                                label="描述"
+                                min-width="250"
+                            >
                                 <template #default="{ row }">
                                     <el-input
                                         v-if="row.status === 'success'"
@@ -183,7 +221,11 @@
                                     <span v-else class="text-gray-400">—</span>
                                 </template>
                             </el-table-column>
-                            <el-table-column v-if="selectedFields.includes('tags')" label="标签" min-width="200">
+                            <el-table-column
+                                v-if="selectedFields.includes('tags')"
+                                label="标签"
+                                min-width="200"
+                            >
                                 <template #default="{ row }">
                                     <el-input
                                         v-if="row.status === 'success'"
@@ -196,9 +238,10 @@
                         </el-table>
 
                         <div class="mt-2 text-gray-400 text-sm">
-                            共 {{ batchResults.length }} 个结果，
-                            成功 {{ batchResults.filter(r => r.status === 'success').length }} 个，
-                            失败 {{ batchResults.filter(r => r.status !== 'success').length }} 个。
+                            共 {{ batchResults.length }} 个结果， 成功
+                            {{ batchResults.filter((r) => r.status === 'success').length }} 个，
+                            失败
+                            {{ batchResults.filter((r) => r.status !== 'success').length }} 个。
                             可在表格中直接编辑生成内容，确认无误后点击「确认保存」。
                         </div>
                     </div>
@@ -207,11 +250,19 @@
                 <!-- Tab 3: 使用统计 -->
                 <el-tab-pane label="使用统计" name="stats">
                     <!-- AI 未配置时的引导提示 -->
-                    <div v-if="configList.length === 0 && !configLoading" class="flex flex-col items-center justify-center" style="min-height: 300px;">
+                    <div
+                        v-if="configList.length === 0 && !configLoading"
+                        class="flex flex-col items-center justify-center"
+                        style="min-height: 300px"
+                    >
                         <el-empty description="暂未配置 AI 服务">
-                            <el-button type="primary" @click="activeTab = 'config'">前往配置</el-button>
+                            <el-button type="primary" @click="activeTab = 'config'"
+                                >前往配置</el-button
+                            >
                         </el-empty>
-                        <p class="text-gray-400 mt-2">请先在「配置管理」中添加 AI 配置，启用后即可查看使用统计</p>
+                        <p class="text-gray-400 mt-2">
+                            请先在「配置管理」中添加 AI 配置，启用后即可查看使用统计
+                        </p>
                     </div>
 
                     <div v-else>
@@ -279,7 +330,10 @@
                             </el-table-column>
                             <el-table-column label="功能类型" width="120">
                                 <template #default="{ row }">
-                                    <el-tag size="small" :type="getFeatureTypeTagType(row.feature_type)">
+                                    <el-tag
+                                        size="small"
+                                        :type="getFeatureTypeTagType(row.feature_type)"
+                                    >
                                         {{ getFeatureTypeLabel(row.feature_type) }}
                                     </el-tag>
                                 </template>
@@ -288,18 +342,42 @@
                                 <template #default="{ row }">
                                     <el-tag
                                         size="small"
-                                        :type="row.response_status === 'success' ? 'success' : 'danger'"
+                                        :type="
+                                            row.response_status === 'success' ? 'success' : 'danger'
+                                        "
                                     >
                                         {{ row.response_status === 'success' ? '成功' : '失败' }}
                                     </el-tag>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="Token" prop="tokens_used" width="100" align="right" />
-                            <el-table-column label="耗时(ms)" prop="duration_ms" width="100" align="right" />
-                            <el-table-column label="请求内容" prop="request_content" min-width="200" show-overflow-tooltip />
-                            <el-table-column label="错误信息" prop="error_message" min-width="160" show-overflow-tooltip>
+                            <el-table-column
+                                label="Token"
+                                prop="tokens_used"
+                                width="100"
+                                align="right"
+                            />
+                            <el-table-column
+                                label="耗时(ms)"
+                                prop="duration_ms"
+                                width="100"
+                                align="right"
+                            />
+                            <el-table-column
+                                label="请求内容"
+                                prop="request_content"
+                                min-width="200"
+                                show-overflow-tooltip
+                            />
+                            <el-table-column
+                                label="错误信息"
+                                prop="error_message"
+                                min-width="160"
+                                show-overflow-tooltip
+                            >
                                 <template #default="{ row }">
-                                    <span v-if="row.error_message" class="text-red-500">{{ row.error_message }}</span>
+                                    <span v-if="row.error_message" class="text-red-500">{{
+                                        row.error_message
+                                    }}</span>
                                     <span v-else class="text-gray-300">—</span>
                                 </template>
                             </el-table-column>
@@ -322,14 +400,16 @@
 
                 <!-- Tab 4: 功能开关 -->
                 <el-tab-pane label="功能开关" name="toggle">
-                    <div v-loading="toggleLoading" style="max-width: 600px;">
+                    <div v-loading="toggleLoading" style="max-width: 600px">
                         <el-form label-width="140px" class="toggle-form">
                             <!-- 全局开关 -->
                             <el-card shadow="never" class="mb-4">
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <div class="text-base font-medium">AI 全局开关</div>
-                                        <div class="text-gray-400 text-sm mt-1">关闭后将禁用所有 AI 功能，前端将隐藏 AI 相关入口</div>
+                                        <div class="text-gray-400 text-sm mt-1">
+                                            关闭后将禁用所有 AI 功能，前端将隐藏 AI 相关入口
+                                        </div>
                                     </div>
                                     <el-switch
                                         v-model="toggleForm.aiEnabled"
@@ -349,7 +429,9 @@
                                 <div class="toggle-item">
                                     <div class="toggle-item-info">
                                         <div class="toggle-item-title">AI 搜索</div>
-                                        <div class="toggle-item-desc">启用后支持自然语言搜索理解和智能匹配排序</div>
+                                        <div class="toggle-item-desc">
+                                            启用后支持自然语言搜索理解和智能匹配排序
+                                        </div>
                                     </div>
                                     <el-switch
                                         v-model="toggleForm.aiSearch"
@@ -357,13 +439,15 @@
                                     />
                                 </div>
 
-                                <el-divider style="margin: 12px 0;" />
+                                <el-divider style="margin: 12px 0" />
 
                                 <!-- AI 内容生成 -->
                                 <div class="toggle-item">
                                     <div class="toggle-item-info">
                                         <div class="toggle-item-title">AI 内容生成</div>
-                                        <div class="toggle-item-desc">启用后支持 AI 自动生成网站描述、标签等信息</div>
+                                        <div class="toggle-item-desc">
+                                            启用后支持 AI 自动生成网站描述、标签等信息
+                                        </div>
                                     </div>
                                     <el-switch
                                         v-model="toggleForm.aiGenerate"
@@ -371,13 +455,15 @@
                                     />
                                 </div>
 
-                                <el-divider style="margin: 12px 0;" />
+                                <el-divider style="margin: 12px 0" />
 
                                 <!-- AI 对话助手 -->
                                 <div class="toggle-item">
                                     <div class="toggle-item-info">
                                         <div class="toggle-item-title">AI 对话助手</div>
-                                        <div class="toggle-item-desc">启用后在前端详情页展示 AI 对话助手入口</div>
+                                        <div class="toggle-item-desc">
+                                            启用后在前端详情页展示 AI 对话助手入口
+                                        </div>
                                     </div>
                                     <el-switch
                                         v-model="toggleForm.aiChat"
@@ -409,17 +495,16 @@
             width="600px"
             :close-on-click-modal="false"
         >
-            <el-form
-                ref="editFormRef"
-                :model="editForm"
-                :rules="editRules"
-                label-width="100px"
-            >
+            <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="100px">
                 <el-form-item label="配置名称" prop="name">
                     <el-input v-model="editForm.name" placeholder="请输入配置名称，如：主力配置" />
                 </el-form-item>
                 <el-form-item label="提供商" prop="provider">
-                    <el-select v-model="editForm.provider" placeholder="请选择 AI 提供商" style="width: 100%">
+                    <el-select
+                        v-model="editForm.provider"
+                        placeholder="请选择 AI 提供商"
+                        style="width: 100%"
+                    >
                         <el-option label="OpenAI" value="openai" />
                         <el-option label="Azure OpenAI" value="azure" />
                         <el-option label="Claude" value="claude" />
@@ -431,7 +516,10 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="API 地址" prop="apiUrl">
-                    <el-input v-model="editForm.apiUrl" placeholder="请输入 API 地址，如：https://api.openai.com/v1" />
+                    <el-input
+                        v-model="editForm.apiUrl"
+                        placeholder="请输入 API 地址，如：https://api.openai.com/v1"
+                    />
                 </el-form-item>
                 <el-form-item label="API 密钥" prop="apiKey">
                     <el-input
@@ -442,7 +530,10 @@
                     />
                 </el-form-item>
                 <el-form-item label="模型" prop="model">
-                    <el-input v-model="editForm.model" placeholder="请输入模型名称，如：gpt-3.5-turbo" />
+                    <el-input
+                        v-model="editForm.model"
+                        placeholder="请输入模型名称，如：gpt-3.5-turbo"
+                    />
                 </el-form-item>
                 <el-row :gutter="16">
                     <el-col :span="12">
@@ -536,7 +627,7 @@ const loadConfigList = async () => {
     try {
         const res = await uiedAiConfigList()
         // API 返回的数据可能是数组或包含 list 的对象
-        configList.value = Array.isArray(res) ? res : (res?.lists || res?.list || [])
+        configList.value = Array.isArray(res) ? res : res?.lists || res?.list || []
     } catch (error) {
         console.error('获取AI配置列表失败:', error)
         ElMessage.error('获取配置列表失败')
@@ -723,11 +814,9 @@ const handleSave = async () => {
 /** 删除配置 */
 const handleDelete = async (row: any) => {
     try {
-        await ElMessageBox.confirm(
-            `确定要删除配置「${row.name}」吗？`,
-            '删除确认',
-            { type: 'warning' }
-        )
+        await ElMessageBox.confirm(`确定要删除配置「${row.name}」吗？`, '删除确认', {
+            type: 'warning'
+        })
         await uiedAiConfigDelete({ id: row.id })
         ElMessage.success('删除成功')
         loadConfigList()
@@ -835,7 +924,7 @@ const handleBatchGenerate = async () => {
 /** 确认保存批量生成结果 */
 const handleBatchConfirm = async () => {
     // 只保存成功的结果
-    const successResults = batchResults.value.filter(r => r.status === 'success')
+    const successResults = batchResults.value.filter((r) => r.status === 'success')
     if (successResults.length === 0) {
         ElMessage.warning('没有可保存的结果')
         return
@@ -843,7 +932,7 @@ const handleBatchConfirm = async () => {
 
     batchConfirmLoading.value = true
     try {
-        const confirmData = successResults.map(r => ({
+        const confirmData = successResults.map((r) => ({
             websiteId: r.websiteId,
             description: r.description,
             tags: r.tags

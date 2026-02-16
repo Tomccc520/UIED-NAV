@@ -12,6 +12,123 @@
 
 const baseController = require('../baseController');
 
+/**
+ * 规范化上下文消息，确保只保留合法 role/content 结构
+ * @param {any} context - 原始上下文
+ * @return {Array<{role: string, content: string}>} 规范化后的上下文列表
+ */
+const normalizeChatContext = context => {
+  if (!Array.isArray(context)) return [];
+  const allowRoles = new Set([ 'system', 'user', 'assistant' ]);
+  return context
+    .map(item => {
+      const role = String(item?.role || '').trim();
+      const content = String(item?.content || '').trim();
+      if (!allowRoles.has(role) || !content) return null;
+      return { role, content };
+    })
+    .filter(Boolean)
+    .slice(-6);
+};
+
+/**
+ * 将编辑器请求参数组装为 AI 提示词
+ * @param {Object} payload - 编辑器请求体
+ * @return {string} 组装后的提示词
+ */
+const buildEditorPrompt = payload => {
+  const body = payload || {};
+  const rawMessage = String(body.message || '').trim();
+  if (rawMessage) {
+    return rawMessage;
+  }
+
+  const scene = String(body.scene || 'article').trim();
+  const mode = String(body.mode || 'replace').trim();
+  const title = String(body.title || '').trim();
+  const version = String(body.version || '').trim();
+  const date = String(body.date || '').trim();
+  const tone = String(body.tone || '').trim();
+  const audience = String(body.audience || '').trim();
+  const extraRequirements = String(body.extraRequirements || '').trim();
+  const content = String(body.content || '').trim();
+  const context = body.context && typeof body.context === 'object' ? body.context : {};
+  const changePoints = Array.isArray(body.changePoints)
+    ? body.changePoints.map(item => String(item || '').trim()).filter(Boolean)
+    : [];
+
+  const sections = [];
+  sections.push(`场景：${scene}`);
+  sections.push(`模式：${mode}`);
+  if (title) sections.push(`标题：${title}`);
+  if (version) sections.push(`版本：${version}`);
+  if (date) sections.push(`日期：${date}`);
+  if (tone) sections.push(`语气：${tone}`);
+  if (audience) sections.push(`受众：${audience}`);
+  if (extraRequirements) sections.push(`额外要求：${extraRequirements}`);
+  if (changePoints.length) sections.push(`变化要点：${changePoints.join('；')}`);
+  if (context?.category) sections.push(`栏目：${String(context.category || '').trim()}`);
+  if (context?.author) sections.push(`作者：${String(context.author || '').trim()}`);
+  if (context?.intro) sections.push(`简介：${String(context.intro || '').trim()}`);
+  if (context?.summary) sections.push(`摘要：${String(context.summary || '').trim()}`);
+  if (Array.isArray(context?.tags) && context.tags.length) {
+    sections.push(`标签：${context.tags.map(item => String(item || '').trim()).filter(Boolean).join('、')}`);
+  }
+  if (context?.topic) sections.push(`专题：${String(context.topic || '').trim()}`);
+  if (content) sections.push(`正文内容：\n${content}`);
+  sections.push('请输出纯文本，不要包含 Markdown 代码块。');
+
+  return sections.join('\n');
+};
+
+/**
+ * 按语义边界拆分文本，用于 SSE 渐进输出
+ * @param {string} text - 原始文本
+ * @return {string[]} 拆分后的文本片段
+ */
+const splitTextForSse = text => {
+  const source = String(text || '');
+  if (!source.trim()) return [];
+  const chunks = [];
+  let current = '';
+  for (const char of source) {
+    current += char;
+    if (/[\n，。！？；：]/.test(char) || current.length >= 36) {
+      chunks.push(current);
+      current = '';
+    }
+  }
+  if (current) {
+    chunks.push(current);
+  }
+  return chunks;
+};
+
+/**
+ * 写入 SSE 消息片段（OpenAI delta 兼容格式）
+ * @param {import('http').ServerResponse} res - Node 响应对象
+ * @param {string} chunk - 文本片段
+ */
+const writeSseDeltaChunk = (res, chunk) => {
+  const payload = JSON.stringify({
+    choices: [
+      {
+        delta: { content: chunk },
+      },
+    ],
+  });
+  res.write(`data: ${payload}\n\n`);
+};
+
+/**
+ * 结束 SSE 输出
+ * @param {import('http').ServerResponse} res - Node 响应对象
+ */
+const endSseStream = res => {
+  res.write('data: [DONE]\n\n');
+  res.end();
+};
+
 class AiConfigController extends baseController {
   /**
    * 获取所有 AI 配置
@@ -283,6 +400,49 @@ class AiConfigController extends baseController {
     } catch (error) {
       ctx.logger.error('AI对话失败:', error);
       this.result({ code: 500, message: error.message || 'AI对话失败' });
+    }
+  }
+
+  /**
+   * 编辑器 AI 流式对话（SSE）
+   * 说明：底层仍复用 AI 配置服务，返回 OpenAI delta 兼容数据结构。
+   */
+  async chatCompletionsEditor() {
+    const { ctx } = this;
+    const prompt = buildEditorPrompt(ctx.request.body || {});
+    if (!prompt) {
+      return this.result({ code: 400, message: '请提供消息内容' });
+    }
+
+    const context = normalizeChatContext(ctx.request.body?.context);
+    const res = ctx.res;
+    ctx.status = 200;
+    ctx.respond = false;
+    ctx.set('Content-Type', 'text/event-stream; charset=utf-8');
+    ctx.set('Cache-Control', 'no-cache, no-transform');
+    ctx.set('Connection', 'keep-alive');
+    ctx.set('X-Accel-Buffering', 'no');
+    if (typeof res.flushHeaders === 'function') {
+      res.flushHeaders();
+    }
+
+    try {
+      const result = await ctx.service.uied.aiConfig.chat(prompt, context);
+      const reply = String(result?.reply || '').trim();
+      if (!reply) {
+        writeSseDeltaChunk(res, 'AI 未返回可用内容，请稍后重试。');
+        endSseStream(res);
+        return;
+      }
+      const chunks = splitTextForSse(reply);
+      for (const chunk of chunks) {
+        writeSseDeltaChunk(res, chunk);
+      }
+      endSseStream(res);
+    } catch (error) {
+      ctx.logger.error('编辑器AI流式对话失败:', error);
+      writeSseDeltaChunk(res, `AI 处理失败：${error.message || '未知错误'}`);
+      endSseStream(res);
     }
   }
 }

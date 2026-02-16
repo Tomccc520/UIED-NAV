@@ -21,8 +21,13 @@
                 <el-table-column label="ID" prop="id" width="80" />
                 <el-table-column label="图片" width="120">
                     <template #default="{ row }">
-                        <el-image v-if="row.image" :src="row.image" :preview-src-list="[row.image]" 
-                            fit="cover" style="width: 80px; height: 45px" />
+                        <el-image
+                            v-if="row.image"
+                            :src="row.image"
+                            :preview-src-list="[row.image]"
+                            fit="cover"
+                            style="width: 80px; height: 45px"
+                        />
                         <span v-else>-</span>
                     </template>
                 </el-table-column>
@@ -78,7 +83,9 @@
             </el-form>
             <template #footer>
                 <el-button @click="showEdit = false">取消</el-button>
-                <el-button type="primary" :loading="editLoading" @click="handleSubmit">确定</el-button>
+                <el-button type="primary" :loading="editLoading" @click="handleSubmit"
+                    >确定</el-button
+                >
             </template>
         </el-dialog>
     </div>
@@ -95,26 +102,56 @@ const { pager, getLists } = usePaging({ fetchFun: uiedBannerList })
 const showEdit = ref(false)
 const editLoading = ref(false)
 const editFormRef = ref<FormInstance>()
-const editData = reactive({ id: 0, title: '', image: '', url: '', position: 'home', sortOrder: 0, isActive: true })
+const editData = reactive({
+    id: 0,
+    title: '',
+    image: '',
+    url: '',
+    position: 'home',
+    sortOrder: 0,
+    isActive: true
+})
 const editRules: FormRules = {
     title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
-    image: [{ required: true, message: '请输入图片URL', trigger: 'blur' }],
+    image: [{ required: true, message: '请输入图片URL', trigger: 'blur' }]
 }
 
-const resetEditData = () => Object.assign(editData, { id: 0, title: '', image: '', url: '', position: 'home', sortOrder: 0, isActive: true })
+const resetEditData = () =>
+    Object.assign(editData, {
+        id: 0,
+        title: '',
+        image: '',
+        url: '',
+        position: 'home',
+        sortOrder: 0,
+        isActive: true
+    })
 
-const handleAdd = () => { resetEditData(); showEdit.value = true }
-const handleEdit = (row: any) => { Object.assign(editData, row); showEdit.value = true }
+const handleAdd = () => {
+    resetEditData()
+    showEdit.value = true
+}
+const handleEdit = (row: any) => {
+    Object.assign(editData, row)
+    showEdit.value = true
+}
 
 const handleSubmit = async () => {
     await editFormRef.value?.validate()
     editLoading.value = true
     try {
-        if (editData.id) { await uiedBannerEdit(editData); feedback.msgSuccess('编辑成功') }
-        else { await uiedBannerAdd(editData); feedback.msgSuccess('添加成功') }
+        if (editData.id) {
+            await uiedBannerEdit(editData)
+            feedback.msgSuccess('编辑成功')
+        } else {
+            await uiedBannerAdd(editData)
+            feedback.msgSuccess('添加成功')
+        }
         showEdit.value = false
         getLists()
-    } finally { editLoading.value = false }
+    } finally {
+        editLoading.value = false
+    }
 }
 
 const handleDelete = async (id: number) => {

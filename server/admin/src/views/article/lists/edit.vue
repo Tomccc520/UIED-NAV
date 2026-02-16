@@ -177,10 +177,14 @@
                                 prop="content"
                                 class="article-edit__full-item"
                             >
-                                <editor v-model="formData.content" :height="700" width="100%" />
-                                <div class="form-tips">
-                                    支持选中文本后使用编辑器悬浮 AI 按钮改写。
-                                </div>
+                                <ai-editor
+                                    v-model="formData.content"
+                                    :height="700"
+                                    scene="article"
+                                    :title="formData.title"
+                                    :context="aiEditorContext"
+                                />
+                                <div class="form-tips">支持对话式流式生成，并可一键替换正文。</div>
                             </el-form-item>
                         </el-card>
 
@@ -262,73 +266,6 @@
                             </el-row>
                         </el-card>
                     </section>
-
-                    <aside class="article-edit__aside">
-                        <el-card shadow="never" class="article-edit__ai-card">
-                            <template #header>
-                                <span class="font-medium">AI 助手</span>
-                            </template>
-                            <el-input
-                                v-model="aiPrompt"
-                                type="textarea"
-                                :autosize="{ minRows: 3, maxRows: 6 }"
-                                placeholder="输入你的要求，例如：偏行业分析风格、分 3 段输出"
-                                clearable
-                            />
-                            <div class="mt-3 flex flex-wrap gap-2">
-                                <el-button
-                                    type="primary"
-                                    :loading="aiLoading"
-                                    @click="handleAiGenerate('replace')"
-                                >
-                                    生成正文草稿
-                                </el-button>
-                                <el-button
-                                    type="success"
-                                    :loading="aiLoading"
-                                    @click="handleAiGenerate('append')"
-                                >
-                                    续写草稿
-                                </el-button>
-                                <el-button
-                                    type="warning"
-                                    :loading="aiLoading"
-                                    @click="handleAiGenerate('polish')"
-                                >
-                                    润色草稿
-                                </el-button>
-                            </div>
-                            <el-divider />
-                            <el-input
-                                v-model="aiDraftText"
-                                type="textarea"
-                                :autosize="{ minRows: 10, maxRows: 18 }"
-                                placeholder="AI 生成草稿会显示在这里"
-                            />
-                            <div class="mt-3 flex flex-wrap gap-2">
-                                <el-button
-                                    type="primary"
-                                    :disabled="!aiDraftText"
-                                    @click="applyAiDraft('replace')"
-                                >
-                                    替换正文
-                                </el-button>
-                                <el-button
-                                    type="success"
-                                    :disabled="!aiDraftText"
-                                    @click="applyAiDraft('append')"
-                                >
-                                    追加正文
-                                </el-button>
-                                <el-button :disabled="!aiDraftText" @click="copyAiDraft"
-                                    >复制草稿</el-button
-                                >
-                                <el-button :disabled="!aiDraftText" @click="clearAiDraft"
-                                    >清空草稿</el-button
-                                >
-                            </div>
-                        </el-card>
-                    </aside>
                 </div>
             </el-form>
         </el-card>
@@ -353,10 +290,8 @@ import {
 } from '@/api/article'
 import { getAuthorUserOptions } from '@/api/consumer'
 import { transferEditorContentImages, transferRemoteImages } from '@/api/file'
-import { uiedAiChat } from '@/api/uied'
 import useMultipleTabs from '@/hooks/useMultipleTabs'
 
-type AiGenerateMode = 'replace' | 'append' | 'polish'
 type AuthorOptionItem = {
     value: string
     label: string
@@ -387,10 +322,6 @@ const formData = reactive({
 
 const { removeTab } = useMultipleTabs()
 const formRef = shallowRef<FormInstance>()
-const aiLoading = ref(false)
-const aiRewriting = ref(false)
-const aiPrompt = ref('')
-const aiDraftText = ref('')
 const importWechatLoading = ref(false)
 const transferImagesLoading = ref(false)
 const localDraftExists = ref(false)
@@ -487,6 +418,43 @@ const selectedAuthorName = computed(() => {
     if (!item) return `用户${value}`
     return item.nickname || item.username || item.realName || `用户${value}`
 })
+
+/**
+ * 当前选中标签名称列表（用于 AI 上下文）
+ */
+const selectedTagNames = computed(() => {
+    const tagIds = Array.isArray(formData.tagIds) ? formData.tagIds.map((item) => Number(item)) : []
+    if (!tagIds.length) return [] as string[]
+    const idSet = new Set(tagIds)
+    const list = Array.isArray(optionsData.articleTag) ? optionsData.articleTag : []
+    return list
+        .filter((item: any) => idSet.has(Number(item.id)))
+        .map((item: any) => String(item.name || '').trim())
+        .filter(Boolean)
+})
+
+/**
+ * 当前选中专题名称（用于 AI 上下文）
+ */
+const selectedTopicName = computed(() => {
+    const topicId = Number(formData.topicId || 0)
+    if (!topicId) return ''
+    const list = Array.isArray(optionsData.articleTopic) ? optionsData.articleTopic : []
+    const topic = list.find((item: any) => Number(item.id) === topicId)
+    return String(topic?.name || '').trim()
+})
+
+/**
+ * 构建文章 AI 上下文信息（传入右侧 AI 助手）
+ */
+const aiEditorContext = computed(() => ({
+    category: selectedCateName.value,
+    author: selectedAuthorName.value,
+    intro: String(formData.intro || '').trim(),
+    summary: String(formData.summary || '').trim(),
+    tags: selectedTagNames.value,
+    topic: selectedTopicName.value
+}))
 
 /**
  * 拉取作者下拉选项（支持关键词与身份筛选）
@@ -884,171 +852,6 @@ const handleTransferEditorImages = async () => {
 }
 
 /**
- * 将富文本转纯文本，便于拼接 AI 提示词
- */
-const toPlainText = (html: string) =>
-    (html || '')
-        .replace(/<[^>]+>/g, ' ')
-        .replace(/&nbsp;/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim()
-
-/**
- * 将 AI 返回的纯文本转换为编辑器可识别的 HTML
- */
-const plainTextToHtml = (text: string) => {
-    if (!text.trim()) return ''
-    const escape = (input: string) =>
-        input.replace(
-            /[&<>"']/g,
-            (char) =>
-                ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char] ||
-                char)
-        )
-    return text
-        .split(/\n{2,}/)
-        .map((block) => `<p>${escape(block).replace(/\n/g, '<br/>')}</p>`)
-        .join('')
-}
-
-/**
- * 清理 AI 响应中的 Markdown 围栏，避免污染正文
- */
-const normalizeAiReply = (text: string) =>
-    (text || '')
-        .replace(/\r\n/g, '\n')
-        .replace(/```[\w-]*\n?/g, '')
-        .replace(/```/g, '')
-        .trim()
-
-/**
- * 统一解析 AI 响应文本
- */
-const parseAiReply = (result: any) => {
-    const reply = result?.reply || result?.content || result?.data?.reply || ''
-    return normalizeAiReply(reply)
-}
-
-/**
- * 构建文章 AI 提示词
- */
-const buildArticleAiPrompt = (mode: AiGenerateMode, userPrompt = '') => {
-    const title = formData.title || '未命名文章'
-    const intro = formData.intro || ''
-    const summary = formData.summary || ''
-    const currentText = toPlainText(formData.content || '')
-
-    const modeInstructions: Record<AiGenerateMode, string> = {
-        replace: '请生成一篇完整正文，结构清晰，适合文章详情页展示。',
-        append: '请基于当前正文继续续写，保持逻辑连贯并避免重复。',
-        polish: '请在不改变原意前提下润色正文，增强可读性和专业感。'
-    }
-
-    let prompt = `文章标题：${title}\n`
-    if (selectedCateName.value) prompt += `文章栏目：${selectedCateName.value}\n`
-    if (selectedAuthorName.value) prompt += `作者：${selectedAuthorName.value}\n`
-    if (intro) prompt += `文章简介：${intro}\n`
-    if (summary) prompt += `摘要：${summary}\n`
-    if (currentText && mode !== 'replace') prompt += `\n当前正文：\n${currentText}\n`
-    prompt += `\n${modeInstructions[mode]}\n请只输出纯文本，不要 Markdown 代码块。`
-    if (userPrompt.trim()) prompt += `\n额外要求：${userPrompt.trim()}`
-    return prompt
-}
-
-/**
- * 调用 AI 生成/续写/润色文章正文
- */
-const handleAiGenerate = async (mode: AiGenerateMode) => {
-    aiLoading.value = true
-    try {
-        const message = buildArticleAiPrompt(mode, aiPrompt.value)
-        const result = await uiedAiChat({ message, context: '文章内容编辑' })
-        const draft = parseAiReply(result)
-        if (!draft) {
-            feedback.msgWarning('AI 未返回可用结果，请调整后重试')
-            return
-        }
-        aiDraftText.value = draft
-        feedback.msgSuccess('AI 草稿已生成，可在右侧选择替换或追加')
-    } catch (error: any) {
-        feedback.msgError(error?.msg || error?.message || 'AI 处理失败')
-    } finally {
-        aiLoading.value = false
-    }
-}
-
-/**
- * 将 AI 草稿应用到正文
- */
-const applyAiDraft = (mode: 'replace' | 'append') => {
-    const draft = aiDraftText.value.trim()
-    if (!draft) {
-        feedback.msgWarning('暂无可用草稿')
-        return
-    }
-    const html = plainTextToHtml(draft)
-    if (mode === 'append' && (formData.content || '').trim()) {
-        formData.content = `${formData.content}<p><br/></p>${html}`
-        feedback.msgSuccess('已追加到正文')
-        return
-    }
-    formData.content = html
-    feedback.msgSuccess('已替换正文')
-}
-
-/**
- * 复制 AI 草稿
- */
-const copyAiDraft = async () => {
-    const draft = aiDraftText.value.trim()
-    if (!draft) return
-    try {
-        await navigator.clipboard.writeText(draft)
-        feedback.msgSuccess('草稿已复制')
-    } catch (error: any) {
-        feedback.msgError(error?.message || '复制失败')
-    }
-}
-
-/**
- * 清空 AI 草稿
- */
-const clearAiDraft = () => {
-    aiDraftText.value = ''
-}
-
-/**
- * 处理编辑器选中文本的 AI 改写事件
- */
-const handleAiHover = async (event: Event) => {
-    const detail = (event as CustomEvent).detail || {}
-    const selectedText: string = detail.text
-    const editor = detail.editor
-    if (!selectedText || aiRewriting.value) return
-
-    aiRewriting.value = true
-    try {
-        const result = await uiedAiChat({
-            message: `请优化改写以下文本，保持原意但使其更专业流畅，直接返回改写后的纯文本：\n\n${selectedText}`,
-            context: '文章内容编辑'
-        })
-        const newText = parseAiReply(result)
-        if (!newText) {
-            feedback.msgWarning('AI 未返回可用改写内容')
-            return
-        }
-        if (editor && typeof editor.insertText === 'function') {
-            editor.insertText(newText)
-            feedback.msgSuccess('AI 改写完成')
-        }
-    } catch (error: any) {
-        feedback.msgError(error?.msg || error?.message || 'AI 改写失败')
-    } finally {
-        aiRewriting.value = false
-    }
-}
-
-/**
  * 保存文章
  */
 const handleSave = async () => {
@@ -1065,20 +868,9 @@ const handleSave = async () => {
     router.back()
 }
 
-/**
- * 绑定编辑器 AI 悬浮菜单事件
- */
 onMounted(() => {
-    window.addEventListener('wangeditor-ai-hover', handleAiHover as EventListener)
     refreshLocalDraftState()
     fetchAuthorOptions('')
-})
-
-/**
- * 解绑编辑器 AI 悬浮菜单事件
- */
-onBeforeUnmount(() => {
-    window.removeEventListener('wangeditor-ai-hover', handleAiHover as EventListener)
 })
 
 route.query.id && getDetails()
@@ -1087,10 +879,7 @@ route.query.id && getDetails()
 <style lang="scss" scoped>
 .article-edit {
     &__grid {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) 360px;
-        gap: 20px;
-        align-items: flex-start;
+        display: block;
     }
 
     &__main {
@@ -1129,17 +918,6 @@ route.query.id && getDetails()
         }
     }
 
-    &__aside {
-        position: sticky;
-        top: 76px;
-    }
-
-    &__ai-card {
-        :deep(.el-card__body) {
-            padding-top: 12px;
-        }
-    }
-
     &__author-picker {
         display: flex;
         gap: 8px;
@@ -1165,14 +943,6 @@ route.query.id && getDetails()
 
 @media (max-width: 1200px) {
     .article-edit {
-        &__grid {
-            grid-template-columns: minmax(0, 1fr);
-        }
-
-        &__aside {
-            position: static;
-        }
-
         &__panel-head {
             flex-direction: column;
             align-items: flex-start;

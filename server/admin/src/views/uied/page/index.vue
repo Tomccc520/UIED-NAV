@@ -21,10 +21,18 @@
                 <el-table-column label="ID" prop="id" width="80" />
                 <el-table-column label="页面名称" prop="name" min-width="120" />
                 <el-table-column label="别名" prop="slug" min-width="100" />
-                <el-table-column label="Hero标题" prop="heroTitle" min-width="150" show-overflow-tooltip />
+                <el-table-column
+                    label="Hero标题"
+                    prop="heroTitle"
+                    min-width="150"
+                    show-overflow-tooltip
+                />
                 <el-table-column label="显示模式" width="100">
                     <template #default="{ row }">
-                        <el-tag size="small" :type="row.heroBgType === 'iconScroll' ? 'warning' : ''">
+                        <el-tag
+                            size="small"
+                            :type="row.heroBgType === 'iconScroll' ? 'warning' : ''"
+                        >
                             {{ row.heroDisplayMode === 'iconScroll' ? '图标滚动' : '搜索框' }}
                         </el-tag>
                     </template>
@@ -39,7 +47,9 @@
                 </el-table-column>
                 <el-table-column label="操作" width="180" fixed="right">
                     <template #default="{ row }">
-                        <el-button type="primary" link @click="handleCategories(row)">分类配置</el-button>
+                        <el-button type="primary" link @click="handleCategories(row)"
+                            >分类配置</el-button
+                        >
                         <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
                         <el-button type="danger" link @click="handleDelete(row.id)">删除</el-button>
                     </template>
@@ -51,7 +61,12 @@
         </el-card>
 
         <!-- 编辑弹窗 -->
-        <el-dialog v-model="showEdit" :title="editData.id ? '编辑页面' : '添加页面'" width="700px" top="5vh">
+        <el-dialog
+            v-model="showEdit"
+            :title="editData.id ? '编辑页面' : '添加页面'"
+            width="700px"
+            top="5vh"
+        >
             <el-form ref="editFormRef" :model="editData" :rules="editRules" label-width="110px">
                 <el-tabs v-model="editTab">
                     <!-- 基本信息 -->
@@ -60,7 +75,10 @@
                             <el-input v-model="editData.name" placeholder="请输入页面名称" />
                         </el-form-item>
                         <el-form-item label="页面别名" prop="slug">
-                            <el-input v-model="editData.slug" placeholder="请输入页面别名（URL友好）" />
+                            <el-input
+                                v-model="editData.slug"
+                                placeholder="请输入页面别名（URL友好）"
+                            />
                         </el-form-item>
                         <el-form-item label="页面描述">
                             <el-input v-model="editData.description" type="textarea" :rows="2" />
@@ -79,14 +97,27 @@
                             <el-input v-model="editData.heroTitle" placeholder="首屏大标题" />
                         </el-form-item>
                         <el-form-item label="高亮文本">
-                            <el-input v-model="editData.heroHighlightText" placeholder="标题中需要高亮的文本，如: AI工具" />
+                            <el-input
+                                v-model="editData.heroHighlightText"
+                                placeholder="标题中需要高亮的文本，如: AI工具"
+                            />
                             <div class="text-gray-400 text-xs mt-1">标题中需要高亮显示的文本</div>
                         </el-form-item>
                         <el-form-item label="Hero副标题">
-                            <el-input v-model="editData.heroSubtitle" type="textarea" :rows="2" placeholder="首屏副标题" />
+                            <el-input
+                                v-model="editData.heroSubtitle"
+                                type="textarea"
+                                :rows="2"
+                                placeholder="首屏副标题"
+                            />
                         </el-form-item>
                         <el-form-item label="热门搜索标签">
-                            <el-input v-model="editData.hotSearchTagsStr" type="textarea" :rows="2" placeholder="标签1,标签2,标签3" />
+                            <el-input
+                                v-model="editData.hotSearchTagsStr"
+                                type="textarea"
+                                :rows="2"
+                                placeholder="标签1,标签2,标签3"
+                            />
                             <div class="text-gray-400 text-xs mt-1">多个标签用逗号分隔</div>
                         </el-form-item>
                         <el-form-item label="背景类型">
@@ -98,7 +129,10 @@
                             </el-select>
                         </el-form-item>
                         <el-form-item label="背景值" v-if="editData.heroBgType !== 'default'">
-                            <el-input v-model="editData.heroBgValue" :placeholder="getBgPlaceholder()" />
+                            <el-input
+                                v-model="editData.heroBgValue"
+                                :placeholder="getBgPlaceholder()"
+                            />
                             <div class="text-gray-400 text-xs mt-1">{{ getBgHint() }}</div>
                         </el-form-item>
                         <el-form-item label="显示模式">
@@ -106,11 +140,16 @@
                                 <el-option label="搜索框模式" value="search" />
                                 <el-option label="图标滚动墙" value="iconScroll" />
                             </el-select>
-                            <div class="text-gray-400 text-xs mt-1">图标滚动墙会在背景显示网站图标滚动效果</div>
+                            <div class="text-gray-400 text-xs mt-1">
+                                图标滚动墙会在背景显示网站图标滚动效果
+                            </div>
                         </el-form-item>
-                        
+
                         <!-- 图标滚动墙分类选择 -->
-                        <el-form-item label="滚动图标分类" v-if="editData.heroDisplayMode === 'iconScroll'">
+                        <el-form-item
+                            label="滚动图标分类"
+                            v-if="editData.heroDisplayMode === 'iconScroll'"
+                        >
                             <div class="scroll-categories-selector">
                                 <!-- 多选分类 -->
                                 <el-select
@@ -131,10 +170,16 @@
                                 <div class="text-gray-400 text-xs mt-2">
                                     选择分类后，该分类下的网站图标将在 Hero 区域滚动显示
                                 </div>
-                                <div v-if="loadingScrollWebsites" class="text-blue-500 text-xs mt-1">
+                                <div
+                                    v-if="loadingScrollWebsites"
+                                    class="text-blue-500 text-xs mt-1"
+                                >
                                     正在加载分类下的网站...
                                 </div>
-                                <div v-else-if="selectedScrollWebsites.length > 0" class="text-green-500 text-xs mt-1">
+                                <div
+                                    v-else-if="selectedScrollWebsites.length > 0"
+                                    class="text-green-500 text-xs mt-1"
+                                >
                                     已匹配 {{ selectedScrollWebsites.length }} 个网站图标
                                 </div>
                             </div>
@@ -144,7 +189,10 @@
                     <!-- 页面配置 -->
                     <el-tab-pane label="页面配置" name="config">
                         <el-form-item label="搜索占位符">
-                            <el-input v-model="editData.searchPlaceholder" placeholder="搜索框占位文本" />
+                            <el-input
+                                v-model="editData.searchPlaceholder"
+                                placeholder="搜索框占位文本"
+                            />
                         </el-form-item>
                         <el-form-item label="启用搜索">
                             <el-switch v-model="editData.searchEnabled" />
@@ -160,14 +208,18 @@
                         </el-form-item>
                         <el-form-item label="主题色">
                             <el-color-picker v-model="editData.themeColor" />
-                            <span class="ml-2 text-gray-400">{{ editData.themeColor || '未设置' }}</span>
+                            <span class="ml-2 text-gray-400">{{
+                                editData.themeColor || '未设置'
+                            }}</span>
                         </el-form-item>
                     </el-tab-pane>
                 </el-tabs>
             </el-form>
             <template #footer>
                 <el-button @click="showEdit = false">取消</el-button>
-                <el-button type="primary" :loading="editLoading" @click="handleSubmit">确定</el-button>
+                <el-button type="primary" :loading="editLoading" @click="handleSubmit"
+                    >确定</el-button
+                >
             </template>
         </el-dialog>
 
@@ -181,14 +233,26 @@
             />
             <template #footer>
                 <el-button @click="showCategories = false">取消</el-button>
-                <el-button type="primary" :loading="categoryLoading" @click="handleSaveCategories">保存</el-button>
+                <el-button type="primary" :loading="categoryLoading" @click="handleSaveCategories"
+                    >保存</el-button
+                >
             </template>
         </el-dialog>
     </div>
 </template>
 
 <script lang="ts" setup name="uiedPage">
-import { uiedPageList, uiedPageAdd, uiedPageEdit, uiedPageDelete, uiedPageCategories, uiedPageUpdateCategories, uiedCategoryAll, uiedWebsiteSearch, uiedWebsiteList } from '@/api/uied'
+import {
+    uiedPageList,
+    uiedPageAdd,
+    uiedPageEdit,
+    uiedPageDelete,
+    uiedPageCategories,
+    uiedPageUpdateCategories,
+    uiedCategoryAll,
+    uiedWebsiteSearch,
+    uiedWebsiteList
+} from '@/api/uied'
 import { usePaging } from '@/hooks/usePaging'
 import feedback from '@/utils/feedback'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -229,7 +293,7 @@ const editData = reactive({
     showHotRecommendations: true,
     showCategories: true,
     showSidebar: true,
-    themeColor: '',
+    themeColor: ''
 })
 
 const editRules: FormRules = {
@@ -240,20 +304,28 @@ const editRules: FormRules = {
 // 获取背景值占位符
 const getBgPlaceholder = () => {
     switch (editData.heroBgType) {
-        case 'color': return '#1a1a2e'
-        case 'gradient': return 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-        case 'image': return 'https://example.com/bg.jpg'
-        default: return ''
+        case 'color':
+            return '#1a1a2e'
+        case 'gradient':
+            return 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+        case 'image':
+            return 'https://example.com/bg.jpg'
+        default:
+            return ''
     }
 }
 
 // 获取背景值提示
 const getBgHint = () => {
     switch (editData.heroBgType) {
-        case 'color': return '输入十六进制颜色值，如 #1a1a2e'
-        case 'gradient': return '输入 CSS 渐变值，如 linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-        case 'image': return '输入图片 URL 地址'
-        default: return ''
+        case 'color':
+            return '输入十六进制颜色值，如 #1a1a2e'
+        case 'gradient':
+            return '输入 CSS 渐变值，如 linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+        case 'image':
+            return '输入图片 URL 地址'
+        default:
+            return ''
     }
 }
 
@@ -284,7 +356,12 @@ watch(selectedScrollCategoryIds, async (newIds) => {
         const allWebsites: any[] = []
         const seenIds = new Set<number>()
         for (const catId of newIds) {
-            const res = await uiedWebsiteList({ categoryId: catId, includeChildren: 'true', pageSize: 200, pageNo: 1 })
+            const res = await uiedWebsiteList({
+                categoryId: catId,
+                includeChildren: 'true',
+                pageSize: 200,
+                pageNo: 1
+            })
             const websites = res?.lists || []
             for (const w of websites) {
                 if (!seenIds.has(w.id)) {
@@ -304,40 +381,60 @@ watch(selectedScrollCategoryIds, async (newIds) => {
 
 const resetEditData = () => {
     Object.assign(editData, {
-        id: 0, name: '', slug: '', description: '', sortOrder: 0, isActive: true,
-        heroTitle: '', heroHighlightText: '', heroSubtitle: '', hotSearchTagsStr: '',
-        heroBgType: 'default', heroBgValue: '', heroDisplayMode: 'search',
-        heroScrollWebsites: [], heroScrollCategories: [],
-        searchPlaceholder: '', searchEnabled: true, showHotRecommendations: true,
-        showCategories: true, showSidebar: true, themeColor: '',
+        id: 0,
+        name: '',
+        slug: '',
+        description: '',
+        sortOrder: 0,
+        isActive: true,
+        heroTitle: '',
+        heroHighlightText: '',
+        heroSubtitle: '',
+        hotSearchTagsStr: '',
+        heroBgType: 'default',
+        heroBgValue: '',
+        heroDisplayMode: 'search',
+        heroScrollWebsites: [],
+        heroScrollCategories: [],
+        searchPlaceholder: '',
+        searchEnabled: true,
+        showHotRecommendations: true,
+        showCategories: true,
+        showSidebar: true,
+        themeColor: ''
     })
     selectedScrollCategoryIds.value = []
     editTab.value = 'basic'
 }
 
-const handleAdd = () => { 
+const handleAdd = () => {
     resetEditData()
     loadScrollCategories()
-    showEdit.value = true 
+    showEdit.value = true
 }
 
 const handleEdit = async (row: any) => {
     isEditLoading.value = true
     // 转换热门标签数组为字符串
-    const hotSearchTagsStr = Array.isArray(row.hotSearchTags) ? row.hotSearchTags.join(',') : (row.hotSearchTags || '')
-    
+    const hotSearchTagsStr = Array.isArray(row.hotSearchTags)
+        ? row.hotSearchTags.join(',')
+        : row.hotSearchTags || ''
+
     // 解析滚动网站ID列表
     let heroScrollWebsites: any[] = []
     if (row.heroScrollWebsites) {
         try {
-            heroScrollWebsites = typeof row.heroScrollWebsites === 'string' 
-                ? JSON.parse(row.heroScrollWebsites) 
-                : (Array.isArray(row.heroScrollWebsites) ? row.heroScrollWebsites : [])
+            heroScrollWebsites =
+                typeof row.heroScrollWebsites === 'string'
+                    ? JSON.parse(row.heroScrollWebsites)
+                    : Array.isArray(row.heroScrollWebsites)
+                    ? row.heroScrollWebsites
+                    : []
         } catch (e) {
             heroScrollWebsites = []
         }
     }
-    
+
     Object.assign(editData, {
         ...row,
         hotSearchTagsStr,
@@ -345,31 +442,34 @@ const handleEdit = async (row: any) => {
         searchEnabled: row.searchEnabled !== false,
         showHotRecommendations: row.showHotRecommendations !== false,
         showCategories: row.showCategories !== false,
-        showSidebar: row.showSidebar !== false,
+        showSidebar: row.showSidebar !== false
     })
-    
+
     // 加载分类列表
     await loadScrollCategories()
-    
+
     // 如果有滚动网站，加载网站详情
     if (heroScrollWebsites.length > 0) {
         try {
             // 使用 uiedWebsiteSearch 通过 ids 参数查询，支持新旧ID格式
-            const idsStr = heroScrollWebsites.map(id => String(id)).join(',')
+            const idsStr = heroScrollWebsites.map((id) => String(id)).join(',')
             const res = await uiedWebsiteSearch({ ids: idsStr, pageSize: 200 })
             // likeadmin 返回格式: { lists: [...], count: ... }
             const websites = res?.lists || []
-            
+
             console.log('加载滚动网站:', { heroScrollWebsites, idsStr, res, websites })
-            
+
             if (websites.length > 0) {
                 // 按原顺序排列，支持新数字ID和旧cuid格式
                 selectedScrollWebsites.value = heroScrollWebsites
-                    .map((id: any) => websites.find((w: any) => 
-                        String(w.id) === String(id) || 
-                        w.oldId === id || 
-                        w.oldId === String(id)
-                    ))
+                    .map((id: any) =>
+                        websites.find(
+                            (w: any) =>
+                                String(w.id) === String(id) ||
+                                w.oldId === id ||
+                                w.oldId === String(id)
+                        )
+                    )
                     .filter(Boolean)
             } else {
                 selectedScrollWebsites.value = []
@@ -381,7 +481,7 @@ const handleEdit = async (row: any) => {
     } else {
         selectedScrollWebsites.value = []
     }
-    
+
     editTab.value = 'basic'
     showEdit.value = true
     isEditLoading.value = false
@@ -394,16 +494,28 @@ const handleSubmit = async () => {
         // 转换热门标签字符串为数组
         const submitData = {
             ...editData,
-            hotSearchTags: editData.hotSearchTagsStr ? editData.hotSearchTagsStr.split(',').map(s => s.trim()).filter(Boolean) : [],
-            heroScrollWebsites: selectedScrollWebsites.value.map(w => w.id),
+            hotSearchTags: editData.hotSearchTagsStr
+                ? editData.hotSearchTagsStr
+                      .split(',')
+                      .map((s) => s.trim())
+                      .filter(Boolean)
+                : [],
+            heroScrollWebsites: selectedScrollWebsites.value.map((w) => w.id)
         }
         delete (submitData as any).hotSearchTagsStr
-        
-        if (editData.id) { await uiedPageEdit(submitData); feedback.msgSuccess('编辑成功') }
-        else { await uiedPageAdd(submitData); feedback.msgSuccess('添加成功') }
+
+        if (editData.id) {
+            await uiedPageEdit(submitData)
+            feedback.msgSuccess('编辑成功')
+        } else {
+            await uiedPageAdd(submitData)
+            feedback.msgSuccess('添加成功')
+        }
         showEdit.value = false
         getLists()
-    } finally { editLoading.value = false }
+    } finally {
+        editLoading.value = false
+    }
 }
 
 const handleDelete = async (id: number) => {
@@ -422,7 +534,10 @@ const selectedCategories = ref<number[]>([])
 
 const handleCategories = async (row: any) => {
     currentPageId.value = row.id
-    const [cats, pageCats] = await Promise.all([uiedCategoryAll(), uiedPageCategories({ id: row.id })])
+    const [cats, pageCats] = await Promise.all([
+        uiedCategoryAll(),
+        uiedPageCategories({ id: row.id })
+    ])
     allCategories.value = cats || []
     selectedCategories.value = (pageCats || []).map((c: any) => c.id)
     showCategories.value = true
@@ -431,10 +546,15 @@ const handleCategories = async (row: any) => {
 const handleSaveCategories = async () => {
     categoryLoading.value = true
     try {
-        await uiedPageUpdateCategories({ pageId: currentPageId.value, categoryIds: selectedCategories.value })
+        await uiedPageUpdateCategories({
+            pageId: currentPageId.value,
+            categoryIds: selectedCategories.value
+        })
         feedback.msgSuccess('保存成功')
         showCategories.value = false
-    } finally { categoryLoading.value = false }
+    } finally {
+        categoryLoading.value = false
+    }
 }
 
 getLists()

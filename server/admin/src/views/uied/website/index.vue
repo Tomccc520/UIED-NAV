@@ -21,7 +21,12 @@
                     />
                 </el-form-item>
                 <el-form-item label="所属分类">
-                    <el-select class="w-[200px]" v-model="queryParams.categoryId" clearable placeholder="全部分类">
+                    <el-select
+                        class="w-[200px]"
+                        v-model="queryParams.categoryId"
+                        clearable
+                        placeholder="全部分类"
+                    >
                         <el-option
                             v-for="item in categoryList"
                             :key="item.id"
@@ -43,13 +48,15 @@
                         <template #icon><icon name="el-icon-Plus" /></template>
                         添加网站
                     </el-button>
-                    <el-button type="danger" :disabled="!selectedIds.length" @click="handleBatchDelete">
+                    <el-button
+                        type="danger"
+                        :disabled="!selectedIds.length"
+                        @click="handleBatchDelete"
+                    >
                         批量删除
                     </el-button>
                 </div>
-                <div class="text-gray-400">
-                    共 {{ pager.count }} 个网站
-                </div>
+                <div class="text-gray-400">共 {{ pager.count }} 个网站</div>
             </div>
             <el-table
                 size="large"
@@ -61,17 +68,29 @@
                 <el-table-column label="ID" prop="id" width="80" />
                 <el-table-column label="图标" width="70">
                     <template #default="{ row }">
-                        <el-avatar v-if="row.iconUrl" :src="row.iconUrl" :size="32" shape="square" />
+                        <el-avatar
+                            v-if="row.iconUrl"
+                            :src="row.iconUrl"
+                            :size="32"
+                            shape="square"
+                        />
                         <el-avatar v-else :size="32" shape="square">
                             {{ row.name?.charAt(0) }}
                         </el-avatar>
                     </template>
                 </el-table-column>
-                <el-table-column label="网站名称" prop="name" min-width="150" show-overflow-tooltip />
+                <el-table-column
+                    label="网站名称"
+                    prop="name"
+                    min-width="150"
+                    show-overflow-tooltip
+                />
                 <el-table-column label="分类" prop="categoryName" width="120" />
                 <el-table-column label="URL" min-width="200" show-overflow-tooltip>
                     <template #default="{ row }">
-                        <a :href="row.url" target="_blank" class="text-primary hover:underline">{{ row.url }}</a>
+                        <a :href="row.url" target="_blank" class="text-primary hover:underline">{{
+                            row.url
+                        }}</a>
                     </template>
                 </el-table-column>
                 <el-table-column label="前端" width="80" align="center">
@@ -105,7 +124,12 @@
 </template>
 
 <script lang="ts" setup name="uiedWebsite">
-import { uiedWebsiteList, uiedWebsiteDelete, uiedWebsiteBatchDelete, uiedCategoryAll } from '@/api/uied'
+import {
+    uiedWebsiteList,
+    uiedWebsiteDelete,
+    uiedWebsiteBatchDelete,
+    uiedCategoryAll
+} from '@/api/uied'
 import { usePaging } from '@/hooks/usePaging'
 import feedback from '@/utils/feedback'
 
@@ -142,7 +166,7 @@ const getCategoryList = async () => {
 // 选中的ID
 const selectedIds = ref<number[]>([])
 const handleSelectionChange = (rows: any[]) => {
-    selectedIds.value = rows.map(row => row.id)
+    selectedIds.value = rows.map((row) => row.id)
 }
 
 // 跳转到编辑页面

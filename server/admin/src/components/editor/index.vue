@@ -68,11 +68,18 @@ function registerAiHoverMenu() {
     class AiHoverMenu {
         title = 'AI'
         tag = 'button'
-        iconSvg = '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>'
+        iconSvg =
+            '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>'
 
-        isActive() { return false }
-        getValue() { return '' }
-        isDisabled(editor: IDomEditor) { return !editor.getSelectionText() }
+        isActive() {
+            return false
+        }
+        getValue() {
+            return ''
+        }
+        isDisabled(editor: IDomEditor) {
+            return !editor.getSelectionText()
+        }
 
         exec(editor: IDomEditor) {
             const selectedText = editor.getSelectionText()
@@ -88,7 +95,9 @@ function registerAiHoverMenu() {
 
     const aiMenuConf = {
         key: 'aiHoverMenu',
-        factory() { return new AiHoverMenu() }
+        factory() {
+            return new AiHoverMenu()
+        }
     }
 
     try {
@@ -128,8 +137,15 @@ const editorConfig: Partial<IEditorConfig> = {
         // 选中文本时的悬浮菜单
         text: {
             menuKeys: [
-                'headerSelect', 'bold', 'italic', 'underline', 'through',
-                'color', 'bgColor', 'insertLink', 'aiHoverMenu'
+                'headerSelect',
+                'bold',
+                'italic',
+                'underline',
+                'through',
+                'color',
+                'bgColor',
+                'insertLink',
+                'aiHoverMenu'
             ]
         }
     }
@@ -178,7 +194,7 @@ const handleCreated = (editor: any) => {
 }
 /* AI 悬浮按钮样式 */
 .w-e-hover-bar {
-    .w-e-menu-tooltip-v5[data-tooltip="AI"] {
+    .w-e-menu-tooltip-v5[data-tooltip='AI'] {
         button {
             color: #7c3aed;
             font-weight: bold;

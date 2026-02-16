@@ -307,7 +307,14 @@ const { optionsData } = useDictOptions<{
 /**
  * 解析文章编辑路由，优先使用动态菜单路由，缺失时使用兜底路径
  */
-const resolveEditPath = () => getRoutePath('article:add/edit') || '/article-manage/article/add/edit'
+const resolveEditPath = () => {
+    const routePaths = new Set(router.getRoutes().map((item) => item.path))
+    const dynamicPath = getRoutePath('article:add/edit')
+    const fallbackPaths = ['/article-manage/article/add/edit', '/_detail/article/edit']
+    const candidates = [dynamicPath, ...fallbackPaths].filter(Boolean) as string[]
+    const matched = candidates.find((path) => routePaths.has(path))
+    return matched || fallbackPaths[0]
+}
 
 /**
  * 文章编辑路由

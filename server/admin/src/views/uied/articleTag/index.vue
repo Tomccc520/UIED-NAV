@@ -34,9 +34,7 @@
                         添加标签
                     </el-button>
                 </div>
-                <div class="text-gray-400">
-                    共 {{ pager.count }} 个标签
-                </div>
+                <div class="text-gray-400">共 {{ pager.count }} 个标签</div>
             </div>
             <el-table size="large" v-loading="pager.loading" :data="pager.lists">
                 <el-table-column label="ID" prop="id" width="80" />
@@ -44,7 +42,11 @@
                     <template #default="{ row }">
                         <el-tag
                             :color="row.color || undefined"
-                            :style="row.color ? { color: getContrastColor(row.color), borderColor: row.color } : {}"
+                            :style="
+                                row.color
+                                    ? { color: getContrastColor(row.color), borderColor: row.color }
+                                    : {}
+                            "
                             size="default"
                         >
                             {{ row.name }}
@@ -95,7 +97,9 @@
                 <el-form-item label="标签颜色">
                     <div class="flex items-center gap-3">
                         <el-color-picker v-model="editData.color" />
-                        <span v-if="editData.color" class="text-xs text-gray-400">{{ editData.color }}</span>
+                        <span v-if="editData.color" class="text-xs text-gray-400">{{
+                            editData.color
+                        }}</span>
                     </div>
                 </el-form-item>
                 <el-form-item label="排序">
@@ -104,7 +108,9 @@
             </el-form>
             <template #footer>
                 <el-button @click="showEdit = false">取消</el-button>
-                <el-button type="primary" :loading="editLoading" @click="handleSubmit">确定</el-button>
+                <el-button type="primary" :loading="editLoading" @click="handleSubmit"
+                    >确定</el-button
+                >
             </template>
         </el-dialog>
     </div>
@@ -120,7 +126,12 @@
  * @license MIT
  * @version 1.0.0
  */
-import { uiedArticleTagList, uiedArticleTagAdd, uiedArticleTagEdit, uiedArticleTagDelete } from '@/api/uied'
+import {
+    uiedArticleTagList,
+    uiedArticleTagAdd,
+    uiedArticleTagEdit,
+    uiedArticleTagDelete
+} from '@/api/uied'
 import { usePaging } from '@/hooks/usePaging'
 import feedback from '@/utils/feedback'
 import type { FormInstance, FormRules } from 'element-plus'

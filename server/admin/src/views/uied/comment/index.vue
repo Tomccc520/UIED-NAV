@@ -27,7 +27,9 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <div class="text-gray-400 text-sm">待审核</div>
-                            <div class="text-2xl font-bold mt-1 text-orange-500">{{ stats.pendingCount }}</div>
+                            <div class="text-2xl font-bold mt-1 text-orange-500">
+                                {{ stats.pendingCount }}
+                            </div>
                         </div>
                         <el-icon :size="32" class="text-orange-300"><Clock /></el-icon>
                     </div>
@@ -38,7 +40,9 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <div class="text-gray-400 text-sm">已通过</div>
-                            <div class="text-2xl font-bold mt-1 text-green-500">{{ stats.approvedCount }}</div>
+                            <div class="text-2xl font-bold mt-1 text-green-500">
+                                {{ stats.approvedCount }}
+                            </div>
                         </div>
                         <el-icon :size="32" class="text-green-300"><CircleCheck /></el-icon>
                     </div>
@@ -49,7 +53,9 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <div class="text-gray-400 text-sm">已拒绝</div>
-                            <div class="text-2xl font-bold mt-1 text-red-500">{{ stats.rejectedCount }}</div>
+                            <div class="text-2xl font-bold mt-1 text-red-500">
+                                {{ stats.rejectedCount }}
+                            </div>
                         </div>
                         <el-icon :size="32" class="text-red-300"><CircleClose /></el-icon>
                     </div>
@@ -97,9 +103,7 @@
                     <span class="text-gray-500">评论管理</span>
                     <el-badge v-if="pendingCount > 0" :value="pendingCount" class="ml-1" />
                 </div>
-                <div class="text-gray-400">
-                    共 {{ pager.count }} 条评论
-                </div>
+                <div class="text-gray-400">共 {{ pager.count }} 条评论</div>
             </div>
             <el-table size="large" v-loading="pager.loading" :data="pager.lists">
                 <el-table-column label="ID" prop="id" width="70" />
@@ -113,26 +117,38 @@
                 <el-table-column label="类型" width="100">
                     <template #default="{ row }">
                         <el-tag v-if="row.type === 'website'" size="small">网站</el-tag>
-                        <el-tag v-else-if="row.type === 'article'" type="info" size="small">文章</el-tag>
+                        <el-tag v-else-if="row.type === 'article'" type="info" size="small"
+                            >文章</el-tag
+                        >
                         <el-tag v-else size="small">{{ row.type }}</el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column label="评论对象" prop="targetName" min-width="150">
                     <template #default="{ row }">
-                        <span v-if="row.targetName" class="text-gray-600">{{ row.targetName }}</span>
+                        <span v-if="row.targetName" class="text-gray-600">{{
+                            row.targetName
+                        }}</span>
                         <span v-else class="text-gray-400">-</span>
                     </template>
                 </el-table-column>
                 <el-table-column label="作者" width="120">
                     <template #default="{ row }">
-                        <span class="text-gray-600">{{ row.author || row.nickname || '匿名' }}</span>
+                        <span class="text-gray-600">{{
+                            row.author || row.nickname || '匿名'
+                        }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column label="状态" width="100">
                     <template #default="{ row }">
-                        <el-tag v-if="row.status === 'pending'" type="warning" size="small">待审核</el-tag>
-                        <el-tag v-else-if="row.status === 'approved'" type="success" size="small">已通过</el-tag>
-                        <el-tag v-else-if="row.status === 'rejected'" type="danger" size="small">已拒绝</el-tag>
+                        <el-tag v-if="row.status === 'pending'" type="warning" size="small"
+                            >待审核</el-tag
+                        >
+                        <el-tag v-else-if="row.status === 'approved'" type="success" size="small"
+                            >已通过</el-tag
+                        >
+                        <el-tag v-else-if="row.status === 'rejected'" type="danger" size="small"
+                            >已拒绝</el-tag
+                        >
                         <el-tag v-else size="small">{{ row.status }}</el-tag>
                     </template>
                 </el-table-column>
@@ -144,8 +160,12 @@
                 <el-table-column label="操作" width="200" fixed="right">
                     <template #default="{ row }">
                         <template v-if="row.status === 'pending'">
-                            <el-button type="success" link @click="handleApprove(row.id)">通过</el-button>
-                            <el-button type="warning" link @click="handleReject(row.id)">拒绝</el-button>
+                            <el-button type="success" link @click="handleApprove(row.id)"
+                                >通过</el-button
+                            >
+                            <el-button type="warning" link @click="handleReject(row.id)"
+                                >拒绝</el-button
+                            >
                         </template>
                         <el-button type="danger" link @click="handleDelete(row.id)">删除</el-button>
                     </template>

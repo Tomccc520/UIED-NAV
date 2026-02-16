@@ -20,8 +20,18 @@
             <el-table size="large" v-loading="pager.loading" :data="pager.lists">
                 <el-table-column label="ID" prop="id" width="80" />
                 <el-table-column label="名称" prop="name" min-width="120" />
-                <el-table-column label="URL模板" prop="urlTemplate" min-width="300" show-overflow-tooltip />
-                <el-table-column label="描述" prop="description" min-width="150" show-overflow-tooltip />
+                <el-table-column
+                    label="URL模板"
+                    prop="urlTemplate"
+                    min-width="300"
+                    show-overflow-tooltip
+                />
+                <el-table-column
+                    label="描述"
+                    prop="description"
+                    min-width="150"
+                    show-overflow-tooltip
+                />
                 <el-table-column label="排序" prop="sortOrder" width="80" />
                 <el-table-column label="默认" width="80">
                     <template #default="{ row }">
@@ -39,7 +49,13 @@
                 </el-table-column>
                 <el-table-column label="操作" width="180" fixed="right">
                     <template #default="{ row }">
-                        <el-button v-if="!row.isDefault" type="warning" link @click="handleSetDefault(row.id)">设为默认</el-button>
+                        <el-button
+                            v-if="!row.isDefault"
+                            type="warning"
+                            link
+                            @click="handleSetDefault(row.id)"
+                            >设为默认</el-button
+                        >
                         <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
                         <el-button type="danger" link @click="handleDelete(row.id)">删除</el-button>
                     </template>
@@ -57,8 +73,13 @@
                     <el-input v-model="editData.name" placeholder="请输入名称" />
                 </el-form-item>
                 <el-form-item label="URL模板" prop="urlTemplate">
-                    <el-input v-model="editData.urlTemplate" placeholder="使用 {domain} 作为域名占位符" />
-                    <div class="text-gray-400 text-xs mt-1">示例: https://api.example.com/favicon?domain={domain}</div>
+                    <el-input
+                        v-model="editData.urlTemplate"
+                        placeholder="使用 {domain} 作为域名占位符"
+                    />
+                    <div class="text-gray-400 text-xs mt-1">
+                        示例: https://api.example.com/favicon?domain={domain}
+                    </div>
                 </el-form-item>
                 <el-form-item label="描述">
                     <el-input v-model="editData.description" type="textarea" :rows="2" />
@@ -75,14 +96,22 @@
             </el-form>
             <template #footer>
                 <el-button @click="showEdit = false">取消</el-button>
-                <el-button type="primary" :loading="editLoading" @click="handleSubmit">确定</el-button>
+                <el-button type="primary" :loading="editLoading" @click="handleSubmit"
+                    >确定</el-button
+                >
             </template>
         </el-dialog>
     </div>
 </template>
 
 <script lang="ts" setup name="uiedFaviconApi">
-import { uiedFaviconApiList, uiedFaviconApiAdd, uiedFaviconApiEdit, uiedFaviconApiDelete, uiedFaviconApiSetDefault } from '@/api/uied'
+import {
+    uiedFaviconApiList,
+    uiedFaviconApiAdd,
+    uiedFaviconApiEdit,
+    uiedFaviconApiDelete,
+    uiedFaviconApiSetDefault
+} from '@/api/uied'
 import { usePaging } from '@/hooks/usePaging'
 import feedback from '@/utils/feedback'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -92,26 +121,56 @@ const { pager, getLists } = usePaging({ fetchFun: uiedFaviconApiList })
 const showEdit = ref(false)
 const editLoading = ref(false)
 const editFormRef = ref<FormInstance>()
-const editData = reactive({ id: 0, name: '', urlTemplate: '', description: '', sortOrder: 0, isDefault: false, isActive: true })
+const editData = reactive({
+    id: 0,
+    name: '',
+    urlTemplate: '',
+    description: '',
+    sortOrder: 0,
+    isDefault: false,
+    isActive: true
+})
 const editRules: FormRules = {
     name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
-    urlTemplate: [{ required: true, message: '请输入URL模板', trigger: 'blur' }],
+    urlTemplate: [{ required: true, message: '请输入URL模板', trigger: 'blur' }]
 }
 
-const resetEditData = () => Object.assign(editData, { id: 0, name: '', urlTemplate: '', description: '', sortOrder: 0, isDefault: false, isActive: true })
+const resetEditData = () =>
+    Object.assign(editData, {
+        id: 0,
+        name: '',
+        urlTemplate: '',
+        description: '',
+        sortOrder: 0,
+        isDefault: false,
+        isActive: true
+    })
 
-const handleAdd = () => { resetEditData(); showEdit.value = true }
-const handleEdit = (row: any) => { Object.assign(editData, row); showEdit.value = true }
+const handleAdd = () => {
+    resetEditData()
+    showEdit.value = true
+}
+const handleEdit = (row: any) => {
+    Object.assign(editData, row)
+    showEdit.value = true
+}
 
 const handleSubmit = async () => {
     await editFormRef.value?.validate()
     editLoading.value = true
     try {
-        if (editData.id) { await uiedFaviconApiEdit(editData); feedback.msgSuccess('编辑成功') }
-        else { await uiedFaviconApiAdd(editData); feedback.msgSuccess('添加成功') }
+        if (editData.id) {
+            await uiedFaviconApiEdit(editData)
+            feedback.msgSuccess('编辑成功')
+        } else {
+            await uiedFaviconApiAdd(editData)
+            feedback.msgSuccess('添加成功')
+        }
         showEdit.value = false
         getLists()
-    } finally { editLoading.value = false }
+    } finally {
+        editLoading.value = false
+    }
 }
 
 const handleDelete = async (id: number) => {

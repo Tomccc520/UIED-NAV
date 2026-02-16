@@ -12,32 +12,44 @@
         <el-card class="!border-none" shadow="never">
             <div class="setting-header">
                 <h2 class="setting-title">网站详情页配置</h2>
-                <p class="setting-desc">配置前端「网站详情页」的各项功能和显示内容。修改后保存即可实时生效，无需重启服务。</p>
+                <p class="setting-desc">
+                    配置前端「网站详情页」的各项功能和显示内容。修改后保存即可实时生效，无需重启服务。
+                </p>
             </div>
 
             <el-form :model="config" label-width="160px" style="max-width: 700px">
                 <!-- 区块显示控制 -->
                 <el-divider content-position="left">区块显示控制</el-divider>
-                <p class="section-desc">控制详情页中各个功能区块是否显示。关闭后对应区块将在前端隐藏，不影响已有数据。</p>
+                <p class="section-desc">
+                    控制详情页中各个功能区块是否显示。关闭后对应区块将在前端隐藏，不影响已有数据。
+                </p>
 
                 <el-form-item label="产品截图">
                     <el-switch v-model="config.screenshotsEnabled" />
-                    <span class="form-tip">开启后，详情页将展示该网站的产品截图（需在网站编辑中上传截图）</span>
+                    <span class="form-tip"
+                        >开启后，详情页将展示该网站的产品截图（需在网站编辑中上传截图）</span
+                    >
                 </el-form-item>
 
                 <el-form-item label="评分功能">
                     <el-switch v-model="config.ratingsEnabled" />
-                    <span class="form-tip">开启后，用户可以对网站进行 1-5 星评分，评分结果将展示在详情页</span>
+                    <span class="form-tip"
+                        >开启后，用户可以对网站进行 1-5 星评分，评分结果将展示在详情页</span
+                    >
                 </el-form-item>
 
                 <el-form-item label="评论功能">
                     <el-switch v-model="config.commentsEnabled" />
-                    <span class="form-tip">开启后，用户可以在详情页发表评论。评论需在「评论管理」中审核</span>
+                    <span class="form-tip"
+                        >开启后，用户可以在详情页发表评论。评论需在「评论管理」中审核</span
+                    >
                 </el-form-item>
 
                 <el-form-item label="分享按钮">
                     <el-switch v-model="config.sharingEnabled" />
-                    <span class="form-tip">开启后，详情页底部将显示社交分享按钮（微信、微博、QQ 等）</span>
+                    <span class="form-tip"
+                        >开启后，详情页底部将显示社交分享按钮（微信、微博、QQ 等）</span
+                    >
                 </el-form-item>
 
                 <el-form-item label="收藏按钮">
@@ -52,16 +64,22 @@
 
                 <el-form-item label="标签显示">
                     <el-switch v-model="config.tagsEnabled" />
-                    <span class="form-tip">开启后，详情页将展示该网站关联的标签，方便用户了解网站特征</span>
+                    <span class="form-tip"
+                        >开启后，详情页将展示该网站关联的标签，方便用户了解网站特征</span
+                    >
                 </el-form-item>
 
                 <!-- 直达按钮 -->
                 <el-divider content-position="left">直达按钮</el-divider>
-                <p class="section-desc">控制详情页头部区域的「直达网站」箭头按钮。点击后将在新窗口打开目标网站。</p>
+                <p class="section-desc">
+                    控制详情页头部区域的「直达网站」箭头按钮。点击后将在新窗口打开目标网站。
+                </p>
 
                 <el-form-item label="显示直达箭头">
                     <el-switch v-model="config.visitArrowEnabled" />
-                    <span class="form-tip">开启后，网站名称右侧将显示一个箭头图标，点击可直接跳转到目标网站</span>
+                    <span class="form-tip"
+                        >开启后，网站名称右侧将显示一个箭头图标，点击可直接跳转到目标网站</span
+                    >
                 </el-form-item>
 
                 <el-form-item label="箭头提示文字">
@@ -70,7 +88,9 @@
                         placeholder="鼠标悬停时显示的提示文字"
                         :disabled="!config.visitArrowEnabled"
                     />
-                    <span class="form-tip">鼠标悬停在箭头上时显示的提示文字，默认为「直达网站」</span>
+                    <span class="form-tip"
+                        >鼠标悬停在箭头上时显示的提示文字，默认为「直达网站」</span
+                    >
                 </el-form-item>
 
                 <!-- 版权信息 -->
@@ -97,7 +117,9 @@
                         placeholder="例如：https://example.com（可选，留空则不可点击）"
                         :disabled="!config.copyrightEnabled"
                     />
-                    <span class="form-tip">点击版权文字后跳转的链接地址，留空则版权文字不可点击</span>
+                    <span class="form-tip"
+                        >点击版权文字后跳转的链接地址，留空则版权文字不可点击</span
+                    >
                 </el-form-item>
 
                 <!-- 免责声明 -->
@@ -144,16 +166,22 @@
                         placeholder="例如：report@example.com"
                         :disabled="!config.reportEnabled"
                     />
-                    <span class="form-tip">接收举报邮件的邮箱地址，用户点击举报后将自动打开邮件客户端</span>
+                    <span class="form-tip"
+                        >接收举报邮件的邮箱地址，用户点击举报后将自动打开邮件客户端</span
+                    >
                 </el-form-item>
 
                 <!-- 访问按钮 -->
                 <el-divider content-position="left">访问按钮</el-divider>
-                <p class="section-desc">详情页正文下方的大号访问按钮，点击后跳转到目标网站。直达箭头和访问按钮均受此配置控制。</p>
+                <p class="section-desc">
+                    详情页正文下方的大号访问按钮，点击后跳转到目标网站。直达箭头和访问按钮均受此配置控制。
+                </p>
 
                 <el-form-item label="新窗口打开">
                     <el-switch v-model="config.visitBtnNewWindow" />
-                    <span class="form-tip">开启后，点击「访问网站」按钮和直达箭头时将在浏览器新标签页中打开目标网站；关闭则在当前页面跳转</span>
+                    <span class="form-tip"
+                        >开启后，点击「访问网站」按钮和直达箭头时将在浏览器新标签页中打开目标网站；关闭则在当前页面跳转</span
+                    >
                 </el-form-item>
 
                 <el-form-item label="按钮文字">
@@ -166,7 +194,9 @@
 
                 <!-- 保存按钮 -->
                 <el-form-item>
-                    <el-button type="primary" :loading="saving" @click="handleSave">保存配置</el-button>
+                    <el-button type="primary" :loading="saving" @click="handleSave"
+                        >保存配置</el-button
+                    >
                 </el-form-item>
             </el-form>
         </el-card>
@@ -213,7 +243,7 @@ const defaultConfig = {
     reportEmail: '',
     // 访问按钮
     visitBtnText: '访问网站',
-    visitBtnNewWindow: true,
+    visitBtnNewWindow: true
 }
 
 const saving = ref(false)

@@ -63,6 +63,38 @@ export const constantRoutes: Array<RouteRecordRaw> = [
                 }
             }
         ]
+    },
+    {
+        path: '/article-manage/article',
+        component: LAYOUT,
+        children: [
+            {
+                path: 'add/edit',
+                name: Symbol(),
+                component: () => import('@/views/article/lists/edit.vue'),
+                meta: {
+                    title: '编辑文章',
+                    hidden: true,
+                    activeMenu: '/article-manage/article/lists'
+                }
+            }
+        ]
+    },
+    {
+        path: '/_detail/article',
+        component: LAYOUT,
+        children: [
+            {
+                path: 'edit',
+                name: Symbol(),
+                component: () => import('@/views/article/lists/edit.vue'),
+                meta: {
+                    title: '编辑文章',
+                    hidden: true,
+                    activeMenu: '/article-manage/article/lists'
+                }
+            }
+        ]
     }
 ]
 

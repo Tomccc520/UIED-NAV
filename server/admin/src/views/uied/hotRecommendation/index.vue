@@ -22,14 +22,21 @@
                 <el-table-column label="网站" min-width="200">
                     <template #default="{ row }">
                         <div class="flex items-center gap-2">
-                            <el-avatar v-if="row.iconUrl || row.websiteIcon" :src="row.iconUrl || row.websiteIcon" :size="24" shape="square" />
+                            <el-avatar
+                                v-if="row.iconUrl || row.websiteIcon"
+                                :src="row.iconUrl || row.websiteIcon"
+                                :size="24"
+                                shape="square"
+                            />
                             <span>{{ row.name || row.websiteName || row.title }}</span>
                         </div>
                     </template>
                 </el-table-column>
                 <el-table-column label="链接" prop="url" min-width="200" show-overflow-tooltip>
                     <template #default="{ row }">
-                        <a :href="row.url || row.websiteUrl" target="_blank" class="text-primary">{{ row.url || row.websiteUrl }}</a>
+                        <a :href="row.url || row.websiteUrl" target="_blank" class="text-primary">{{
+                            row.url || row.websiteUrl
+                        }}</a>
                     </template>
                 </el-table-column>
                 <el-table-column label="位置" prop="position" width="100" />
@@ -66,7 +73,12 @@
                     <el-input v-model="editData.iconUrl" placeholder="请输入图标URL（可选）" />
                 </el-form-item>
                 <el-form-item label="描述">
-                    <el-input v-model="editData.description" type="textarea" :rows="2" placeholder="请输入描述（可选）" />
+                    <el-input
+                        v-model="editData.description"
+                        type="textarea"
+                        :rows="2"
+                        placeholder="请输入描述（可选）"
+                    />
                 </el-form-item>
                 <el-form-item label="位置">
                     <el-select v-model="editData.position" style="width: 100%">
@@ -85,14 +97,21 @@
             </el-form>
             <template #footer>
                 <el-button @click="showEdit = false">取消</el-button>
-                <el-button type="primary" :loading="editLoading" @click="handleSubmit">确定</el-button>
+                <el-button type="primary" :loading="editLoading" @click="handleSubmit"
+                    >确定</el-button
+                >
             </template>
         </el-dialog>
     </div>
 </template>
 
 <script lang="ts" setup name="uiedHotRecommendation">
-import { uiedHotRecommendationList, uiedHotRecommendationAdd, uiedHotRecommendationEdit, uiedHotRecommendationDelete } from '@/api/uied'
+import {
+    uiedHotRecommendationList,
+    uiedHotRecommendationAdd,
+    uiedHotRecommendationEdit,
+    uiedHotRecommendationDelete
+} from '@/api/uied'
 import { usePaging } from '@/hooks/usePaging'
 import feedback from '@/utils/feedback'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -102,34 +121,38 @@ const { pager, getLists } = usePaging({ fetchFun: uiedHotRecommendationList })
 const showEdit = ref(false)
 const editLoading = ref(false)
 const editFormRef = ref<FormInstance>()
-const editData = reactive({ 
-    id: 0, 
-    name: '', 
-    url: '', 
-    iconUrl: '', 
-    description: '', 
-    position: 'hot', 
-    sortOrder: 0, 
-    isShow: true 
+const editData = reactive({
+    id: 0,
+    name: '',
+    url: '',
+    iconUrl: '',
+    description: '',
+    position: 'hot',
+    sortOrder: 0,
+    isShow: true
 })
-const editRules: FormRules = { 
+const editRules: FormRules = {
     name: [{ required: true, message: '请输入网站名称', trigger: 'blur' }],
     url: [{ required: true, message: '请输入网站URL', trigger: 'blur' }]
 }
 
-const resetEditData = () => Object.assign(editData, { 
-    id: 0, 
-    name: '', 
-    url: '', 
-    iconUrl: '', 
-    description: '', 
-    position: 'hot', 
-    sortOrder: 0, 
-    isShow: true 
-})
+const resetEditData = () =>
+    Object.assign(editData, {
+        id: 0,
+        name: '',
+        url: '',
+        iconUrl: '',
+        description: '',
+        position: 'hot',
+        sortOrder: 0,
+        isShow: true
+    })
 
-const handleAdd = () => { resetEditData(); showEdit.value = true }
-const handleEdit = (row: any) => { 
+const handleAdd = () => {
+    resetEditData()
+    showEdit.value = true
+}
+const handleEdit = (row: any) => {
     Object.assign(editData, {
         id: row.id,
         name: row.name || row.websiteName || row.title || '',
@@ -140,23 +163,25 @@ const handleEdit = (row: any) => {
         sortOrder: row.sortOrder || 0,
         isShow: row.isActive !== false && row.isShow !== false
     })
-    showEdit.value = true 
+    showEdit.value = true
 }
 
 const handleSubmit = async () => {
     await editFormRef.value?.validate()
     editLoading.value = true
     try {
-        if (editData.id) { 
+        if (editData.id) {
             await uiedHotRecommendationEdit(editData)
-            feedback.msgSuccess('编辑成功') 
-        } else { 
+            feedback.msgSuccess('编辑成功')
+        } else {
             await uiedHotRecommendationAdd(editData)
-            feedback.msgSuccess('添加成功') 
+            feedback.msgSuccess('添加成功')
         }
         showEdit.value = false
         getLists()
-    } finally { editLoading.value = false }
+    } finally {
+        editLoading.value = false
+    }
 }
 
 const handleDelete = async (id: number) => {

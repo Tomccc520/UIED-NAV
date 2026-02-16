@@ -1,9 +1,21 @@
 <template>
     <div class="edit-popup">
-        <popup ref="popupRef" :title="popupTitle" :async="true" width="550px" @confirm="handleSubmit" @close="handleClose">
+        <popup
+            ref="popupRef"
+            :title="popupTitle"
+            :async="true"
+            width="550px"
+            @confirm="handleSubmit"
+            @close="handleClose"
+        >
             <el-form ref="formRef" :model="formData" label-width="84px" :rules="formRules">
                 <el-form-item label="账号" prop="username">
-                    <el-input v-model="formData.username" :disabled="isRoot" placeholder="请输入账号" clearable />
+                    <el-input
+                        v-model="formData.username"
+                        :disabled="isRoot"
+                        placeholder="请输入账号"
+                        clearable
+                    />
                 </el-form-item>
                 <el-form-item label="头像">
                     <div>
@@ -17,37 +29,75 @@
                     <el-input v-model="formData.nickname" placeholder="请输入名称" clearable />
                 </el-form-item>
                 <el-form-item label="归属部门" prop="deptId">
-                    <el-tree-select class="flex-1" v-model="formData.deptId" :data="optionsData.dept" clearable
-                        node-key="id" :props="{
+                    <el-tree-select
+                        class="flex-1"
+                        v-model="formData.deptId"
+                        :data="optionsData.dept"
+                        clearable
+                        node-key="id"
+                        :props="{
                             value: 'id',
                             label: 'name',
                             disabled(data: any) {
                                 return !!data.isStop
                             }
-                        }" check-strictly :default-expand-all="true" placeholder="请选择上级部门" />
+                        }"
+                        check-strictly
+                        :default-expand-all="true"
+                        placeholder="请选择上级部门"
+                    />
                 </el-form-item>
                 <el-form-item label="岗位" prop="postId">
-                    <el-select class="flex-1" clearable v-model="formData.postId" placeholder="请选择岗位">
-                        <el-option v-for="(item, index) in optionsData.post" :key="index" :label="item.name"
-                            :value="item.id" />
+                    <el-select
+                        class="flex-1"
+                        clearable
+                        v-model="formData.postId"
+                        placeholder="请选择岗位"
+                    >
+                        <el-option
+                            v-for="(item, index) in optionsData.post"
+                            :key="index"
+                            :label="item.name"
+                            :value="item.id"
+                        />
                     </el-select>
                 </el-form-item>
 
                 <el-form-item label="角色" prop="role">
-                    <el-select v-model="formData.role" :disabled="isRoot" class="flex-1" clearable placeholder="请选择角色"
-                        multiple>
+                    <el-select
+                        v-model="formData.role"
+                        :disabled="isRoot"
+                        class="flex-1"
+                        clearable
+                        placeholder="请选择角色"
+                        multiple
+                    >
                         <el-option v-if="isRoot" label="系统管理员" :value="0" />
-                        <el-option v-for="(item, index) in optionsData.role" :key="index" :label="item.name"
-                            :value="item.id" />
+                        <el-option
+                            v-for="(item, index) in optionsData.role"
+                            :key="index"
+                            :label="item.name"
+                            :value="item.id"
+                        />
                     </el-select>
                 </el-form-item>
 
                 <el-form-item label="密码" prop="password">
-                    <el-input v-model.trim="formData.password" show-password clearable placeholder="请输入密码" />
+                    <el-input
+                        v-model.trim="formData.password"
+                        show-password
+                        clearable
+                        placeholder="请输入密码"
+                    />
                 </el-form-item>
 
                 <el-form-item label="确认密码" prop="passwordConfirm">
-                    <el-input v-model.trim="formData.passwordConfirm" show-password clearable placeholder="请输入确认密码" />
+                    <el-input
+                        v-model.trim="formData.passwordConfirm"
+                        show-password
+                        clearable
+                        placeholder="请输入确认密码"
+                    />
                 </el-form-item>
 
                 <el-form-item label="管理员状态" v-if="!isRoot">
@@ -56,7 +106,11 @@
 
                 <el-form-item label="多处登录">
                     <div>
-                        <el-switch v-model="formData.isMultipoint" :active-value="1" :inactive-value="0" />
+                        <el-switch
+                            v-model="formData.isMultipoint"
+                            :active-value="1"
+                            :inactive-value="0"
+                        />
                         <div class="form-tips">允许多人同时在线登录</div>
                     </div>
                 </el-form-item>
@@ -203,7 +257,7 @@ const setFormData = async (row: any) => {
             if (key === 'role') {
                 //@ts-ignore
                 // formData[key] = Number(data[key])
-                const arr = data[key].split(',').map(char => Number(char));
+                const arr = data[key].split(',').map((char) => Number(char))
                 formData[key] = arr
                 return
             }
