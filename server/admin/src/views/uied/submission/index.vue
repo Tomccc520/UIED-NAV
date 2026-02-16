@@ -117,12 +117,13 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
 import { usePaging } from '@/hooks/usePaging'
 import Pagination from '@/components/pagination/index.vue'
 import request from '@/utils/request'
+import feedback from '@/utils/feedback'
 
 type TagType = '' | 'success' | 'warning' | 'danger' | 'info'
+type SubmissionStatus = 'pending' | 'approved' | 'rejected'
 
 const queryParams = reactive({ status: '', url: '' })
 const { pager, getLists, resetPage, resetParams, lists, loading } = usePaging({
@@ -135,48 +136,93 @@ const detailData = ref<any>({})
 const showReject = ref(false)
 const rejectReason = ref('')
 const currentRejectId = ref<number | null>(null)
-const statusTypeMap: Record<string, TagType> = {
+const statusTypeMap: Record<SubmissionStatus, TagType> = {
     pending: 'warning',
     approved: 'success',
     rejected: 'danger'
+}
+const statusLabelMap: Record<SubmissionStatus, string> = {
+    pending: '待审核',
+    approved: '已通过',
+    rejected: '已拒绝'
 }
 
 /**
  * 获取状态标签颜色类型
  */
-const getStatusType = (status: string): TagType => statusTypeMap[status] || 'info'
+const getStatusType = (status: string): TagType =>
+    statusTypeMap[status as SubmissionStatus] || 'info'
+
+/**
+ * 获取状态标签文案
+ */
 const getStatusLabel = (status: string) =>
-    ({ pending: '待审核', approved: '已通过', rejected: '已拒绝' }[status] || status)
+    statusLabelMap[status as SubmissionStatus] || status || '-'
+
 const formatTime = (ts: number) => (ts ? new Date(ts * 1000).toLocaleString('zh-CN') : '-')
 
 const handleView = (row: any) => {
     detailData.value = row
     showDetail.value = true
 }
+
+/**
+ * 审核通过提交
+ */
 const handleApprove = async (row: any) => {
-    await ElMessageBox.confirm('确定通过该提交吗？', '提示')
+    try {
+        await feedback.confirm('确定通过该提交吗？')
+    } catch (error) {
+        return
+    }
     await request.post({ url: '/uied/submission/approve', params: { id: row.id } })
-    ElMessage.success('审核通过')
+    feedback.msgSuccess('审核通过')
     getLists()
 }
+
+/**
+ * 打开拒绝弹窗
+ */
 const handleReject = (row: any) => {
     currentRejectId.value = row.id
     rejectReason.value = ''
     showReject.value = true
 }
+
+/**
+ * 确认拒绝提交
+ */
 const confirmReject = async () => {
+    const id = Number(currentRejectId.value || 0)
+    const reason = String(rejectReason.value || '').trim()
+    if (!id) {
+        feedback.msgWarning('提交记录不存在，请刷新后重试')
+        return
+    }
+    if (!reason) {
+        feedback.msgWarning('请输入拒绝原因')
+        return
+    }
     await request.post({
         url: '/uied/submission/reject',
-        params: { id: currentRejectId.value, reason: rejectReason.value }
+        params: { id, reason }
     })
-    ElMessage.success('已拒绝')
+    feedback.msgSuccess('已拒绝')
     showReject.value = false
     getLists()
 }
+
+/**
+ * 删除提交记录
+ */
 const handleDelete = async (id: number) => {
-    await ElMessageBox.confirm('确定删除吗？', '提示', { type: 'warning' })
+    try {
+        await feedback.confirm('确定删除该提交记录吗？')
+    } catch (error) {
+        return
+    }
     await request.post({ url: '/uied/submission/del', params: { id } })
-    ElMessage.success('删除成功')
+    feedback.msgSuccess('删除成功')
     getLists()
 }
 

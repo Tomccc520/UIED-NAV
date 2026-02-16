@@ -293,6 +293,9 @@ import {
     Document as DocumentIcon
 } from '@element-plus/icons-vue'
 import request from '@/utils/request'
+import feedback from '@/utils/feedback'
+
+type RankTagType = '' | 'success' | 'warning' | 'danger' | 'info'
 
 const activeTab = ref('ranking')
 const loading = ref(false)
@@ -305,19 +308,23 @@ const clickStats = ref<any>({})
 const recentWebsites = ref<any[]>([])
 const searchStats = ref<any>({})
 
-// 获取概览数据
+/**
+ * 获取概览统计
+ */
 const getOverview = async () => {
     try {
         const res = await request.get({ url: '/uied/statistics/overview' })
         if (res) {
             overview.value = res
         }
-    } catch (error) {
-        console.error('获取概览失败:', error)
+    } catch (error: any) {
+        feedback.msgError(error?.msg || error?.message || '获取概览数据失败')
     }
 }
 
-// 获取点击统计
+/**
+ * 获取点击统计
+ */
 const getClickStats = async () => {
     loading.value = true
     try {
@@ -325,14 +332,16 @@ const getClickStats = async () => {
         if (res) {
             clickStats.value = res
         }
-    } catch (error) {
-        console.error('获取点击统计失败:', error)
+    } catch (error: any) {
+        feedback.msgError(error?.msg || error?.message || '获取点击统计失败')
     } finally {
         loading.value = false
     }
 }
 
-// 获取最近网站
+/**
+ * 获取最近网站
+ */
 const getRecentWebsites = async () => {
     recentLoading.value = true
     try {
@@ -340,14 +349,16 @@ const getRecentWebsites = async () => {
         if (res) {
             recentWebsites.value = res
         }
-    } catch (error) {
-        console.error('获取最近网站失败:', error)
+    } catch (error: any) {
+        feedback.msgError(error?.msg || error?.message || '获取最近网站失败')
     } finally {
         recentLoading.value = false
     }
 }
 
-// 获取搜索统计
+/**
+ * 获取搜索统计
+ */
 const getSearchStats = async () => {
     searchLoading.value = true
     try {
@@ -355,25 +366,30 @@ const getSearchStats = async () => {
         if (res) {
             searchStats.value = res
         }
-    } catch (error) {
-        console.error('获取搜索统计失败:', error)
+    } catch (error: any) {
+        feedback.msgError(error?.msg || error?.message || '获取搜索统计失败')
     } finally {
         searchLoading.value = false
     }
 }
 
-// 排名样式
-const getRankType = (index: number) => {
+/**
+ * 获取排名标签颜色
+ */
+const getRankType = (index: number): RankTagType => {
     if (index === 0) return 'danger'
     if (index === 1) return 'warning'
     if (index === 2) return 'success'
     return 'info'
 }
 
-// 格式化时间
+/**
+ * 格式化时间（兼容秒/毫秒时间戳）
+ */
 const formatTime = (timestamp: number) => {
     if (!timestamp) return '-'
-    const date = new Date(timestamp)
+    const ts = Number(timestamp || 0)
+    const date = new Date(ts < 1000000000000 ? ts * 1000 : ts)
     return date.toLocaleString('zh-CN', {
         year: 'numeric',
         month: '2-digit',

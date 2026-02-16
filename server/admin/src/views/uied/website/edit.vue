@@ -441,12 +441,15 @@ const isEdit = computed(() => !!route.query.id)
 
 // 分类列表
 const categoryList = ref<any[]>([])
+/**
+ * 获取分类选项
+ */
 const getCategoryList = async () => {
     try {
         const res = await uiedCategoryAll()
         categoryList.value = res || []
-    } catch (error) {
-        console.error('获取分类列表失败:', error)
+    } catch (error: any) {
+        feedback.msgError(error?.msg || error?.message || '获取分类列表失败')
     }
 }
 
@@ -481,6 +484,9 @@ const editRules: FormRules = {
 }
 
 // 加载网站详情
+/**
+ * 加载网站详情
+ */
 const loadDetail = async (id: string | number) => {
     pageLoading.value = true
     try {
@@ -495,7 +501,13 @@ const loadDetail = async (id: string | number) => {
         editData.iconUrl = data.iconUrl || data.icon_url || ''
         editData.tags = Array.isArray(data.tags) ? data.tags : []
         editData.sortOrder = data.order || data.sortOrder || data.sort || 0
-        editData.isActive = data.isActive || data.status !== 'disabled' ? 1 : 0
+        const activeValue =
+            data.isActive !== undefined && data.isActive !== null
+                ? Number(data.isActive)
+                : data.status !== 'disabled'
+                ? 1
+                : 0
+        editData.isActive = activeValue === 1 ? 1 : 0
         editData.isPinned = data.isPinned ? 1 : 0
         editData.detailContent = data.detailContent || data.detail_content || ''
         editData.visitBtnText = data.visitBtnText || data.visit_btn_text || ''

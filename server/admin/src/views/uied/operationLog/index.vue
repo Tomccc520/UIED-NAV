@@ -53,7 +53,13 @@
                         }}</el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column label="资源类型" prop="resource" width="100" />
+                <el-table-column label="资源类型" prop="resource" width="110">
+                    <template #default="{ row }">
+                        <el-tag size="small" effect="plain">
+                            {{ getResourceLabel(row.resource) }}
+                        </el-tag>
+                    </template>
+                </el-table-column>
                 <el-table-column label="资源ID" prop="resourceId" width="100" />
                 <el-table-column
                     label="描述"
@@ -117,6 +123,19 @@ const getActionLabel = (action: string) => {
         export: '导出'
     }
     return labels[action] || action
+}
+
+/**
+ * 获取资源类型显示文案
+ */
+const getResourceLabel = (resource: string) => {
+    const labels: Record<string, string> = {
+        website: '网站',
+        category: '分类',
+        page: '页面',
+        setting: '设置'
+    }
+    return labels[resource] || resource || '-'
 }
 
 const formatTime = (timestamp: number) => {
