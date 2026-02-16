@@ -180,10 +180,30 @@ class AiConfigService extends Service {
       ctx.logger.warn(
         `AI 请求证书校验失败，准备使用不校验证书模式重试一次: ${error?.message || error}`
       );
-      return await ctx.curl(url, {
-        ...baseOptions,
-        rejectUnauthorized: false,
-      });
+      try {
+        return await ctx.curl(url, {
+          ...baseOptions,
+          rejectUnauthorized: false,
+        });
+      } catch (retryError) {
+        if (!this.isTlsCertificateError(retryError) || String(this.app.config.env || '').trim() === 'prod') {
+          throw retryError;
+        }
+        ctx.logger.warn(
+          `AI 不校验证书重试仍失败，准备在开发环境使用 NODE_TLS_REJECT_UNAUTHORIZED=0 再重试一次: ${retryError?.message || retryError}`
+        );
+        const prevTlsEnv = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+        try {
+          return await ctx.curl(url, baseOptions);
+        } finally {
+          if (prevTlsEnv === undefined) {
+            delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+          } else {
+            process.env.NODE_TLS_REJECT_UNAUTHORIZED = prevTlsEnv;
+          }
+        }
+      }
     }
   }
 

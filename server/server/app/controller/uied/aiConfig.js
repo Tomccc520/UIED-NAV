@@ -20,6 +20,9 @@ const baseController = require('../baseController');
 const formatAiErrorMessage = error => {
   const message = String(error?.message || error || '').trim();
   if (!message) return 'AI 服务暂时不可用，请稍后重试';
+  if (/unable to get local issuer certificate|unable to verify the first certificate|self signed certificate|certificate has expired/i.test(message)) {
+    return 'AI 服务 SSL 证书校验失败，请检查服务器证书链配置';
+  }
   if (/connect timeout|timed out|socket hang up|econnrefused|enotfound/i.test(message)) {
     return 'AI 服务连接超时，请检查后台 AI 配置中的 API 地址与网络连通性';
   }
@@ -125,6 +128,38 @@ const splitTextForSse = text => {
 };
 
 /**
+ * 将值标准化为布尔值（仅在传值时转换）
+ * @param {any} value - 原始值
+ * @return {boolean|undefined} 标准化布尔值
+ */
+const normalizeOptionalBoolean = value => {
+  if (value === undefined || value === null || value === '') return undefined;
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'number') return value === 1;
+  const text = String(value).trim().toLowerCase();
+  return [ '1', 'true', 'yes', 'y', 'on' ].includes(text);
+};
+
+/**
+ * 兼容驼峰与下划线风格的 AI 配置参数
+ * @param {Object} payload - 原始请求参数
+ * @return {Object} 统一后的参数对象
+ */
+const normalizeAiConfigPayload = payload => {
+  const source = payload && typeof payload === 'object' ? payload : {};
+  return {
+    id: source.id,
+    name: source.name,
+    provider: source.provider,
+    apiUrl: source.apiUrl !== undefined ? source.apiUrl : source.api_url,
+    apiKey: source.apiKey !== undefined ? source.apiKey : source.api_key,
+    model: source.model,
+    enabled: normalizeOptionalBoolean(source.enabled !== undefined ? source.enabled : source.is_enabled),
+    isDefault: normalizeOptionalBoolean(source.isDefault !== undefined ? source.isDefault : source.is_default),
+  };
+};
+
+/**
  * 写入 SSE 消息片段（OpenAI delta 兼容格式）
  * @param {import('http').ServerResponse} res - Node 响应对象
  * @param {string} chunk - 文本片段
@@ -184,7 +219,7 @@ class AiConfigController extends baseController {
   async save() {
     const { ctx } = this;
     try {
-      const data = ctx.request.body;
+      const data = normalizeAiConfigPayload(ctx.request.body);
       const result = await ctx.service.uied.aiConfig.saveConfig(data);
       this.result({ data: result, message: '保存成功' });
     } catch (error) {
@@ -199,7 +234,8 @@ class AiConfigController extends baseController {
   async test() {
     const { ctx } = this;
     try {
-      const { provider, apiKey, apiUrl } = ctx.request.body;
+      const data = normalizeAiConfigPayload(ctx.request.body);
+      const { provider, apiKey, apiUrl } = data;
       const result = await ctx.service.uied.aiConfig.testConnection(provider, apiKey, apiUrl);
       if (result.success) {
         this.result({ message: '连接成功' });
@@ -243,7 +279,7 @@ class AiConfigController extends baseController {
   async add() {
     const { ctx } = this;
     try {
-      const data = ctx.request.body;
+      const data = normalizeAiConfigPayload(ctx.request.body);
       if (!data.name || !data.apiUrl || !data.apiKey || !data.model) {
         return this.result({ code: 400, message: '名称、API地址、API密钥和模型为必填项' });
       }
@@ -261,7 +297,7 @@ class AiConfigController extends baseController {
   async edit() {
     const { ctx } = this;
     try {
-      const data = ctx.request.body;
+      const data = normalizeAiConfigPayload(ctx.request.body);
       if (!data.id) {
         return this.result({ code: 400, message: '缺少配置ID' });
       }
@@ -461,7 +497,11 @@ class AiConfigController extends baseController {
       endSseStream(res);
     } catch (error) {
       ctx.logger.error('编辑器AI流式对话失败:', error);
-      writeSseDeltaChunk(res, `AI 处理失败：${formatAiErrorMessage(error)}`);
+      const readableMessage = formatAiErrorMessage(error);
+      const outputMessage = /^AI\s*(处理失败|服务)/.test(readableMessage)
+        ? readableMessage
+        : `AI 处理失败：${readableMessage}`;
+      writeSseDeltaChunk(res, outputMessage);
       endSseStream(res);
     }
   }

@@ -2608,6 +2608,8 @@ class ArticleService extends Service {
       reviewTime: formatTime(row.review_time),
       reviewAdminId: Number(row.review_admin_id || 0),
       summary: row.summary,
+      createTime: formatTime(row.create_time),
+      updateTime: formatTime(row.update_time),
     };
   }
 

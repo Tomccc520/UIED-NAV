@@ -107,6 +107,9 @@ module.exports = app => {
   router.all('/api/gen/syncTable', controller.gen.gen.syncTable);
   router.all('/api/gen/previewCode', controller.gen.gen.previewCode);
   router.all('/api/gen/downloadCode', controller.gen.gen.downloadCode);
+  router.all('/api/user/list', controller.user.list);
+  router.all('/api/user/detail', controller.user.detail);
+  router.all('/api/user/edit', controller.user.edit);
   router.all('/api/user/author/options', controller.user.authorOptions);
   router.all('/api/user/article/collect/list', controller.user.articleCollectList);
   router.all('/api/user/article/like/list', controller.user.articleLikeList);

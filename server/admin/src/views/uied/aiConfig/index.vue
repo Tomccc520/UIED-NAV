@@ -50,7 +50,7 @@
                         <el-table-column label="状态" width="90" align="center">
                             <template #default="{ row }">
                                 <el-switch
-                                    :model-value="row.is_enabled === 1"
+                                    :model-value="row.enabled"
                                     @change="(val: string | number | boolean) => handleToggleEnabled(row, !!val)"
                                     size="small"
                                 />
@@ -59,7 +59,7 @@
                         <el-table-column label="默认" width="90" align="center">
                             <template #default="{ row }">
                                 <el-tag
-                                    v-if="row.is_default === 1"
+                                    v-if="row.isDefault"
                                     type="success"
                                     size="small"
                                     effect="dark"
@@ -83,7 +83,7 @@
                                 <el-button
                                     type="success"
                                     link
-                                    :disabled="!row.api_key"
+                                    :disabled="!row.apiKey"
                                     @click="handleTestConnection(row)"
                                     >测试连接</el-button
                                 >
@@ -621,13 +621,46 @@ const getProviderLabel = (provider: string): string => {
 const configList = ref<any[]>([])
 const configLoading = ref(false)
 
+/**
+ * 将值规范为布尔值
+ */
+const normalizeBoolean = (value: any, fallback = false): boolean => {
+    if (value === undefined || value === null || value === '') return fallback
+    if (typeof value === 'boolean') return value
+    if (typeof value === 'number') return value === 1
+    return ['1', 'true', 'yes', 'on'].includes(String(value).trim().toLowerCase())
+}
+
+/**
+ * 统一配置项字段（兼容驼峰/下划线）
+ */
+const normalizeConfigItem = (row: any) => {
+    const source = row && typeof row === 'object' ? row : {}
+    return {
+        id: Number(source.id || 0),
+        name: String(source.name || ''),
+        provider: String(source.provider || 'siliconflow'),
+        apiUrl: String(source.apiUrl ?? source.api_url ?? ''),
+        apiKey: String(source.apiKey ?? source.api_key ?? ''),
+        model: String(source.model || ''),
+        enabled: normalizeBoolean(source.enabled ?? source.is_enabled, true),
+        isDefault: normalizeBoolean(source.isDefault ?? source.is_default, false),
+        createdAt: source.createdAt ?? source.create_time ?? 0
+    }
+}
+
 /** 加载配置列表 */
 const loadConfigList = async () => {
     configLoading.value = true
     try {
         const res = await uiedAiConfigList()
-        // API 返回的数据可能是数组或包含 list 的对象
-        configList.value = Array.isArray(res) ? res : res?.lists || res?.list || []
+        // API 返回可能为数组，或被包装在 list/lists/data 中
+        const rawList = Array.isArray(res)
+            ? res
+            : res?.lists || res?.list || res?.data?.lists || res?.data?.list || res?.data || []
+        configList.value = (Array.isArray(rawList) ? rawList : []).map((item) =>
+            normalizeConfigItem(item)
+        )
     } catch (error) {
         console.error('获取AI配置列表失败:', error)
         ElMessage.error('获取配置列表失败')
@@ -644,7 +677,7 @@ const handleToggleEnabled = async (row: any, val: boolean) => {
     try {
         await uiedAiConfigEdit({
             id: row.id,
-            is_enabled: val ? 1 : 0
+            enabled: val
         })
         ElMessage.success(val ? '已启用' : '已禁用')
         loadConfigList()
@@ -661,7 +694,7 @@ const handleSetDefault = async (row: any) => {
     try {
         await uiedAiConfigEdit({
             id: row.id,
-            is_default: 1
+            isDefault: true
         })
         ElMessage.success('已设为默认配置')
         loadConfigList()
@@ -681,8 +714,8 @@ const handleTestConnection = async (row: any) => {
     try {
         await uiedAiConfigTest({
             provider: row.provider,
-            apiKey: row.api_key,
-            apiUrl: row.api_url
+            apiKey: row.apiKey,
+            apiUrl: row.apiUrl
         })
         ElMessage.success('连接成功')
     } catch (error: any) {
@@ -800,15 +833,16 @@ const handleAdd = () => {
 
 /** 编辑配置 */
 const handleEdit = (row: any) => {
+    const normalizedRow = normalizeConfigItem(row)
     resetEditForm()
-    editForm.id = row.id
-    editForm.name = row.name || ''
-    editForm.provider = row.provider || 'siliconflow'
-    editForm.apiUrl = row.api_url || ''
-    editForm.apiKey = row.api_key || ''
-    editForm.model = row.model || ''
-    editForm.enabled = row.is_enabled === 1
-    editForm.isDefault = row.is_default === 1
+    editForm.id = normalizedRow.id
+    editForm.name = normalizedRow.name
+    editForm.provider = normalizedRow.provider || 'siliconflow'
+    editForm.apiUrl = normalizedRow.apiUrl
+    editForm.apiKey = normalizedRow.apiKey
+    editForm.model = normalizedRow.model
+    editForm.enabled = normalizedRow.enabled
+    editForm.isDefault = normalizedRow.isDefault
     applyProviderDefaults(editForm.provider, false)
     showEditDialog.value = true
     nextTick(() => {
@@ -824,11 +858,11 @@ const handleSave = async () => {
         const submitData = {
             name: editForm.name,
             provider: editForm.provider,
-            api_url: editForm.apiUrl,
-            api_key: editForm.apiKey,
+            apiUrl: editForm.apiUrl,
+            apiKey: editForm.apiKey,
             model: editForm.model,
-            is_enabled: editForm.enabled ? 1 : 0,
-            is_default: editForm.isDefault ? 1 : 0
+            enabled: editForm.enabled,
+            isDefault: editForm.isDefault
         }
 
         if (editForm.id) {

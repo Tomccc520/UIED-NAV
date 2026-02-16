@@ -632,6 +632,186 @@ class FrontendController extends Controller {
   }
 
   /**
+   * 解析正整数参数
+   */
+  parsePositiveInt(value, defaultValue = 0) {
+    const parsed = Number.parseInt(String(value ?? ''), 10);
+    if (!Number.isInteger(parsed) || parsed <= 0) return defaultValue;
+    return parsed;
+  }
+
+  /**
+   * 将时间值转换为毫秒时间戳
+   */
+  toTimestampMs(value) {
+    if (value === null || value === undefined || value === '') return null;
+    if (typeof value === 'number') {
+      if (value <= 0) return null;
+      return value > 1e12 ? value : value * 1000;
+    }
+    const text = String(value).trim();
+    if (!text) return null;
+    const ts = Date.parse(text);
+    if (Number.isNaN(ts)) return null;
+    return ts;
+  }
+
+  /**
+   * 由文章 ID 生成前端详情 slug
+   */
+  buildArticleSlug(articleId) {
+    const id = this.parsePositiveInt(articleId, 0);
+    return id > 0 ? String(id) : '';
+  }
+
+  /**
+   * 由 slug 解析文章 ID（兼容纯数字或末尾带数字的 slug）
+   */
+  resolveArticleIdBySlug(slug) {
+    const text = String(slug || '').trim();
+    if (!text) return 0;
+    if (/^\d+$/.test(text)) return this.parsePositiveInt(text, 0);
+    const match = text.match(/(\d+)(?!.*\d)/);
+    if (!match) return 0;
+    return this.parsePositiveInt(match[1], 0);
+  }
+
+  /**
+   * 读取公开标签的文章数量映射
+   */
+  async getPublicTagCountMap(tagIds = []) {
+    const { ctx } = this;
+    const ids = Array.isArray(tagIds)
+      ? tagIds.map(id => this.parsePositiveInt(id, 0)).filter(Boolean)
+      : [];
+    if (!ids.length) return new Map();
+    try {
+      const rows = await ctx.model.query(
+        `
+        SELECT r.tag_id AS tagId, COUNT(DISTINCT r.article_id) AS total
+        FROM la_article_tag_rel r
+        INNER JOIN la_article a
+          ON a.id = r.article_id
+         AND a.is_delete = 0
+         AND a.is_show = 1
+        INNER JOIN la_article_tag t
+          ON t.id = r.tag_id
+         AND t.is_delete = 0
+         AND t.is_show = 1
+        WHERE r.is_delete = 0
+          AND r.tag_id IN (?)
+        GROUP BY r.tag_id
+        `,
+        {
+          replacements: [ ids ],
+          type: ctx.model.QueryTypes.SELECT,
+        }
+      );
+      return new Map((Array.isArray(rows) ? rows : []).map(item => [
+        this.parsePositiveInt(item.tagId, 0),
+        this.parsePositiveInt(item.total, 0),
+      ]));
+    } catch (error) {
+      ctx.logger.warn(`FrontendController.getPublicTagCountMap fallback empty: ${error.message || error}`);
+      return new Map();
+    }
+  }
+
+  /**
+   * 格式化标签元数据（前端文章页）
+   */
+  formatArticleTagMeta(tagItem, tagCountMap = new Map()) {
+    const id = this.parsePositiveInt(tagItem?.id, 0);
+    const name = String(tagItem?.name || '').trim();
+    const slug = String(tagItem?.slug || '').trim() || String(id || '');
+    return {
+      id,
+      name,
+      slug,
+      color: '',
+      articleCount: this.parsePositiveInt(tagCountMap.get(id), 0),
+    };
+  }
+
+  /**
+   * 格式化文章列表项（前端文章卡片）
+   */
+  formatArticleListItem(item, { categoryMap = new Map(), tagMetaByName = new Map() } = {}) {
+    const id = this.parsePositiveInt(item?.id, 0);
+    const categoryName = String(item?.category || '').trim()
+      || String(categoryMap.get(this.parsePositiveInt(item?.cid, 0)) || '').trim()
+      || '未分类';
+    const rawTagNames = Array.isArray(item?.tags) ? item.tags : [];
+    const tags = rawTagNames
+      .map(tagName => {
+        const name = String(tagName || '').trim();
+        if (!name) return null;
+        const tagMeta = tagMetaByName.get(name);
+        return {
+          id: this.parsePositiveInt(tagMeta?.id, 0),
+          name,
+          slug: String(tagMeta?.slug || name),
+          color: '',
+        };
+      })
+      .filter(Boolean);
+
+    return {
+      id,
+      title: String(item?.title || ''),
+      excerpt: String(item?.summary || item?.intro || ''),
+      coverImage: String(item?.image || ''),
+      author: String(item?.author || ''),
+      category: categoryName,
+      slug: this.buildArticleSlug(id),
+      viewCount: this.parsePositiveInt(item?.visit, 0),
+      publishedAt: this.toTimestampMs(item?.reviewTime || item?.createTime),
+      createdAt: this.toTimestampMs(item?.createTime),
+      updatedAt: this.toTimestampMs(item?.updateTime),
+      tags,
+    };
+  }
+
+  /**
+   * 格式化文章详情（前端详情页）
+   */
+  formatArticleDetailItem(item, { categoryMap = new Map(), tagMetaById = new Map() } = {}) {
+    const id = this.parsePositiveInt(item?.id, 0);
+    const categoryName = String(categoryMap.get(this.parsePositiveInt(item?.cid, 0)) || '').trim() || '未分类';
+    const rawTags = Array.isArray(item?.tags) ? item.tags : [];
+    const tags = rawTags.map(tag => {
+      const tagId = this.parsePositiveInt(tag?.id, 0);
+      const meta = tagMetaById.get(tagId);
+      return {
+        id: tagId,
+        name: String(tag?.name || meta?.name || ''),
+        slug: String(meta?.slug || tagId || ''),
+        color: '',
+      };
+    }).filter(tag => tag.id > 0 && tag.name);
+
+    const excerpt = String(item?.summary || item?.intro || '').trim();
+    return {
+      id,
+      title: String(item?.title || ''),
+      content: String(item?.content || ''),
+      excerpt,
+      coverImage: String(item?.image || ''),
+      author: String(item?.author || ''),
+      category: categoryName,
+      slug: this.buildArticleSlug(id),
+      status: Number(item?.isShow || 0) === 1 ? 'published' : 'draft',
+      viewCount: this.parsePositiveInt(item?.visit, 0),
+      seoTitle: String(item?.title || ''),
+      seoDescription: excerpt,
+      publishedAt: this.toTimestampMs(item?.reviewTime),
+      createdAt: this.toTimestampMs(item?.createTime),
+      updatedAt: this.toTimestampMs(item?.updateTime),
+      tags,
+    };
+  }
+
+  /**
    * 获取文章列表（前端）
    * GET /api/articles
    */
@@ -640,13 +820,59 @@ class FrontendController extends Controller {
     const { page = 1, pageSize = 10, category, tag } = ctx.query;
 
     try {
-      const result = await ctx.service.uied.article.publicList({ page, pageSize, category, tag });
+      const currentPage = this.parsePositiveInt(page, 1);
+      const currentPageSize = this.parsePositiveInt(pageSize, 10);
+      const categoryText = String(category || '').trim();
+      const tagText = String(tag || '').trim();
+
+      const [ categories, tags ] = await Promise.all([
+        ctx.service.article.cateAll({}),
+        ctx.service.article.tagAll({}),
+      ]);
+
+      const categoryMap = new Map((Array.isArray(categories) ? categories : []).map(item => [
+        this.parsePositiveInt(item.id, 0),
+        String(item.name || ''),
+      ]));
+      const categoryByName = new Map((Array.isArray(categories) ? categories : []).map(item => [
+        String(item.name || ''),
+        this.parsePositiveInt(item.id, 0),
+      ]));
+
+      const tagCountMap = await this.getPublicTagCountMap((Array.isArray(tags) ? tags : []).map(item => item.id));
+      const tagMetaList = (Array.isArray(tags) ? tags : []).map(item => this.formatArticleTagMeta(item, tagCountMap));
+      const tagMetaByName = new Map(tagMetaList.map(item => [ item.name, item ]));
+      const tagMetaBySlug = new Map(tagMetaList.map(item => [ item.slug, item ]));
+
+      const cid = categoryText ? (categoryByName.get(categoryText) || 0) : 0;
+      if (categoryText && !cid) {
+        ctx.body = { lists: [], total: 0, page: currentPage, pageSize: currentPageSize, totalPages: 0 };
+        return;
+      }
+      const tagMeta = tagText ? (tagMetaBySlug.get(tagText) || null) : null;
+      if (tagText && !tagMeta) {
+        ctx.body = { lists: [], total: 0, page: currentPage, pageSize: currentPageSize, totalPages: 0 };
+        return;
+      }
+
+      const result = await ctx.service.article.list({
+        pageNo: currentPage,
+        pageSize: currentPageSize,
+        cid: cid || undefined,
+        tagId: tagMeta ? tagMeta.id : undefined,
+      });
+
+      const lists = (Array.isArray(result?.lists) ? result.lists : []).map(item => this.formatArticleListItem(item, {
+        categoryMap,
+        tagMetaByName,
+      }));
+      const total = this.parsePositiveInt(result?.count, lists.length);
       ctx.body = {
-        lists: result.lists,
-        total: result.total,
-        page: result.page,
-        pageSize: result.pageSize,
-        totalPages: Math.ceil(result.total / result.pageSize),
+        lists,
+        total,
+        page: currentPage,
+        pageSize: currentPageSize,
+        totalPages: total > 0 ? Math.ceil(total / currentPageSize) : 0,
       };
     } catch (error) {
       ctx.logger.error('获取文章列表失败:', error);
@@ -663,8 +889,13 @@ class FrontendController extends Controller {
     const { ctx } = this;
 
     try {
-      const categories = await ctx.service.uied.article.categories();
-      ctx.body = categories;
+      const categories = await ctx.service.article.cateAll({});
+      const names = Array.from(new Set(
+        (Array.isArray(categories) ? categories : [])
+          .map(item => String(item?.name || '').trim())
+          .filter(Boolean)
+      ));
+      ctx.body = names;
     } catch (error) {
       ctx.logger.error('获取文章分类失败:', error);
       ctx.status = 500;
@@ -681,13 +912,39 @@ class FrontendController extends Controller {
     const { slug } = ctx.params;
 
     try {
-      const article = await ctx.service.uied.article.detailBySlug(slug);
+      const articleId = this.resolveArticleIdBySlug(slug);
+      if (!articleId) {
+        ctx.status = 404;
+        ctx.body = { error: '文章不存在' };
+        return;
+      }
+      let article = null;
+      try {
+        article = await ctx.service.article.detail(articleId);
+      } catch (error) {
+        if (String(error?.message || '').includes('文章不存在')) {
+          article = null;
+        } else {
+          throw error;
+        }
+      }
       if (!article) {
         ctx.status = 404;
         ctx.body = { error: '文章不存在' };
         return;
       }
-      ctx.body = article;
+      const [ categories, tags ] = await Promise.all([
+        ctx.service.article.cateAll({}),
+        ctx.service.article.tagAll({}),
+      ]);
+      const categoryMap = new Map((Array.isArray(categories) ? categories : []).map(item => [
+        this.parsePositiveInt(item.id, 0),
+        String(item.name || ''),
+      ]));
+      const tagCountMap = await this.getPublicTagCountMap((Array.isArray(tags) ? tags : []).map(item => item.id));
+      const tagMetaList = (Array.isArray(tags) ? tags : []).map(item => this.formatArticleTagMeta(item, tagCountMap));
+      const tagMetaById = new Map(tagMetaList.map(item => [ item.id, item ]));
+      ctx.body = this.formatArticleDetailItem(article, { categoryMap, tagMetaById });
     } catch (error) {
       ctx.logger.error('获取文章详情失败:', error);
       ctx.status = 500;
@@ -704,12 +961,27 @@ class FrontendController extends Controller {
     const { id } = ctx.params;
 
     try {
-      await ctx.service.uied.article.recordView(id);
-      ctx.body = {};
+      const articleId = this.parsePositiveInt(id, 0);
+      if (!articleId) {
+        ctx.status = 400;
+        ctx.body = { error: '文章ID无效' };
+        return;
+      }
+      const result = await ctx.service.article.visitIncr(articleId);
+      ctx.body = {
+        id: this.parsePositiveInt(result?.id, articleId),
+        viewCount: this.parsePositiveInt(result?.visit, 0),
+      };
     } catch (error) {
-      ctx.logger.error('记录文章浏览失败:', error);
-      ctx.status = 500;
-      ctx.body = { error: error.message };
+      const message = String(error?.message || '');
+      if (message.includes('文章不存在')) {
+        ctx.status = 404;
+        ctx.body = { error: message };
+      } else {
+        ctx.logger.error('记录文章浏览失败:', error);
+        ctx.status = 500;
+        ctx.body = { error: message };
+      }
     }
   }
 
@@ -721,8 +993,9 @@ class FrontendController extends Controller {
     const { ctx } = this;
 
     try {
-      const tags = await ctx.service.uied.article.tags();
-      ctx.body = tags;
+      const tags = await ctx.service.article.tagAll({});
+      const tagCountMap = await this.getPublicTagCountMap((Array.isArray(tags) ? tags : []).map(item => item.id));
+      ctx.body = (Array.isArray(tags) ? tags : []).map(item => this.formatArticleTagMeta(item, tagCountMap));
     } catch (error) {
       ctx.logger.error('获取文章标签失败:', error);
       ctx.status = 500;
@@ -740,17 +1013,37 @@ class FrontendController extends Controller {
     const { page = 1, pageSize = 10 } = ctx.query;
 
     try {
-      const result = await ctx.service.uied.comment.articleComments(id, { page, pageSize });
+      const articleId = this.parsePositiveInt(id, 0);
+      if (!articleId) {
+        ctx.status = 400;
+        ctx.body = { error: '文章ID无效' };
+        return;
+      }
+      const pageNo = this.parsePositiveInt(page, 1);
+      const limit = this.parsePositiveInt(pageSize, 10);
+      const result = await ctx.service.article.commentList({
+        articleId,
+        pageNo,
+        pageSize: limit,
+      });
+      const total = this.parsePositiveInt(result?.count, 0);
       ctx.body = {
-        lists: result.lists,
-        total: result.total,
-        page: result.page,
-        pageSize: result.pageSize,
+        lists: Array.isArray(result?.lists) ? result.lists : [],
+        total,
+        page: pageNo,
+        pageSize: limit,
+        totalPages: total > 0 ? Math.ceil(total / limit) : 0,
       };
     } catch (error) {
-      ctx.logger.error('获取文章评论失败:', error);
-      ctx.status = 500;
-      ctx.body = { error: error.message };
+      const message = String(error?.message || '');
+      if (message.includes('文章不存在')) {
+        ctx.status = 404;
+        ctx.body = { error: message };
+      } else {
+        ctx.logger.error('获取文章评论失败:', error);
+        ctx.status = 500;
+        ctx.body = { error: message };
+      }
     }
   }
 
@@ -764,6 +1057,12 @@ class FrontendController extends Controller {
     const { text, userId, userName } = ctx.request.body;
 
     try {
+      const articleId = this.parsePositiveInt(id, 0);
+      if (!articleId) {
+        ctx.status = 400;
+        ctx.body = { error: '文章ID无效' };
+        return;
+      }
       // 验证评论内容
       if (!text || text.trim().length === 0) {
         ctx.status = 400;
@@ -777,18 +1076,28 @@ class FrontendController extends Controller {
         return;
       }
 
-      const comment = await ctx.service.uied.comment.addArticleComment({
-        articleId: id,
+      const comment = await ctx.service.article.commentAdd({
+        articleId,
+        parentId: this.parsePositiveInt(ctx.request.body?.parentId, 0),
         content: text.trim(),
-        userId: userId || 'anonymous',
-        userName: userName || '匿名用户',
+        userId,
+        userName,
       });
 
       ctx.body = comment;
     } catch (error) {
+      const message = String(error?.message || '');
+      if (message.includes('未登录') || message.includes('登录已失效')) {
+        ctx.status = 401;
+      } else if (message.includes('文章不存在')) {
+        ctx.status = 404;
+      } else if (message.includes('不能为空') || message.includes('过于频繁') || message.includes('禁言')) {
+        ctx.status = 400;
+      } else {
+        ctx.status = 500;
+      }
       ctx.logger.error('提交文章评论失败:', error);
-      ctx.status = 500;
-      ctx.body = { error: error.message };
+      ctx.body = { message, error: message };
     }
   }
   /**
