@@ -53,6 +53,13 @@
                                         >
                                             公众号导入
                                         </el-button>
+                                        <el-button
+                                            size="small"
+                                            :loading="transferImagesLoading"
+                                            @click="handleTransferEditorImages"
+                                        >
+                                            一键转存正文图片
+                                        </el-button>
                                     </div>
                                 </div>
                             </template>
@@ -345,6 +352,7 @@ import {
     articleTopicAll
 } from '@/api/article'
 import { getAuthorUserOptions } from '@/api/consumer'
+import { transferEditorContentImages, transferRemoteImages } from '@/api/file'
 import { uiedAiChat } from '@/api/uied'
 import useMultipleTabs from '@/hooks/useMultipleTabs'
 
@@ -384,6 +392,7 @@ const aiRewriting = ref(false)
 const aiPrompt = ref('')
 const aiDraftText = ref('')
 const importWechatLoading = ref(false)
+const transferImagesLoading = ref(false)
 const localDraftExists = ref(false)
 const localDraftTime = ref('')
 const authorOptionsLoading = ref(false)
@@ -678,6 +687,29 @@ const extractFirstImageUrlFromHtml = (html: string) => {
 }
 
 /**
+ * 判断是否为本地素材地址
+ */
+const isLocalMaterialUrl = (url: string) => {
+    const text = String(url || '').trim()
+    if (!text) return true
+    if (text.startsWith('/public/uploads/')) return true
+    if (text.startsWith('/api/uploads/')) return true
+    if (/^https?:\/\//i.test(text) && text.includes('/public/uploads/')) return true
+    if (/^https?:\/\//i.test(text) && text.includes('/api/uploads/')) return true
+    return false
+}
+
+/**
+ * 判断封面是否需要转存
+ */
+const isTransferableCoverUrl = (url: string) => {
+    const text = String(url || '').trim()
+    if (!/^https?:\/\//i.test(text)) return false
+    if (isLocalMaterialUrl(text)) return false
+    return true
+}
+
+/**
  * 通过公众号链接导入文章内容
  */
 const handleImportWechatArticle = async () => {
@@ -752,6 +784,102 @@ const handleImportWechatArticle = async () => {
         feedback.msgError(error?.message || '公众号导入失败')
     } finally {
         importWechatLoading.value = false
+    }
+}
+
+/**
+ * 一键转存正文外链图片（含封面兜底转存）
+ */
+const handleTransferEditorImages = async () => {
+    const html = String(formData.content || '').trim()
+    if (!html) {
+        feedback.msgWarning('正文为空，无需转存图片')
+        return
+    }
+    try {
+        await feedback.confirm('将正文中的外链图片转存到素材库并替换为本地地址，是否继续？')
+    } catch (error) {
+        return
+    }
+
+    transferImagesLoading.value = true
+    try {
+        const data: any = await transferEditorContentImages({
+            contentHtml: html,
+            cid: 0
+        })
+        const nextHtml = String(data?.contentHtml || '')
+        const count = Number(data?.count || 0)
+        const total = Number(data?.total || 0)
+        const failed = Array.isArray(data?.failed) ? data.failed : []
+
+        if (nextHtml) {
+            formData.content = nextHtml
+        }
+
+        const coverUrl = String(formData.image || '').trim()
+        let coverTransferred = false
+        let coverTransferError = ''
+        if (isTransferableCoverUrl(coverUrl)) {
+            try {
+                const coverRes: any = await transferRemoteImages({
+                    urls: [coverUrl],
+                    cid: 0
+                })
+                const coverMap = Array.isArray(coverRes?.maps) ? coverRes.maps[0] : null
+                const nextCover = String(coverMap?.to || '').trim()
+                if (nextCover) {
+                    formData.image = nextCover
+                    coverTransferred = true
+                } else {
+                    coverTransferError = '封面图未转存成功'
+                }
+            } catch (error: any) {
+                coverTransferError = error?.message || '封面图转存失败'
+            }
+        }
+
+        if (total === 0 && !coverTransferred && !coverTransferError) {
+            feedback.msgSuccess('未检测到可转存的外链图片（含封面）')
+            return
+        }
+        if (total === 0 && coverTransferred) {
+            feedback.msgSuccess('正文未检测到外链图片，封面图已转存到素材库')
+            return
+        }
+        if (total === 0 && coverTransferError) {
+            feedback.msgWarning(`正文未检测到外链图片，${coverTransferError}`)
+            return
+        }
+        if (count > 0 && failed.length === 0) {
+            if (coverTransferred) {
+                feedback.msgSuccess(`正文已转存 ${count}/${total} 张，封面图已转存`)
+                return
+            }
+            if (coverTransferError) {
+                feedback.msgWarning(`正文已转存 ${count}/${total} 张，${coverTransferError}`)
+                return
+            }
+            feedback.msgSuccess(`已转存 ${count}/${total} 张图片到素材库`)
+            return
+        }
+        if (count > 0 && failed.length > 0) {
+            feedback.msgWarning(`已转存正文 ${count}/${total} 张，失败 ${failed.length} 张`)
+            return
+        }
+        if (failed.length > 0) {
+            feedback.msgWarning('未转存成功（可能外链限制或图片不可访问）')
+            return
+        }
+        if (coverTransferred) {
+            feedback.msgSuccess('正文转存未命中，封面图已转存')
+            return
+        }
+        feedback.msgWarning(coverTransferError || '未转存成功（可能外链限制或图片不可访问）')
+    } catch (error: any) {
+        feedback.msgError(error?.message || '正文图片转存失败')
+    } finally {
+        transferImagesLoading.value = false
     }
 }
 

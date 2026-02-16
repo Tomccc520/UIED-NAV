@@ -200,6 +200,9 @@ module.exports = options => {
       'article:comment:manage:mute:del': [ 'article:comment:manage:del' ],
       // 内容管理：作者下拉接口复用文章编辑权限
       'user:author:options': [ 'article:edit', 'article:add', 'article:list' ],
+      // 内容管理：外链图片转存复用文章编辑权限
+      'common:upload:image:transfer': [ 'article:edit', 'article:add', 'common:upload:image' ],
+      'common:upload:image:transfer-content': [ 'article:edit', 'article:add', 'common:upload:image' ],
     };
     if (perms.some(item => item && (auths === item || auths.startsWith(item + ':')))) {
       return true;

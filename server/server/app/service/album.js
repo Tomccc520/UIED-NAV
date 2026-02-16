@@ -351,6 +351,263 @@ class AlbumService extends Service {
     };
     return data;
   }
+
+  /**
+   * 规范化远程地址（兼容 //cdn.xx.jpg）
+   */
+  normalizeRemoteUrl(rawUrl = '') {
+    const value = String(rawUrl || '').trim();
+    if (!value) return '';
+    if (value.startsWith('//')) return `https:${value}`;
+    return value;
+  }
+
+  /**
+   * 判断是否为图片链接
+   */
+  isImageContentType(contentType = '') {
+    return /^image\//i.test(String(contentType || '').trim());
+  }
+
+  /**
+   * 判断是否为本地素材地址
+   */
+  isLocalMaterialUrl(url = '') {
+    const value = String(url || '').trim();
+    if (!value) return true;
+    if (value.startsWith('/public/uploads/')) return true;
+    if (value.startsWith('/api/uploads/')) return true;
+    if (/^https?:\/\//i.test(value) && value.includes('/public/uploads/')) return true;
+    if (/^https?:\/\//i.test(value) && value.includes('/api/uploads/')) return true;
+    return false;
+  }
+
+  /**
+   * 根据 content-type 与 url 推断图片后缀
+   */
+  resolveImageExt(contentType = '', url = '') {
+    const type = String(contentType || '').toLowerCase();
+    const map = {
+      'image/jpeg': 'jpg',
+      'image/jpg': 'jpg',
+      'image/png': 'png',
+      'image/gif': 'gif',
+      'image/webp': 'webp',
+      'image/svg+xml': 'svg',
+      'image/bmp': 'bmp',
+      'image/x-icon': 'ico',
+      'image/vnd.microsoft.icon': 'ico',
+    };
+    if (map[type]) return map[type];
+    const ext = path.extname(String(url || '')).replace('.', '').toLowerCase();
+    if (ext && [ 'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'ico' ].includes(ext)) {
+      return ext === 'jpeg' ? 'jpg' : ext;
+    }
+    return 'jpg';
+  }
+
+  /**
+   * 下载远程图片为 Buffer
+   */
+  async fetchRemoteImageBuffer(remoteUrl) {
+    const { ctx } = this;
+    const requestUrl = this.normalizeRemoteUrl(remoteUrl);
+    if (!requestUrl || !/^https?:\/\//i.test(requestUrl)) {
+      throw new Error('仅支持 http/https 图片地址');
+    }
+
+    const transferConfig = this.config.remoteImageTransfer || {};
+    const allowInsecureTls = Boolean(transferConfig.allowInsecureTls);
+    const response = await ctx.curl(requestUrl, {
+      method: 'GET',
+      timeout: 20000,
+      followRedirect: true,
+      maxRedirects: 3,
+      rejectUnauthorized: !allowInsecureTls,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; UIED-Nav/1.0; +https://fsuied.com)',
+        Accept: 'image/*,*/*;q=0.8',
+      },
+    });
+    if (Number(response.status || 0) >= 400) {
+      throw new Error(`下载失败(${response.status})`);
+    }
+    const contentType = String(response.headers?.['content-type'] || '').split(';')[0].trim();
+    if (contentType && !this.isImageContentType(contentType)) {
+      throw new Error(`目标不是图片(${contentType})`);
+    }
+    const buffer = Buffer.isBuffer(response.data)
+      ? response.data
+      : Buffer.from(response.data || '');
+    if (!buffer.length) {
+      throw new Error('远程图片内容为空');
+    }
+    const maxBytes = Number(transferConfig.maxBytes || 10 * 1024 * 1024);
+    if (buffer.length > maxBytes) {
+      throw new Error(`图片过大，超过限制(${Math.ceil(maxBytes / 1024 / 1024)}MB)`);
+    }
+    return {
+      buffer,
+      contentType,
+      finalUrl: requestUrl,
+    };
+  }
+
+  /**
+   * 将远程图片保存到本地素材库
+   */
+  async saveRemoteImageToAlbum(remoteUrl, cid = 0) {
+    const { ctx } = this;
+    const { buffer, contentType, finalUrl } = await this.fetchRemoteImageBuffer(remoteUrl);
+    const ext = this.resolveImageExt(contentType, finalUrl);
+    const targetDir = `/public/uploads/image/${dayjs().format('YYYY-MM-DD')}`;
+    const dir = path.join(this.config.baseDir, 'app', targetDir);
+    await mkdirp.sync(dir);
+    const filename = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const relativeUrl = `${targetDir}/${filename}`;
+    const targetPath = path.join(this.config.baseDir, 'app', relativeUrl);
+    fs.writeFileSync(targetPath, buffer);
+
+    const aid = Number(ctx.session[reqAdminIdKey] || 0);
+    const now = Math.floor(Date.now() / 1000);
+    const addReq = {
+      aid,
+      cid: Number(cid || 0),
+      type: 10,
+      uri: relativeUrl,
+      name: path.basename(finalUrl).split('?')[0] || filename,
+      ext,
+      size: buffer.length,
+      createTime: now,
+      updateTime: now,
+    };
+    const albumId = await this.albumAdd(addReq);
+    return {
+      id: albumId,
+      from: String(remoteUrl || ''),
+      to: urlUtil.toAbsoluteUrl(relativeUrl),
+      uri: relativeUrl,
+      ext,
+      size: buffer.length,
+    };
+  }
+
+  /**
+   * 批量转存远程图片
+   */
+  async transferRemoteImages(urls = [], cid = 0) {
+    const candidates = Array.from(
+      new Set(
+        (Array.isArray(urls) ? urls : [])
+          .map(url => this.normalizeRemoteUrl(url))
+          .filter(url => /^https?:\/\//i.test(String(url || '').trim()))
+          .filter(url => !this.isLocalMaterialUrl(url))
+      )
+    );
+
+    const maps = [];
+    const failed = [];
+    for (let i = 0; i < candidates.length; i += 1) {
+      const remoteUrl = candidates[i];
+      try {
+        const item = await this.saveRemoteImageToAlbum(remoteUrl, cid);
+        maps.push({
+          from: item.from,
+          to: item.to,
+          id: item.id,
+          uri: item.uri,
+        });
+      } catch (error) {
+        failed.push({
+          url: remoteUrl,
+          reason: error.message || '转存失败',
+        });
+      }
+    }
+
+    return {
+      count: maps.length,
+      total: candidates.length,
+      maps,
+      failed,
+    };
+  }
+
+  /**
+   * 从正文中提取外链图片 URL
+   */
+  extractRemoteImageUrlsFromHtml(contentHtml = '') {
+    const html = String(contentHtml || '');
+    if (!html) return [];
+    const tags = html.match(/<img\b[^>]*>/gi) || [];
+    const urls = [];
+    tags.forEach(tag => {
+      const readAttr = (name) => {
+        const re = new RegExp(`\\b${name}\\s*=\\s*(?:\"([^\"]*)\"|'([^']*)'|([^\\s>]+))`, 'i');
+        const matched = String(tag || '').match(re);
+        return String(matched?.[1] || matched?.[2] || matched?.[3] || '').replace(/&amp;/g, '&').trim();
+      };
+      const src = readAttr('src') || readAttr('data-src') || readAttr('data-original');
+      if (!src) return;
+      const normalized = this.normalizeRemoteUrl(src);
+      if (!/^https?:\/\//i.test(normalized)) return;
+      if (this.isLocalMaterialUrl(normalized)) return;
+      urls.push(normalized);
+    });
+    return Array.from(new Set(urls));
+  }
+
+  /**
+   * 在正文中替换图片 URL（兼容 &amp; 场景）
+   */
+  replaceImageUrlsInHtml(contentHtml = '', maps = []) {
+    let html = String(contentHtml || '');
+    const list = Array.isArray(maps) ? maps : [];
+    list.forEach(item => {
+      const from = String(item?.from || '').trim();
+      const to = String(item?.to || '').trim();
+      if (!from || !to) return;
+      const fromEscaped = from.replace(/&/g, '&amp;');
+      html = html.split(from).join(to);
+      html = html.split(fromEscaped).join(to);
+    });
+    return html;
+  }
+
+  /**
+   * 一键转存正文外链图片并返回替换后的正文
+   */
+  async transferEditorContentImages(contentHtml = '', cid = 0) {
+    const html = String(contentHtml || '');
+    if (!html.trim()) {
+      return {
+        contentHtml: html,
+        count: 0,
+        total: 0,
+        maps: [],
+        failed: [],
+      };
+    }
+    const urls = this.extractRemoteImageUrlsFromHtml(html);
+    if (!urls.length) {
+      return {
+        contentHtml: html,
+        count: 0,
+        total: 0,
+        maps: [],
+        failed: [],
+      };
+    }
+    const transferResult = await this.transferRemoteImages(urls, cid);
+    const nextHtml = this.replaceImageUrlsInHtml(html, transferResult.maps);
+    return {
+      contentHtml: nextHtml,
+      count: Number(transferResult.count || 0),
+      total: Number(transferResult.total || 0),
+      maps: transferResult.maps || [],
+      failed: transferResult.failed || [],
+    };
+  }
 }
 
 

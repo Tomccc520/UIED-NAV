@@ -37,3 +37,17 @@ export function fileMove(params: Record<string, any>) {
 export function fileRename(params: { id: number; name: string }) {
     return request.post({ url: '/common/album/albumRename', params })
 }
+
+/**
+ * 批量转存远程图片到素材库
+ */
+export function transferRemoteImages(params: { urls: string[]; cid?: number }) {
+    return request.post({ url: '/common/upload/image/transfer', params })
+}
+
+/**
+ * 一键转存正文中的外链图片并替换正文地址
+ */
+export function transferEditorContentImages(params: { contentHtml: string; cid?: number }) {
+    return request.post({ url: '/common/upload/image/transfer-content', params })
+}

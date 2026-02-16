@@ -62,6 +62,10 @@ module.exports = app => {
 
   // 上传
   router.all('/api/common/upload/image', controller.common.album.uploadImage);
+  // 远程图片转存（用于编辑器粘贴公众号等外链图片时落到素材库）
+  router.all('/api/common/upload/image/transfer', controller.common.album.transferImage);
+  // 正文图片一键转存（服务端抽取图片并替换正文）
+  router.all('/api/common/upload/image/transfer-content', controller.common.album.transferEditorContentImages);
   router.all('/api/common/upload/video', controller.common.album.uploadVideo);
 
   // 网站信息

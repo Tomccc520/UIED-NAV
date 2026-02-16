@@ -195,6 +195,52 @@ class CommonAblumController extends baseController {
       ctx.status = 500;
     }
   }
+
+  /**
+   * 远程图片转存到素材库
+   */
+  async transferImage() {
+    const { ctx } = this;
+    try {
+      const body = ctx.request.body || {};
+      const urls = Array.isArray(body.urls) ? body.urls : [];
+      const cid = Number(body.cid || 0);
+      const data = await ctx.service.album.transferRemoteImages(urls, cid);
+      this.result({
+        data,
+      });
+    } catch (err) {
+      ctx.logger.error(`CommonAblumController.transferImage error: ${err}`);
+      this.result({
+        code: 500,
+        message: err.message || '转存失败',
+        data: {},
+      });
+    }
+  }
+
+  /**
+   * 正文外链图片一键转存并替换正文
+   */
+  async transferEditorContentImages() {
+    const { ctx } = this;
+    try {
+      const body = ctx.request.body || {};
+      const contentHtml = String(body.contentHtml || '');
+      const cid = Number(body.cid || 0);
+      const data = await ctx.service.album.transferEditorContentImages(contentHtml, cid);
+      this.result({
+        data,
+      });
+    } catch (err) {
+      ctx.logger.error(`CommonAblumController.transferEditorContentImages error: ${err}`);
+      this.result({
+        code: 500,
+        message: err.message || '正文图片转存失败',
+        data: {},
+      });
+    }
+  }
 }
 
 module.exports = CommonAblumController;
