@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = app => {
-  const { INTEGER, SMALLINT } = app.Sequelize;
+  const { INTEGER, SMALLINT, STRING } = app.Sequelize;
 
   const modelDefinition = {
     id: {
@@ -15,10 +15,35 @@ module.exports = app => {
       allowNull: false,
       defaultValue: 0,
     },
-    article_id: {
-      type: INTEGER.UNSIGNED,
+    display_name: {
+      type: STRING(64),
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: '',
+    },
+    bio: {
+      type: STRING(255),
+      allowNull: false,
+      defaultValue: '',
+    },
+    homepage: {
+      type: STRING(200),
+      allowNull: false,
+      defaultValue: '',
+    },
+    xiaohongshu: {
+      type: STRING(200),
+      allowNull: false,
+      defaultValue: '',
+    },
+    weibo: {
+      type: STRING(200),
+      allowNull: false,
+      defaultValue: '',
+    },
+    is_public: {
+      type: SMALLINT.UNSIGNED,
+      allowNull: false,
+      defaultValue: 1,
     },
     is_delete: {
       type: SMALLINT.UNSIGNED,
@@ -41,10 +66,10 @@ module.exports = app => {
       defaultValue: 0,
     },
   };
-  const ArticleCollect = app.model.define('ArticleCollect', modelDefinition, {
-    tableName: 'la_article_collect', // 定义实际表名
+  const UserAuthorProfile = app.model.define('UserAuthorProfile', modelDefinition, {
+    tableName: 'la_user_author_profile',
     timestamps: false,
   });
 
-  return ArticleCollect;
+  return UserAuthorProfile;
 };

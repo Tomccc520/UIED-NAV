@@ -46,4 +46,7 @@ docs/
 
 # 开发工具脚本
 add_copyright.py
-0
+
+# 模块安装临时目录
+server/.module_backup/
+server/.module_report/

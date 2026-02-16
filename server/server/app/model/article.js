@@ -59,6 +59,26 @@ module.exports = app => {
       allowNull: false,
       defaultValue: 0,
     },
+    review_status: {
+      type: SMALLINT.UNSIGNED,
+      allowNull: false,
+      defaultValue: 2,
+    },
+    review_remark: {
+      type: STRING(255),
+      allowNull: false,
+      defaultValue: '',
+    },
+    review_time: {
+      type: INTEGER.UNSIGNED,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    review_admin_id: {
+      type: INTEGER.UNSIGNED,
+      allowNull: false,
+      defaultValue: 0,
+    },
     is_delete: {
       type: SMALLINT.UNSIGNED,
       allowNull: false,
@@ -82,8 +102,8 @@ module.exports = app => {
   };
   const Article = app.model.define('Article', modelDefinition, {
     tableName: 'la_article', // 定义实际表名
+    timestamps: false,
   });
 
   return Article;
 };
-

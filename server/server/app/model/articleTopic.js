@@ -11,7 +11,22 @@ module.exports = app => {
       primaryKey: true,
     },
     name: {
-      type: STRING(60),
+      type: STRING(100),
+      allowNull: false,
+      defaultValue: '',
+    },
+    slug: {
+      type: STRING(120),
+      allowNull: false,
+      defaultValue: '',
+    },
+    intro: {
+      type: STRING(255),
+      allowNull: false,
+      defaultValue: '',
+    },
+    image: {
+      type: STRING(200),
       allowNull: false,
       defaultValue: '',
     },
@@ -46,10 +61,10 @@ module.exports = app => {
       defaultValue: 0,
     },
   };
-  const ArticleCategory = app.model.define('ArticleCategory', modelDefinition, {
-    tableName: 'la_article_category', // 定义实际表名
+  const ArticleTopic = app.model.define('ArticleTopic', modelDefinition, {
+    tableName: 'la_article_topic',
     timestamps: false,
   });
 
-  return ArticleCategory;
+  return ArticleTopic;
 };

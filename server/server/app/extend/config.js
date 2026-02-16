@@ -16,6 +16,12 @@ const rsa = {
   backstageTokenKey: 'backstage:token:',
   // 令牌的集合
   backstageTokenSet: 'backstage:token:set:',
+  // 用户令牌缓存键
+  userTokenKey: 'user:token:',
+  // 用户令牌集合
+  userTokenSet: 'user:token:set:',
+  // 用户信息缓存键
+  userInfoKey: 'user:info:',
   // Redis键前缀
   redisPrefix: 'Like:',
   // 管理缓存键
@@ -313,6 +319,39 @@ const rsa = {
     'articles',
     'articles:categories',
     'articles:*',
+    'user:author:center:detail', // 作者中心详情（前台登录）
+    'user:author:center:save', // 作者中心保存（前台登录）
+    'user:author:public:detail', // 作者公开主页
+    'user:article:collect:list', // 用户收藏文章列表
+    'user:article:like:list', // 用户点赞文章列表
+    'article:list', // 文章列表
+    'article:detail', // 文章详情
+    'article:cate:list', // 文章分类列表
+    'article:cate:all', // 文章分类全部
+    'article:tag:all', // 文章标签全部
+    'article:topic:all', // 文章专题全部
+    'article:all', // 文章全部
+    'article:front:add', // 官网前台投稿文章
+    'article:front:list', // 官网前台投稿列表
+    'article:front:detail', // 官网前台投稿详情
+    'article:front:edit', // 官网前台投稿编辑
+    'article:front:audit:message:list', // 投稿审核消息列表
+    'article:visit:incr', // 文章阅读+1
+    'article:collect:list', // 文章收藏列表
+    'article:collect:toggle', // 文章收藏切换
+    'article:like:toggle', // 文章点赞切换
+    'article:stats', // 文章互动统计
+    'article:comment:list', // 文章留言列表
+    'article:comment:add', // 发布文章留言
+    'article:comment:like:toggle', // 评论点赞切换
+    'ai:chat:completions:editor', // AI 编辑器生成
+  ],
+
+  // 前台用户 token 可直通（不走后台 admin token）接口
+  userTokenPassUri: [
+    'common:album:albumList', // 素材列表（前台富文本选择素材）
+    'common:album:cateList', // 素材分类（前台富文本选择素材）
+    'ai:chat:completions:editor', // AI 编辑器生成
   ],
 
   // 免权限验证
@@ -491,6 +530,12 @@ const rsa = {
     'uied:statistics:search',
     'uied:statistics:overview',
     'uied:statistics:recent',
+    'article:tag:all', // 所有文章标签
+    'article:topic:all', // 所有文章专题
+    'article:tag:batch:change', // 标签批量状态切换
+    'article:tag:batch:del', // 标签批量删除
+    'article:tag:merge', // 标签合并
+    'article:import:wechat', // 公众号文章导入
   ],
 
   publicUrl: 'http://127.0.0.1:8002',

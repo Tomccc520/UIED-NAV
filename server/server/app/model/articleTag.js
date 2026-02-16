@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = app => {
-  const { INTEGER, SMALLINT } = app.Sequelize;
+  const { STRING, INTEGER, SMALLINT } = app.Sequelize;
 
   const modelDefinition = {
     id: {
@@ -10,15 +10,25 @@ module.exports = app => {
       allowNull: false,
       primaryKey: true,
     },
-    user_id: {
-      type: INTEGER.UNSIGNED,
+    name: {
+      type: STRING(60),
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: '',
     },
-    article_id: {
-      type: INTEGER.UNSIGNED,
+    slug: {
+      type: STRING(120),
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: '',
+    },
+    sort: {
+      type: SMALLINT.UNSIGNED,
+      allowNull: false,
+      defaultValue: 50,
+    },
+    is_show: {
+      type: SMALLINT.UNSIGNED,
+      allowNull: false,
+      defaultValue: 1,
     },
     is_delete: {
       type: SMALLINT.UNSIGNED,
@@ -27,24 +37,24 @@ module.exports = app => {
     },
     create_time: {
       type: INTEGER.UNSIGNED,
-      allowNull: false,
+      allowNull: true,
       defaultValue: 0,
     },
     update_time: {
       type: INTEGER.UNSIGNED,
-      allowNull: false,
+      allowNull: true,
       defaultValue: 0,
     },
     delete_time: {
       type: INTEGER.UNSIGNED,
-      allowNull: false,
+      allowNull: true,
       defaultValue: 0,
     },
   };
-  const ArticleCollect = app.model.define('ArticleCollect', modelDefinition, {
-    tableName: 'la_article_collect', // 定义实际表名
+  const ArticleTag = app.model.define('ArticleTag', modelDefinition, {
+    tableName: 'la_article_tag',
     timestamps: false,
   });
 
-  return ArticleCollect;
+  return ArticleTag;
 };

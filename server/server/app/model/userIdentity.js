@@ -15,8 +15,8 @@ module.exports = app => {
       allowNull: false,
       defaultValue: 0,
     },
-    article_id: {
-      type: INTEGER.UNSIGNED,
+    user_type: {
+      type: SMALLINT.UNSIGNED,
       allowNull: false,
       defaultValue: 0,
     },
@@ -41,10 +41,10 @@ module.exports = app => {
       defaultValue: 0,
     },
   };
-  const ArticleCollect = app.model.define('ArticleCollect', modelDefinition, {
-    tableName: 'la_article_collect', // 定义实际表名
+  const UserIdentity = app.model.define('UserIdentity', modelDefinition, {
+    tableName: 'la_user_identity',
     timestamps: false,
   });
 
-  return ArticleCollect;
+  return UserIdentity;
 };

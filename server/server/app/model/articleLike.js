@@ -41,10 +41,10 @@ module.exports = app => {
       defaultValue: 0,
     },
   };
-  const ArticleCollect = app.model.define('ArticleCollect', modelDefinition, {
-    tableName: 'la_article_collect', // 定义实际表名
+  const ArticleLike = app.model.define('ArticleLike', modelDefinition, {
+    tableName: 'la_article_like',
     timestamps: false,
   });
 
-  return ArticleCollect;
+  return ArticleLike;
 };

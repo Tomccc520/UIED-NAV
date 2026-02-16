@@ -10,12 +10,12 @@ module.exports = app => {
       allowNull: false,
       primaryKey: true,
     },
-    user_id: {
+    article_id: {
       type: INTEGER.UNSIGNED,
       allowNull: false,
       defaultValue: 0,
     },
-    article_id: {
+    user_id: {
       type: INTEGER.UNSIGNED,
       allowNull: false,
       defaultValue: 0,
@@ -41,10 +41,10 @@ module.exports = app => {
       defaultValue: 0,
     },
   };
-  const ArticleCollect = app.model.define('ArticleCollect', modelDefinition, {
-    tableName: 'la_article_collect', // 定义实际表名
+  const ArticleAuthorRel = app.model.define('ArticleAuthorRel', modelDefinition, {
+    tableName: 'la_article_author_rel',
     timestamps: false,
   });
 
-  return ArticleCollect;
+  return ArticleAuthorRel;
 };

@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = app => {
-  const { INTEGER, SMALLINT } = app.Sequelize;
+  const { INTEGER, SMALLINT, STRING } = app.Sequelize;
 
   const modelDefinition = {
     id: {
@@ -19,6 +19,26 @@ module.exports = app => {
       type: INTEGER.UNSIGNED,
       allowNull: false,
       defaultValue: 0,
+    },
+    parent_id: {
+      type: INTEGER.UNSIGNED,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    content: {
+      type: STRING(1000),
+      allowNull: false,
+      defaultValue: '',
+    },
+    is_top: {
+      type: SMALLINT.UNSIGNED,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    is_show: {
+      type: SMALLINT.UNSIGNED,
+      allowNull: false,
+      defaultValue: 1,
     },
     is_delete: {
       type: SMALLINT.UNSIGNED,
@@ -41,10 +61,10 @@ module.exports = app => {
       defaultValue: 0,
     },
   };
-  const ArticleCollect = app.model.define('ArticleCollect', modelDefinition, {
-    tableName: 'la_article_collect', // 定义实际表名
+  const ArticleComment = app.model.define('ArticleComment', modelDefinition, {
+    tableName: 'la_article_comment',
     timestamps: false,
   });
 
-  return ArticleCollect;
+  return ArticleComment;
 };
