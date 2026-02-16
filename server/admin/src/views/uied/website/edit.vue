@@ -1,11 +1,10 @@
 <!--
- * @file views/uied/website/edit.vue
- * @description UIED 网站编辑页面 - 独立页面模式，AI 辅助编辑器
- * @author Tomda
- * @copyright 版权所有 (c) 2026 UIED技术团队
- * @website https://fsuied.com
- * @license MIT
- * @version 2.0.0
+/**
+ * @copyright Tomda (https://www.tomda.top)
+ * @copyright UIED技术团队 (https://fsuied.com)
+ * @author UIED技术团队
+ * @createDate 2026-02-16
+ */
 -->
 <template>
     <div class="website-edit" v-loading="pageLoading">
@@ -412,13 +411,12 @@ import {
     uiedWebsiteEdit,
     uiedWebsiteDetail,
     uiedCategoryAll,
-    uiedAiGenerateDetailContent,
     uiedAiChat,
     uiedSeoScraperFetch
 } from '@/api/uied'
 import feedback from '@/utils/feedback'
 import type { FormInstance, FormRules } from 'element-plus'
-import { QuestionFilled, MagicStick, FolderOpened } from '@element-plus/icons-vue'
+import { QuestionFilled, FolderOpened } from '@element-plus/icons-vue'
 import editor from '@/components/editor/index.vue'
 import MaterialPicker from '@/components/material/picker.vue'
 
