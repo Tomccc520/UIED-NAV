@@ -21,6 +21,10 @@ module.exports = app => {
    * 注册前台 POST 路由（统一挂载响应归一化中间件）
    */
   const post = (path, action) => router.post(path, frontendNormalize, action);
+  /**
+   * 注册前台 DELETE 路由（统一挂载响应归一化中间件）
+   */
+  const del = (path, action) => router.delete(path, frontendNormalize, action);
   
   // ==================== 页面相关 ====================
   // GET /api/pages - 获取所有页面
@@ -56,6 +60,16 @@ module.exports = app => {
   get('/api/websites/:id/related', controller.uied.frontend.websiteRelated);
   // POST /api/websites/:id/click - 记录网站点击
   post('/api/websites/:id/click', controller.uied.frontend.websiteClick);
+  // GET /api/websites/:id/comments - 获取网站评论
+  get('/api/websites/:id/comments', controller.uied.frontend.websiteComments);
+  // POST /api/websites/:id/comments - 发表评论
+  post('/api/websites/:id/comments', controller.uied.frontend.addWebsiteComment);
+  // POST /api/websites/:id/rate - 网站评分（兼容旧前端）
+  post('/api/websites/:id/rate', controller.uied.frontend.websiteRate);
+  // POST /api/websites/:id/favorite - 添加收藏（兼容旧前端）
+  post('/api/websites/:id/favorite', controller.uied.frontend.websiteFavoriteAdd);
+  // DELETE /api/websites/:id/favorite - 取消收藏（兼容旧前端）
+  del('/api/websites/:id/favorite', controller.uied.frontend.websiteFavoriteDel);
   
   // ==================== 公开设置 ====================
   // GET /api/settings/public - 获取公开设置

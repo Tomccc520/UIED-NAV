@@ -76,6 +76,31 @@ class FrontendController extends Controller {
   }
 
   /**
+   * 获取页面统计（兼容旧前端）
+   * GET /api/pages/:slug/stats
+   */
+  async pageStats() {
+    const { ctx } = this;
+    const { slug } = ctx.params;
+
+    try {
+      const data = await ctx.service.uied.frontend.getPageFullData(slug);
+      if (!data) {
+        ctx.status = 404;
+        ctx.body = { error: '页面不存在' };
+        return;
+      }
+      const totalWebsites = Number(data?.stats?.totalWebsites || 0);
+      const totalCategories = Number(data?.stats?.totalCategories || 0);
+      ctx.body = { totalWebsites, totalCategories };
+    } catch (error) {
+      ctx.logger.error('获取页面统计失败:', error);
+      ctx.status = 500;
+      ctx.body = { error: error.message };
+    }
+  }
+
+  /**
    * 获取页面热门推荐
    * GET /api/pages/:slug/hot
    */
@@ -164,6 +189,42 @@ class FrontendController extends Controller {
   }
 
   /**
+   * 获取精选网站列表（兼容旧前端）
+   * GET /api/websites/featured/list
+   */
+  async featuredWebsites() {
+    const { ctx } = this;
+    const limit = this.parsePositiveInt(ctx.query?.limit, 24);
+
+    try {
+      const websites = await ctx.service.uied.frontend.getHotWebsites(limit);
+      ctx.body = (Array.isArray(websites) ? websites : []).filter(item => item?.isFeatured === true);
+    } catch (error) {
+      ctx.logger.error('获取精选网站失败:', error);
+      ctx.status = 500;
+      ctx.body = { error: error.message };
+    }
+  }
+
+  /**
+   * 获取热门网站列表（兼容旧前端）
+   * GET /api/websites/hot/list
+   */
+  async hotWebsites() {
+    const { ctx } = this;
+    const limit = this.parsePositiveInt(ctx.query?.limit, 24);
+
+    try {
+      const websites = await ctx.service.uied.frontend.getHotWebsites(limit);
+      ctx.body = (Array.isArray(websites) ? websites : []).filter(item => item?.isHot === true);
+    } catch (error) {
+      ctx.logger.error('获取热门网站失败:', error);
+      ctx.status = 500;
+      ctx.body = { error: error.message };
+    }
+  }
+
+  /**
    * 获取网站详情
    * GET /api/websites/:idOrSlug
    */
@@ -221,6 +282,304 @@ class FrontendController extends Controller {
       ctx.status = 500;
       ctx.body = { error: error.message };
     }
+  }
+
+  /**
+   * 获取网站评论（前端）
+   * GET /api/websites/:id/comments
+   */
+  async websiteComments() {
+    const { ctx } = this;
+    const { id } = ctx.params;
+    const { page = 1, pageSize = 10 } = ctx.query;
+
+    try {
+      const websiteId = this.parsePositiveInt(id, 0);
+      if (!websiteId) {
+        ctx.status = 400;
+        ctx.body = { error: '网站ID无效' };
+        return;
+      }
+      const pageNo = this.parsePositiveInt(page, 1);
+      const limit = this.parsePositiveInt(pageSize, 10);
+      const result = await ctx.service.uied.comment.list({
+        websiteId,
+        page: pageNo,
+        pageSize: limit,
+        type: 'website',
+        status: 'approved',
+      });
+      const total = this.parsePositiveInt(result?.count, 0);
+      ctx.body = {
+        lists: Array.isArray(result?.lists) ? result.lists : [],
+        total,
+        page: pageNo,
+        pageSize: limit,
+        totalPages: total > 0 ? Math.ceil(total / limit) : 0,
+      };
+    } catch (error) {
+      ctx.logger.error('获取网站评论失败:', error);
+      ctx.status = 500;
+      ctx.body = { error: error.message || '获取评论失败' };
+    }
+  }
+
+  /**
+   * 提交网站评论（前端）
+   * POST /api/websites/:id/comments
+   */
+  async addWebsiteComment() {
+    const { ctx } = this;
+    const { id } = ctx.params;
+    const { text, userId, userName } = ctx.request.body;
+
+    try {
+      const websiteId = this.parsePositiveInt(id, 0);
+      if (!websiteId) {
+        ctx.status = 400;
+        ctx.body = { error: '网站ID无效' };
+        return;
+      }
+      const content = String(text || '').trim();
+      if (!content) {
+        ctx.status = 400;
+        ctx.body = { error: '评论内容不能为空' };
+        return;
+      }
+      if (content.length > 1000) {
+        ctx.status = 400;
+        ctx.body = { error: '评论内容不能超过1000字符' };
+        return;
+      }
+
+      const comment = await ctx.service.uied.comment.add({
+        websiteId,
+        parentId: this.parsePositiveInt(ctx.request.body?.parentId, 0),
+        content,
+        userId,
+        userName,
+      });
+      ctx.body = comment;
+    } catch (error) {
+      ctx.logger.error('提交网站评论失败:', error);
+      ctx.status = 500;
+      ctx.body = { error: error.message || '提交评论失败' };
+    }
+  }
+
+  /**
+   * 网站评分（兼容旧前端）
+   * POST /api/websites/:id/rate
+   */
+  async websiteRate() {
+    const { ctx } = this;
+    const { id } = ctx.params;
+    const rating = Number(ctx.request.body?.rating || 0);
+
+    const websiteId = this.parsePositiveInt(id, 0);
+    if (!websiteId) {
+      ctx.status = 400;
+      ctx.body = { error: '网站ID无效' };
+      return;
+    }
+    if (!Number.isFinite(rating) || rating < 1 || rating > 5) {
+      ctx.status = 400;
+      ctx.body = { error: '评分范围应为 1-5' };
+      return;
+    }
+
+    // 兼容返回：当前版本暂未启用评分持久化表，先返回可用结构避免前端报错
+    ctx.body = {
+      userRating: rating,
+      averageRating: rating,
+      totalRatings: 1,
+      message: '评分接口处于兼容模式，结果未持久化',
+    };
+  }
+
+  /**
+   * 添加网站收藏（兼容旧前端）
+   * POST /api/websites/:id/favorite
+   */
+  async websiteFavoriteAdd() {
+    const { ctx } = this;
+    const { id } = ctx.params;
+    const websiteId = this.parsePositiveInt(id, 0);
+    if (!websiteId) {
+      ctx.status = 400;
+      ctx.body = { error: '网站ID无效' };
+      return;
+    }
+    ctx.body = {
+      favorited: true,
+      message: '收藏接口处于兼容模式，结果未持久化',
+    };
+  }
+
+  /**
+   * 取消网站收藏（兼容旧前端）
+   * DELETE /api/websites/:id/favorite
+   */
+  async websiteFavoriteDel() {
+    const { ctx } = this;
+    const { id } = ctx.params;
+    const websiteId = this.parsePositiveInt(id, 0);
+    if (!websiteId) {
+      ctx.status = 400;
+      ctx.body = { error: '网站ID无效' };
+      return;
+    }
+    ctx.body = {
+      favorited: false,
+      message: '收藏接口处于兼容模式，结果未持久化',
+    };
+  }
+
+  /**
+   * 抓取站点图标（兼容旧前端）
+   * GET /api/favicon-api/fetch
+   */
+  async faviconFetch() {
+    const { ctx } = this;
+    const url = String(ctx.query?.url || ctx.request.body?.url || '').trim();
+
+    if (!url) {
+      ctx.status = 400;
+      ctx.body = { error: '请提供URL' };
+      return;
+    }
+
+    try {
+      const seoData = await ctx.service.uied.seoScraper.fetch(url);
+      ctx.body = {
+        faviconUrl: String(seoData?.favicon || ''),
+        favicon: String(seoData?.favicon || ''),
+        title: String(seoData?.title || ''),
+        description: String(seoData?.description || ''),
+        keywords: String(seoData?.keywords || ''),
+        ogImage: String(seoData?.ogImage || ''),
+      };
+    } catch (error) {
+      ctx.logger.error('抓取站点图标失败:', error);
+      ctx.status = 500;
+      ctx.body = { error: error.message || '抓取失败' };
+    }
+  }
+
+  /**
+   * AI 智能搜索（兼容旧前端）
+   * POST /api/ai-search
+   * POST /api/ai-config/smart-search
+   */
+  async aiSearch() {
+    const { ctx } = this;
+    const body = ctx.request.body || {};
+    const query = String(body.query || '').trim();
+    const limit = Math.min(this.parsePositiveInt(body.limit, 10), 100);
+    const categoryId = this.parsePositiveInt(body.categoryId, 0);
+
+    if (!query) {
+      ctx.body = {
+        results: [],
+        mode: 'keyword',
+        reason: '关键词为空，未执行检索',
+        message: '请输入搜索关键词',
+        reasoning: '请输入搜索关键词后再尝试 AI 搜索',
+      };
+      return;
+    }
+
+    try {
+      const pattern = `%${query}%`;
+      const whereSql = categoryId > 0 ? ' AND w.category_id = ? ' : '';
+      const replacements = categoryId > 0
+        ? [ pattern, pattern, pattern, pattern, categoryId, limit ]
+        : [ pattern, pattern, pattern, pattern, limit ];
+      const rows = await ctx.app.model.query(
+        `
+        SELECT w.id, w.name, w.slug, w.description, w.url, w.icon_url AS iconUrl, w.tags,
+               w.is_hot AS isHot, w.is_featured AS isFeatured, w.is_new AS isNew,
+               c.name AS category
+        FROM uied_website w
+        LEFT JOIN uied_category c ON c.id = w.category_id
+        WHERE w.is_delete = 0
+          AND (
+            w.name LIKE ?
+            OR w.description LIKE ?
+            OR w.tags LIKE ?
+            OR w.url LIKE ?
+          )
+          ${whereSql}
+        ORDER BY w.is_pinned DESC, w.is_hot DESC, w.is_featured DESC, w.click_count DESC, w.id DESC
+        LIMIT ?
+        `,
+        { replacements, type: ctx.app.Sequelize.QueryTypes.SELECT }
+      );
+
+      const results = (Array.isArray(rows) ? rows : []).map(item => ({
+        id: String(item?.id || ''),
+        name: String(item?.name || ''),
+        slug: String(item?.slug || ''),
+        description: String(item?.description || ''),
+        url: String(item?.url || ''),
+        iconUrl: String(item?.iconUrl || ''),
+        category: String(item?.category || ''),
+        tags: this.safeJsonParse(item?.tags, []),
+        isHot: Number(item?.isHot || 0) === 1,
+        isFeatured: Number(item?.isFeatured || 0) === 1,
+        isNew: Number(item?.isNew || 0) === 1,
+      }));
+
+      ctx.body = {
+        results,
+        mode: 'keyword',
+        reason: '当前为关键词匹配结果',
+        message: `找到 ${results.length} 个结果`,
+        reasoning: '已按名称、描述、标签和网址进行关键词匹配排序',
+      };
+    } catch (error) {
+      ctx.logger.error('AI搜索失败（关键词兜底）:', error);
+      ctx.status = 500;
+      ctx.body = { error: error.message || 'AI搜索失败' };
+    }
+  }
+
+  /**
+   * 获取 WordPress 分类配置（兼容旧前端）
+   * GET /api/wordpress/categories/active
+   */
+  async wordpressCategoriesActive() {
+    const { ctx } = this;
+    const pageSlug = String(ctx.query?.pageSlug || '').trim();
+
+    try {
+      const categories = await ctx.service.uied.wordpressConfig.listCategories(pageSlug || undefined);
+      ctx.body = (Array.isArray(categories) ? categories : []).filter(item => item?.visible !== false);
+    } catch (error) {
+      ctx.logger.error('获取 WordPress 分类失败:', error);
+      // 兼容旧前端：异常时返回空数组，避免页面硬失败
+      ctx.body = [];
+    }
+  }
+
+  /**
+   * 获取 WordPress 标签配置（兼容旧前端）
+   * GET /api/wordpress/tags
+   */
+  async wordpressTags() {
+    const { ctx } = this;
+    // 当前后端未维护独立的 WordPress 标签配置表，统一返回空数组
+    ctx.body = [];
+  }
+
+  /**
+   * 获取 WordPress 组件配置（兼容旧前端）
+   * GET /api/wordpress/widgets/active
+   */
+  async wordpressWidgetsActive() {
+    const { ctx } = this;
+    // 当前后端未维护独立组件配置表，统一返回空数组
+    ctx.body = [];
   }
 
   /**
