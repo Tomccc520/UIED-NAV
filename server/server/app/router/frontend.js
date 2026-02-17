@@ -31,6 +31,8 @@ module.exports = app => {
   
   // GET /api/pages/:slug/full - 获取页面完整数据
   get('/api/pages/:slug/full', controller.uied.frontend.pageFullData);
+  // GET /api/pages/:slug/stats - 获取页面统计（兼容旧前端）
+  get('/api/pages/:slug/stats', controller.uied.frontend.pageStats);
   
   // GET /api/pages/:slug/hot - 获取页面热门推荐
   get('/api/pages/:slug/hot', controller.uied.frontend.pageHotWebsites);
@@ -44,6 +46,10 @@ module.exports = app => {
   // ==================== 网站相关 ====================
   // GET /api/websites - 获取网站列表（支持通过 ids 参数批量获取）
   get('/api/websites', controller.uied.frontend.websites);
+  // GET /api/websites/featured/list - 获取精选网站（兼容旧前端）
+  get('/api/websites/featured/list', controller.uied.frontend.featuredWebsites);
+  // GET /api/websites/hot/list - 获取热门网站（兼容旧前端）
+  get('/api/websites/hot/list', controller.uied.frontend.hotWebsites);
   // GET /api/websites/:idOrSlug - 获取网站详情
   get('/api/websites/:idOrSlug', controller.uied.frontend.websiteDetail);
   // GET /api/websites/:id/related - 获取相关推荐网站
@@ -56,12 +62,16 @@ module.exports = app => {
   get('/api/settings/public', controller.uied.frontend.publicSettings);
   // GET /api/settings/detailPageConfig - 获取详情页配置
   get('/api/settings/detailPageConfig', controller.uied.frontend.detailPageConfig);
+  // GET /api/public/detail-sidebar-config - 获取详情侧栏配置（兼容旧前端）
+  get('/api/public/detail-sidebar-config', controller.uied.frontend.detailPageConfig);
   // GET /api/settings/frontend-config - 获取前端配置
   get('/api/settings/frontend-config', controller.uied.frontend.frontendConfig);
   // GET /api/settings/permalink - 获取固定链接配置
   get('/api/settings/permalink', controller.uied.frontend.permalinkConfig);
   // GET /api/settings/favicon-apis - 获取启用的 Favicon API 列表
   get('/api/settings/favicon-apis', controller.uied.frontend.faviconApis);
+  // GET /api/favicon-api/fetch - 抓取站点 favicon（兼容旧前端）
+  get('/api/favicon-api/fetch', controller.uied.frontend.faviconFetch);
   // GET /api/settings/website/:id/tags - 获取网站标签
   get('/api/settings/website/:id/tags', controller.uied.frontend.websiteTags);
   
@@ -80,6 +90,26 @@ module.exports = app => {
   get('/api/hot-recommendations/active', controller.uied.frontend.hotRecommendationsActive);
   // POST /api/hot-recommendations/:id/click - 记录热门推荐点击
   post('/api/hot-recommendations/:id/click', controller.uied.frontend.hotRecommendationClick);
+
+  // ==================== 前端提交与 AI 兼容接口 ====================
+  // GET /api/submissions/check-url - 检查提交 URL
+  get('/api/submissions/check-url', controller.uied.submission.checkUrl);
+  // POST /api/submissions - 前端提交网站
+  post('/api/submissions', controller.uied.submission.submit);
+  // POST /api/ai-config/generate-website-info - AI 生成网站信息
+  post('/api/ai-config/generate-website-info', controller.uied.aiConfig.generateWebsiteInfo);
+  // POST /api/ai-config/chat - AI 聊天
+  post('/api/ai-config/chat', controller.uied.aiConfig.chat);
+  // POST /api/ai-config/smart-search - AI 智能搜索（兼容旧前端）
+  post('/api/ai-config/smart-search', controller.uied.frontend.aiSearch);
+  // POST /api/ai-search - AI 智能搜索（统一前端入口）
+  post('/api/ai-search', controller.uied.frontend.aiSearch);
+  // GET /api/wordpress/categories/active - WordPress 分类（兼容旧前端）
+  get('/api/wordpress/categories/active', controller.uied.frontend.wordpressCategoriesActive);
+  // GET /api/wordpress/tags - WordPress 标签（兼容旧前端）
+  get('/api/wordpress/tags', controller.uied.frontend.wordpressTags);
+  // GET /api/wordpress/widgets/active - WordPress 组件（兼容旧前端）
+  get('/api/wordpress/widgets/active', controller.uied.frontend.wordpressWidgetsActive);
   
   // GET /api/nav-menus - 获取导航菜单
   get('/api/nav-menus', controller.uied.frontend.navMenus);

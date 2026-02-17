@@ -148,6 +148,17 @@ const rsa = {
     'settings:nav-menus', // GET /api/settings/nav-menus
     'settings:footer-groups', // GET /api/settings/footer-groups
     'settings:friend-links', // GET /api/settings/friend-links
+    'public:detail-sidebar-config', // GET /api/public/detail-sidebar-config
+    'favicon-api:fetch', // GET /api/favicon-api/fetch
+    'submissions', // POST /api/submissions
+    'submissions:check-url', // GET /api/submissions/check-url
+    'ai-config:generate-website-info', // POST /api/ai-config/generate-website-info
+    'ai-config:chat', // POST /api/ai-config/chat
+    'ai-config:smart-search', // POST /api/ai-config/smart-search
+    'ai-search', // POST /api/ai-search
+    'wordpress:categories:active', // GET /api/wordpress/categories/active
+    'wordpress:tags', // GET /api/wordpress/tags
+    'wordpress:widgets:active', // GET /api/wordpress/widgets/active
     'settings:hot-recommendation-click', // GET /api/settings/hot-recommendation-click
     'nav-menus', // GET /api/nav-menus
     'friend-links', // GET /api/friend-links
