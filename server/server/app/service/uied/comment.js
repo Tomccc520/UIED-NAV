@@ -14,11 +14,11 @@ const Service = require('egg').Service;
 
 class CommentService extends Service {
   /**
-   * 获取评论列表（管理后台）
+   * 获取评论列表（管理后台 & 前端）
    */
   async list(params = {}) {
     const { app } = this;
-    const { page = 1, pageSize = 15, type = 'website', status, keyword } = params;
+    const { page = 1, pageSize = 15, type = 'website', status, keyword, articleId, websiteId } = params;
     const offset = (page - 1) * pageSize;
 
     const tableName = type === 'article' ? 'uied_article_comment' : 'uied_website_comment';
@@ -38,6 +38,16 @@ class CommentService extends Service {
     if (keyword) {
       conditions += ' AND (c.content LIKE ? OR c.nickname LIKE ? OR c.email LIKE ?)';
       replacements.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
+    }
+
+    // 特定文章/网站的评论
+    if (type === 'article' && articleId) {
+      conditions += ' AND c.article_id = ?';
+      replacements.push(articleId);
+    }
+    if (type === 'website' && websiteId) {
+      conditions += ' AND c.website_id = ?';
+      replacements.push(websiteId);
     }
 
     // 查询总数
@@ -65,6 +75,52 @@ class CommentService extends Service {
       count: countResult.total,
       page: parseInt(page),
       pageSize: parseInt(pageSize),
+    };
+  }
+
+  /**
+   * 添加评论
+   */
+  async add(data) {
+    const { app } = this;
+    const now = Math.floor(Date.now() / 1000);
+    const { articleId, websiteId, parentId = 0, content, userId, userName, email } = data;
+    
+    // 判断类型
+    const type = articleId ? 'article' : (websiteId ? 'website' : null);
+    if (!type) {
+      throw new Error('未指定评论对象');
+    }
+    
+    const tableName = type === 'article' ? 'uied_article_comment' : 'uied_website_comment';
+    const targetIdField = type === 'article' ? 'article_id' : 'website_id';
+    const targetId = articleId || websiteId;
+    
+    // 插入评论
+    const [ result ] = await app.model.query(
+      `INSERT INTO ${tableName} 
+       (${targetIdField}, parent_id, content, user_id, nickname, email, status, create_time, update_time)
+       VALUES (?, ?, ?, ?, ?, ?, 'approved', ?, ?)`,
+      {
+        replacements: [
+          targetId,
+          parentId,
+          content,
+          userId || 0,
+          userName || '匿名用户',
+          email || '',
+          now,
+          now
+        ],
+        type: app.Sequelize.QueryTypes.INSERT
+      }
+    );
+    
+    return {
+      id: result,
+      content,
+      createTime: now,
+      status: 'approved'
     };
   }
 

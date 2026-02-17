@@ -826,8 +826,8 @@ class FrontendController extends Controller {
       const tagText = String(tag || '').trim();
 
       const [ categories, tags ] = await Promise.all([
-        ctx.service.article.cateAll({}),
-        ctx.service.article.tagAll({}),
+        ctx.service.uied.articleCategory.all(),
+        ctx.service.uied.articleTag.all(),
       ]);
 
       const categoryMap = new Map((Array.isArray(categories) ? categories : []).map(item => [
@@ -855,11 +855,12 @@ class FrontendController extends Controller {
         return;
       }
 
-      const result = await ctx.service.article.list({
-        pageNo: currentPage,
+      const result = await ctx.service.uied.article.list({
+        page: currentPage,
         pageSize: currentPageSize,
-        cid: cid || undefined,
+        categoryId: cid || undefined,
         tagId: tagMeta ? tagMeta.id : undefined,
+        status: 'published'
       });
 
       const lists = (Array.isArray(result?.lists) ? result.lists : []).map(item => this.formatArticleListItem(item, {
@@ -889,7 +890,7 @@ class FrontendController extends Controller {
     const { ctx } = this;
 
     try {
-      const categories = await ctx.service.article.cateAll({});
+      const categories = await ctx.service.uied.articleCategory.all();
       const names = Array.from(new Set(
         (Array.isArray(categories) ? categories : [])
           .map(item => String(item?.name || '').trim())
@@ -920,7 +921,7 @@ class FrontendController extends Controller {
       }
       let article = null;
       try {
-        article = await ctx.service.article.detail(articleId);
+        article = await ctx.service.uied.article.detail(articleId);
       } catch (error) {
         if (String(error?.message || '').includes('文章不存在')) {
           article = null;
@@ -934,8 +935,8 @@ class FrontendController extends Controller {
         return;
       }
       const [ categories, tags ] = await Promise.all([
-        ctx.service.article.cateAll({}),
-        ctx.service.article.tagAll({}),
+        ctx.service.uied.articleCategory.all(),
+        ctx.service.uied.articleTag.all(),
       ]);
       const categoryMap = new Map((Array.isArray(categories) ? categories : []).map(item => [
         this.parsePositiveInt(item.id, 0),
@@ -967,7 +968,7 @@ class FrontendController extends Controller {
         ctx.body = { error: '文章ID无效' };
         return;
       }
-      const result = await ctx.service.article.visitIncr(articleId);
+      const result = await ctx.service.uied.article.visitIncr(articleId);
       ctx.body = {
         id: this.parsePositiveInt(result?.id, articleId),
         viewCount: this.parsePositiveInt(result?.visit, 0),
@@ -993,7 +994,7 @@ class FrontendController extends Controller {
     const { ctx } = this;
 
     try {
-      const tags = await ctx.service.article.tagAll({});
+      const tags = await ctx.service.uied.articleTag.all();
       const tagCountMap = await this.getPublicTagCountMap((Array.isArray(tags) ? tags : []).map(item => item.id));
       ctx.body = (Array.isArray(tags) ? tags : []).map(item => this.formatArticleTagMeta(item, tagCountMap));
     } catch (error) {
@@ -1021,10 +1022,12 @@ class FrontendController extends Controller {
       }
       const pageNo = this.parsePositiveInt(page, 1);
       const limit = this.parsePositiveInt(pageSize, 10);
-      const result = await ctx.service.article.commentList({
+      const result = await ctx.service.uied.comment.list({
         articleId,
-        pageNo,
+        page: pageNo,
         pageSize: limit,
+        type: 'article',
+        status: 'approved'
       });
       const total = this.parsePositiveInt(result?.count, 0);
       ctx.body = {
@@ -1076,7 +1079,7 @@ class FrontendController extends Controller {
         return;
       }
 
-      const comment = await ctx.service.article.commentAdd({
+      const comment = await ctx.service.uied.comment.add({
         articleId,
         parentId: this.parsePositiveInt(ctx.request.body?.parentId, 0),
         content: text.trim(),

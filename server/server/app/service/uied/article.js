@@ -14,11 +14,11 @@ const Service = require('egg').Service;
 
 class ArticleService extends Service {
   /**
-   * 获取文章列表（管理后台）
+   * 获取文章列表（管理后台 & 前端）
    */
   async list(params = {}) {
     const { app } = this;
-    const { page = 1, pageSize = 15, status, category, keyword } = params;
+    const { page = 1, pageSize = 15, status, category, categoryId, tagId, keyword } = params;
     const offset = (page - 1) * pageSize;
 
     // 关键词搜索
@@ -38,24 +38,40 @@ class ArticleService extends Service {
 
     // 构建分类条件
     let categoryCondition = '';
-    if (category) {
+    if (categoryId) {
+      categoryCondition = ' AND category_id = ?';
+      replacements.push(categoryId);
+    } else if (category) {
       categoryCondition = ' AND category = ?';
       replacements.push(category);
+    }
+
+    // 构建标签条件 (需要联表)
+    let tagJoin = '';
+    let tagCondition = '';
+    if (tagId) {
+      // 使用 EXISTS 子查询比 JOIN 更高效且避免重复行
+      tagCondition = ` AND EXISTS (
+        SELECT 1 FROM uied_article_tag_relation tr 
+        WHERE tr.article_id = uied_article.id 
+        AND tr.tag_id = ?
+      )`;
+      replacements.push(tagId);
     }
 
     // 查询总数
     const [ countResult ] = await app.model.query(
       `SELECT COUNT(*) as total FROM uied_article 
-       WHERE is_delete = 0${statusCondition}${categoryCondition}${keywordCondition}`,
+       WHERE is_delete = 0${statusCondition}${categoryCondition}${tagCondition}${keywordCondition}`,
       { replacements, type: app.Sequelize.QueryTypes.SELECT }
     );
 
     // 查询列表
     const lists = await app.model.query(
-      `SELECT id, title, excerpt, cover_image, author, category, slug, status, 
+      `SELECT id, title, excerpt, cover_image, author, category, category_id, slug, status, 
               view_count, published_at, create_time, update_time
        FROM uied_article 
-       WHERE is_delete = 0${statusCondition}${categoryCondition}${keywordCondition}
+       WHERE is_delete = 0${statusCondition}${categoryCondition}${tagCondition}${keywordCondition}
        ORDER BY create_time DESC
        LIMIT ? OFFSET ?`,
       {
@@ -79,6 +95,35 @@ class ArticleService extends Service {
       count: countResult.total,
       page: parseInt(page),
       pageSize: parseInt(pageSize),
+    };
+  }
+
+  /**
+   * 增加文章浏览量
+   */
+  async visitIncr(id) {
+    const { app } = this;
+    const now = Math.floor(Date.now() / 1000);
+    
+    // 检查文章是否存在
+    const [ article ] = await app.model.query(
+      'SELECT id, view_count FROM uied_article WHERE id = ? AND is_delete = 0',
+      { replacements: [ id ], type: app.Sequelize.QueryTypes.SELECT }
+    );
+    
+    if (!article) {
+      throw new Error('文章不存在');
+    }
+    
+    // 更新浏览量
+    await app.model.query(
+      'UPDATE uied_article SET view_count = view_count + 1 WHERE id = ?',
+      { replacements: [ id ], type: app.Sequelize.QueryTypes.UPDATE }
+    );
+    
+    return {
+      id: article.id,
+      visit: (article.view_count || 0) + 1
     };
   }
 
