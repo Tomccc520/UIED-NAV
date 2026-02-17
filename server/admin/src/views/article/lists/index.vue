@@ -292,6 +292,22 @@ const queryParams = reactive({
 })
 const router = useRouter()
 const seedLoading = ref(false)
+const frontendUrl = (import.meta.env.VITE_FRONTEND_URL || 'http://localhost:3003').replace(
+    /\/$/,
+    ''
+)
+/**
+ * 规范化前台路由路径，确保始终为「/xxx」格式
+ */
+const normalizeFrontendRoutePath = (rawPath: string, fallbackPath = '/articles') => {
+    const source = String(rawPath || '').trim() || String(fallbackPath || '').trim()
+    const normalized = source.replace(/^\/+|\/+$/g, '')
+    return normalized ? `/${normalized}` : '/'
+}
+const frontendArticleDetailPath = normalizeFrontendRoutePath(
+    import.meta.env.VITE_FRONTEND_ARTICLE_DETAIL_PATH || '/articles',
+    '/articles'
+)
 
 const { pager, getLists, resetPage, resetParams } = usePaging({
     fetchFun: articleLists,
@@ -431,8 +447,11 @@ const handleAuditPass = async (row: ArticleListItem) => {
  * 在前台新窗口查看文章
  */
 const handleView = (row: ArticleListItem) => {
-    const frontendUrl = import.meta.env.VITE_FRONTEND_URL || 'http://localhost:3003'
-    window.open(`${frontendUrl}/news/${row.id}`, '_blank')
+    const articleSlug = String((row as any)?.slug || row.id || '').trim()
+    window.open(
+        `${frontendUrl}${frontendArticleDetailPath}/${encodeURIComponent(articleSlug)}`,
+        '_blank'
+    )
 }
 
 /**

@@ -70,7 +70,7 @@
                 <el-table-column label="文章数" prop="number" min-width="120" />
                 <el-table-column label="前台路径" min-width="240" show-overflow-tooltip>
                     <template #default="{ row }">
-                        <span class="text-info">{{ getTagFrontendPath(row.id) }}</span>
+                        <span class="text-info">{{ getTagFrontendPath(row) }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column label="状态" min-width="120">
@@ -92,7 +92,7 @@
                                 type="primary"
                                 link
                                 :icon="View"
-                                @click="openTagFrontend(row.id)"
+                                @click="openTagFrontend(row)"
                             />
                         </el-tooltip>
                         <el-tooltip content="复制路径" placement="top">
@@ -100,7 +100,7 @@
                                 type="primary"
                                 link
                                 :icon="Link"
-                                @click="copyTagFrontendPath(row.id)"
+                                @click="copyTagFrontendPath(row)"
                             />
                         </el-tooltip>
                         <el-button
@@ -187,10 +187,27 @@ import feedback from '@/utils/feedback'
 import EditPopup from './edit.vue'
 const editRef = shallowRef<InstanceType<typeof EditPopup>>()
 const showEdit = ref(false)
-const frontendUrl = (import.meta.env.VITE_FRONTEND_URL || 'http://localhost:3000').replace(
+const frontendUrl = (import.meta.env.VITE_FRONTEND_URL || 'http://localhost:3003').replace(
     /\/$/,
     ''
 )
+/**
+ * 规范化前台路由路径，确保始终为「/xxx」格式
+ */
+const normalizeFrontendRoutePath = (rawPath: string, fallbackPath = '/articles') => {
+    const source = String(rawPath || '').trim() || String(fallbackPath || '').trim()
+    const normalized = source.replace(/^\/+|\/+$/g, '')
+    return normalized ? `/${normalized}` : '/'
+}
+const frontendArticleListPath = normalizeFrontendRoutePath(
+    import.meta.env.VITE_FRONTEND_ARTICLE_LIST_PATH || '/articles',
+    '/articles'
+)
+const frontendArticleTagQueryKey = (
+    import.meta.env.VITE_FRONTEND_ARTICLE_TAG_QUERY_KEY || 'tag'
+)
+    .trim()
+    .replace(/^\?/, '')
 const selectedIds = ref<number[]>([])
 const mergeDialog = reactive({
     visible: false,
@@ -211,21 +228,30 @@ const handlePopupSuccess = () => {
 /**
  * 生成标签前台访问路径
  */
-const getTagFrontendPath = (tagId: number | string) => `/news?tagId=${tagId}`
+const getTagFrontendPath = (row: any) => {
+    const path = frontendArticleListPath || '/articles'
+    const queryKey = frontendArticleTagQueryKey || 'tag'
+    const value =
+        queryKey.toLowerCase().includes('id')
+            ? String(row?.id || '').trim()
+            : String(row?.slug || row?.id || '').trim()
+    if (!value) return path
+    return `${path}?${encodeURIComponent(queryKey)}=${encodeURIComponent(value)}`
+}
 
 /**
  * 快速打开标签前台聚合页
  */
-const openTagFrontend = (tagId: number | string) => {
-    const path = getTagFrontendPath(tagId)
+const openTagFrontend = (row: any) => {
+    const path = getTagFrontendPath(row)
     window.open(`${frontendUrl}${path}`, '_blank')
 }
 
 /**
  * 复制标签前台访问路径
  */
-const copyTagFrontendPath = async (tagId: number | string) => {
-    const path = getTagFrontendPath(tagId)
+const copyTagFrontendPath = async (row: any) => {
+    const path = getTagFrontendPath(row)
     try {
         if (navigator?.clipboard?.writeText) {
             await navigator.clipboard.writeText(path)

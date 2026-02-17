@@ -50,7 +50,7 @@
                 <el-table-column label="文章数" prop="number" min-width="100" />
                 <el-table-column label="前台路径" min-width="240" show-overflow-tooltip>
                     <template #default="{ row }">
-                        <span class="text-info">{{ getTopicFrontendPath(row.id) }}</span>
+                        <span class="text-info">{{ getTopicFrontendPath(row) }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column label="状态" min-width="120">
@@ -72,7 +72,7 @@
                                 type="primary"
                                 link
                                 :icon="View"
-                                @click="openTopicFrontend(row.id)"
+                                @click="openTopicFrontend(row)"
                             />
                         </el-tooltip>
                         <el-tooltip content="复制路径" placement="top">
@@ -80,7 +80,7 @@
                                 type="primary"
                                 link
                                 :icon="Link"
-                                @click="copyTopicFrontendPath(row.id)"
+                                @click="copyTopicFrontendPath(row)"
                             />
                         </el-tooltip>
                         <el-button
@@ -122,10 +122,27 @@ import feedback from '@/utils/feedback'
 import EditPopup from './edit.vue'
 const editRef = shallowRef<InstanceType<typeof EditPopup>>()
 const showEdit = ref(false)
-const frontendUrl = (import.meta.env.VITE_FRONTEND_URL || 'http://localhost:3000').replace(
+const frontendUrl = (import.meta.env.VITE_FRONTEND_URL || 'http://localhost:3003').replace(
     /\/$/,
     ''
 )
+/**
+ * 规范化前台路由路径，确保始终为「/xxx」格式
+ */
+const normalizeFrontendRoutePath = (rawPath: string, fallbackPath = '/articles') => {
+    const source = String(rawPath || '').trim() || String(fallbackPath || '').trim()
+    const normalized = source.replace(/^\/+|\/+$/g, '')
+    return normalized ? `/${normalized}` : '/'
+}
+const frontendArticleListPath = normalizeFrontendRoutePath(
+    import.meta.env.VITE_FRONTEND_ARTICLE_LIST_PATH || '/articles',
+    '/articles'
+)
+const frontendArticleTopicQueryKey = (
+    import.meta.env.VITE_FRONTEND_ARTICLE_TOPIC_QUERY_KEY || 'topicId'
+)
+    .trim()
+    .replace(/^\?/, '')
 
 const { pager, getLists, resetPage } = usePaging({
     fetchFun: articleTopicLists
@@ -140,21 +157,30 @@ const handlePopupSuccess = () => {
 /**
  * 生成专题前台访问路径
  */
-const getTopicFrontendPath = (topicId: number | string) => `/news?topicId=${topicId}`
+const getTopicFrontendPath = (row: any) => {
+    const path = frontendArticleListPath || '/articles'
+    const queryKey = frontendArticleTopicQueryKey || 'topicId'
+    const value =
+        queryKey.toLowerCase().includes('id')
+            ? String(row?.id || '').trim()
+            : String(row?.slug || row?.id || '').trim()
+    if (!value) return path
+    return `${path}?${encodeURIComponent(queryKey)}=${encodeURIComponent(value)}`
+}
 
 /**
  * 快速打开专题前台聚合页
  */
-const openTopicFrontend = (topicId: number | string) => {
-    const path = getTopicFrontendPath(topicId)
+const openTopicFrontend = (row: any) => {
+    const path = getTopicFrontendPath(row)
     window.open(`${frontendUrl}${path}`, '_blank')
 }
 
 /**
  * 复制专题前台访问路径
  */
-const copyTopicFrontendPath = async (topicId: number | string) => {
-    const path = getTopicFrontendPath(topicId)
+const copyTopicFrontendPath = async (row: any) => {
+    const path = getTopicFrontendPath(row)
     try {
         if (navigator?.clipboard?.writeText) {
             await navigator.clipboard.writeText(path)
