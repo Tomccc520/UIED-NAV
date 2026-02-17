@@ -817,13 +817,31 @@ class FrontendController extends Controller {
    */
   async articles() {
     const { ctx } = this;
-    const { page = 1, pageSize = 10, category, tag } = ctx.query;
+    const {
+      page,
+      pageNo,
+      pageSize,
+      limit,
+      category,
+      categoryId,
+      cid,
+      categorySlug,
+      cateSlug,
+      tag,
+      tagId,
+      tag_id,
+      tagSlug
+    } = ctx.query;
 
     try {
-      const currentPage = this.parsePositiveInt(page, 1);
-      const currentPageSize = this.parsePositiveInt(pageSize, 10);
+      const currentPage = this.parsePositiveInt(page || pageNo, 1);
+      const currentPageSize = this.parsePositiveInt(pageSize || limit, 10);
       const categoryText = String(category || '').trim();
+      const categorySlugText = String(categorySlug || cateSlug || '').trim();
+      const categoryIdValue = this.parsePositiveInt(categoryId || cid, 0);
       const tagText = String(tag || '').trim();
+      const tagSlugText = String(tagSlug || '').trim();
+      const tagIdValue = this.parsePositiveInt(tagId || tag_id, 0);
 
       const [ categories, tags ] = await Promise.all([
         ctx.service.uied.articleCategory.all(),
@@ -838,19 +856,40 @@ class FrontendController extends Controller {
         String(item.name || ''),
         this.parsePositiveInt(item.id, 0),
       ]));
+      const categoryBySlug = new Map((Array.isArray(categories) ? categories : []).map(item => [
+        String(item.slug || ''),
+        this.parsePositiveInt(item.id, 0),
+      ]));
 
       const tagCountMap = await this.getPublicTagCountMap((Array.isArray(tags) ? tags : []).map(item => item.id));
       const tagMetaList = (Array.isArray(tags) ? tags : []).map(item => this.formatArticleTagMeta(item, tagCountMap));
       const tagMetaByName = new Map(tagMetaList.map(item => [ item.name, item ]));
       const tagMetaBySlug = new Map(tagMetaList.map(item => [ item.slug, item ]));
+      const tagMetaById = new Map(tagMetaList.map(item => [ this.parsePositiveInt(item.id, 0), item ]));
 
-      const cid = categoryText ? (categoryByName.get(categoryText) || 0) : 0;
-      if (categoryText && !cid) {
+      let resolvedCategoryId = 0;
+      if (categoryIdValue > 0) {
+        resolvedCategoryId = categoryIdValue;
+      } else if (categorySlugText) {
+        resolvedCategoryId = categoryBySlug.get(categorySlugText) || 0;
+      } else if (categoryText) {
+        resolvedCategoryId = categoryByName.get(categoryText) || 0;
+      }
+      if ((categoryIdValue > 0 || categorySlugText || categoryText) && !resolvedCategoryId) {
         ctx.body = { lists: [], total: 0, page: currentPage, pageSize: currentPageSize, totalPages: 0 };
         return;
       }
-      const tagMeta = tagText ? (tagMetaBySlug.get(tagText) || null) : null;
-      if (tagText && !tagMeta) {
+
+      let resolvedTagMeta = null;
+      if (tagIdValue > 0) {
+        resolvedTagMeta = tagMetaById.get(tagIdValue) || null;
+      } else if (tagSlugText) {
+        resolvedTagMeta = tagMetaBySlug.get(tagSlugText) || null;
+      } else if (tagText) {
+        // 兼容老前端传“标签名称”而不是 slug 的场景
+        resolvedTagMeta = tagMetaBySlug.get(tagText) || tagMetaByName.get(tagText) || null;
+      }
+      if ((tagIdValue > 0 || tagSlugText || tagText) && !resolvedTagMeta) {
         ctx.body = { lists: [], total: 0, page: currentPage, pageSize: currentPageSize, totalPages: 0 };
         return;
       }
@@ -858,8 +897,8 @@ class FrontendController extends Controller {
       const result = await ctx.service.uied.article.list({
         page: currentPage,
         pageSize: currentPageSize,
-        categoryId: cid || undefined,
-        tagId: tagMeta ? tagMeta.id : undefined,
+        categoryId: resolvedCategoryId || undefined,
+        tagId: resolvedTagMeta ? resolvedTagMeta.id : undefined,
         status: 'published'
       });
 

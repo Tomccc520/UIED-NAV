@@ -197,7 +197,8 @@ class ArticleController extends Controller {
     const { ctx } = this;
 
     try {
-      const categories = await ctx.service.uied.article.categories();
+      // 兼容前端按 mode/detail/onlyPublished 获取不同粒度分类数据
+      const categories = await ctx.service.uied.article.categories(ctx.query || {});
       ctx.body = {
         code: 200,
         msg: '获取成功',

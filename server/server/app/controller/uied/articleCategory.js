@@ -20,9 +20,9 @@ class ArticleCategoryController extends Controller {
   async list() {
     const { ctx } = this;
     try {
-      const { pageNo = 1, pageSize = 20, keyword } = ctx.query;
+      const { pageNo, page, pageSize = 20, keyword } = ctx.query;
       const result = await ctx.service.uied.articleCategory.list({
-        page: parseInt(pageNo),
+        page: parseInt(pageNo || page || 1),
         pageSize: parseInt(pageSize),
         keyword,
       });
@@ -70,8 +70,8 @@ class ArticleCategoryController extends Controller {
     const { ctx } = this;
     const data = ctx.request.body;
 
-    if (!data.name || !data.slug) {
-      ctx.body = { code: 400, msg: '名称和标识不能为空' };
+    if (!data.name) {
+      ctx.body = { code: 400, msg: '名称不能为空' };
       return;
     }
 

@@ -18,8 +18,16 @@ class ArticleService extends Service {
    */
   async list(params = {}) {
     const { app } = this;
-    const { page = 1, pageSize = 15, status, category, categoryId, tagId, keyword } = params;
-    const offset = (page - 1) * pageSize;
+    const currentPage = this.parsePositiveInt(params.page ?? params.pageNo, 1);
+    const currentPageSize = this.parsePositiveInt(params.pageSize ?? params.limit, 15);
+    const rawStatus = String(params.status || '').trim();
+    const rawIsShow = params.isShow;
+    const keyword = String(params.keyword || '').trim();
+    const category = String(params.category || '').trim();
+    const categoryId = this.parsePositiveInt(params.categoryId ?? params.cid, 0);
+    const tagId = this.parsePositiveInt(params.tagId ?? params.tag_id, 0);
+    const tagSlug = String(params.tagSlug || params.tag || '').trim();
+    const offset = (currentPage - 1) * currentPageSize;
 
     // 关键词搜索
     let keywordCondition = '';
@@ -31,7 +39,14 @@ class ArticleService extends Service {
 
     // 构建状态条件
     let statusCondition = '';
-    if (status) {
+    let status = rawStatus;
+    /**
+     * 兼容旧参数 isShow（1=published,0=draft），避免前端切换成本
+     */
+    if (!status && rawIsShow !== undefined && rawIsShow !== null && rawIsShow !== '') {
+      status = Number(rawIsShow) === 1 ? 'published' : 'draft';
+    }
+    if (status === 'published' || status === 'draft') {
       statusCondition = ' AND status = ?';
       replacements.push(status);
     }
@@ -47,7 +62,6 @@ class ArticleService extends Service {
     }
 
     // 构建标签条件 (需要联表)
-    let tagJoin = '';
     let tagCondition = '';
     if (tagId) {
       // 使用 EXISTS 子查询比 JOIN 更高效且避免重复行
@@ -57,6 +71,16 @@ class ArticleService extends Service {
         AND tr.tag_id = ?
       )`;
       replacements.push(tagId);
+    } else if (tagSlug) {
+      // 兼容按 tag slug 查询
+      tagCondition = ` AND EXISTS (
+        SELECT 1
+        FROM uied_article_tag_relation tr
+        INNER JOIN uied_article_tag t ON t.id = tr.tag_id AND t.is_delete = 0
+        WHERE tr.article_id = uied_article.id
+        AND t.slug = ?
+      )`;
+      replacements.push(tagSlug);
     }
 
     // 查询总数
@@ -75,7 +99,7 @@ class ArticleService extends Service {
        ORDER BY create_time DESC
        LIMIT ? OFFSET ?`,
       {
-        replacements: [ ...replacements, parseInt(pageSize), offset ],
+        replacements: [ ...replacements, currentPageSize, offset ],
         type: app.Sequelize.QueryTypes.SELECT,
       }
     );
@@ -92,9 +116,9 @@ class ArticleService extends Service {
 
     return {
       lists: formattedLists,
-      count: countResult.total,
-      page: parseInt(page),
-      pageSize: parseInt(pageSize),
+      count: Number(countResult.total || 0),
+      page: currentPage,
+      pageSize: currentPageSize,
     };
   }
 
@@ -170,14 +194,71 @@ class ArticleService extends Service {
   }
 
   /**
+   * 规范化文章入参（兼容新旧字段命名）
+   */
+  normalizeArticlePayload(data = {}) {
+    const statusRaw = String(data.status || '').trim();
+    const isShowRaw = data.isShow;
+    let status = statusRaw;
+    if (!status && isShowRaw !== undefined && isShowRaw !== null && isShowRaw !== '') {
+      status = Number(isShowRaw) === 1 ? 'published' : 'draft';
+    }
+    if (status !== 'published' && status !== 'draft') {
+      status = 'draft';
+    }
+    const title = String(data.title || '').trim();
+    const content = String(data.content || '').trim();
+    const excerpt = String(data.excerpt || data.summary || '').trim();
+    const coverImage = String(data.coverImage || data.cover_image || data.image || '').trim();
+    const author = String(data.author || '').trim() || '管理员';
+    const category = String(data.category || data.categoryName || '').trim();
+    const categoryId = this.parsePositiveInt(data.categoryId ?? data.category_id ?? data.cid, 0) || null;
+    const slug = String(data.slug || '').trim();
+    const seoTitle = String(data.seoTitle || data.seo_title || '').trim();
+    const seoDescription = String(data.seoDescription || data.seo_description || '').trim();
+    const hasTagIdsInput = data.tagIds !== undefined || data.tag_ids !== undefined;
+    const tagIdsRaw = data.tagIds !== undefined ? data.tagIds : data.tag_ids;
+    const tagIds = Array.isArray(tagIdsRaw)
+      ? Array.from(new Set(tagIdsRaw.map(item => this.parsePositiveInt(item, 0)).filter(Boolean)))
+      : [];
+
+    return {
+      title,
+      content,
+      excerpt,
+      coverImage,
+      author,
+      category,
+      categoryId,
+      slug,
+      status,
+      seoTitle,
+      seoDescription,
+      tagIds,
+      hasTagIdsInput,
+    };
+  }
+
+  /**
    * 创建文章
    */
   async add(data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
+    const payload = this.normalizeArticlePayload(data);
+    let categoryName = payload.category || '未分类';
+    if (!payload.category && payload.categoryId) {
+      const [ categoryRow ] = await app.model.query(
+        'SELECT name FROM uied_article_category WHERE id = ? AND is_delete = 0',
+        { replacements: [ payload.categoryId ], type: app.Sequelize.QueryTypes.SELECT }
+      );
+      if (categoryRow && categoryRow.name) {
+        categoryName = String(categoryRow.name);
+      }
+    }
 
     // 生成 slug
-    const slug = data.slug || this.generateSlug(data.title);
+    const slug = payload.slug || this.generateSlug(payload.title);
 
     // 检查 slug 唯一性
     const [ existing ] = await app.model.query(
@@ -196,18 +277,18 @@ class ArticleService extends Service {
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       {
         replacements: [
-          data.title || '',
-          data.content || '',
-          data.excerpt || (data.content || '').slice(0, 200),
-          data.coverImage || null,
-          data.author || '管理员',
-          data.category || '未分类',
-          data.categoryId || null,
+          payload.title || '',
+          payload.content || '',
+          payload.excerpt || (payload.content || '').slice(0, 200),
+          payload.coverImage || null,
+          payload.author || '管理员',
+          categoryName,
+          payload.categoryId || null,
           slug,
-          data.status || 'draft',
-          data.seoTitle || data.title,
-          data.seoDescription || (data.excerpt || '').slice(0, 160),
-          data.status === 'published' ? now : null,
+          payload.status || 'draft',
+          payload.seoTitle || payload.title,
+          payload.seoDescription || (payload.excerpt || '').slice(0, 160),
+          payload.status === 'published' ? now : null,
           now,
           now,
         ],
@@ -216,8 +297,8 @@ class ArticleService extends Service {
     );
 
     // 保存文章标签关联
-    if (data.tagIds && Array.isArray(data.tagIds) && data.tagIds.length > 0) {
-      await this.ctx.service.uied.articleTag.setArticleTags(result, data.tagIds);
+    if (payload.tagIds.length > 0) {
+      await this.ctx.service.uied.articleTag.setArticleTags(result, payload.tagIds);
     }
 
     return result;
@@ -229,6 +310,17 @@ class ArticleService extends Service {
   async edit(id, data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
+    const payload = this.normalizeArticlePayload(data);
+    let categoryName = payload.category || '未分类';
+    if (!payload.category && payload.categoryId) {
+      const [ categoryRow ] = await app.model.query(
+        'SELECT name FROM uied_article_category WHERE id = ? AND is_delete = 0',
+        { replacements: [ payload.categoryId ], type: app.Sequelize.QueryTypes.SELECT }
+      );
+      if (categoryRow && categoryRow.name) {
+        categoryName = String(categoryRow.name);
+      }
+    }
 
     // 检查文章是否存在
     const [ existing ] = await app.model.query(
@@ -241,10 +333,10 @@ class ArticleService extends Service {
     }
 
     // 如果修改了 slug，检查唯一性
-    if (data.slug) {
+    if (payload.slug) {
       const [ slugExists ] = await app.model.query(
         'SELECT id FROM uied_article WHERE slug = ? AND id != ? AND is_delete = 0',
-        { replacements: [ data.slug, id ], type: app.Sequelize.QueryTypes.SELECT }
+        { replacements: [ payload.slug, id ], type: app.Sequelize.QueryTypes.SELECT }
       );
       if (slugExists) {
         throw new Error('URL标识已存在');
@@ -253,7 +345,7 @@ class ArticleService extends Service {
 
     // 处理发布时间
     let publishedAt = existing.published_at;
-    if (data.status === 'published' && !existing.published_at) {
+    if (payload.status === 'published' && !existing.published_at) {
       publishedAt = now;
     }
 
@@ -265,17 +357,17 @@ class ArticleService extends Service {
        WHERE id = ?`,
       {
         replacements: [
-          data.title || '',
-          data.content || '',
-          data.excerpt || '',
-          data.coverImage || null,
-          data.author || '管理员',
-          data.category || '未分类',
-          data.categoryId !== undefined ? data.categoryId : existing.category_id || null,
-          data.slug || existing.slug,
-          data.status || existing.status,
-          data.seoTitle || data.title,
-          data.seoDescription || '',
+          payload.title || '',
+          payload.content || '',
+          payload.excerpt || '',
+          payload.coverImage || null,
+          payload.author || '管理员',
+          categoryName,
+          payload.categoryId !== null ? payload.categoryId : existing.category_id || null,
+          payload.slug || existing.slug,
+          payload.status || existing.status,
+          payload.seoTitle || payload.title,
+          payload.seoDescription || '',
           publishedAt,
           now,
           id,
@@ -285,8 +377,8 @@ class ArticleService extends Service {
     );
 
     // 保存文章标签关联
-    if (data.tagIds && Array.isArray(data.tagIds)) {
-      await this.ctx.service.uied.articleTag.setArticleTags(id, data.tagIds);
+    if (payload.hasTagIdsInput) {
+      await this.ctx.service.uied.articleTag.setArticleTags(id, payload.tagIds);
     }
 
     return true;
@@ -424,17 +516,84 @@ class ArticleService extends Service {
   /**
    * 获取所有分类
    */
-  async categories() {
+  async categories(params = {}) {
     const { app } = this;
+    const mode = String(params.mode || params.format || '').trim().toLowerCase();
+    const needDetail = mode === 'full' || mode === 'detail'
+      || params.detail === 1 || params.detail === '1' || params.detail === true;
+    const publishedOnly = params.onlyPublished === 1
+      || params.onlyPublished === '1'
+      || params.onlyPublished === true
+      || params.publishedOnly === 1
+      || params.publishedOnly === '1'
+      || params.publishedOnly === true;
 
-    const results = await app.model.query(
-      `SELECT DISTINCT category FROM uied_article 
-       WHERE is_delete = 0 AND status = 'published' AND category != ''
-       ORDER BY category`,
+    /**
+     * 默认使用分类管理表，保证“先建分类再发文”的后台场景也能看到分类。
+     */
+    let categoryRows = await app.model.query(
+      `SELECT id, name, slug
+       FROM uied_article_category
+       WHERE is_delete = 0
+       ORDER BY sort_order ASC, id ASC`,
       { type: app.Sequelize.QueryTypes.SELECT }
     );
 
-    return results.map(r => r.category);
+    /**
+     * publishedOnly 场景下仅返回有已发布文章的分类。
+     */
+    if (publishedOnly && categoryRows.length) {
+      const categoryIds = categoryRows.map(item => Number(item.id || 0)).filter(Boolean);
+      if (categoryIds.length) {
+        const placeholders = categoryIds.map(() => '?').join(',');
+        const usedRows = await app.model.query(
+          `SELECT DISTINCT category_id
+           FROM uied_article
+           WHERE is_delete = 0
+             AND status = 'published'
+             AND category_id IN (${placeholders})`,
+          {
+            replacements: categoryIds,
+            type: app.Sequelize.QueryTypes.SELECT,
+          }
+        );
+        const usedSet = new Set(
+          usedRows.map(item => Number(item.category_id || 0)).filter(Boolean)
+        );
+        categoryRows = categoryRows.filter(item => usedSet.has(Number(item.id || 0)));
+      }
+    }
+
+    /**
+     * 兜底：当分类表为空时，回退到文章表去重分类名，保证线上不空白。
+     */
+    if (!categoryRows.length) {
+      const articleCategories = await app.model.query(
+        `SELECT DISTINCT category
+         FROM uied_article
+         WHERE is_delete = 0 AND category != ''
+         ORDER BY category`,
+        { type: app.Sequelize.QueryTypes.SELECT }
+      );
+      if (needDetail) {
+        return articleCategories.map(item => ({
+          id: 0,
+          name: String(item.category || ''),
+          slug: '',
+        }));
+      }
+      return articleCategories.map(item => String(item.category || '')).filter(Boolean);
+    }
+
+    if (needDetail) {
+      return categoryRows.map(item => ({
+        id: Number(item.id || 0),
+        name: String(item.name || ''),
+        slug: String(item.slug || ''),
+      }));
+    }
+
+    return categoryRows.map(item => String(item.name || '')).filter(Boolean);
   }
 
   /**
@@ -546,6 +705,17 @@ class ArticleService extends Service {
     }
 
     return result;
+  }
+
+  /**
+   * 解析正整数参数
+   */
+  parsePositiveInt(value, defaultValue = 0) {
+    const parsed = Number.parseInt(String(value ?? ''), 10);
+    if (!Number.isInteger(parsed) || parsed <= 0) {
+      return defaultValue;
+    }
+    return parsed;
   }
 
   /**

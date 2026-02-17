@@ -200,6 +200,12 @@ module.exports = app => {
   router.all('/api/uied/articleTag/del', controller.uied.articleTag.del);
   router.all('/api/uied/articleTag/articleTags', controller.uied.articleTag.articleTags);
   router.all('/api/uied/articleTag/setArticleTags', controller.uied.articleTag.setArticleTags);
+  // 兼容旧风格命名（给新前端渐进迁移使用）
+  router.all('/api/uied/article/tag/list', controller.uied.articleTag.list);
+  router.all('/api/uied/article/tag/all', controller.uied.articleTag.all);
+  router.all('/api/uied/article/tag/add', controller.uied.articleTag.add);
+  router.all('/api/uied/article/tag/edit', controller.uied.articleTag.edit);
+  router.all('/api/uied/article/tag/del', controller.uied.articleTag.del);
   
   // ==================== 文章分类 ====================
   router.all('/api/uied/articleCategory/list', controller.uied.articleCategory.list);
@@ -207,6 +213,12 @@ module.exports = app => {
   router.all('/api/uied/articleCategory/add', controller.uied.articleCategory.add);
   router.all('/api/uied/articleCategory/edit', controller.uied.articleCategory.edit);
   router.all('/api/uied/articleCategory/del', controller.uied.articleCategory.del);
+  // 兼容旧风格命名（给新前端渐进迁移使用）
+  router.all('/api/uied/article/cate/list', controller.uied.articleCategory.list);
+  router.all('/api/uied/article/cate/all', controller.uied.articleCategory.all);
+  router.all('/api/uied/article/cate/add', controller.uied.articleCategory.add);
+  router.all('/api/uied/article/cate/edit', controller.uied.articleCategory.edit);
+  router.all('/api/uied/article/cate/del', controller.uied.articleCategory.del);
   
   // ==================== 评论管理 ====================
   router.all('/api/uied/comment/list', controller.uied.comment.list);
