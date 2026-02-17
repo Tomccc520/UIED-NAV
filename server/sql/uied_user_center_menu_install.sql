@@ -1,6 +1,6 @@
 -- UIED 后台“用户中心”菜单安装脚本（可重复执行）
 -- 目标：
--- 1) 在 UIED导航 下新增“用户中心”
+-- 1) 新增“用户中心”为一级导航（不挂在 UIED导航 下）
 -- 2) 挂载用户列表/详情页面及编辑按钮权限
 -- 3) 自动授权给超级管理员角色（role_id = 1）
 --
@@ -10,20 +10,11 @@
 SET NAMES utf8mb4;
 START TRANSACTION;
 
--- 若 UIED 导航主菜单缺失，则补一个默认入口（ID=702）
-INSERT INTO la_system_auth_menu
-(id, pid, menu_type, menu_name, menu_icon, menu_sort, perms, paths, component, selected, params, is_cache, is_show, is_disable, create_time, update_time)
-SELECT
-  702, 0, 'M', 'UIED导航', 'el-icon-Compass', 5, '', 'uied', '', '', '', 0, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()
-WHERE NOT EXISTS (
-  SELECT 1 FROM la_system_auth_menu WHERE id = 702
-);
-
 -- 上级菜单：用户中心
 INSERT INTO la_system_auth_menu
 (id, pid, menu_type, menu_name, menu_icon, menu_sort, perms, paths, component, selected, params, is_cache, is_show, is_disable, create_time, update_time)
 VALUES
-(860, 702, 'M', '用户中心', 'el-icon-UserFilled', 37, '', 'user-center', '', '', '', 0, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
+(860, 0, 'M', '用户中心', 'el-icon-UserFilled', 41, '', 'user-center', '', '', '', 0, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
 ON DUPLICATE KEY UPDATE
 pid = VALUES(pid),
 menu_type = VALUES(menu_type),
