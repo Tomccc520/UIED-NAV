@@ -4,7 +4,8 @@ module.exports = options => {
   // 验证是否在登录状态下
   async function verify(ctx, next) {
     try {
-      console.log(options);
+      // 兼容中间件参数，避免未使用变量告警
+      void options;
       // const sign = ctx.get('sign')
       // let decodeData = await ctx.nodersa.rsaDecrypt(sign)
       // decodeData = JSON.parse(decodeData)
