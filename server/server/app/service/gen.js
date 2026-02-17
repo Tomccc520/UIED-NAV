@@ -330,7 +330,6 @@ class GenService extends Service {
   }
 
   async getDbTableColumnsQueryByName(tableName) {
-    console.log(tableName, 'tableName...');
     const { app } = this;
     const sequelize = app.model;
 
@@ -465,7 +464,6 @@ class GenService extends Service {
   }
 
   async getDbType(columnType) {
-    console.log(columnType, 'columnType...');
     const index = columnType.indexOf('(');
     if (index < 0) {
       return columnType;
@@ -565,7 +563,6 @@ class GenService extends Service {
 
       const filePath = {};
       for (const tplPath in tplCodeMap) {
-        console.log(tplPath, 'tplPath....');
         const file = fmtMap[tplPath].replace('%s', moduleName);
         filePath[file] = tplCodeMap[tplPath];
       }

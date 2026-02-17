@@ -69,7 +69,6 @@ class DictService extends Service {
       const existingDictName = await DictType.findOne({
         where: { dictName: addReq.dictName, isDelete: 0 },
       });
-      console.log(existingDictName, 'existingDictName....');
       if (existingDictName) {
         throw new Error('字典名称已存在！');
       }
