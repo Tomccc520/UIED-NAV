@@ -137,6 +137,7 @@ const rsa = {
     'websites', // GET /api/websites
     'websites:*', // POST /api/websites/:id/click
     'settings:public', // GET /api/settings/public
+    'uied:setting:public', // GET /api/uied/setting/public（兼容旧前端）
     'settings:detailPageConfig', // GET /api/settings/detailPageConfig
     'settings:frontend-config', // GET /api/settings/frontend-config
     'settings:permalink', // GET /api/settings/permalink
@@ -172,8 +173,23 @@ const rsa = {
     'tags:*', // GET /api/tags/:idOrSlug
     // 前端文章接口（公开阅读 + 投稿中心）
     'articles',
+    'articles:meta:categories',
+    'articles:meta:tags',
     'articles:categories',
     'articles:*',
+    // 前台用户中心（账号与个人中心）
+    'user:register',
+    'user:login',
+    'user:profile',
+    'user:profile:update',
+    'user:index:stats',
+    'user:order:list',
+    'user:license:list',
+    'user:password:change',
+    'user:message:list',
+    'user:message:read',
+    'user:message:delete',
+    'user:login:log',
     'user:author:center:detail', // 作者中心详情（前台登录）
     'user:author:center:save', // 作者中心保存（前台登录）
     'user:author:public:detail', // 作者公开主页

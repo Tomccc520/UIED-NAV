@@ -21,8 +21,10 @@ class ArticleService extends Service {
     const message = String(error?.message || '');
     return code === 'ER_NO_SUCH_TABLE'
       || code === 'ER_BAD_FIELD_ERROR'
+      || code === 'ER_CANT_AGGREGATE_2COLLATIONS'
       || message.includes('doesn\'t exist')
-      || message.includes('Unknown column');
+      || message.includes('Unknown column')
+      || message.includes('Illegal mix of collations');
   }
 
   /**
@@ -170,43 +172,56 @@ class ArticleService extends Service {
       replacements.push(tagSlug);
     }
 
-    // 查询总数
-    const [ countResult ] = await app.model.query(
-      `SELECT COUNT(*) as total FROM uied_article 
-       WHERE is_delete = 0${statusCondition}${categoryCondition}${tagCondition}${keywordCondition}`,
-      { replacements, type: app.Sequelize.QueryTypes.SELECT }
-    );
+    try {
+      // 查询总数
+      const [ countResult ] = await app.model.query(
+        `SELECT COUNT(*) as total FROM uied_article 
+         WHERE is_delete = 0${statusCondition}${categoryCondition}${tagCondition}${keywordCondition}`,
+        { replacements, type: app.Sequelize.QueryTypes.SELECT }
+      );
 
-    // 查询列表
-    const lists = await app.model.query(
-      `SELECT id, title, excerpt, cover_image, author, category, ${selectCategoryIdSql}, slug, status, 
-              view_count, published_at, create_time, update_time
-       FROM uied_article 
-       WHERE is_delete = 0${statusCondition}${categoryCondition}${tagCondition}${keywordCondition}
-       ORDER BY create_time DESC
-       LIMIT ? OFFSET ?`,
-      {
-        replacements: [ ...replacements, currentPageSize, offset ],
-        type: app.Sequelize.QueryTypes.SELECT,
+      // 查询列表
+      const lists = await app.model.query(
+        `SELECT id, title, excerpt, cover_image, author, category, ${selectCategoryIdSql}, slug, status, 
+                view_count, published_at, create_time, update_time
+         FROM uied_article 
+         WHERE is_delete = 0${statusCondition}${categoryCondition}${tagCondition}${keywordCondition}
+         ORDER BY create_time DESC
+         LIMIT ? OFFSET ?`,
+        {
+          replacements: [ ...replacements, currentPageSize, offset ],
+          type: app.Sequelize.QueryTypes.SELECT,
+        }
+      );
+
+      // 批量获取文章标签
+      const formattedLists = lists.map(item => this.formatArticle(item));
+      const articleIds = formattedLists.map(a => a.id);
+      const tagsMap = await this.batchGetArticleTags(articleIds);
+
+      // 将标签附加到每篇文章
+      for (const article of formattedLists) {
+        article.tags = tagsMap[article.id] || [];
       }
-    );
 
-    // 批量获取文章标签
-    const formattedLists = lists.map(item => this.formatArticle(item));
-    const articleIds = formattedLists.map(a => a.id);
-    const tagsMap = await this.batchGetArticleTags(articleIds);
-
-    // 将标签附加到每篇文章
-    for (const article of formattedLists) {
-      article.tags = tagsMap[article.id] || [];
+      return {
+        lists: formattedLists,
+        count: Number(countResult.total || 0),
+        page: currentPage,
+        pageSize: currentPageSize,
+      };
+    } catch (error) {
+      if (!this.isSchemaCompatibilityError(error)) {
+        throw error;
+      }
+      this.ctx.logger.warn('[article] list 降级为空列表:', error.message);
+      return {
+        lists: [],
+        count: 0,
+        page: currentPage,
+        pageSize: currentPageSize,
+      };
     }
-
-    return {
-      lists: formattedLists,
-      count: Number(countResult.total || 0),
-      page: currentPage,
-      pageSize: currentPageSize,
-    };
   }
 
   /**
@@ -747,26 +762,33 @@ class ArticleService extends Service {
    */
   async tags() {
     const { app } = this;
+    try {
+      const tags = await app.model.query(
+        `SELECT t.id, t.name, t.slug, t.color,
+                COUNT(DISTINCT r.article_id) AS articleCount
+         FROM uied_article_tag t
+         INNER JOIN uied_article_tag_relation r ON r.tag_id = t.id
+         INNER JOIN uied_article a ON a.id = r.article_id AND a.is_delete = 0 AND a.status = 'published'
+         WHERE t.is_delete = 0
+         GROUP BY t.id, t.name, t.slug, t.color
+         ORDER BY t.sort_order ASC, t.name ASC`,
+        { type: app.Sequelize.QueryTypes.SELECT }
+      );
 
-    const tags = await app.model.query(
-      `SELECT t.id, t.name, t.slug, t.color,
-              COUNT(DISTINCT r.article_id) AS articleCount
-       FROM uied_article_tag t
-       INNER JOIN uied_article_tag_relation r ON r.tag_id = t.id
-       INNER JOIN uied_article a ON a.id = r.article_id AND a.is_delete = 0 AND a.status = 'published'
-       WHERE t.is_delete = 0
-       GROUP BY t.id, t.name, t.slug, t.color
-       ORDER BY t.sort_order ASC, t.name ASC`,
-      { type: app.Sequelize.QueryTypes.SELECT }
-    );
-
-    return tags.map(tag => ({
-      id: tag.id,
-      name: tag.name,
-      slug: tag.slug,
-      color: tag.color,
-      articleCount: parseInt(tag.articleCount, 10) || 0,
-    }));
+      return tags.map(tag => ({
+        id: tag.id,
+        name: tag.name,
+        slug: tag.slug,
+        color: tag.color,
+        articleCount: parseInt(tag.articleCount, 10) || 0,
+      }));
+    } catch (error) {
+      if (!this.isSchemaCompatibilityError(error)) {
+        throw error;
+      }
+      this.ctx.logger.warn('[article] tags 降级为空列表:', error.message);
+      return [];
+    }
   }
 
   /**
@@ -796,14 +818,23 @@ class ArticleService extends Service {
     }
 
     const placeholders = articleIds.map(() => '?').join(',');
-    const tags = await app.model.query(
-      `SELECT r.article_id, t.id, t.name, t.slug, t.color
-       FROM uied_article_tag_relation r
-       INNER JOIN uied_article_tag t ON t.id = r.tag_id
-       WHERE r.article_id IN (${placeholders}) AND t.is_delete = 0
-       ORDER BY t.sort_order ASC`,
-      { replacements: articleIds, type: app.Sequelize.QueryTypes.SELECT }
-    );
+    let tags = [];
+    try {
+      tags = await app.model.query(
+        `SELECT r.article_id, t.id, t.name, t.slug, t.color
+         FROM uied_article_tag_relation r
+         INNER JOIN uied_article_tag t ON t.id = r.tag_id
+         WHERE r.article_id IN (${placeholders}) AND t.is_delete = 0
+         ORDER BY t.sort_order ASC`,
+        { replacements: articleIds, type: app.Sequelize.QueryTypes.SELECT }
+      );
+    } catch (error) {
+      if (!this.isSchemaCompatibilityError(error)) {
+        throw error;
+      }
+      this.ctx.logger.warn('[article] batchGetArticleTags 降级为空映射:', error.message);
+      return {};
+    }
 
     // 按 article_id 分组
     const tagsMap = {};

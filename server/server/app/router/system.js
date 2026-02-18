@@ -110,6 +110,24 @@ module.exports = app => {
   router.all('/api/user/list', controller.user.list);
   router.all('/api/user/detail', controller.user.detail);
   router.all('/api/user/edit', controller.user.edit);
+  // 前台用户中心（登录/资料）
+  router.all('/api/user/register', controller.user.register);
+  router.all('/api/user/login', controller.user.login);
+  router.all('/api/user/profile', controller.user.profile);
+  router.all('/api/user/profile/update', controller.user.updateProfile);
+  // 前台作者中心
+  router.all('/api/user/author/center/detail', controller.user.authorCenterDetail);
+  router.all('/api/user/author/center/save', controller.user.authorCenterSave);
+  router.all('/api/user/author/public/detail', controller.user.authorPublicDetail);
+  // 前台用户中心（概览）
+  router.all('/api/user/index/stats', controller.user.indexStats);
+  router.all('/api/user/order/list', controller.user.orderList);
+  router.all('/api/user/license/list', controller.user.licenseList);
+  router.all('/api/user/password/change', controller.user.changePassword);
+  router.all('/api/user/message/list', controller.user.messageList);
+  router.all('/api/user/message/read', controller.user.messageRead);
+  router.all('/api/user/message/delete', controller.user.messageDelete);
+  router.all('/api/user/login/log', controller.user.loginLog);
   router.all('/api/user/author/options', controller.user.authorOptions);
   router.all('/api/user/article/collect/list', controller.user.articleCollectList);
   router.all('/api/user/article/like/list', controller.user.articleLikeList);

@@ -14,6 +14,37 @@ const Service = require('egg').Service;
 
 class SettingService extends Service {
   /**
+   * 获取站点信息表字段映射（兼容不同版本字段命名）
+   */
+  async getSiteInfoFieldMapping() {
+    if (this._siteInfoFieldMapping) {
+      return this._siteInfoFieldMapping;
+    }
+    const { app } = this;
+    let columns = [];
+    try {
+      columns = await app.model.query(
+        `SELECT COLUMN_NAME
+         FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = 'uied_site_info'`,
+        { type: app.Sequelize.QueryTypes.SELECT }
+      );
+    } catch (error) {
+      this.ctx.logger.warn('[setting] 读取 uied_site_info 字段失败，使用默认兼容映射:', error.message);
+      columns = [];
+    }
+    const has = new Set((Array.isArray(columns) ? columns : []).map(item => String(item?.COLUMN_NAME || '')));
+    this._siteInfoFieldMapping = {
+      descriptionField: has.has('site_description') ? 'site_description' : (has.has('description') ? 'description' : ''),
+      keywordsField: has.has('site_keywords') ? 'site_keywords' : (has.has('keywords') ? 'keywords' : ''),
+      contactEmailField: has.has('contact_email') ? 'contact_email' : '',
+      analyticsCodeField: has.has('analytics_code') ? 'analytics_code' : '',
+    };
+    return this._siteInfoFieldMapping;
+  }
+
+  /**
    * 获取默认导航切换项配置
    */
   getDefaultNavSwitchItems() {
@@ -198,14 +229,14 @@ class SettingService extends Service {
       id: info.id,
       siteName: info.site_name,
       siteTitle: info.site_title,
-      siteDescription: info.site_description,
-      siteKeywords: info.site_keywords,
+      siteDescription: info.site_description !== undefined ? info.site_description : (info.description || ''),
+      siteKeywords: info.site_keywords !== undefined ? info.site_keywords : (info.keywords || ''),
       logo: info.logo,
       favicon: info.favicon,
       icp: info.icp,
       copyright: info.copyright,
-      contactEmail: info.contact_email,
-      analyticsCode: info.analytics_code,
+      contactEmail: info.contact_email !== undefined ? info.contact_email : '',
+      analyticsCode: info.analytics_code !== undefined ? info.analytics_code : '',
     };
   }
 
@@ -215,6 +246,7 @@ class SettingService extends Service {
   async saveSiteInfo(data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
+    const fieldMapping = await this.getSiteInfoFieldMapping();
 
     // 检查是否存在记录
     const [ existing ] = await app.model.query(
@@ -223,34 +255,93 @@ class SettingService extends Service {
     );
 
     if (existing) {
+      const updates = [
+        'site_name = ?',
+        'site_title = ?',
+      ];
+      const values = [
+        data.siteName || '',
+        data.siteTitle || '',
+      ];
+      if (fieldMapping.descriptionField) {
+        updates.push(`\`${fieldMapping.descriptionField}\` = ?`);
+        values.push(data.siteDescription || '');
+      }
+      if (fieldMapping.keywordsField) {
+        updates.push(`\`${fieldMapping.keywordsField}\` = ?`);
+        values.push(data.siteKeywords || '');
+      }
+      updates.push('logo = ?');
+      values.push(data.logo || '');
+      updates.push('favicon = ?');
+      values.push(data.favicon || '');
+      updates.push('icp = ?');
+      values.push(data.icp || '');
+      updates.push('copyright = ?');
+      values.push(data.copyright || '');
+      if (fieldMapping.contactEmailField) {
+        updates.push(`\`${fieldMapping.contactEmailField}\` = ?`);
+        values.push(data.contactEmail || '');
+      }
+      if (fieldMapping.analyticsCodeField) {
+        updates.push(`\`${fieldMapping.analyticsCodeField}\` = ?`);
+        values.push(data.analyticsCode || '');
+      }
+      updates.push('update_time = ?');
+      values.push(now);
+      values.push(existing.id);
+
       await app.model.query(
-        `UPDATE uied_site_info SET
-          site_name = ?, site_title = ?, site_description = ?, site_keywords = ?,
-          logo = ?, favicon = ?, icp = ?, copyright = ?, contact_email = ?,
-          analytics_code = ?, update_time = ?
-         WHERE id = ?`,
+        `UPDATE uied_site_info SET ${updates.join(', ')} WHERE id = ?`,
         {
-          replacements: [
-            data.siteName || '', data.siteTitle || '', data.siteDescription || '',
-            data.siteKeywords || '', data.logo || '', data.favicon || '',
-            data.icp || '', data.copyright || '', data.contactEmail || '',
-            data.analyticsCode || '', now, existing.id,
-          ],
+          replacements: values,
           type: app.Sequelize.QueryTypes.UPDATE,
         }
       );
     } else {
+      const insertColumns = [
+        'site_name',
+        'site_title',
+      ];
+      const insertValues = [
+        data.siteName || '',
+        data.siteTitle || '',
+      ];
+      if (fieldMapping.descriptionField) {
+        insertColumns.push(`\`${fieldMapping.descriptionField}\``);
+        insertValues.push(data.siteDescription || '');
+      }
+      if (fieldMapping.keywordsField) {
+        insertColumns.push(`\`${fieldMapping.keywordsField}\``);
+        insertValues.push(data.siteKeywords || '');
+      }
+      insertColumns.push('logo');
+      insertValues.push(data.logo || '');
+      insertColumns.push('favicon');
+      insertValues.push(data.favicon || '');
+      insertColumns.push('icp');
+      insertValues.push(data.icp || '');
+      insertColumns.push('copyright');
+      insertValues.push(data.copyright || '');
+      if (fieldMapping.contactEmailField) {
+        insertColumns.push(`\`${fieldMapping.contactEmailField}\``);
+        insertValues.push(data.contactEmail || '');
+      }
+      if (fieldMapping.analyticsCodeField) {
+        insertColumns.push(`\`${fieldMapping.analyticsCodeField}\``);
+        insertValues.push(data.analyticsCode || '');
+      }
+      insertColumns.push('create_time');
+      insertValues.push(now);
+      insertColumns.push('update_time');
+      insertValues.push(now);
+      const placeholders = insertColumns.map(() => '?').join(', ');
+
       await app.model.query(
-        `INSERT INTO uied_site_info (site_name, site_title, site_description, site_keywords,
-          logo, favicon, icp, copyright, contact_email, analytics_code, create_time, update_time)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO uied_site_info (${insertColumns.join(', ')})
+         VALUES (${placeholders})`,
         {
-          replacements: [
-            data.siteName || '', data.siteTitle || '', data.siteDescription || '',
-            data.siteKeywords || '', data.logo || '', data.favicon || '',
-            data.icp || '', data.copyright || '', data.contactEmail || '',
-            data.analyticsCode || '', now, now,
-          ],
+          replacements: insertValues,
           type: app.Sequelize.QueryTypes.INSERT,
         }
       );

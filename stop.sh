@@ -6,7 +6,7 @@
 echo "🛑 停止 UIED 服务..."
 
 # 端口配置（与 start.sh 保持一致）
-BACKEND_PORT=4000
+BACKEND_PORT=8002
 ADMIN_PORT=5174
 FRONTEND_PORT=3003
 

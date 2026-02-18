@@ -80,6 +80,22 @@ const normalizeVipGoodsItem = (item, defaults) => {
 
 class UserService extends Service {
   /**
+   * 检查模型是否已注册（用于兼容裁剪版后端）
+   */
+  hasModel(modelName = '') {
+    const { ctx } = this;
+    return Boolean(ctx?.model && ctx.model[String(modelName || '')]);
+  }
+
+  /**
+   * 检查服务是否已注册（用于兼容裁剪版后端）
+   */
+  hasService(serviceName = '') {
+    const { ctx } = this;
+    return Boolean(ctx?.service && ctx.service[String(serviceName || '')]);
+  }
+
+  /**
    * 确保表字段存在（兼容不支持 IF NOT EXISTS 的 MySQL 版本）
    */
   async ensureTableColumn(tableName, columnName, addColumnSql) {
@@ -636,9 +652,13 @@ class UserService extends Service {
       user.sn = user.id;
     }
     /**
-     * 自动发放优惠券
+     * 自动发放优惠券（可选模块，缺失时降级）
      */
-    await ctx.service.coupon.grantAutoToUser(user.id);
+    if (this.hasService('coupon') && typeof ctx.service.coupon.grantAutoToUser === 'function') {
+      await ctx.service.coupon.grantAutoToUser(user.id);
+    } else {
+      ctx.logger.warn('[user.register] coupon 服务不存在，跳过自动发券');
+    }
     const token = await this.createUserToken(user);
     return { user, token };
   }
@@ -733,7 +753,9 @@ class UserService extends Service {
    */
   async stats(userId) {
     const { ctx } = this;
-    await ctx.service.license.ensureSchemaCompatibility();
+    if (this.hasService('license') && typeof ctx.service.license.ensureSchemaCompatibility === 'function') {
+      await ctx.service.license.ensureSchemaCompatibility();
+    }
     const user = await ctx.model.User.findOne({
       where: { id: userId, isDelete: 0 },
     });
@@ -742,8 +764,12 @@ class UserService extends Service {
     }
 
     const [ orderCount, licenseCount ] = await Promise.all([
-      ctx.model.Order.count({ where: { userId, isDelete: 0 } }),
-      ctx.model.License.count({ where: { userId, isDelete: 0, status: 1 } }),
+      this.hasModel('Order')
+        ? ctx.model.Order.count({ where: { userId, isDelete: 0 } })
+        : Promise.resolve(0),
+      this.hasModel('License')
+        ? ctx.model.License.count({ where: { userId, isDelete: 0, status: 1 } })
+        : Promise.resolve(0),
     ]);
 
     const now = Math.floor(Date.now() / 1000);
@@ -764,6 +790,15 @@ class UserService extends Service {
    */
   async orderList(userId, params) {
     const { ctx } = this;
+    if (!this.hasModel('Order')) {
+      ctx.logger.warn('[user.orderList] Order 模型未注册，返回空列表');
+      return {
+        lists: [],
+        total: 0,
+        pageNo: Number(params.pageNo || 1),
+        pageSize: Number(params.pageSize || 10),
+      };
+    }
     const pageNo = Number(params.pageNo || 1);
     const pageSize = Number(params.pageSize || 10);
     const status = params.status;
@@ -795,7 +830,7 @@ class UserService extends Service {
     });
 
     const productIds = Array.from(new Set(rows.map(item => item.productId)));
-    const products = productIds.length
+    const products = (this.hasModel('Product') && productIds.length)
       ? await ctx.model.Product.findAll({
         where: { id: { [Op.in]: productIds } },
         attributes: [ 'id', 'cover', 'version' ],
@@ -868,7 +903,18 @@ class UserService extends Service {
    */
   async licenseList(userId, params) {
     const { ctx } = this;
-    await ctx.service.license.ensureSchemaCompatibility();
+    if (!this.hasModel('License')) {
+      ctx.logger.warn('[user.licenseList] License 模型未注册，返回空列表');
+      return {
+        lists: [],
+        total: 0,
+        pageNo: Number(params.pageNo || 1),
+        pageSize: Number(params.pageSize || 10),
+      };
+    }
+    if (this.hasService('license') && typeof ctx.service.license.ensureSchemaCompatibility === 'function') {
+      await ctx.service.license.ensureSchemaCompatibility();
+    }
     const pageNo = Number(params.pageNo || 1);
     const pageSize = Number(params.pageSize || 10);
     const limit = pageSize;
@@ -882,7 +928,7 @@ class UserService extends Service {
     });
 
     const productIds = Array.from(new Set(rows.map(item => item.productId)));
-    const products = productIds.length
+    const products = (this.hasModel('Product') && productIds.length)
       ? await ctx.model.Product.findAll({
         where: { id: { [Op.in]: productIds } },
         attributes: [ 'id', 'name' ],
@@ -890,7 +936,7 @@ class UserService extends Service {
       : [];
     const productMap = new Map(products.map(product => [ product.id, product ]));
     const orderIds = Array.from(new Set(rows.map(item => item.orderId).filter(Boolean)));
-    const orders = orderIds.length
+    const orders = (this.hasModel('Order') && orderIds.length)
       ? await ctx.model.Order.findAll({
         where: {
           id: { [Op.in]: orderIds },
@@ -1640,6 +1686,15 @@ class UserService extends Service {
    */
   async loginLog(userId, params) {
     const { ctx } = this;
+    if (!this.hasModel('UserLoginLog')) {
+      ctx.logger.warn('[user.loginLog] UserLoginLog 模型未注册，返回空列表');
+      return {
+        pageNo: Number(params.pageNo || 1),
+        pageSize: Number(params.pageSize || 10),
+        total: 0,
+        lists: [],
+      };
+    }
     const pageNo = Number(params.pageNo || 1);
     const pageSize = Number(params.pageSize || 10);
     const { count, rows } = await ctx.model.UserLoginLog.findAndCountAll({
@@ -1662,6 +1717,14 @@ class UserService extends Service {
    */
   async walletInfo(userId) {
     const { ctx } = this;
+    if (!this.hasModel('UserWallet') || !this.hasModel('UserWalletFlow')) {
+      ctx.logger.warn('[user.walletInfo] 钱包模型未注册，返回默认值');
+      return {
+        balance: '0.00',
+        totalRecharge: '0.00',
+        totalSpend: '0.00',
+      };
+    }
     let wallet = await ctx.model.UserWallet.findOne({ where: { userId } });
     if (!wallet) {
       wallet = await ctx.model.UserWallet.create({ userId, balance: 0 });
@@ -1703,6 +1766,15 @@ class UserService extends Service {
    */
   async walletLog(userId, params) {
     const { ctx } = this;
+    if (!this.hasModel('UserWallet') || !this.hasModel('UserWalletFlow')) {
+      ctx.logger.warn('[user.walletLog] 钱包模型未注册，返回空列表');
+      return {
+        pageNo: Number(params.pageNo || 1),
+        pageSize: Number(params.pageSize || 10),
+        total: 0,
+        lists: [],
+      };
+    }
     const pageNo = Number(params.pageNo || 1);
     const pageSize = Number(params.pageSize || 10);
     const type = params.type || 'all';
@@ -1747,6 +1819,9 @@ class UserService extends Service {
    */
   async walletRecharge(userId, params) {
     const { ctx } = this;
+    if (!this.hasModel('UserWallet') || !this.hasModel('UserWalletFlow')) {
+      throw new Error('钱包模块未启用');
+    }
     const amount = Number(params.amount || 0);
     if (!amount || amount < 0.01 || amount > 50000) {
       throw new Error('充值金额不合法');

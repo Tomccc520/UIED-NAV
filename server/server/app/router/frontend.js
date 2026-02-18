@@ -74,6 +74,8 @@ module.exports = app => {
   // ==================== 公开设置 ====================
   // GET /api/settings/public - 获取公开设置
   get('/api/settings/public', controller.uied.frontend.publicSettings);
+  // GET /uied/setting/public - 获取公开设置（兼容旧前端无 /api 前缀）
+  get('/uied/setting/public', controller.uied.frontend.publicSettings);
   // GET /api/settings/detailPageConfig - 获取详情页配置
   get('/api/settings/detailPageConfig', controller.uied.frontend.detailPageConfig);
   // GET /api/public/detail-sidebar-config - 获取详情侧栏配置（兼容旧前端）
@@ -160,18 +162,34 @@ module.exports = app => {
   // ==================== 文章相关（前端） ====================
   // GET /api/articles - 获取文章列表
   get('/api/articles', controller.uied.frontend.articles);
+  // GET /articles - 获取文章列表（兼容旧前端无 /api 前缀）
+  get('/articles', controller.uied.frontend.articles);
   // GET /api/articles/meta/categories - 获取文章分类元数据
   get('/api/articles/meta/categories', controller.uied.frontend.articleCategories);
+  // GET /articles/meta/categories - 获取文章分类元数据（兼容旧前端无 /api 前缀）
+  get('/articles/meta/categories', controller.uied.frontend.articleCategories);
   // GET /api/articles/meta/tags - 获取文章标签元数据
   get('/api/articles/meta/tags', controller.uied.frontend.articleTags);
+  // GET /articles/meta/tags - 获取文章标签元数据（兼容旧前端无 /api 前缀）
+  get('/articles/meta/tags', controller.uied.frontend.articleTags);
   // GET /api/articles/categories - 获取文章分类（兼容旧路由）
   get('/api/articles/categories', controller.uied.frontend.articleCategories);
+  // GET /articles/categories - 获取文章分类（兼容旧前端无 /api 前缀）
+  get('/articles/categories', controller.uied.frontend.articleCategories);
   // GET /api/articles/:slug - 获取文章详情
   get('/api/articles/:slug', controller.uied.frontend.articleDetail);
+  // GET /articles/:slug - 获取文章详情（兼容旧前端无 /api 前缀）
+  get('/articles/:slug', controller.uied.frontend.articleDetail);
   // POST /api/articles/:id/view - 记录文章浏览
   post('/api/articles/:id/view', controller.uied.frontend.articleView);
+  // POST /articles/:id/view - 记录文章浏览（兼容旧前端无 /api 前缀）
+  post('/articles/:id/view', controller.uied.frontend.articleView);
   // GET /api/articles/:id/comments - 获取文章评论
   get('/api/articles/:id/comments', controller.uied.frontend.articleComments);
+  // GET /articles/:id/comments - 获取文章评论（兼容旧前端无 /api 前缀）
+  get('/articles/:id/comments', controller.uied.frontend.articleComments);
   // POST /api/articles/:id/comments - 提交文章评论
   post('/api/articles/:id/comments', controller.uied.frontend.addArticleComment);
+  // POST /articles/:id/comments - 提交文章评论（兼容旧前端无 /api 前缀）
+  post('/articles/:id/comments', controller.uied.frontend.addArticleComment);
 };
