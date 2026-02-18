@@ -14,6 +14,41 @@ const Service = require('egg').Service;
 
 class ArticleCategoryService extends Service {
   /**
+   * 获取文章表的“分类ID”字段名（兼容 category_id / categoryId / cate_id / 无该字段）
+   */
+  async getArticleCategoryColumn() {
+    if (this._articleCategoryColumn !== undefined) {
+      return this._articleCategoryColumn;
+    }
+
+    const { app } = this;
+    try {
+      const rows = await app.model.query(
+        `SELECT COLUMN_NAME
+         FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = 'uied_article'
+           AND COLUMN_NAME IN ('category_id', 'categoryId', 'cate_id')`,
+        { type: app.Sequelize.QueryTypes.SELECT }
+      );
+      const available = new Set((Array.isArray(rows) ? rows : []).map(item => String(item?.COLUMN_NAME || '')));
+      if (available.has('category_id')) {
+        this._articleCategoryColumn = 'category_id';
+      } else if (available.has('categoryId')) {
+        this._articleCategoryColumn = 'categoryId';
+      } else if (available.has('cate_id')) {
+        this._articleCategoryColumn = 'cate_id';
+      } else {
+        this._articleCategoryColumn = '';
+      }
+    } catch (error) {
+      this._articleCategoryColumn = '';
+      this.ctx.logger.warn('[articleCategory] 检测分类字段失败，回退为 category 文本模式:', error.message);
+    }
+    return this._articleCategoryColumn;
+  }
+
+  /**
    * 解析正整数参数
    */
   parsePositiveInt(value, defaultValue = 0) {
@@ -87,6 +122,7 @@ class ArticleCategoryService extends Service {
    */
   async list({ page = 1, pageSize = 20, keyword }) {
     const { app } = this;
+    const articleCategoryColumn = await this.getArticleCategoryColumn();
     const currentPage = this.parsePositiveInt(page, 1);
     const currentPageSize = this.parsePositiveInt(pageSize, 20);
     const offset = (currentPage - 1) * currentPageSize;
@@ -108,9 +144,12 @@ class ArticleCategoryService extends Service {
     const total = countResult.total;
 
     // 获取列表（包含文章数量）
+    const articleCountWhere = articleCategoryColumn
+      ? `a.\`${articleCategoryColumn}\` = c.id`
+      : 'a.category = c.name';
     const categories = await app.model.query(
       `SELECT c.*,
-        (SELECT COUNT(*) FROM uied_article a WHERE a.category_id = c.id AND a.is_delete = 0) as article_count
+        (SELECT COUNT(*) FROM uied_article a WHERE ${articleCountWhere} AND a.is_delete = 0) as article_count
        FROM uied_article_category c
        WHERE ${whereClause}
        ORDER BY c.sort_order ASC, c.id ASC
@@ -141,10 +180,14 @@ class ArticleCategoryService extends Service {
    */
   async all() {
     const { app } = this;
+    const articleCategoryColumn = await this.getArticleCategoryColumn();
 
+    const articleCountWhere = articleCategoryColumn
+      ? `a.\`${articleCategoryColumn}\` = c.id`
+      : 'a.category = c.name';
     const categories = await app.model.query(
       `SELECT c.*,
-        (SELECT COUNT(*) FROM uied_article a WHERE a.category_id = c.id AND a.is_delete = 0) as article_count
+        (SELECT COUNT(*) FROM uied_article a WHERE ${articleCountWhere} AND a.is_delete = 0) as article_count
        FROM uied_article_category c
        WHERE c.is_delete = 0
        ORDER BY c.sort_order ASC, c.name ASC`,

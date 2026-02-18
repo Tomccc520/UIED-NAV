@@ -14,6 +14,55 @@ const Service = require('egg').Service;
 
 class ArticleService extends Service {
   /**
+   * 获取文章表的“分类ID”字段名（兼容 category_id / categoryId / cate_id / 无该字段）
+   */
+  async getArticleCategoryColumn() {
+    if (this._articleCategoryColumn !== undefined) {
+      return this._articleCategoryColumn;
+    }
+
+    const { app } = this;
+    try {
+      const rows = await app.model.query(
+        `SELECT COLUMN_NAME
+         FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = 'uied_article'
+           AND COLUMN_NAME IN ('category_id', 'categoryId', 'cate_id')`,
+        { type: app.Sequelize.QueryTypes.SELECT }
+      );
+      const available = new Set((Array.isArray(rows) ? rows : []).map(item => String(item?.COLUMN_NAME || '')));
+      if (available.has('category_id')) {
+        this._articleCategoryColumn = 'category_id';
+      } else if (available.has('categoryId')) {
+        this._articleCategoryColumn = 'categoryId';
+      } else if (available.has('cate_id')) {
+        this._articleCategoryColumn = 'cate_id';
+      } else {
+        this._articleCategoryColumn = '';
+      }
+    } catch (error) {
+      this._articleCategoryColumn = '';
+      this.ctx.logger.warn('[article] 检测分类字段失败，回退为 category 文本模式:', error.message);
+    }
+    return this._articleCategoryColumn;
+  }
+
+  /**
+   * 根据分类ID查询分类名称（用于无 category_id 字段时的兼容过滤）
+   */
+  async getCategoryNameById(categoryId) {
+    const { app } = this;
+    const id = this.parsePositiveInt(categoryId, 0);
+    if (!id) return '';
+    const [ row ] = await app.model.query(
+      'SELECT name FROM uied_article_category WHERE id = ? AND is_delete = 0 LIMIT 1',
+      { replacements: [ id ], type: app.Sequelize.QueryTypes.SELECT }
+    );
+    return String(row?.name || '').trim();
+  }
+
+  /**
    * 获取文章列表（管理后台 & 前端）
    */
   async list(params = {}) {
@@ -28,6 +77,10 @@ class ArticleService extends Service {
     const tagId = this.parsePositiveInt(params.tagId ?? params.tag_id, 0);
     const tagSlug = String(params.tagSlug || params.tag || '').trim();
     const offset = (currentPage - 1) * currentPageSize;
+    const articleCategoryColumn = await this.getArticleCategoryColumn();
+    const selectCategoryIdSql = articleCategoryColumn
+      ? `\`${articleCategoryColumn}\` AS category_id`
+      : 'NULL AS category_id';
 
     // 关键词搜索
     let keywordCondition = '';
@@ -54,8 +107,22 @@ class ArticleService extends Service {
     // 构建分类条件
     let categoryCondition = '';
     if (categoryId) {
-      categoryCondition = ' AND category_id = ?';
-      replacements.push(categoryId);
+      if (articleCategoryColumn) {
+        categoryCondition = ` AND \`${articleCategoryColumn}\` = ?`;
+        replacements.push(categoryId);
+      } else {
+        const categoryName = await this.getCategoryNameById(categoryId);
+        if (!categoryName) {
+          return {
+            lists: [],
+            count: 0,
+            page: currentPage,
+            pageSize: currentPageSize,
+          };
+        }
+        categoryCondition = ' AND category = ?';
+        replacements.push(categoryName);
+      }
     } else if (category) {
       categoryCondition = ' AND category = ?';
       replacements.push(category);
@@ -92,7 +159,7 @@ class ArticleService extends Service {
 
     // 查询列表
     const lists = await app.model.query(
-      `SELECT id, title, excerpt, cover_image, author, category, category_id, slug, status, 
+      `SELECT id, title, excerpt, cover_image, author, category, ${selectCategoryIdSql}, slug, status, 
               view_count, published_at, create_time, update_time
        FROM uied_article 
        WHERE is_delete = 0${statusCondition}${categoryCondition}${tagCondition}${keywordCondition}
@@ -246,6 +313,7 @@ class ArticleService extends Service {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
     const payload = this.normalizeArticlePayload(data);
+    const articleCategoryColumn = await this.getArticleCategoryColumn();
     let categoryName = payload.category || '未分类';
     if (!payload.category && payload.categoryId) {
       const [ categoryRow ] = await app.model.query(
@@ -270,30 +338,45 @@ class ArticleService extends Service {
       throw new Error('URL标识已存在');
     }
 
+    const insertColumns = [
+      'title',
+      'content',
+      'excerpt',
+      'cover_image',
+      'author',
+      'category',
+      'slug',
+      'status',
+      'seo_title',
+      'seo_description',
+      'published_at',
+      'create_time',
+      'update_time',
+    ];
+    const insertValues = [
+      payload.title || '',
+      payload.content || '',
+      payload.excerpt || (payload.content || '').slice(0, 200),
+      payload.coverImage || null,
+      payload.author || '管理员',
+      categoryName,
+      slug,
+      payload.status || 'draft',
+      payload.seoTitle || payload.title,
+      payload.seoDescription || (payload.excerpt || '').slice(0, 160),
+      payload.status === 'published' ? now : null,
+      now,
+      now,
+    ];
+    if (articleCategoryColumn) {
+      insertColumns.splice(6, 0, `\`${articleCategoryColumn}\``);
+      insertValues.splice(6, 0, payload.categoryId || null);
+    }
+    const placeholders = insertColumns.map(() => '?').join(', ');
     const [ result ] = await app.model.query(
-      `INSERT INTO uied_article 
-       (title, content, excerpt, cover_image, author, category, category_id, slug, status, 
-        seo_title, seo_description, published_at, create_time, update_time)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      {
-        replacements: [
-          payload.title || '',
-          payload.content || '',
-          payload.excerpt || (payload.content || '').slice(0, 200),
-          payload.coverImage || null,
-          payload.author || '管理员',
-          categoryName,
-          payload.categoryId || null,
-          slug,
-          payload.status || 'draft',
-          payload.seoTitle || payload.title,
-          payload.seoDescription || (payload.excerpt || '').slice(0, 160),
-          payload.status === 'published' ? now : null,
-          now,
-          now,
-        ],
-        type: app.Sequelize.QueryTypes.INSERT,
-      }
+      `INSERT INTO uied_article (${insertColumns.join(', ')})
+       VALUES (${placeholders})`,
+      { replacements: insertValues, type: app.Sequelize.QueryTypes.INSERT }
     );
 
     // 保存文章标签关联
@@ -311,6 +394,7 @@ class ArticleService extends Service {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
     const payload = this.normalizeArticlePayload(data);
+    const articleCategoryColumn = await this.getArticleCategoryColumn();
     let categoryName = payload.category || '未分类';
     if (!payload.category && payload.categoryId) {
       const [ categoryRow ] = await app.model.query(
@@ -324,7 +408,9 @@ class ArticleService extends Service {
 
     // 检查文章是否存在
     const [ existing ] = await app.model.query(
-      'SELECT id, status, published_at, category_id, slug FROM uied_article WHERE id = ? AND is_delete = 0',
+      `SELECT id, status, published_at, ${articleCategoryColumn ? `\`${articleCategoryColumn}\`` : 'NULL'} AS category_id, slug
+       FROM uied_article
+       WHERE id = ? AND is_delete = 0`,
       { replacements: [ id ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
@@ -349,31 +435,45 @@ class ArticleService extends Service {
       publishedAt = now;
     }
 
+    const updateSetSql = [
+      'title = ?',
+      'content = ?',
+      'excerpt = ?',
+      'cover_image = ?',
+      'author = ?',
+      'category = ?',
+      'slug = ?',
+      'status = ?',
+      'seo_title = ?',
+      'seo_description = ?',
+      'published_at = ?',
+      'update_time = ?',
+    ];
+    const updateValues = [
+      payload.title || '',
+      payload.content || '',
+      payload.excerpt || '',
+      payload.coverImage || null,
+      payload.author || '管理员',
+      categoryName,
+      payload.slug || existing.slug,
+      payload.status || existing.status,
+      payload.seoTitle || payload.title,
+      payload.seoDescription || '',
+      publishedAt,
+      now,
+    ];
+    if (articleCategoryColumn) {
+      updateSetSql.splice(6, 0, `\`${articleCategoryColumn}\` = ?`);
+      updateValues.splice(6, 0, payload.categoryId !== null ? payload.categoryId : existing.category_id || null);
+    }
+    updateValues.push(id);
+
     await app.model.query(
       `UPDATE uied_article SET
-       title = ?, content = ?, excerpt = ?, cover_image = ?, author = ?,
-       category = ?, category_id = ?, slug = ?, status = ?, seo_title = ?, seo_description = ?,
-       published_at = ?, update_time = ?
+       ${updateSetSql.join(', ')}
        WHERE id = ?`,
-      {
-        replacements: [
-          payload.title || '',
-          payload.content || '',
-          payload.excerpt || '',
-          payload.coverImage || null,
-          payload.author || '管理员',
-          categoryName,
-          payload.categoryId !== null ? payload.categoryId : existing.category_id || null,
-          payload.slug || existing.slug,
-          payload.status || existing.status,
-          payload.seoTitle || payload.title,
-          payload.seoDescription || '',
-          publishedAt,
-          now,
-          id,
-        ],
-        type: app.Sequelize.QueryTypes.UPDATE,
-      }
+      { replacements: updateValues, type: app.Sequelize.QueryTypes.UPDATE }
     );
 
     // 保存文章标签关联
@@ -518,6 +618,7 @@ class ArticleService extends Service {
    */
   async categories(params = {}) {
     const { app } = this;
+    const articleCategoryColumn = await this.getArticleCategoryColumn();
     const mode = String(params.mode || params.format || '').trim().toLowerCase();
     const needDetail = mode === 'full' || mode === 'detail'
       || params.detail === 1 || params.detail === '1' || params.detail === true;
@@ -543,24 +644,39 @@ class ArticleService extends Service {
      * publishedOnly 场景下仅返回有已发布文章的分类。
      */
     if (publishedOnly && categoryRows.length) {
-      const categoryIds = categoryRows.map(item => Number(item.id || 0)).filter(Boolean);
-      if (categoryIds.length) {
-        const placeholders = categoryIds.map(() => '?').join(',');
+      if (articleCategoryColumn) {
+        const categoryIds = categoryRows.map(item => Number(item.id || 0)).filter(Boolean);
+        if (categoryIds.length) {
+          const placeholders = categoryIds.map(() => '?').join(',');
+          const usedRows = await app.model.query(
+            `SELECT DISTINCT \`${articleCategoryColumn}\` AS category_id
+             FROM uied_article
+             WHERE is_delete = 0
+               AND status = 'published'
+               AND \`${articleCategoryColumn}\` IN (${placeholders})`,
+            {
+              replacements: categoryIds,
+              type: app.Sequelize.QueryTypes.SELECT,
+            }
+          );
+          const usedSet = new Set(
+            usedRows.map(item => Number(item.category_id || 0)).filter(Boolean)
+          );
+          categoryRows = categoryRows.filter(item => usedSet.has(Number(item.id || 0)));
+        }
+      } else {
         const usedRows = await app.model.query(
-          `SELECT DISTINCT category_id
+          `SELECT DISTINCT category
            FROM uied_article
            WHERE is_delete = 0
              AND status = 'published'
-             AND category_id IN (${placeholders})`,
-          {
-            replacements: categoryIds,
-            type: app.Sequelize.QueryTypes.SELECT,
-          }
+             AND category != ''`,
+          { type: app.Sequelize.QueryTypes.SELECT }
         );
-        const usedSet = new Set(
-          usedRows.map(item => Number(item.category_id || 0)).filter(Boolean)
+        const usedNames = new Set(
+          usedRows.map(item => String(item.category || '').trim()).filter(Boolean)
         );
-        categoryRows = categoryRows.filter(item => usedSet.has(Number(item.id || 0)));
+        categoryRows = categoryRows.filter(item => usedNames.has(String(item.name || '').trim()));
       }
     }
 
@@ -689,6 +805,7 @@ class ArticleService extends Service {
       coverImage: article.cover_image,
       author: article.author,
       category: article.category,
+      categoryId: this.parsePositiveInt(article.category_id, 0) || null,
       slug: article.slug,
       status: article.status,
       viewCount: article.view_count,

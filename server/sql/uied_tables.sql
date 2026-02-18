@@ -360,6 +360,7 @@ CREATE TABLE IF NOT EXISTS `uied_article` (
   `cover_image` varchar(500) DEFAULT NULL COMMENT '封面图片URL',
   `author` varchar(100) NOT NULL DEFAULT '' COMMENT '作者',
   `category` varchar(100) NOT NULL DEFAULT '' COMMENT '分类',
+  `category_id` int(10) unsigned DEFAULT NULL COMMENT '分类ID',
   `slug` varchar(200) NOT NULL COMMENT 'URL slug',
   `status` varchar(20) NOT NULL DEFAULT 'draft' COMMENT '状态',
   `view_count` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '浏览次数',
@@ -373,7 +374,8 @@ CREATE TABLE IF NOT EXISTS `uied_article` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `slug` (`slug`),
   KEY `status` (`status`),
-  KEY `category` (`category`)
+  KEY `category` (`category`),
+  KEY `category_id` (`category_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='UIED文章表';
 
 -- 媒体库表
