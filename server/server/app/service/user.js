@@ -119,6 +119,60 @@ class UserService extends Service {
   }
 
   /**
+   * 读取 la_user 表字段集合（用于兼容不同版本数据库结构）
+   */
+  async getUserTableColumns() {
+    if (this._userTableColumns instanceof Set) {
+      return this._userTableColumns;
+    }
+    const { ctx } = this;
+    try {
+      const rows = await ctx.model.query(
+        `
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = 'la_user'
+        `,
+        { type: ctx.app.Sequelize.QueryTypes.SELECT }
+      );
+      this._userTableColumns = new Set(
+        (Array.isArray(rows) ? rows : []).map(item => String(item?.COLUMN_NAME || ''))
+      );
+    } catch (error) {
+      ctx.logger.warn(`[user] 获取 la_user 字段集合失败: ${error.message || error}`);
+      this._userTableColumns = new Set();
+    }
+    return this._userTableColumns;
+  }
+
+  /**
+   * 判断 la_user 是否包含指定字段（支持蛇形/驼峰兼容）
+   */
+  async hasUserColumn(candidates = []) {
+    const columns = await this.getUserTableColumns();
+    const list = Array.isArray(candidates) ? candidates : [ candidates ];
+    return list.some(item => columns.has(String(item || '').trim()));
+  }
+
+  /**
+   * 获取用户扩展业务字段可用状态
+   */
+  async getUserBusinessColumns() {
+    if (this._userBusinessColumns) {
+      return this._userBusinessColumns;
+    }
+    this._userBusinessColumns = {
+      email: await this.hasUserColumn([ 'email' ]),
+      groupId: await this.hasUserColumn([ 'group_id', 'groupId' ]),
+      vipLevel: await this.hasUserColumn([ 'vip_level', 'vipLevel' ]),
+      vipExpireTime: await this.hasUserColumn([ 'vip_expire_time', 'vipExpireTime' ]),
+      remark: await this.hasUserColumn([ 'remark' ]),
+    };
+    return this._userBusinessColumns;
+  }
+
+  /**
    * 规范化用户身份值
    */
   normalizeUserType(input) {
@@ -417,15 +471,102 @@ class UserService extends Service {
   }
 
   /**
+   * 提取前台用户 token（兼容 token 头与 Authorization Bearer）
+   */
+  extractUserTokenFromRequest() {
+    const { ctx } = this;
+    const tokenHeader = String(ctx.request.header.token || '').trim();
+    if (tokenHeader) {
+      return tokenHeader;
+    }
+    const authHeader = String(
+      ctx.request.header.authorization || ctx.request.header.Authorization || ''
+    ).trim();
+    if (!authHeader) {
+      return '';
+    }
+    const bearerMatch = authHeader.match(/^Bearer\s+(.+)$/i);
+    if (bearerMatch && bearerMatch[1]) {
+      return String(bearerMatch[1]).trim();
+    }
+    return authHeader;
+  }
+
+  /**
+   * 构建对外安全的用户信息（去除密码等敏感字段）
+   */
+  buildSafeUserInfo(user) {
+    const row = user && typeof user.toJSON === 'function' ? user.toJSON() : (user || {});
+    return {
+      id: Number(row.id || 0),
+      sn: Number(row.sn || 0),
+      username: String(row.username || ''),
+      nickname: String(row.nickname || ''),
+      realName: String(row.realName || ''),
+      avatar: row.avatar ? urlUtil.toAbsoluteUrl(row.avatar) : '',
+      mobile: String(row.mobile || ''),
+      sex: Number(row.sex || 0),
+      isDisable: Number(row.isDisable || 0),
+      createTime: Number(row.createTime || 0),
+      updateTime: Number(row.updateTime || 0),
+      lastLoginTime: Number(row.lastLoginTime || 0),
+    };
+  }
+
+  /**
+   * 计算用户资料完善度（用于个人中心展示）
+   */
+  buildProfileCompletion(data = {}) {
+    const fields = [
+      { key: 'avatar', label: '头像', value: data.avatar },
+      { key: 'nickname', label: '昵称', value: data.nickname },
+      { key: 'mobile', label: '手机号', value: data.mobile },
+    ];
+    const missingFields = fields.filter(item => !item.value).map(item => item.label);
+    const completeCount = fields.length - missingFields.length;
+    return {
+      rate: fields.length === 0 ? 0 : Math.round((completeCount / fields.length) * 100),
+      missingFields,
+    };
+  }
+
+  /**
+   * 获取安全用户信息（附带身份类型信息）
+   */
+  async getSafeUserInfoById(userId, withProfileCompletion = false) {
+    const { ctx } = this;
+    const uid = Number(userId || 0);
+    if (!uid) {
+      throw new Error('用户不存在');
+    }
+    const user = await ctx.model.User.findOne({
+      where: { id: uid, isDelete: 0 },
+    });
+    if (!user) {
+      throw new Error('用户不存在');
+    }
+    const data = this.buildSafeUserInfo(user);
+    const userTypeMap = await this.getUserTypeMap([ data.id ]);
+    const userType = this.normalizeUserType(userTypeMap.get(data.id) || 0);
+    data.userType = userType;
+    data.userTypeName = this.getUserTypeLabel(userType);
+    if (withProfileCompletion) {
+      data.profileCompletion = this.buildProfileCompletion(data);
+    }
+    return data;
+  }
+
+  /**
    * 同步用户缓存信息
    */
   async syncUserCache(userId) {
     const { ctx } = this;
     const user = await ctx.model.User.findOne({ where: { id: userId, isDelete: 0 } });
     if (!user) return;
+    const safeUser = this.buildSafeUserInfo(user);
     const appConfig = this.getAppConfig();
     const userInfoKey = appConfig.userInfoKey || extendConfig.userInfoKey;
-    await ctx.service.redis.set(userInfoKey + user.id, JSON.stringify(user));
+    await ctx.service.redis.set(userInfoKey + user.id, JSON.stringify(safeUser));
   }
 
   /**
@@ -445,7 +586,8 @@ class UserService extends Service {
     const setKey = userTokenSet + user.id;
     await ctx.service.redis.set(key, user.id);
     await ctx.service.redis.sadd(setKey, token);
-    await ctx.service.redis.set(userInfoKey + user.id, JSON.stringify(user));
+    const safeUser = this.buildSafeUserInfo(user);
+    await ctx.service.redis.set(userInfoKey + user.id, JSON.stringify(safeUser));
     return token;
   }
 
@@ -455,7 +597,7 @@ class UserService extends Service {
   async getUserId() {
     const { ctx } = this;
     const appConfig = this.getAppConfig();
-    const token = ctx.request.header.token || '';
+    const token = this.extractUserTokenFromRequest();
     if (!token) {
       throw new Error('未登录');
     }
@@ -465,6 +607,39 @@ class UserService extends Service {
       throw new Error('登录已失效');
     }
     return parseInt(uid, 10);
+  }
+
+  /**
+   * 退出登录（清理当前 token）
+   */
+  async logout() {
+    const { ctx } = this;
+    const token = this.extractUserTokenFromRequest();
+    if (!token) {
+      return true;
+    }
+    const appConfig = this.getAppConfig();
+    const userTokenKey = appConfig.userTokenKey || extendConfig.userTokenKey;
+    const userTokenSet = appConfig.userTokenSet || extendConfig.userTokenSet;
+    const userInfoKey = appConfig.userInfoKey || extendConfig.userInfoKey;
+    const tokenKey = userTokenKey + token;
+    const uid = await ctx.service.redis.get(tokenKey);
+    await ctx.service.redis.del(tokenKey);
+    const userId = Number(uid || 0);
+    if (!userId) {
+      return true;
+    }
+    if (ctx.app.redis) {
+      await ctx.app.redis.srem(userTokenSet + userId, token);
+      const remain = await ctx.app.redis.scard(userTokenSet + userId);
+      if (!remain) {
+        await ctx.app.redis.del(userTokenSet + userId);
+        await ctx.app.redis.del(userInfoKey + userId);
+      }
+    } else {
+      await ctx.service.redis.del(userInfoKey + userId);
+    }
+    return true;
   }
 
   /**
@@ -622,7 +797,23 @@ class UserService extends Service {
    */
   async register(params) {
     const { ctx } = this;
-    const { username, password, email } = params;
+    const username = String(params.username || params.account || '').trim();
+    const password = String(params.password || '').trim();
+    const confirmPassword = String(params.confirmPassword || params.confirm_password || '').trim();
+    const nickname = String(params.nickname || username).trim();
+    const mobile = String(params.mobile || '').trim();
+    if (!username) {
+      throw new Error('账号不能为空');
+    }
+    if (username.length < 3 || username.length > 32) {
+      throw new Error('账号长度需在3~32位');
+    }
+    if (password.length < 6 || password.length > 20) {
+      throw new Error('密码长度需在6~20位');
+    }
+    if (confirmPassword && confirmPassword !== password) {
+      throw new Error('两次密码输入不一致');
+    }
     const exists = await ctx.model.User.findOne({
       where: { username },
     });
@@ -635,10 +826,9 @@ class UserService extends Service {
     const user = await ctx.model.User.create({
       sn: snValue,
       password: md5(password),
-      nickname: username,
+      nickname: nickname || username,
       username,
-      email,
-      groupId: 1,
+      mobile,
       createTime,
       updateTime: createTime,
     });
@@ -660,7 +850,8 @@ class UserService extends Service {
       ctx.logger.warn('[user.register] coupon 服务不存在，跳过自动发券');
     }
     const token = await this.createUserToken(user);
-    return { user, token };
+    const userInfo = await this.getSafeUserInfoById(user.id, true);
+    return { user: userInfo, userInfo, token };
   }
 
   /**
@@ -668,7 +859,11 @@ class UserService extends Service {
    */
   async login(params) {
     const { ctx } = this;
-    const { username, password } = params;
+    const username = String(params.username || params.account || '').trim();
+    const password = String(params.password || '').trim();
+    if (!username || !password) {
+      throw new Error('账号或密码不能为空');
+    }
     const isNumericUsername = /^\d+$/.test(String(username));
     const orConditions = [
       { username },
@@ -702,7 +897,8 @@ class UserService extends Service {
     });
     await this.recordLoginLog(user.id, 1);
     const token = await this.createUserToken(user);
-    return { user, token };
+    const userInfo = await this.getSafeUserInfoById(user.id, true);
+    return { user: userInfo, userInfo, token };
   }
 
   async recordLoginLog(userId, status = 1) {
@@ -726,16 +922,18 @@ class UserService extends Service {
    */
   async updateProfile(userId, params) {
     const { ctx } = this;
-    const { nickname, avatar, email } = params;
+    const { nickname, avatar } = params;
     const updateData = {};
     if (nickname !== undefined) {
-      updateData.nickname = nickname;
+      const nextNickname = String(nickname || '').trim();
+      if (!nextNickname) {
+        throw new Error('昵称不能为空');
+      }
+      updateData.nickname = nextNickname.slice(0, 32);
     }
     if (avatar !== undefined) {
-      updateData.avatar = avatar ? urlUtil.toRelativeUrl(avatar) : '';
-    }
-    if (email !== undefined) {
-      updateData.email = email;
+      const nextAvatar = String(avatar || '').trim();
+      updateData.avatar = nextAvatar ? urlUtil.toRelativeUrl(nextAvatar) : '';
     }
     const updateTime = Math.floor(Date.now() / 1000);
     await ctx.model.User.update({
@@ -745,7 +943,7 @@ class UserService extends Service {
       where: { id: userId },
     });
     await this.syncUserCache(userId);
-    return await ctx.model.User.findOne({ where: { id: userId } });
+    return await this.getSafeUserInfoById(userId, true);
   }
 
   /**
@@ -1873,23 +2071,25 @@ class UserService extends Service {
    */
   async vipInfo(userId) {
     const { ctx } = this;
+    const userColumns = await this.getUserBusinessColumns();
     const user = await ctx.model.User.findOne({ where: { id: userId, isDelete: 0 } });
     if (!user) {
       throw new Error('用户不存在');
     }
-    const level = Number(user.vipLevel || 0);
+    const level = userColumns.vipLevel ? Number(user.vipLevel || 0) : 0;
     const levelMap = await this.getLevelMap();
     const levelName = levelMap.get(level) || (level === 1 ? 'VIP会员' : level === 2 ? 'SVIP会员' : '普通用户');
-    
+    const vipExpireTime = userColumns.vipExpireTime ? Number(user.vipExpireTime || 0) : 0;
+
     // 格式化过期时间
-    const expireTime = user.vipExpireTime 
-      ? moment(user.vipExpireTime * 1000).format('YYYY-MM-DD HH:mm:ss')
+    const expireTime = vipExpireTime
+      ? moment(vipExpireTime * 1000).format('YYYY-MM-DD HH:mm:ss')
       : '';
 
     /**
      * 会员过期提醒（按配置控制提醒次数与间隔）
      */
-    await this.sendVipExpireNoticeIfNeeded(userId, user.vipExpireTime);
+    await this.sendVipExpireNoticeIfNeeded(userId, vipExpireTime);
 
     return {
       level,
@@ -1958,6 +2158,10 @@ class UserService extends Service {
      * 会员购买逻辑（余额支付时校准钱包余额）
      */
     const { skuId, payWay, couponId } = params || {};
+    const userColumns = await this.getUserBusinessColumns();
+    if (!userColumns.vipLevel || !userColumns.vipExpireTime) {
+      throw new Error('当前系统未启用会员能力');
+    }
     const goods = await this.vipGoods();
     const target = goods.find(item => item.skuId === skuId);
     if (!target) {
@@ -2143,6 +2347,10 @@ class UserService extends Service {
     if (!allowTypes.includes(type)) {
       throw new Error('类型错误');
     }
+    const userColumns = await this.getUserBusinessColumns();
+    if (type === 'bind_email' && !userColumns.email) {
+      throw new Error('当前系统未启用邮箱绑定');
+    }
 
     if (type === 'bind_mobile' && !/^\d{6,20}$/.test(String(account))) {
       throw new Error('手机号格式错误');
@@ -2170,6 +2378,10 @@ class UserService extends Service {
     const allowTypes = [ 'mobile', 'email' ];
     if (!allowTypes.includes(type)) {
       throw new Error('类型错误');
+    }
+    const userColumns = await this.getUserBusinessColumns();
+    if (type === 'email' && !userColumns.email) {
+      throw new Error('当前系统未启用邮箱绑定');
     }
 
     const cacheKey = `user:bind_code:bind_${type}:${account}`;
@@ -2213,6 +2425,10 @@ class UserService extends Service {
     const allowTypes = [ 'mobile', 'email' ];
     if (!allowTypes.includes(type)) {
       throw new Error('类型错误');
+    }
+    const userColumns = await this.getUserBusinessColumns();
+    if (type === 'email' && !userColumns.email) {
+      throw new Error('当前系统未启用邮箱绑定');
     }
     const now = Math.floor(Date.now() / 1000);
     await ctx.model.User.update({
@@ -2383,15 +2599,22 @@ class UserService extends Service {
     const { ctx } = this;
     const now = Math.floor(Date.now() / 1000);
     const dayStart = now - (now % 86400);
+    const userColumns = await this.getUserBusinessColumns();
 
-    const [ total, active, disabled, vip, svip, today ] = await Promise.all([
+    const [ total, active, disabled, today ] = await Promise.all([
       ctx.model.User.count({ where: { isDelete: 0 } }),
       ctx.model.User.count({ where: { isDelete: 0, isDisable: 0 } }),
       ctx.model.User.count({ where: { isDelete: 0, isDisable: 1 } }),
-      ctx.model.User.count({ where: { isDelete: 0, vipLevel: 1 } }),
-      ctx.model.User.count({ where: { isDelete: 0, vipLevel: 2 } }),
       ctx.model.User.count({ where: { isDelete: 0, createTime: { [Op.gte]: dayStart } } }),
     ]);
+    let vip = 0;
+    let svip = 0;
+    if (userColumns.vipLevel) {
+      [ vip, svip ] = await Promise.all([
+        ctx.model.User.count({ where: { isDelete: 0, vipLevel: 1 } }),
+        ctx.model.User.count({ where: { isDelete: 0, vipLevel: 2 } }),
+      ]);
+    }
 
     return {
       total,
@@ -2623,6 +2846,7 @@ class UserService extends Service {
    */
   async list(params) {
     const { ctx } = this;
+    const userColumns = await this.getUserBusinessColumns();
     const {
       pageNo = 1,
       pageSize = 10,
@@ -2643,15 +2867,18 @@ class UserService extends Service {
     };
 
     if (keyword) {
-      where[Op.or] = [
+      const keywordWhere = [
         { sn: { [Op.like]: `%${keyword}%` } },
         { nickname: { [Op.like]: `%${keyword}%` } },
         { mobile: { [Op.like]: `%${keyword}%` } },
-        { email: { [Op.like]: `%${keyword}%` } },
       ];
+      if (userColumns.email) {
+        keywordWhere.push({ email: { [Op.like]: `%${keyword}%` } });
+      }
+      where[Op.or] = keywordWhere;
     }
 
-    if (email) {
+    if (email && userColumns.email) {
       where.email = { [Op.like]: `%${email}%` };
     }
 
@@ -2663,11 +2890,11 @@ class UserService extends Service {
       where.isDisable = status;
     }
 
-    if (vipLevel !== undefined && vipLevel !== '') {
+    if (vipLevel !== undefined && vipLevel !== '' && userColumns.vipLevel) {
       where.vipLevel = vipLevel;
     }
 
-    if (groupId !== undefined && groupId !== '') {
+    if (groupId !== undefined && groupId !== '' && userColumns.groupId) {
       where.groupId = groupId;
     }
 
@@ -2781,7 +3008,9 @@ class UserService extends Service {
     });
 
     const userIds = rows.map(item => item.id);
-    const groupIds = Array.from(new Set(rows.map(item => item.groupId).filter(Boolean)));
+    const groupIds = userColumns.groupId
+      ? Array.from(new Set(rows.map(item => item.groupId).filter(Boolean)))
+      : [];
     const [ levelMap, groupMap, tagMaps, userTypeMap ] = await Promise.all([
       this.getLevelMap(),
       this.getGroupMap(groupIds),
@@ -2793,8 +3022,9 @@ class UserService extends Service {
       const data = item.toJSON();
       data.avatar = urlUtil.toAbsoluteUrl(data.avatar || '');
       data.ip = data.lastLoginIp || '';
-      data.groupName = groupMap.get(data.groupId) || '';
-      data.levelName = levelMap.get(data.vipLevel) || (data.vipLevel === 1 ? 'VIP' : data.vipLevel === 2 ? 'SVIP' : '普通');
+      const vipLevelValue = userColumns.vipLevel ? Number(data.vipLevel || 0) : 0;
+      data.groupName = userColumns.groupId ? (groupMap.get(data.groupId) || '') : '';
+      data.levelName = levelMap.get(vipLevelValue) || (vipLevelValue === 1 ? 'VIP' : vipLevelValue === 2 ? 'SVIP' : '普通');
       data.userType = userTypeMap.has(data.id) ? userTypeMap.get(data.id) : 0;
       data.userTypeName = this.getUserTypeLabel(data.userType);
       const tagList = tagMaps.userTagMap.get(data.id) || [];
@@ -2816,6 +3046,7 @@ class UserService extends Service {
    */
   async detail(id) {
     const { ctx } = this;
+    const userColumns = await this.getUserBusinessColumns();
     const user = await ctx.model.User.findOne({
       where: { id, isDelete: 0 },
       attributes: { exclude: [ 'password', 'salt' ] },
@@ -2828,12 +3059,13 @@ class UserService extends Service {
     data.ip = data.lastLoginIp || '';
     const [ levelMap, groupMap, tagMaps, userTypeMap ] = await Promise.all([
       this.getLevelMap(),
-      this.getGroupMap([ data.groupId ].filter(Boolean)),
+      this.getGroupMap(userColumns.groupId ? [ data.groupId ].filter(Boolean) : []),
       this.getTagMaps([ data.id ]),
       this.getUserTypeMap([ data.id ]),
     ]);
-    data.groupName = groupMap.get(data.groupId) || '';
-    data.levelName = levelMap.get(data.vipLevel) || (data.vipLevel === 1 ? 'VIP' : data.vipLevel === 2 ? 'SVIP' : '普通');
+    const vipLevelValue = userColumns.vipLevel ? Number(data.vipLevel || 0) : 0;
+    data.groupName = userColumns.groupId ? (groupMap.get(data.groupId) || '') : '';
+    data.levelName = levelMap.get(vipLevelValue) || (vipLevelValue === 1 ? 'VIP' : vipLevelValue === 2 ? 'SVIP' : '普通');
     data.userType = userTypeMap.has(data.id) ? userTypeMap.get(data.id) : 0;
     data.userTypeName = this.getUserTypeLabel(data.userType);
     const tagList = tagMaps.userTagMap.get(data.id) || [];
@@ -2904,9 +3136,14 @@ class UserService extends Service {
    */
   async edit(id, field, value) {
     const { ctx } = this;
-    const allowFields = [ 'username', 'realName', 'sex', 'mobile', 'nickname', 'email', 'vipLevel', 'remark', 'isDisable', 'groupId', 'userType' ];
+    const userColumns = await this.getUserBusinessColumns();
+    const allowFields = [ 'username', 'realName', 'sex', 'mobile', 'nickname', 'isDisable', 'userType' ];
+    if (userColumns.email) allowFields.push('email');
+    if (userColumns.vipLevel) allowFields.push('vipLevel');
+    if (userColumns.remark) allowFields.push('remark');
+    if (userColumns.groupId) allowFields.push('groupId');
     if (!allowFields.includes(field)) {
-      throw new Error('字段不允许编辑');
+      throw new Error(`字段不允许编辑: ${field}`);
     }
     if (field === 'userType') {
       await this.setUserType(id, value);
@@ -2918,7 +3155,7 @@ class UserService extends Service {
       [field]: value,
       updateTime,
     };
-    if (field === 'vipLevel' && Number(value) === 0) {
+    if (field === 'vipLevel' && Number(value) === 0 && userColumns.vipExpireTime) {
       updateData.vipExpireTime = 0;
     }
     await ctx.model.User.update(updateData, {

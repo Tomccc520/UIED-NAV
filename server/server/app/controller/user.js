@@ -88,27 +88,21 @@ class UserController extends BaseController {
     const { ctx } = this;
     try {
       const userId = await ctx.service.user.getUserId();
-      const user = await ctx.model.User.findOne({ where: { id: userId } });
-      if (user) {
-        const data = user.toJSON();
-        const urlUtil = require('../util/urlUtil');
-        data.avatar = urlUtil.toAbsoluteUrl(data.avatar || '');
-        const fields = [
-          { key: 'avatar', label: '头像', value: data.avatar },
-          { key: 'nickname', label: '昵称', value: data.nickname },
-          { key: 'mobile', label: '手机号', value: data.mobile },
-          { key: 'email', label: '邮箱', value: data.email },
-        ];
-        const missingFields = fields.filter(item => !item.value).map(item => item.label);
-        const completeCount = fields.length - missingFields.length;
-        data.profileCompletion = {
-          rate: fields.length === 0 ? 0 : Math.round((completeCount / fields.length) * 100),
-          missingFields,
-        };
-        this.result({ data });
-        return;
-      }
-      this.result({ data: user });
+      const data = await ctx.service.user.getSafeUserInfoById(userId, true);
+      this.result({ data });
+    } catch (e) {
+      this.result({ data: '', message: e.message, code: 1001 });
+    }
+  }
+
+  /**
+   * 用户退出登录
+   */
+  async logout() {
+    const { ctx } = this;
+    try {
+      await ctx.service.user.logout();
+      this.result({ data: true, message: '退出成功' });
     } catch (e) {
       this.result({ data: '', message: e.message, code: 1001 });
     }

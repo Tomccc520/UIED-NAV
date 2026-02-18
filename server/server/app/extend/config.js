@@ -180,6 +180,7 @@ const rsa = {
     // 前台用户中心（账号与个人中心）
     'user:register',
     'user:login',
+    'user:logout',
     'user:profile',
     'user:profile:update',
     'user:index:stats',

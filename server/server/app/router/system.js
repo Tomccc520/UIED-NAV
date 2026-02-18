@@ -113,6 +113,7 @@ module.exports = app => {
   // 前台用户中心（登录/资料）
   router.all('/api/user/register', controller.user.register);
   router.all('/api/user/login', controller.user.login);
+  router.all('/api/user/logout', controller.user.logout);
   router.all('/api/user/profile', controller.user.profile);
   router.all('/api/user/profile/update', controller.user.updateProfile);
   // 前台作者中心
