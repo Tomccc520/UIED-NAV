@@ -14,6 +14,46 @@ const Service = require('egg').Service;
 
 class ArticleTagService extends Service {
   /**
+   * 判断是否为可降级的库结构兼容错误
+   */
+  isSchemaCompatibilityError(error) {
+    const code = String(error?.original?.code || error?.code || '').toUpperCase();
+    const message = String(error?.message || '');
+    return code === 'ER_NO_SUCH_TABLE'
+      || code === 'ER_BAD_FIELD_ERROR'
+      || message.includes('doesn\'t exist')
+      || message.includes('Unknown column');
+  }
+
+  /**
+   * 标签列表降级查询（忽略关联计数，保证接口可用）
+   */
+  async fallbackAllWithoutRelation() {
+    const { app } = this;
+    try {
+      const tags = await app.model.query(
+        `SELECT id, name, slug, color
+         FROM uied_article_tag
+         WHERE is_delete = 0
+         ORDER BY id ASC`,
+        { type: app.Sequelize.QueryTypes.SELECT }
+      );
+      return (Array.isArray(tags) ? tags : []).map(t => ({
+        id: t.id,
+        name: t.name,
+        slug: t.slug,
+        color: t.color,
+        sortOrder: 0,
+        sort_order: 0,
+        articleCount: 0,
+      }));
+    } catch (error) {
+      this.ctx.logger.warn('[articleTag] fallbackAllWithoutRelation 失败，返回空数组:', error.message);
+      return [];
+    }
+  }
+
+  /**
    * 解析正整数参数
    */
   parsePositiveInt(value, defaultValue = 0) {
@@ -100,23 +140,48 @@ class ArticleTagService extends Service {
       replacements.push(`%${keyword}%`);
     }
 
-    // 获取总数
-    const [ countResult ] = await app.model.query(
-      `SELECT COUNT(*) as total FROM uied_article_tag t WHERE ${whereClause}`,
-      { replacements, type: app.Sequelize.QueryTypes.SELECT }
-    );
-    const total = countResult.total;
+    let total = 0;
+    let tags = [];
+    try {
+      // 获取总数
+      const [ countResult ] = await app.model.query(
+        `SELECT COUNT(*) as total FROM uied_article_tag t WHERE ${whereClause}`,
+        { replacements, type: app.Sequelize.QueryTypes.SELECT }
+      );
+      total = this.parsePositiveInt(countResult?.total, 0);
 
-    // 获取列表
-    const tags = await app.model.query(
-      `SELECT t.*,
-        (SELECT COUNT(*) FROM uied_article_tag_relation r WHERE r.tag_id = t.id) as article_count
-       FROM uied_article_tag t
-       WHERE ${whereClause}
-       ORDER BY t.sort_order ASC, t.id ASC
-       LIMIT ? OFFSET ?`,
-      { replacements: [ ...replacements, currentPageSize, offset ], type: app.Sequelize.QueryTypes.SELECT }
-    );
+      // 获取列表
+      tags = await app.model.query(
+        `SELECT t.*,
+          (SELECT COUNT(*) FROM uied_article_tag_relation r WHERE r.tag_id = t.id) as article_count
+         FROM uied_article_tag t
+         WHERE ${whereClause}
+         ORDER BY t.sort_order ASC, t.id ASC
+         LIMIT ? OFFSET ?`,
+        { replacements: [ ...replacements, currentPageSize, offset ], type: app.Sequelize.QueryTypes.SELECT }
+      );
+    } catch (error) {
+      if (!this.isSchemaCompatibilityError(error)) {
+        throw error;
+      }
+      this.ctx.logger.warn('[articleTag] list 降级为无关联标签回退:', error.message);
+      const allFallback = await this.fallbackAllWithoutRelation();
+      const keywordText = String(keyword || '').trim();
+      const filtered = keywordText
+        ? allFallback.filter(item => String(item.name || '').includes(keywordText))
+        : allFallback;
+      total = filtered.length;
+      tags = filtered.slice(offset, offset + currentPageSize).map(item => ({
+        id: item.id,
+        name: item.name,
+        slug: item.slug,
+        color: item.color,
+        sort_order: item.sort_order,
+        article_count: item.articleCount,
+        create_time: 0,
+        update_time: 0,
+      }));
+    }
 
     return {
       lists: tags.map(t => ({
@@ -142,14 +207,23 @@ class ArticleTagService extends Service {
   async all() {
     const { app } = this;
 
-    const tags = await app.model.query(
-      `SELECT t.*,
-        (SELECT COUNT(*) FROM uied_article_tag_relation r WHERE r.tag_id = t.id) as article_count
-       FROM uied_article_tag t
-       WHERE t.is_delete = 0
-       ORDER BY t.sort_order ASC, t.name ASC`,
-      { type: app.Sequelize.QueryTypes.SELECT }
-    );
+    let tags = [];
+    try {
+      tags = await app.model.query(
+        `SELECT t.*,
+          (SELECT COUNT(*) FROM uied_article_tag_relation r WHERE r.tag_id = t.id) as article_count
+         FROM uied_article_tag t
+         WHERE t.is_delete = 0
+         ORDER BY t.sort_order ASC, t.name ASC`,
+        { type: app.Sequelize.QueryTypes.SELECT }
+      );
+    } catch (error) {
+      if (!this.isSchemaCompatibilityError(error)) {
+        throw error;
+      }
+      this.ctx.logger.warn('[articleTag] all 降级为无关联标签回退:', error.message);
+      return this.fallbackAllWithoutRelation();
+    }
 
     return tags.map(t => ({
       id: t.id,

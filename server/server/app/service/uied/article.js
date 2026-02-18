@@ -14,6 +14,18 @@ const Service = require('egg').Service;
 
 class ArticleService extends Service {
   /**
+   * 判断是否为可降级的库结构兼容错误
+   */
+  isSchemaCompatibilityError(error) {
+    const code = String(error?.original?.code || error?.code || '').toUpperCase();
+    const message = String(error?.message || '');
+    return code === 'ER_NO_SUCH_TABLE'
+      || code === 'ER_BAD_FIELD_ERROR'
+      || message.includes('doesn\'t exist')
+      || message.includes('Unknown column');
+  }
+
+  /**
    * 获取文章表的“分类ID”字段名（兼容 category_id / categoryId / cate_id / 无该字段）
    */
   async getArticleCategoryColumn() {
@@ -55,11 +67,19 @@ class ArticleService extends Service {
     const { app } = this;
     const id = this.parsePositiveInt(categoryId, 0);
     if (!id) return '';
-    const [ row ] = await app.model.query(
-      'SELECT name FROM uied_article_category WHERE id = ? AND is_delete = 0 LIMIT 1',
-      { replacements: [ id ], type: app.Sequelize.QueryTypes.SELECT }
-    );
-    return String(row?.name || '').trim();
+    try {
+      const [ row ] = await app.model.query(
+        'SELECT name FROM uied_article_category WHERE id = ? AND is_delete = 0 LIMIT 1',
+        { replacements: [ id ], type: app.Sequelize.QueryTypes.SELECT }
+      );
+      return String(row?.name || '').trim();
+    } catch (error) {
+      if (!this.isSchemaCompatibilityError(error)) {
+        throw error;
+      }
+      this.ctx.logger.warn('[article] getCategoryNameById 降级为空字符串:', error.message);
+      return '';
+    }
   }
 
   /**
@@ -632,13 +652,22 @@ class ArticleService extends Service {
     /**
      * 默认使用分类管理表，保证“先建分类再发文”的后台场景也能看到分类。
      */
-    let categoryRows = await app.model.query(
-      `SELECT id, name, slug
-       FROM uied_article_category
-       WHERE is_delete = 0
-       ORDER BY sort_order ASC, id ASC`,
-      { type: app.Sequelize.QueryTypes.SELECT }
-    );
+    let categoryRows = [];
+    try {
+      categoryRows = await app.model.query(
+        `SELECT id, name, slug
+         FROM uied_article_category
+         WHERE is_delete = 0
+         ORDER BY sort_order ASC, id ASC`,
+        { type: app.Sequelize.QueryTypes.SELECT }
+      );
+    } catch (error) {
+      if (!this.isSchemaCompatibilityError(error)) {
+        throw error;
+      }
+      this.ctx.logger.warn('[article] categories 降级到文章表分类去重:', error.message);
+      categoryRows = [];
+    }
 
     /**
      * publishedOnly 场景下仅返回有已发布文章的分类。

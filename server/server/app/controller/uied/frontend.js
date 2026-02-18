@@ -1202,10 +1202,12 @@ class FrontendController extends Controller {
       const tagSlugText = String(tagSlug || '').trim();
       const tagIdValue = this.parsePositiveInt(tagId || tag_id, 0);
 
-      const [ categories, tags ] = await Promise.all([
+      const [ categoriesResult, tagsResult ] = await Promise.allSettled([
         ctx.service.uied.articleCategory.all(),
         ctx.service.uied.articleTag.all(),
       ]);
+      const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.value : [];
+      const tags = tagsResult.status === 'fulfilled' ? tagsResult.value : [];
 
       const categoryMap = new Map((Array.isArray(categories) ? categories : []).map(item => [
         this.parsePositiveInt(item.id, 0),
@@ -1332,10 +1334,12 @@ class FrontendController extends Controller {
         ctx.body = { error: '文章不存在' };
         return;
       }
-      const [ categories, tags ] = await Promise.all([
+      const [ categoriesResult, tagsResult ] = await Promise.allSettled([
         ctx.service.uied.articleCategory.all(),
         ctx.service.uied.articleTag.all(),
       ]);
+      const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.value : [];
+      const tags = tagsResult.status === 'fulfilled' ? tagsResult.value : [];
       const categoryMap = new Map((Array.isArray(categories) ? categories : []).map(item => [
         this.parsePositiveInt(item.id, 0),
         String(item.name || ''),

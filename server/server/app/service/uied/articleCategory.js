@@ -14,6 +14,53 @@ const Service = require('egg').Service;
 
 class ArticleCategoryService extends Service {
   /**
+   * 判断是否为可降级的库结构兼容错误
+   */
+  isSchemaCompatibilityError(error) {
+    const code = String(error?.original?.code || error?.code || '').toUpperCase();
+    const message = String(error?.message || '');
+    return code === 'ER_NO_SUCH_TABLE'
+      || code === 'ER_BAD_FIELD_ERROR'
+      || code === 'ER_CANT_AGGREGATE_2COLLATIONS'
+      || message.includes('doesn\'t exist')
+      || message.includes('Unknown column')
+      || message.includes('Illegal mix of collations');
+  }
+
+  /**
+   * 从文章表回退生成分类列表（用于分类表缺失/字段不一致场景）
+   */
+  async fallbackAllFromArticleTable() {
+    const { app } = this;
+    try {
+      const rows = await app.model.query(
+        `SELECT category AS name, COUNT(*) AS article_count
+         FROM uied_article
+         WHERE is_delete = 0
+           AND category IS NOT NULL
+           AND category != ''
+         GROUP BY category
+         ORDER BY category ASC`,
+        { type: app.Sequelize.QueryTypes.SELECT }
+      );
+      return (Array.isArray(rows) ? rows : []).map((item, index) => {
+        const name = String(item?.name || '').trim();
+        return {
+          id: index + 1,
+          name,
+          slug: this.normalizeSlug(name),
+          description: '',
+          sortOrder: index,
+          sort_order: index,
+          articleCount: this.parsePositiveInt(item?.article_count, 0),
+        };
+      }).filter(item => item.name);
+    } catch (error) {
+      this.ctx.logger.warn('[articleCategory] fallbackAllFromArticleTable 失败，返回空数组:', error.message);
+      return [];
+    }
+  }
+  /**
    * 获取文章表的“分类ID”字段名（兼容 category_id / categoryId / cate_id / 无该字段）
    */
   async getArticleCategoryColumn() {
@@ -136,26 +183,51 @@ class ArticleCategoryService extends Service {
       replacements.push(`%${keyword}%`);
     }
 
-    // 获取总数
-    const [ countResult ] = await app.model.query(
-      `SELECT COUNT(*) as total FROM uied_article_category c WHERE ${whereClause}`,
-      { replacements, type: app.Sequelize.QueryTypes.SELECT }
-    );
-    const total = countResult.total;
+    let total = 0;
+    let categories = [];
+    try {
+      // 获取总数
+      const [ countResult ] = await app.model.query(
+        `SELECT COUNT(*) as total FROM uied_article_category c WHERE ${whereClause}`,
+        { replacements, type: app.Sequelize.QueryTypes.SELECT }
+      );
+      total = this.parsePositiveInt(countResult?.total, 0);
 
-    // 获取列表（包含文章数量）
-    const articleCountWhere = articleCategoryColumn
-      ? `a.\`${articleCategoryColumn}\` = c.id`
-      : 'a.category = c.name';
-    const categories = await app.model.query(
-      `SELECT c.*,
-        (SELECT COUNT(*) FROM uied_article a WHERE ${articleCountWhere} AND a.is_delete = 0) as article_count
-       FROM uied_article_category c
-       WHERE ${whereClause}
-       ORDER BY c.sort_order ASC, c.id ASC
-       LIMIT ? OFFSET ?`,
-      { replacements: [ ...replacements, currentPageSize, offset ], type: app.Sequelize.QueryTypes.SELECT }
-    );
+      // 获取列表（包含文章数量）
+      const articleCountWhere = articleCategoryColumn
+        ? `a.\`${articleCategoryColumn}\` = c.id`
+        : 'BINARY a.category = BINARY c.name';
+      categories = await app.model.query(
+        `SELECT c.*,
+          (SELECT COUNT(*) FROM uied_article a WHERE ${articleCountWhere} AND a.is_delete = 0) as article_count
+         FROM uied_article_category c
+         WHERE ${whereClause}
+         ORDER BY c.sort_order ASC, c.id ASC
+         LIMIT ? OFFSET ?`,
+        { replacements: [ ...replacements, currentPageSize, offset ], type: app.Sequelize.QueryTypes.SELECT }
+      );
+    } catch (error) {
+      if (!this.isSchemaCompatibilityError(error)) {
+        throw error;
+      }
+      this.ctx.logger.warn('[articleCategory] list 降级为文章表分类回退:', error.message);
+      const allFallback = await this.fallbackAllFromArticleTable();
+      const keywordText = String(keyword || '').trim();
+      const filtered = keywordText
+        ? allFallback.filter(item => String(item.name || '').includes(keywordText))
+        : allFallback;
+      total = filtered.length;
+      categories = filtered.slice(offset, offset + currentPageSize).map(item => ({
+        id: item.id,
+        name: item.name,
+        slug: item.slug,
+        description: item.description,
+        sort_order: item.sort_order,
+        article_count: item.articleCount,
+        create_time: 0,
+        update_time: 0,
+      }));
+    }
 
     return {
       lists: categories.map(c => ({
@@ -182,17 +254,26 @@ class ArticleCategoryService extends Service {
     const { app } = this;
     const articleCategoryColumn = await this.getArticleCategoryColumn();
 
-    const articleCountWhere = articleCategoryColumn
-      ? `a.\`${articleCategoryColumn}\` = c.id`
-      : 'a.category = c.name';
-    const categories = await app.model.query(
-      `SELECT c.*,
-        (SELECT COUNT(*) FROM uied_article a WHERE ${articleCountWhere} AND a.is_delete = 0) as article_count
-       FROM uied_article_category c
-       WHERE c.is_delete = 0
-       ORDER BY c.sort_order ASC, c.name ASC`,
-      { type: app.Sequelize.QueryTypes.SELECT }
-    );
+    let categories = [];
+    try {
+      const articleCountWhere = articleCategoryColumn
+        ? `a.\`${articleCategoryColumn}\` = c.id`
+        : 'BINARY a.category = BINARY c.name';
+      categories = await app.model.query(
+        `SELECT c.*,
+          (SELECT COUNT(*) FROM uied_article a WHERE ${articleCountWhere} AND a.is_delete = 0) as article_count
+         FROM uied_article_category c
+         WHERE c.is_delete = 0
+         ORDER BY c.sort_order ASC, c.name ASC`,
+        { type: app.Sequelize.QueryTypes.SELECT }
+      );
+    } catch (error) {
+      if (!this.isSchemaCompatibilityError(error)) {
+        throw error;
+      }
+      this.ctx.logger.warn('[articleCategory] all 降级为文章表分类回退:', error.message);
+      return this.fallbackAllFromArticleTable();
+    }
 
     return categories.map(c => ({
       id: c.id,
