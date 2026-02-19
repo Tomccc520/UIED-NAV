@@ -90,6 +90,68 @@ class SettingController extends baseController {
       this.result({ code: 500, message: '获取公开设置失败' });
     }
   }
+
+  /**
+   * 获取文章公开配置
+   */
+  async articleConfig() {
+    const { ctx } = this;
+    try {
+      const config = await ctx.service.uied.setting.get('articleConfig');
+      const result = ctx.service.uied.setting.normalizeArticleConfig(config || {});
+      this.result({ data: result });
+    } catch (error) {
+      ctx.logger.error('获取文章配置失败:', error);
+      this.result({ code: 500, message: '获取文章配置失败' });
+    }
+  }
+
+  /**
+   * 保存文章公开配置
+   */
+  async saveArticleConfig() {
+    const { ctx } = this;
+    try {
+      const data = ctx.request.body || {};
+      const normalized = ctx.service.uied.setting.normalizeArticleConfig(data);
+      await ctx.service.uied.setting.save({ articleConfig: normalized });
+      this.result({ data: normalized, message: '保存成功' });
+    } catch (error) {
+      ctx.logger.error('保存文章配置失败:', error);
+      this.result({ code: 500, message: '保存文章配置失败' });
+    }
+  }
+
+  /**
+   * 获取文章专题配置（分类/标签视觉配置）
+   */
+  async articleTopicsConfig() {
+    const { ctx } = this;
+    try {
+      const config = await ctx.service.uied.setting.get('articleTopicsConfig');
+      const result = ctx.service.uied.setting.normalizeArticleTopicsConfig(config || {});
+      this.result({ data: result });
+    } catch (error) {
+      ctx.logger.error('获取文章专题配置失败:', error);
+      this.result({ code: 500, message: '获取文章专题配置失败' });
+    }
+  }
+
+  /**
+   * 保存文章专题配置（分类/标签视觉配置）
+   */
+  async saveArticleTopicsConfig() {
+    const { ctx } = this;
+    try {
+      const data = ctx.request.body || {};
+      const normalized = ctx.service.uied.setting.normalizeArticleTopicsConfig(data);
+      await ctx.service.uied.setting.save({ articleTopicsConfig: normalized });
+      this.result({ data: normalized, message: '保存成功' });
+    } catch (error) {
+      ctx.logger.error('保存文章专题配置失败:', error);
+      this.result({ code: 500, message: '保存文章专题配置失败' });
+    }
+  }
 }
 
 module.exports = SettingController;

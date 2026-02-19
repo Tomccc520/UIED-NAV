@@ -16,6 +16,41 @@ export function userEdit(params: any) {
 }
 
 /**
+ * 获取用户等级列表
+ */
+export function getUserLevelList() {
+    return request.get({ url: '/user/level/list' })
+}
+
+/**
+ * 新增用户等级
+ */
+export function addUserLevel(params: any) {
+    return request.post({ url: '/user/level/add', params })
+}
+
+/**
+ * 编辑用户等级
+ */
+export function editUserLevel(params: any) {
+    return request.post({ url: '/user/level/edit', params })
+}
+
+/**
+ * 删除用户等级
+ */
+export function delUserLevel(params: any) {
+    return request.post({ url: '/user/level/del', params })
+}
+
+/**
+ * 初始化测试用户
+ */
+export function seedUserTestUsers() {
+    return request.post({ url: '/user/seed/testUsers' })
+}
+
+/**
  * 获取作者下拉选项（用于文章编辑）
  */
 export function getAuthorUserOptions(params?: {

@@ -214,6 +214,23 @@ module.exports = options => {
       'article:comment:manage:mute:del': [ 'article:comment:manage:del', 'article:del' ],
       // 内容管理：作者下拉接口复用文章编辑权限
       'user:author:options': [ 'article:edit', 'article:add', 'article:list' ],
+      // 用户中心管理：复用用户管理权限，兼容历史角色未配置新权限点
+      'user:stats': [ 'user:list' ],
+      'user:wallet:adjust': [ 'user:edit', 'user:list' ],
+      'user:group:list': [ 'user:list' ],
+      'user:group:add': [ 'user:edit', 'user:list' ],
+      'user:group:edit': [ 'user:edit', 'user:list' ],
+      'user:group:del': [ 'user:edit', 'user:list' ],
+      'user:tag:list': [ 'user:list' ],
+      'user:tag:add': [ 'user:edit', 'user:list' ],
+      'user:tag:edit': [ 'user:edit', 'user:list' ],
+      'user:tag:del': [ 'user:edit', 'user:list' ],
+      'user:tag:bind': [ 'user:edit', 'user:list' ],
+      'user:level:list': [ 'user:list' ],
+      'user:level:add': [ 'user:edit', 'user:list' ],
+      'user:level:edit': [ 'user:edit', 'user:list' ],
+      'user:level:del': [ 'user:edit', 'user:list' ],
+      'user:seed:testUsers': [ 'user:edit', 'user:list' ],
       // 内容管理：外链图片转存复用文章编辑权限
       'common:upload:image:transfer': [ 'article:edit', 'article:add', 'common:upload:image' ],
       'common:upload:image:transfer-content': [ 'article:edit', 'article:add', 'common:upload:image' ],
@@ -223,6 +240,10 @@ module.exports = options => {
       'uied:feature:check': [ 'uied:setting:get' ],
       'uied:license:save': [ 'uied:setting:save' ],
       'uied:feature:save': [ 'uied:setting:save' ],
+      'uied:setting:articleConfig': [ 'uied:setting:get' ],
+      'uied:setting:articleTopicsConfig': [ 'uied:setting:get' ],
+      'uied:setting:saveArticleConfig': [ 'uied:setting:save' ],
+      'uied:setting:saveArticleTopicsConfig': [ 'uied:setting:save' ],
     };
     if (perms.some(item => item && (auths === item || auths.startsWith(item + ':')))) {
       return true;

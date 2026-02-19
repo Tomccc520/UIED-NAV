@@ -854,6 +854,19 @@ class UserController extends BaseController {
       this.result({ data: '', message: e.message, code: 1001 });
     }
   }
+
+  /**
+   * 管理端初始化测试用户（幂等）
+   */
+  async seedTestUsers() {
+    const { ctx } = this;
+    try {
+      const data = await ctx.service.user.seedTestUsers();
+      this.result({ data, message: '测试用户初始化成功' });
+    } catch (e) {
+      this.result({ data: '', message: e.message, code: 1001 });
+    }
+  }
 }
 
 module.exports = UserController;

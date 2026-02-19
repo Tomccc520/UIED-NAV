@@ -185,6 +185,46 @@ export function uiedPublicSettings() {
     return request.get({ url: '/uied/setting/public' })
 }
 
+// 获取许可证信息
+export function uiedLicenseInfo() {
+    return request.get({ url: '/uied/license/info' })
+}
+
+// 保存许可证信息
+export function uiedSaveLicenseInfo(params: any) {
+    return request.post({ url: '/uied/license/save', params })
+}
+
+// 获取功能开关列表
+export function uiedFeatureList() {
+    return request.get({ url: '/uied/feature/list' })
+}
+
+// 保存功能开关
+export function uiedSaveFeature(params: any) {
+    return request.post({ url: '/uied/feature/save', params })
+}
+
+// 获取文章公开配置
+export function uiedArticleConfig() {
+    return request.get({ url: '/uied/setting/articleConfig' })
+}
+
+// 保存文章公开配置
+export function uiedSaveArticleConfig(params: any) {
+    return request.post({ url: '/uied/setting/saveArticleConfig', params })
+}
+
+// 获取文章专题配置
+export function uiedArticleTopicsConfig() {
+    return request.get({ url: '/uied/setting/articleTopicsConfig' })
+}
+
+// 保存文章专题配置
+export function uiedSaveArticleTopicsConfig(params: any) {
+    return request.post({ url: '/uied/setting/saveArticleTopicsConfig', params })
+}
+
 // ==================== 导航菜单 ====================
 
 export function uiedNavMenuList(params?: any) {

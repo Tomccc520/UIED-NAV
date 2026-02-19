@@ -382,6 +382,102 @@ class UserService extends Service {
   }
 
   /**
+   * 确保用户中心扩展表存在（分组/标签/等级）
+   */
+  async ensureUserCenterMetaTables() {
+    const { ctx, app } = this;
+    if (app.__userCenterMetaTablesReady) return true;
+    try {
+      await ctx.model.query(`
+        CREATE TABLE IF NOT EXISTS \`la_user_group\` (
+          \`id\` int unsigned NOT NULL AUTO_INCREMENT,
+          \`name\` varchar(64) NOT NULL DEFAULT '',
+          \`remark\` varchar(255) NOT NULL DEFAULT '',
+          \`sort\` int unsigned NOT NULL DEFAULT 0,
+          \`is_delete\` tinyint unsigned NOT NULL DEFAULT 0,
+          \`create_time\` int unsigned NOT NULL DEFAULT 0,
+          \`update_time\` int unsigned NOT NULL DEFAULT 0,
+          \`delete_time\` int unsigned NOT NULL DEFAULT 0,
+          PRIMARY KEY (\`id\`),
+          KEY \`idx_sort_delete\` (\`sort\`, \`is_delete\`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+      `);
+      await ctx.model.query(`
+        CREATE TABLE IF NOT EXISTS \`la_user_tag\` (
+          \`id\` int unsigned NOT NULL AUTO_INCREMENT,
+          \`name\` varchar(64) NOT NULL DEFAULT '',
+          \`color\` varchar(32) NOT NULL DEFAULT '#409EFF',
+          \`is_delete\` tinyint unsigned NOT NULL DEFAULT 0,
+          \`create_time\` int unsigned NOT NULL DEFAULT 0,
+          \`update_time\` int unsigned NOT NULL DEFAULT 0,
+          \`delete_time\` int unsigned NOT NULL DEFAULT 0,
+          PRIMARY KEY (\`id\`),
+          KEY \`idx_delete\` (\`is_delete\`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+      `);
+      await ctx.model.query(`
+        CREATE TABLE IF NOT EXISTS \`la_user_tag_rel\` (
+          \`id\` int unsigned NOT NULL AUTO_INCREMENT,
+          \`user_id\` int unsigned NOT NULL DEFAULT 0,
+          \`tag_id\` int unsigned NOT NULL DEFAULT 0,
+          \`create_time\` int unsigned NOT NULL DEFAULT 0,
+          PRIMARY KEY (\`id\`),
+          UNIQUE KEY \`uk_user_tag\` (\`user_id\`, \`tag_id\`),
+          KEY \`idx_user_id\` (\`user_id\`),
+          KEY \`idx_tag_id\` (\`tag_id\`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+      `);
+      await ctx.model.query(`
+        CREATE TABLE IF NOT EXISTS \`la_user_level\` (
+          \`id\` int unsigned NOT NULL AUTO_INCREMENT,
+          \`name\` varchar(64) NOT NULL DEFAULT '',
+          \`level_value\` int unsigned NOT NULL DEFAULT 0,
+          \`remark\` varchar(255) NOT NULL DEFAULT '',
+          \`is_default\` tinyint unsigned NOT NULL DEFAULT 0,
+          \`is_delete\` tinyint unsigned NOT NULL DEFAULT 0,
+          \`create_time\` int unsigned NOT NULL DEFAULT 0,
+          \`update_time\` int unsigned NOT NULL DEFAULT 0,
+          \`delete_time\` int unsigned NOT NULL DEFAULT 0,
+          PRIMARY KEY (\`id\`),
+          KEY \`idx_level_delete\` (\`level_value\`, \`is_delete\`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+      `);
+
+      // 初始化售卖版默认等级（Free / Pro / Enterprise）
+      await ctx.model.query(`
+        INSERT INTO \`la_user_level\` (\`name\`, \`level_value\`, \`remark\`, \`is_default\`, \`is_delete\`, \`create_time\`, \`update_time\`, \`delete_time\`)
+        SELECT 'Free', 0, '基础版（默认）', 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0
+        FROM DUAL
+        WHERE NOT EXISTS (
+          SELECT 1 FROM \`la_user_level\` WHERE \`level_value\` = 0 AND \`is_delete\` = 0
+        );
+      `);
+      await ctx.model.query(`
+        INSERT INTO \`la_user_level\` (\`name\`, \`level_value\`, \`remark\`, \`is_default\`, \`is_delete\`, \`create_time\`, \`update_time\`, \`delete_time\`)
+        SELECT 'Pro', 1, '专业版', 0, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0
+        FROM DUAL
+        WHERE NOT EXISTS (
+          SELECT 1 FROM \`la_user_level\` WHERE \`level_value\` = 1 AND \`is_delete\` = 0
+        );
+      `);
+      await ctx.model.query(`
+        INSERT INTO \`la_user_level\` (\`name\`, \`level_value\`, \`remark\`, \`is_default\`, \`is_delete\`, \`create_time\`, \`update_time\`, \`delete_time\`)
+        SELECT 'Enterprise', 2, '企业版', 0, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0
+        FROM DUAL
+        WHERE NOT EXISTS (
+          SELECT 1 FROM \`la_user_level\` WHERE \`level_value\` = 2 AND \`is_delete\` = 0
+        );
+      `);
+
+      app.__userCenterMetaTablesReady = true;
+      return true;
+    } catch (error) {
+      ctx.logger.warn(`ensureUserCenterMetaTables skipped: ${error.message || error}`);
+      return false;
+    }
+  }
+
+  /**
    * 格式化作者展示资料
    */
   formatAuthorProfile(user, profile, forcePublic = false) {
@@ -1249,6 +1345,7 @@ class UserService extends Service {
 
   async getLevelMap() {
     const { ctx } = this;
+    await this.ensureUserCenterMetaTables();
     const levels = await ctx.model.UserLevel.findAll({
       where: { isDelete: 0 },
       order: [[ 'levelValue', 'ASC' ], [ 'id', 'ASC' ]],
@@ -1262,6 +1359,7 @@ class UserService extends Service {
 
   async getGroupMap(groupIds) {
     const { ctx } = this;
+    await this.ensureUserCenterMetaTables();
     if (!groupIds || groupIds.length === 0) {
       return new Map();
     }
@@ -1277,6 +1375,7 @@ class UserService extends Service {
 
   async getTagMaps(userIds) {
     const { ctx } = this;
+    await this.ensureUserCenterMetaTables();
     const userTagMap = new Map();
     if (!userIds || userIds.length === 0) {
       return { userTagMap, tagMap: new Map() };
@@ -2631,6 +2730,7 @@ class UserService extends Service {
    */
   async groupList() {
     const { ctx } = this;
+    await this.ensureUserCenterMetaTables();
     const rows = await ctx.model.UserGroup.findAll({
       where: { isDelete: 0 },
       order: [[ 'sort', 'DESC' ], [ 'id', 'DESC' ]],
@@ -2640,6 +2740,7 @@ class UserService extends Service {
 
   async groupAdd(params) {
     const { ctx } = this;
+    await this.ensureUserCenterMetaTables();
     const { name = '', remark = '', sort = 0 } = params;
     if (!name) {
       throw new Error('分组名称不能为空');
@@ -2656,6 +2757,7 @@ class UserService extends Service {
 
   async groupEdit(params) {
     const { ctx } = this;
+    await this.ensureUserCenterMetaTables();
     const { id, name = '', remark = '', sort = 0 } = params;
     if (!id) {
       throw new Error('分组ID不能为空');
@@ -2673,6 +2775,7 @@ class UserService extends Service {
 
   async groupDel(id) {
     const { ctx } = this;
+    await this.ensureUserCenterMetaTables();
     if (!id) {
       throw new Error('分组ID不能为空');
     }
@@ -2690,6 +2793,7 @@ class UserService extends Service {
    */
   async tagList() {
     const { ctx } = this;
+    await this.ensureUserCenterMetaTables();
     const rows = await ctx.model.UserTag.findAll({
       where: { isDelete: 0 },
       order: [[ 'id', 'DESC' ]],
@@ -2699,6 +2803,7 @@ class UserService extends Service {
 
   async tagAdd(params) {
     const { ctx } = this;
+    await this.ensureUserCenterMetaTables();
     const { name = '', color = '' } = params;
     if (!name) {
       throw new Error('标签名称不能为空');
@@ -2714,6 +2819,7 @@ class UserService extends Service {
 
   async tagEdit(params) {
     const { ctx } = this;
+    await this.ensureUserCenterMetaTables();
     const { id, name = '', color = '' } = params;
     if (!id) {
       throw new Error('标签ID不能为空');
@@ -2730,6 +2836,7 @@ class UserService extends Service {
 
   async tagDel(id) {
     const { ctx } = this;
+    await this.ensureUserCenterMetaTables();
     if (!id) {
       throw new Error('标签ID不能为空');
     }
@@ -2744,6 +2851,7 @@ class UserService extends Service {
 
   async tagBind(userId, tagIds) {
     const { ctx } = this;
+    await this.ensureUserCenterMetaTables();
     if (!userId) {
       throw new Error('用户ID不能为空');
     }
@@ -2769,6 +2877,7 @@ class UserService extends Service {
    */
   async levelList() {
     const { ctx } = this;
+    await this.ensureUserCenterMetaTables();
     const rows = await ctx.model.UserLevel.findAll({
       where: { isDelete: 0 },
       order: [[ 'levelValue', 'ASC' ], [ 'id', 'ASC' ]],
@@ -2778,6 +2887,7 @@ class UserService extends Service {
 
   async levelAdd(params) {
     const { ctx } = this;
+    await this.ensureUserCenterMetaTables();
     const { name = '', levelValue = 0, remark = '', isDefault = 0 } = params;
     if (!name) {
       throw new Error('等级名称不能为空');
@@ -2803,6 +2913,7 @@ class UserService extends Service {
 
   async levelEdit(params) {
     const { ctx } = this;
+    await this.ensureUserCenterMetaTables();
     const { id, name = '', levelValue = 0, remark = '', isDefault = 0 } = params;
     if (!id) {
       throw new Error('等级ID不能为空');
@@ -2829,6 +2940,7 @@ class UserService extends Service {
 
   async levelDel(id) {
     const { ctx } = this;
+    await this.ensureUserCenterMetaTables();
     if (!id) {
       throw new Error('等级ID不能为空');
     }
@@ -2839,6 +2951,151 @@ class UserService extends Service {
     }, {
       where: { id },
     });
+  }
+
+  /**
+   * 管理端初始化测试用户（幂等）
+   */
+  async seedTestUsers() {
+    const { ctx } = this;
+    await this.ensureUserIdentityTable();
+    await this.ensureUserAuthorProfileTable();
+    await this.ensureUserCenterMetaTables();
+
+    const now = Math.floor(Date.now() / 1000);
+    const passwordMd5 = md5('123456');
+    const accountRows = [
+      {
+        username: 'uied_test_free',
+        nickname: '测试用户-Free',
+        realName: '测试用户-Free',
+        mobile: '13900001001',
+        userType: 0,
+        authorBio: '',
+      },
+      {
+        username: 'uied_test_pro',
+        nickname: '测试用户-Pro',
+        realName: '测试用户-Pro',
+        mobile: '13900001002',
+        userType: 1,
+        authorBio: '这是用于售卖版联调的 Pro 测试作者账号。',
+      },
+    ];
+
+    const resultRows = [];
+    for (const item of accountRows) {
+      const where = {
+        [Op.or]: [
+          { username: item.username },
+          { mobile: item.mobile },
+        ],
+      };
+      const exists = await ctx.model.User.findOne({
+        where,
+        attributes: [ 'id', 'sn' ],
+      });
+
+      let userId = Number(exists?.id || 0);
+      let action = 'created';
+      if (!userId) {
+        const created = await ctx.model.User.create({
+          sn: 0,
+          avatar: '/api/static/default_avatar.png',
+          realName: item.realName,
+          nickname: item.nickname,
+          username: item.username,
+          password: passwordMd5,
+          mobile: item.mobile,
+          salt: '',
+          sex: 0,
+          channel: 4,
+          isDisable: 0,
+          isDelete: 0,
+          lastLoginIp: '',
+          lastLoginTime: 0,
+          createTime: now,
+          updateTime: now,
+          deleteTime: 0,
+        });
+        userId = Number(created.id || 0);
+      } else {
+        action = 'updated';
+        await ctx.model.User.update({
+          avatar: '/api/static/default_avatar.png',
+          realName: item.realName,
+          nickname: item.nickname,
+          username: item.username,
+          password: passwordMd5,
+          mobile: item.mobile,
+          channel: 4,
+          isDisable: 0,
+          isDelete: 0,
+          deleteTime: 0,
+          updateTime: now,
+        }, {
+          where: { id: userId },
+        });
+      }
+
+      if (Number(exists?.sn || 0) <= 0) {
+        await ctx.model.User.update({
+          sn: userId,
+          updateTime: now,
+        }, {
+          where: { id: userId },
+        });
+      }
+
+      await this.setUserType(userId, item.userType);
+      if (Number(item.userType) === 1) {
+        const profile = await ctx.model.UserAuthorProfile.findOne({
+          where: { user_id: userId },
+          attributes: [ 'id' ],
+        });
+        if (profile) {
+          await ctx.model.UserAuthorProfile.update({
+            display_name: item.nickname,
+            bio: item.authorBio,
+            is_public: 1,
+            is_delete: 0,
+            delete_time: 0,
+            update_time: now,
+          }, {
+            where: { id: Number(profile.id || 0) },
+          });
+        } else {
+          await ctx.model.UserAuthorProfile.create({
+            user_id: userId,
+            display_name: item.nickname,
+            bio: item.authorBio,
+            homepage: '',
+            xiaohongshu: '',
+            weibo: '',
+            is_public: 1,
+            is_delete: 0,
+            create_time: now,
+            update_time: now,
+            delete_time: 0,
+          });
+        }
+      }
+
+      resultRows.push({
+        id: userId,
+        username: item.username,
+        mobile: item.mobile,
+        password: '123456',
+        userType: this.normalizeUserType(item.userType),
+        userTypeName: this.getUserTypeLabel(item.userType),
+        action,
+      });
+    }
+
+    return {
+      total: resultRows.length,
+      lists: resultRows,
+    };
   }
 
   /**

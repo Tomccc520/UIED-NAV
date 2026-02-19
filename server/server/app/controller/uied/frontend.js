@@ -648,6 +648,8 @@ class FrontendController extends Controller {
         cardStyleConfig,
         sidebarConfig,
         searchConfig,
+        articleConfig,
+        articleTopicsConfig,
       ] = await Promise.all([
         ctx.service.uied.setting.get('exitModalConfig'),
         ctx.service.uied.setting.get('pageGlobalConfig'),
@@ -656,6 +658,8 @@ class FrontendController extends Controller {
         ctx.service.uied.setting.get('cardStyleConfig'),
         ctx.service.uied.setting.get('sidebarConfig'),
         ctx.service.uied.setting.get('searchConfig'),
+        ctx.service.uied.setting.get('articleConfig'),
+        ctx.service.uied.setting.get('articleTopicsConfig'),
       ]);
 
       /**
@@ -674,6 +678,8 @@ class FrontendController extends Controller {
         cardStyleConfig: cardStyleConfig || {},
         sidebarConfig: sidebarConfig || {},
         searchConfig: searchConfig || {},
+        articleConfig: ctx.service.uied.setting.normalizeArticleConfig(articleConfig || {}),
+        articleTopicsConfig: ctx.service.uied.setting.normalizeArticleTopicsConfig(articleTopicsConfig || {}),
       };
     } catch (error) {
       ctx.logger.error('获取前端配置失败:', error);
@@ -686,6 +692,8 @@ class FrontendController extends Controller {
         cardStyleConfig: {},
         sidebarConfig: {},
         searchConfig: {},
+        articleConfig: {},
+        articleTopicsConfig: {},
       };
     }
   }

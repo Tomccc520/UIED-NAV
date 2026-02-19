@@ -55,6 +55,10 @@ module.exports = app => {
   router.all('/api/uied/setting/siteInfo', controller.uied.setting.siteInfo);
   router.all('/api/uied/setting/saveSiteInfo', controller.uied.setting.saveSiteInfo);
   router.all('/api/uied/setting/public', controller.uied.setting.publicSettings);
+  router.all('/api/uied/setting/articleConfig', controller.uied.setting.articleConfig);
+  router.all('/api/uied/setting/saveArticleConfig', controller.uied.setting.saveArticleConfig);
+  router.all('/api/uied/setting/articleTopicsConfig', controller.uied.setting.articleTopicsConfig);
+  router.all('/api/uied/setting/saveArticleTopicsConfig', controller.uied.setting.saveArticleTopicsConfig);
 
   // ==================== 许可证中心 ====================
   router.all('/api/uied/license/info', controller.uied.licenseCenter.info);

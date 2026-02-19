@@ -146,6 +146,60 @@ class SettingService extends Service {
   }
 
   /**
+   * 规范化文章模块公开配置（前端官网读取）
+   */
+  normalizeArticleConfig(config = {}) {
+    const defaults = {
+      enabled: true,
+      homeSectionEnabled: true,
+      homeSectionTitle: '设计文章',
+      homeSectionSubtitle: '汇聚优质设计文章，分享前沿设计趋势与实战经验',
+      homeSectionLimit: 12,
+      listPageTitle: '设计专栏',
+      listPageDescription: '汇聚优质设计文章，分享前沿设计趋势、实战技巧与行业洞察',
+      listPageCoverImage: '',
+      commentsEnabled: true,
+      topicsEnabled: true,
+    };
+    const merged = { ...defaults, ...(config || {}) };
+    return {
+      ...merged,
+      enabled: merged.enabled !== false,
+      homeSectionEnabled: merged.homeSectionEnabled !== false,
+      homeSectionLimit: Number.isFinite(Number(merged.homeSectionLimit))
+        ? Math.max(1, Math.min(50, Number(merged.homeSectionLimit)))
+        : defaults.homeSectionLimit,
+      commentsEnabled: merged.commentsEnabled !== false,
+      topicsEnabled: merged.topicsEnabled !== false,
+    };
+  }
+
+  /**
+   * 规范化文章专题配置（按 category/tag 自定义视觉）
+   */
+  normalizeArticleTopicsConfig(config = {}) {
+    if (!config || typeof config !== 'object') {
+      return {};
+    }
+    const result = {};
+    Object.keys(config).forEach(key => {
+      const item = config[key] || {};
+      const topicKey = String(key || '').trim();
+      if (!topicKey) return;
+      result[topicKey] = {
+        id: String(item.id || topicKey),
+        type: String(item.type || 'category') === 'tag' ? 'tag' : 'category',
+        title: String(item.title || ''),
+        description: String(item.description || ''),
+        coverImage: String(item.coverImage || ''),
+        icon: String(item.icon || ''),
+        themeColor: String(item.themeColor || ''),
+      };
+    });
+    return result;
+  }
+
+  /**
    * 获取单个设置
    */
   async get(key) {
@@ -363,6 +417,8 @@ class SettingService extends Service {
     const searchConfig = await this.get('searchConfig');
     const exitModalConfig = await this.get('exitModalConfig');
     const detailPageConfig = await this.get('detailPageConfig');
+    const articleConfig = await this.get('articleConfig');
+    const articleTopicsConfig = await this.get('articleTopicsConfig');
 
     // 默认配置
     const defaultPageGlobal = {
@@ -465,6 +521,19 @@ class SettingService extends Service {
       visitBtnNewWindow: true,
     };
 
+    const defaultArticleConfig = {
+      enabled: true,
+      homeSectionEnabled: true,
+      homeSectionTitle: '设计文章',
+      homeSectionSubtitle: '汇聚优质设计文章，分享前沿设计趋势与实战经验',
+      homeSectionLimit: 12,
+      listPageTitle: '设计专栏',
+      listPageDescription: '汇聚优质设计文章，分享前沿设计趋势、实战技巧与行业洞察',
+      listPageCoverImage: '',
+      commentsEnabled: true,
+      topicsEnabled: true,
+    };
+
     const normalizedPageGlobalConfig = this.normalizePageGlobalConfig(pageGlobalConfig || {});
 
     // 返回完整的配置结构（注意字段名要和前端期望的一致）
@@ -478,6 +547,8 @@ class SettingService extends Service {
       search: searchConfig || defaultSearch,
       exitModal: exitModalConfig || defaultExitModal,
       detailPage: detailPageConfig || defaultDetailPage,
+      article: this.normalizeArticleConfig(articleConfig || defaultArticleConfig),
+      articleTopics: this.normalizeArticleTopicsConfig(articleTopicsConfig || {}),
     };
   }
 

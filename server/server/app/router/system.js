@@ -110,6 +110,22 @@ module.exports = app => {
   router.all('/api/user/list', controller.user.list);
   router.all('/api/user/detail', controller.user.detail);
   router.all('/api/user/edit', controller.user.edit);
+  router.all('/api/user/stats', controller.user.stats);
+  router.all('/api/user/wallet/adjust', controller.user.walletAdjust);
+  router.all('/api/user/group/list', controller.user.groupList);
+  router.all('/api/user/group/add', controller.user.groupAdd);
+  router.all('/api/user/group/edit', controller.user.groupEdit);
+  router.all('/api/user/group/del', controller.user.groupDel);
+  router.all('/api/user/tag/list', controller.user.tagList);
+  router.all('/api/user/tag/add', controller.user.tagAdd);
+  router.all('/api/user/tag/edit', controller.user.tagEdit);
+  router.all('/api/user/tag/del', controller.user.tagDel);
+  router.all('/api/user/tag/bind', controller.user.tagBind);
+  router.all('/api/user/level/list', controller.user.levelList);
+  router.all('/api/user/level/add', controller.user.levelAdd);
+  router.all('/api/user/level/edit', controller.user.levelEdit);
+  router.all('/api/user/level/del', controller.user.levelDel);
+  router.all('/api/user/seed/testUsers', controller.user.seedTestUsers);
   // 前台用户中心（登录/资料）
   router.all('/api/user/register', controller.user.register);
   router.all('/api/user/login', controller.user.login);
