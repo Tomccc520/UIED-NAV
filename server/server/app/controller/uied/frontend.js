@@ -668,10 +668,17 @@ class FrontendController extends Controller {
       const normalizedPageGlobalConfig = ctx.service.uied.setting.normalizePageGlobalConfig(
         pageGlobalConfig || {}
       );
+      /**
+       * 规范化跳转弹窗配置，确保前端能直接读取协议与品牌字段
+       */
+      const normalizedExitModalConfig = ctx.service.uied.setting.normalizeExitModalConfig(
+        exitModalConfig || {}
+      );
 
       ctx.body = {
         exitModalEnabled: true,
-        exitModalConfig: exitModalConfig || {},
+        exitModalConfig: normalizedExitModalConfig,
+        popupConfig: normalizedExitModalConfig,
         pageGlobalConfig: normalizedPageGlobalConfig,
         appearanceConfig: appearanceConfig || {},
         homepageConfig: homepageConfig || {},

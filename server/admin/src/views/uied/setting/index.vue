@@ -1277,6 +1277,96 @@
                         </el-form-item>
                         <el-form-item>
                             <template #label
+                                ><span>弹窗Logo</span
+                                ><el-tooltip
+                                    content="用于弹窗顶部品牌展示，建议使用透明背景 PNG"
+                                    placement="top"
+                                    ><el-icon class="label-tip-icon"
+                                        ><QuestionFilled /></el-icon></el-tooltip
+                            ></template>
+                            <div style="width: 100%">
+                                <el-input
+                                    v-model="exitModalData.logo"
+                                    placeholder="请输入Logo地址或通过素材库选择"
+                                />
+                                <material-picker v-model="exitModalData.logo" :limit="1">
+                                    <el-button style="margin-top: 8px">从素材库选择</el-button>
+                                </material-picker>
+                                <div v-if="exitModalData.logo" style="margin-top: 8px">
+                                    <el-image
+                                        :src="exitModalData.logo"
+                                        style="width: 120px; height: 40px"
+                                        fit="contain"
+                                    />
+                                </div>
+                            </div>
+                        </el-form-item>
+                        <el-divider content-position="left">协议配置</el-divider>
+                        <el-form-item>
+                            <template #label
+                                ><span>显示协议链接</span
+                                ><el-tooltip
+                                    content="开启后，在弹窗底部显示用户协议与版权协议入口"
+                                    placement="top"
+                                    ><el-icon class="label-tip-icon"
+                                        ><QuestionFilled /></el-icon></el-tooltip
+                            ></template>
+                            <el-switch v-model="exitModalData.showAgreementLinks" />
+                        </el-form-item>
+                        <el-form-item>
+                            <template #label
+                                ><span>用户协议标题</span
+                                ><el-tooltip content="弹窗中展示的用户协议文案" placement="top"
+                                    ><el-icon class="label-tip-icon"
+                                        ><QuestionFilled /></el-icon></el-tooltip
+                            ></template>
+                            <el-input
+                                v-model="exitModalData.userAgreementText"
+                                placeholder="用户协议"
+                                :disabled="!exitModalData.showAgreementLinks"
+                            />
+                        </el-form-item>
+                        <el-form-item>
+                            <template #label
+                                ><span>用户协议链接</span
+                                ><el-tooltip content="用户协议页面地址（URL）" placement="top"
+                                    ><el-icon class="label-tip-icon"
+                                        ><QuestionFilled /></el-icon></el-tooltip
+                            ></template>
+                            <el-input
+                                v-model="exitModalData.userAgreementUrl"
+                                placeholder="https://example.com/user-agreement"
+                                :disabled="!exitModalData.showAgreementLinks"
+                            />
+                        </el-form-item>
+                        <el-form-item>
+                            <template #label
+                                ><span>版权协议标题</span
+                                ><el-tooltip content="弹窗中展示的版权协议文案" placement="top"
+                                    ><el-icon class="label-tip-icon"
+                                        ><QuestionFilled /></el-icon></el-tooltip
+                            ></template>
+                            <el-input
+                                v-model="exitModalData.copyrightAgreementText"
+                                placeholder="版权协议"
+                                :disabled="!exitModalData.showAgreementLinks"
+                            />
+                        </el-form-item>
+                        <el-form-item>
+                            <template #label
+                                ><span>版权协议链接</span
+                                ><el-tooltip content="版权协议页面地址（URL）" placement="top"
+                                    ><el-icon class="label-tip-icon"
+                                        ><QuestionFilled /></el-icon></el-tooltip
+                            ></template>
+                            <el-input
+                                v-model="exitModalData.copyrightAgreementUrl"
+                                placeholder="https://example.com/copyright-agreement"
+                                :disabled="!exitModalData.showAgreementLinks"
+                            />
+                        </el-form-item>
+                        <el-form-item>
+                            <template #label
                                 ><span>自动跳转</span
                                 ><el-tooltip
                                     content="开启后，倒计时结束将自动跳转到目标网站"
@@ -1513,12 +1603,38 @@ const searchData = reactive({
 
 // ==================== 跳转提醒 ====================
 const exitModalLoading = ref(false)
-const exitModalData = reactive({
+const defaultExitModalConfig = {
     enabled: true,
     title: '即将离开本站',
     description: '您即将访问外部网站，请注意安全',
     autoRedirect: true,
-    countdown: 5
+    countdown: 5,
+    logo: '',
+    showAgreementLinks: false,
+    userAgreementText: '用户协议',
+    userAgreementUrl: '',
+    copyrightAgreementText: '版权协议',
+    copyrightAgreementUrl: ''
+}
+const exitModalData = reactive({ ...defaultExitModalConfig })
+
+/**
+ * 规范化跳转弹窗配置，确保协议与品牌字段完整
+ */
+const normalizeExitModalConfigData = (config: any) => ({
+    ...defaultExitModalConfig,
+    ...config,
+    enabled: config?.enabled !== false,
+    autoRedirect: config?.autoRedirect !== false,
+    countdown: Number.isFinite(Number(config?.countdown))
+        ? Math.max(1, Math.min(30, Number(config.countdown)))
+        : 5,
+    logo: String(config?.logo || ''),
+    showAgreementLinks: config?.showAgreementLinks === true,
+    userAgreementText: String(config?.userAgreementText || '用户协议'),
+    userAgreementUrl: String(config?.userAgreementUrl || ''),
+    copyrightAgreementText: String(config?.copyrightAgreementText || '版权协议'),
+    copyrightAgreementUrl: String(config?.copyrightAgreementUrl || '')
 })
 
 // ==================== 快照与比对 ====================
@@ -1638,7 +1754,8 @@ const applyPublicSettings = (settings: Record<string, any>) => {
     if (settings.cardStyle) Object.assign(cardStyleData, settings.cardStyle)
     if (settings.sidebar) Object.assign(sidebarData, settings.sidebar)
     if (settings.search) Object.assign(searchData, settings.search)
-    if (settings.exitModal) Object.assign(exitModalData, settings.exitModal)
+    if (settings.exitModal || settings.popup)
+        Object.assign(exitModalData, normalizeExitModalConfigData(settings.exitModal || settings.popup))
 }
 
 /**
@@ -1729,7 +1846,7 @@ const loadSearch = async () => {
 const loadExitModal = async () => {
     try {
         const res = await uiedSettingGet({ key: 'exitModalConfig' })
-        if (res) Object.assign(exitModalData, res)
+        if (res) Object.assign(exitModalData, normalizeExitModalConfigData(res))
     } catch (e) {
         console.error('加载跳转提醒配置失败', e)
     }

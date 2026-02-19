@@ -146,6 +146,40 @@ class SettingService extends Service {
   }
 
   /**
+   * 规范化跳转弹窗配置，确保商业版协议文案可后台配置
+   */
+  normalizeExitModalConfig(config = {}) {
+    const defaults = {
+      enabled: true,
+      title: '即将离开本站',
+      description: '您即将访问外部网站，请注意安全',
+      autoRedirect: true,
+      countdown: 5,
+      logo: '',
+      showAgreementLinks: false,
+      userAgreementText: '用户协议',
+      userAgreementUrl: '',
+      copyrightAgreementText: '版权协议',
+      copyrightAgreementUrl: '',
+    };
+    const merged = { ...defaults, ...(config || {}) };
+    return {
+      ...merged,
+      enabled: merged.enabled !== false,
+      autoRedirect: merged.autoRedirect !== false,
+      countdown: Number.isFinite(Number(merged.countdown))
+        ? Math.max(1, Math.min(30, Number(merged.countdown)))
+        : defaults.countdown,
+      logo: String(merged.logo || ''),
+      showAgreementLinks: merged.showAgreementLinks === true,
+      userAgreementText: String(merged.userAgreementText || defaults.userAgreementText),
+      userAgreementUrl: String(merged.userAgreementUrl || ''),
+      copyrightAgreementText: String(merged.copyrightAgreementText || defaults.copyrightAgreementText),
+      copyrightAgreementUrl: String(merged.copyrightAgreementUrl || ''),
+    };
+  }
+
+  /**
    * 规范化文章模块公开配置（前端官网读取）
    */
   normalizeArticleConfig(config = {}) {
@@ -254,6 +288,8 @@ class SettingService extends Service {
         ? this.normalizePageGlobalConfig(rawValue)
         : key === 'homepageConfig' && rawValue && typeof rawValue === 'object'
           ? this.normalizeHomepageConfig(rawValue)
+          : key === 'exitModalConfig' && rawValue && typeof rawValue === 'object'
+            ? this.normalizeExitModalConfig(rawValue)
           : rawValue;
       const valueStr = typeof value === 'object' ? JSON.stringify(value) : String(value);
 
@@ -497,6 +533,12 @@ class SettingService extends Service {
       description: '您即将访问外部网站，请注意安全',
       autoRedirect: true,
       countdown: 5,
+      logo: '',
+      showAgreementLinks: false,
+      userAgreementText: '用户协议',
+      userAgreementUrl: '',
+      copyrightAgreementText: '版权协议',
+      copyrightAgreementUrl: '',
     };
 
     const defaultDetailPage = {
@@ -535,6 +577,7 @@ class SettingService extends Service {
     };
 
     const normalizedPageGlobalConfig = this.normalizePageGlobalConfig(pageGlobalConfig || {});
+    const normalizedExitModalConfig = this.normalizeExitModalConfig(exitModalConfig || defaultExitModal);
 
     // 返回完整的配置结构（注意字段名要和前端期望的一致）
     return {
@@ -545,7 +588,8 @@ class SettingService extends Service {
       cardStyle: cardStyleConfig || defaultCardStyle,
       sidebar: sidebarConfig || defaultSidebar,
       search: searchConfig || defaultSearch,
-      exitModal: exitModalConfig || defaultExitModal,
+      exitModal: normalizedExitModalConfig,
+      popup: normalizedExitModalConfig,
       detailPage: detailPageConfig || defaultDetailPage,
       article: this.normalizeArticleConfig(articleConfig || defaultArticleConfig),
       articleTopics: this.normalizeArticleTopicsConfig(articleTopicsConfig || {}),

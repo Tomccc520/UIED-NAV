@@ -1,5 +1,12 @@
 <template>
     <div>
+        <el-alert
+            type="info"
+            :closable="false"
+            show-icon
+            class="mb-4"
+            title="这里是站点终端用户列表（用于前台登录/会员等级），不是系统管理员列表。"
+        />
         <el-card class="!border-none" shadow="never">
             <el-form ref="formRef" class="mb-[-16px]" :model="queryParams" :inline="true">
                 <el-form-item label="用户信息">
@@ -30,6 +37,13 @@
                 <el-form-item>
                     <el-button type="primary" @click="resetPage">查询</el-button>
                     <el-button @click="resetParams">重置</el-button>
+                    <el-button
+                        v-perms="['user:seed:testUsers']"
+                        :loading="seedLoading"
+                        @click="handleSeedTestUsers"
+                    >
+                        初始化测试用户
+                    </el-button>
                 </el-form-item>
             </el-form>
         </el-card>
@@ -44,8 +58,14 @@
                 <el-table-column label="昵称" prop="nickname" min-width="100" />
                 <el-table-column label="账号" prop="username" min-width="120" />
                 <el-table-column label="手机号码" prop="mobile" min-width="100" />
+                <el-table-column label="用户类型" prop="userTypeName" min-width="110" />
+                <el-table-column label="用户等级" prop="levelName" min-width="110" />
                 <el-table-column label="性别" prop="sex" min-width="100" />
-                <el-table-column label="注册来源" prop="channel" min-width="100" />
+                <el-table-column label="注册来源" min-width="100">
+                    <template #default="{ row }">
+                        {{ getChannelLabel(row.channel) }}
+                    </template>
+                </el-table-column>
                 <el-table-column label="注册时间" prop="createTime" min-width="120" />
                 <el-table-column label="操作" width="120" fixed="right">
                     <template #default="{ row }">
@@ -73,19 +93,47 @@
 <script lang="ts" setup name="consumerLists">
 import { usePaging } from '@/hooks/usePaging'
 import { getRoutePath } from '@/router'
-import { getUserList } from '@/api/consumer'
+import { getUserList, seedUserTestUsers } from '@/api/consumer'
 import { ClientMap } from '@/enums/appEnums'
+import feedback from '@/utils/feedback'
 const queryParams = reactive({
     keyword: '',
     channel: '',
     startTime: '',
-    endTime: ''
+    endTime: '',
+    autoSeed: 1
 })
+const seedLoading = ref(false)
 
 const { pager, getLists, resetPage, resetParams } = usePaging({
     fetchFun: getUserList,
     params: queryParams
 })
+
+/**
+ * 初始化测试用户并刷新列表
+ */
+const handleSeedTestUsers = async () => {
+    seedLoading.value = true
+    try {
+        const res = await seedUserTestUsers()
+        const rows = Array.isArray(res?.lists) ? res.lists : []
+        const createdCount = rows.filter((item: any) => item?.action === 'created').length
+        const updatedCount = rows.filter((item: any) => item?.action === 'updated').length
+        feedback.msgSuccess(`初始化完成：新增 ${createdCount} 条，更新 ${updatedCount} 条`)
+        await getLists()
+    } finally {
+        seedLoading.value = false
+    }
+}
+
+/**
+ * 获取注册来源文案
+ */
+const getChannelLabel = (channel: any) => {
+    const key = Number(channel) as keyof typeof ClientMap
+    return ClientMap[key] || channel || '-'
+}
 onActivated(() => {
     getLists()
 })

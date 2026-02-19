@@ -2966,6 +2966,22 @@ class UserService extends Service {
     const passwordMd5 = md5('123456');
     const accountRows = [
       {
+        username: 'uied_test_buyer',
+        nickname: '测试用户-买家',
+        realName: '测试用户-买家',
+        mobile: '13900000001',
+        userType: 0,
+        authorBio: '',
+      },
+      {
+        username: 'uied_test_author',
+        nickname: '测试用户-作者',
+        realName: '测试用户-作者',
+        mobile: '13900000002',
+        userType: 1,
+        authorBio: '这是用于投稿与作者中心联调的测试作者账号。',
+      },
+      {
         username: 'uied_test_free',
         nickname: '测试用户-Free',
         realName: '测试用户-Free',
@@ -3117,7 +3133,12 @@ class UserService extends Service {
       userType,
       startTime,
       endTime,
+      autoSeed,
     } = params;
+    /**
+     * 自动补齐测试用户开关（仅在无筛选且列表为空时触发一次）
+     */
+    const autoSeedEnabled = [ '1', 'true', 'yes', 'on' ].includes(String(autoSeed || '').trim().toLowerCase());
 
     const where = {
       isDelete: 0,
@@ -3263,6 +3284,25 @@ class UserService extends Service {
       order: [[ 'id', 'DESC' ]],
       attributes: { exclude: [ 'password', 'salt' ] },
     });
+    /**
+     * 新环境兜底：用户列表为空时按需自动补齐测试账号，避免“列表空白”影响联调
+     */
+    const hasFilter = [
+      keyword,
+      email,
+      channel,
+      status,
+      vipLevel,
+      groupId,
+      tagId,
+      userType,
+      startTime,
+      endTime,
+    ].some(item => item !== undefined && item !== null && item !== '');
+    if (count === 0 && autoSeedEnabled && !hasFilter) {
+      await this.seedTestUsers();
+      return this.list({ ...params, autoSeed: 0 });
+    }
 
     const userIds = rows.map(item => item.id);
     const groupIds = userColumns.groupId

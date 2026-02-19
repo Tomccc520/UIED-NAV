@@ -185,6 +185,16 @@ export function uiedPublicSettings() {
     return request.get({ url: '/uied/setting/public' })
 }
 
+// 交付初始化预览（不落库）
+export function uiedDeliveryInitPreview(params?: any) {
+    return request.get({ url: '/uied/delivery/init/preview', params })
+}
+
+// 执行交付初始化导入
+export function uiedDeliveryInitExecute(params: any) {
+    return request.post({ url: '/uied/delivery/init/execute', params })
+}
+
 // 获取许可证信息
 export function uiedLicenseInfo() {
     return request.get({ url: '/uied/license/info' })

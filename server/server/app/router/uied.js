@@ -60,6 +60,10 @@ module.exports = app => {
   router.all('/api/uied/setting/articleTopicsConfig', controller.uied.setting.articleTopicsConfig);
   router.all('/api/uied/setting/saveArticleTopicsConfig', controller.uied.setting.saveArticleTopicsConfig);
 
+  // ==================== 交付初始化向导 ====================
+  router.all('/api/uied/delivery/init/preview', controller.uied.deliveryInit.preview);
+  router.all('/api/uied/delivery/init/execute', controller.uied.deliveryInit.execute);
+
   // ==================== 许可证中心 ====================
   router.all('/api/uied/license/info', controller.uied.licenseCenter.info);
   router.all('/api/uied/license/save', controller.uied.licenseCenter.save);

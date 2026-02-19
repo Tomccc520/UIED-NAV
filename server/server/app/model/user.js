@@ -1,5 +1,8 @@
 'use strict';
 
+/**
+ * 用户模型定义（映射 la_user 下划线字段到业务驼峰字段）
+ */
 module.exports = app => {
   const { STRING, INTEGER, SMALLINT } = app.Sequelize;
 
@@ -28,6 +31,7 @@ module.exports = app => {
       collation: 'utf8mb4_general_ci',
       allowNull: false,
       defaultValue: '',
+      field: 'real_name',
     },
     nickname: {
       type: STRING(32),
@@ -81,12 +85,14 @@ module.exports = app => {
       unsigned: true,
       allowNull: false,
       defaultValue: 0,
+      field: 'is_disable',
     },
     isDelete: {
       type: SMALLINT,
       unsigned: true,
       allowNull: false,
       defaultValue: 0,
+      field: 'is_delete',
     },
     lastLoginIp: {
       type: STRING(30),
@@ -94,32 +100,38 @@ module.exports = app => {
       collation: 'utf8mb4_general_ci',
       allowNull: false,
       defaultValue: '',
+      field: 'last_login_ip',
     },
     lastLoginTime: {
       type: INTEGER.UNSIGNED,
       allowNull: false,
       defaultValue: 0,
+      field: 'last_login_time',
     },
     createTime: {
       type: INTEGER.UNSIGNED,
       allowNull: false,
       defaultValue: 0,
+      field: 'create_time',
     },
     updateTime: {
       type: INTEGER.UNSIGNED,
       allowNull: false,
       defaultValue: 0,
+      field: 'update_time',
     },
     deleteTime: {
       type: INTEGER.UNSIGNED,
       allowNull: false,
       defaultValue: 0,
+      field: 'delete_time',
     },
   };
   const User = app.model.define('User', modelDefinition, {
+    createdAt: false,
+    updatedAt: false,
     tableName: 'la_user', // 定义实际表名
   });
 
   return User;
 };
-

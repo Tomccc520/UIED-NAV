@@ -244,6 +244,9 @@ module.exports = options => {
       'uied:setting:articleTopicsConfig': [ 'uied:setting:get' ],
       'uied:setting:saveArticleConfig': [ 'uied:setting:save' ],
       'uied:setting:saveArticleTopicsConfig': [ 'uied:setting:save' ],
+      // 商业版：交付初始化向导复用站点设置权限
+      'uied:delivery:init:preview': [ 'uied:setting:get' ],
+      'uied:delivery:init:execute': [ 'uied:setting:save' ],
     };
     if (perms.some(item => item && (auths === item || auths.startsWith(item + ':')))) {
       return true;
