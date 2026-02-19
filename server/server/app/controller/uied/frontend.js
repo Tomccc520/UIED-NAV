@@ -1008,6 +1008,20 @@ class FrontendController extends Controller {
   }
 
   /**
+   * 判断是否为可降级的库结构兼容错误
+   */
+  isSchemaCompatibilityError(error) {
+    const code = String(error?.original?.code || error?.code || '').toUpperCase();
+    const message = String(error?.message || '');
+    return code === 'ER_NO_SUCH_TABLE'
+      || code === 'ER_BAD_FIELD_ERROR'
+      || code === 'ER_CANT_AGGREGATE_2COLLATIONS'
+      || message.includes('doesn\'t exist')
+      || message.includes('Unknown column')
+      || message.includes('Illegal mix of collations');
+  }
+
+  /**
    * 将时间值转换为毫秒时间戳
    */
   toTimestampMs(value) {
@@ -1052,23 +1066,13 @@ class FrontendController extends Controller {
       ? tagIds.map(id => this.parsePositiveInt(id, 0)).filter(Boolean)
       : [];
     if (!ids.length) return new Map();
-    try {
+
+    /**
+     * 统一执行标签计数 SQL，并转换为 Map 结果
+     */
+    const runCountQuery = async sql => {
       const rows = await ctx.model.query(
-        `
-        SELECT r.tag_id AS tagId, COUNT(DISTINCT r.article_id) AS total
-        FROM la_article_tag_rel r
-        INNER JOIN la_article a
-          ON a.id = r.article_id
-         AND a.is_delete = 0
-         AND a.is_show = 1
-        INNER JOIN la_article_tag t
-          ON t.id = r.tag_id
-         AND t.is_delete = 0
-         AND t.is_show = 1
-        WHERE r.is_delete = 0
-          AND r.tag_id IN (?)
-        GROUP BY r.tag_id
-        `,
+        sql,
         {
           replacements: [ ids ],
           type: ctx.model.QueryTypes.SELECT,
@@ -1078,9 +1082,55 @@ class FrontendController extends Controller {
         this.parsePositiveInt(item.tagId, 0),
         this.parsePositiveInt(item.total, 0),
       ]));
+    };
+
+    try {
+      return await runCountQuery(
+        `
+        SELECT r.tag_id AS tagId, COUNT(DISTINCT r.article_id) AS total
+        FROM uied_article_tag_relation r
+        INNER JOIN uied_article a
+          ON a.id = r.article_id
+         AND a.is_delete = 0
+         AND a.status = 'published'
+        INNER JOIN uied_article_tag t
+          ON t.id = r.tag_id
+         AND t.is_delete = 0
+        WHERE 1 = 1
+          AND r.tag_id IN (?)
+        GROUP BY r.tag_id
+        `
+      );
     } catch (error) {
-      ctx.logger.warn(`FrontendController.getPublicTagCountMap fallback empty: ${error.message || error}`);
-      return new Map();
+      /**
+       * 兼容旧表结构（la_article*），避免历史环境直接报错
+       */
+      if (!this.isSchemaCompatibilityError(error)) {
+        ctx.logger.warn(`FrontendController.getPublicTagCountMap fallback empty: ${error.message || error}`);
+        return new Map();
+      }
+      try {
+        return await runCountQuery(
+          `
+          SELECT r.tag_id AS tagId, COUNT(DISTINCT r.article_id) AS total
+          FROM la_article_tag_rel r
+          INNER JOIN la_article a
+            ON a.id = r.article_id
+           AND a.is_delete = 0
+           AND a.is_show = 1
+          INNER JOIN la_article_tag t
+            ON t.id = r.tag_id
+           AND t.is_delete = 0
+           AND t.is_show = 1
+          WHERE r.is_delete = 0
+            AND r.tag_id IN (?)
+          GROUP BY r.tag_id
+          `
+        );
+      } catch (legacyError) {
+        ctx.logger.warn(`FrontendController.getPublicTagCountMap fallback empty: ${legacyError.message || legacyError}`);
+        return new Map();
+      }
     }
   }
 
@@ -1105,13 +1155,29 @@ class FrontendController extends Controller {
    */
   formatArticleListItem(item, { categoryMap = new Map(), tagMetaByName = new Map() } = {}) {
     const id = this.parsePositiveInt(item?.id, 0);
+    const categoryId = this.parsePositiveInt(item?.categoryId ?? item?.category_id ?? item?.cid, 0);
     const categoryName = String(item?.category || '').trim()
-      || String(categoryMap.get(this.parsePositiveInt(item?.cid, 0)) || '').trim()
+      || String(categoryMap.get(categoryId) || '').trim()
       || '未分类';
-    const rawTagNames = Array.isArray(item?.tags) ? item.tags : [];
-    const tags = rawTagNames
-      .map(tagName => {
-        const name = String(tagName || '').trim();
+    const rawTags = Array.isArray(item?.tags) ? item.tags : [];
+    const tags = rawTags
+      .map(tagItem => {
+        /**
+         * 兼容标签对象数组（新接口）与字符串数组（旧接口）
+         */
+        if (tagItem && typeof tagItem === 'object') {
+          const rawName = String(tagItem.name || '').trim();
+          const tagMeta = tagMetaByName.get(rawName);
+          const name = rawName || String(tagMeta?.name || '').trim();
+          if (!name) return null;
+          return {
+            id: this.parsePositiveInt(tagItem.id ?? tagMeta?.id, 0),
+            name,
+            slug: String(tagItem.slug || tagMeta?.slug || name),
+            color: String(tagItem.color || ''),
+          };
+        }
+        const name = String(tagItem || '').trim();
         if (!name) return null;
         const tagMeta = tagMetaByName.get(name);
         return {
@@ -1126,15 +1192,15 @@ class FrontendController extends Controller {
     return {
       id,
       title: String(item?.title || ''),
-      excerpt: String(item?.summary || item?.intro || ''),
-      coverImage: String(item?.image || ''),
+      excerpt: String(item?.excerpt || item?.summary || item?.intro || ''),
+      coverImage: String(item?.coverImage || item?.cover_image || item?.image || ''),
       author: String(item?.author || ''),
       category: categoryName,
-      slug: this.buildArticleSlug(id),
-      viewCount: this.parsePositiveInt(item?.visit, 0),
-      publishedAt: this.toTimestampMs(item?.reviewTime || item?.createTime),
-      createdAt: this.toTimestampMs(item?.createTime),
-      updatedAt: this.toTimestampMs(item?.updateTime),
+      slug: String(item?.slug || this.buildArticleSlug(id)),
+      viewCount: this.parsePositiveInt(item?.viewCount ?? item?.visit, 0),
+      publishedAt: this.toTimestampMs(item?.publishedAt ?? item?.reviewTime ?? item?.createTime),
+      createdAt: this.toTimestampMs(item?.createdAt ?? item?.createTime),
+      updatedAt: this.toTimestampMs(item?.updatedAt ?? item?.updateTime),
       tags,
     };
   }
@@ -1144,36 +1210,39 @@ class FrontendController extends Controller {
    */
   formatArticleDetailItem(item, { categoryMap = new Map(), tagMetaById = new Map() } = {}) {
     const id = this.parsePositiveInt(item?.id, 0);
-    const categoryName = String(categoryMap.get(this.parsePositiveInt(item?.cid, 0)) || '').trim() || '未分类';
+    const categoryId = this.parsePositiveInt(item?.categoryId ?? item?.category_id ?? item?.cid, 0);
+    const categoryName = String(item?.category || '').trim()
+      || String(categoryMap.get(categoryId) || '').trim()
+      || '未分类';
     const rawTags = Array.isArray(item?.tags) ? item.tags : [];
     const tags = rawTags.map(tag => {
-      const tagId = this.parsePositiveInt(tag?.id, 0);
+      const tagId = this.parsePositiveInt(tag?.id ?? tag?.tagId, 0);
       const meta = tagMetaById.get(tagId);
       return {
         id: tagId,
         name: String(tag?.name || meta?.name || ''),
-        slug: String(meta?.slug || tagId || ''),
-        color: '',
+        slug: String(tag?.slug || meta?.slug || tagId || ''),
+        color: String(tag?.color || ''),
       };
     }).filter(tag => tag.id > 0 && tag.name);
 
-    const excerpt = String(item?.summary || item?.intro || '').trim();
+    const excerpt = String(item?.excerpt || item?.summary || item?.intro || '').trim();
     return {
       id,
       title: String(item?.title || ''),
       content: String(item?.content || ''),
       excerpt,
-      coverImage: String(item?.image || ''),
+      coverImage: String(item?.coverImage || item?.cover_image || item?.image || ''),
       author: String(item?.author || ''),
       category: categoryName,
-      slug: this.buildArticleSlug(id),
-      status: Number(item?.isShow || 0) === 1 ? 'published' : 'draft',
-      viewCount: this.parsePositiveInt(item?.visit, 0),
-      seoTitle: String(item?.title || ''),
-      seoDescription: excerpt,
-      publishedAt: this.toTimestampMs(item?.reviewTime),
-      createdAt: this.toTimestampMs(item?.createTime),
-      updatedAt: this.toTimestampMs(item?.updateTime),
+      slug: String(item?.slug || this.buildArticleSlug(id)),
+      status: String(item?.status || '').trim() || (Number(item?.isShow || 0) === 1 ? 'published' : 'draft'),
+      viewCount: this.parsePositiveInt(item?.viewCount ?? item?.visit, 0),
+      seoTitle: String(item?.seoTitle || item?.title || ''),
+      seoDescription: String(item?.seoDescription || excerpt),
+      publishedAt: this.toTimestampMs(item?.publishedAt ?? item?.reviewTime),
+      createdAt: this.toTimestampMs(item?.createdAt ?? item?.createTime),
+      updatedAt: this.toTimestampMs(item?.updatedAt ?? item?.updateTime),
       tags,
     };
   }
@@ -1322,20 +1391,22 @@ class FrontendController extends Controller {
 
     try {
       const articleId = this.resolveArticleIdBySlug(slug);
-      if (!articleId) {
-        ctx.status = 404;
-        ctx.body = { error: '文章不存在' };
-        return;
-      }
       let article = null;
-      try {
-        article = await ctx.service.uied.article.detail(articleId);
-      } catch (error) {
-        if (String(error?.message || '').includes('文章不存在')) {
-          article = null;
-        } else {
-          throw error;
+      /**
+       * 优先按 ID 解析，若不是数字 slug 则回退按真实 slug 查询
+       */
+      if (articleId > 0) {
+        try {
+          article = await ctx.service.uied.article.detail(articleId);
+        } catch (error) {
+          if (String(error?.message || '').includes('文章不存在')) {
+            article = null;
+          } else {
+            throw error;
+          }
         }
+      } else {
+        article = await ctx.service.uied.article.detailBySlug(String(slug || '').trim());
       }
       if (!article) {
         ctx.status = 404;

@@ -13,6 +13,18 @@
 const Service = require('egg').Service;
 
 class WordpressConfigService extends Service {
+  /**
+   * 判断是否为可降级的库结构兼容错误
+   */
+  isSchemaCompatibilityError(error) {
+    const code = String(error?.original?.code || error?.code || '').toUpperCase();
+    const message = String(error?.message || '');
+    return code === 'ER_NO_SUCH_TABLE'
+      || code === 'ER_BAD_FIELD_ERROR'
+      || message.includes('doesn\'t exist')
+      || message.includes('Unknown column');
+  }
+
   // ==================== WordPress 配置 ====================
 
   /**
@@ -162,10 +174,19 @@ class WordpressConfigService extends Service {
       replacements.push(pageSlug);
     }
 
-    const categories = await app.model.query(
-      `SELECT * FROM uied_wordpress_category WHERE ${whereClause} ORDER BY sort ASC, create_time DESC`,
-      { replacements, type: app.Sequelize.QueryTypes.SELECT }
-    );
+    let categories = [];
+    try {
+      categories = await app.model.query(
+        `SELECT * FROM uied_wordpress_category WHERE ${whereClause} ORDER BY sort ASC, create_time DESC`,
+        { replacements, type: app.Sequelize.QueryTypes.SELECT }
+      );
+    } catch (error) {
+      if (!this.isSchemaCompatibilityError(error)) {
+        throw error;
+      }
+      this.ctx.logger.warn('[wordpressConfig] listCategories 降级为空数组:', error.message);
+      return [];
+    }
 
     return categories.map(c => ({
       id: c.id,

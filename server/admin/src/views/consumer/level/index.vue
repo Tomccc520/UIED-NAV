@@ -14,6 +14,12 @@
                     <el-button type="primary" @click="handleAdd">新增等级</el-button>
                 </div>
             </div>
+            <el-alert
+                title="说明：这里是站点终端用户等级（用于会员权益/功能开关），不是源码购买者账号管理。"
+                type="info"
+                :closable="false"
+                class="mt-4"
+            />
         </el-card>
 
         <el-card class="!border-none mt-4" shadow="never">
