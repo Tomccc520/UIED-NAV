@@ -55,6 +55,13 @@ module.exports = app => {
   router.all('/api/uied/setting/siteInfo', controller.uied.setting.siteInfo);
   router.all('/api/uied/setting/saveSiteInfo', controller.uied.setting.saveSiteInfo);
   router.all('/api/uied/setting/public', controller.uied.setting.publicSettings);
+
+  // ==================== 许可证中心 ====================
+  router.all('/api/uied/license/info', controller.uied.licenseCenter.info);
+  router.all('/api/uied/license/save', controller.uied.licenseCenter.save);
+  router.all('/api/uied/feature/list', controller.uied.licenseCenter.featureList);
+  router.all('/api/uied/feature/check', controller.uied.licenseCenter.featureCheck);
+  router.all('/api/uied/feature/save', controller.uied.licenseCenter.saveFeature);
   
   // ==================== 导航菜单 ====================
   router.all('/api/uied/navMenu/list', controller.uied.navMenu.list);
