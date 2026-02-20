@@ -128,6 +128,24 @@ node scripts/commercial-preflight-check.js \
 
 ---
 
+### 5. commercial-release-check.sh
+**功能**：商业版发布 SOP 一键检查入口（调用 preflight 脚本）
+
+**使用方法**：
+```bash
+./scripts/commercial-release-check.sh
+```
+
+**说明**：
+- 该脚本会执行 `scripts/commercial-preflight-check.js`
+- 可透传参数，例如：
+
+```bash
+./scripts/commercial-release-check.sh --base-url http://127.0.0.1:8002
+```
+
+---
+
 ## 🔧 脚本开发规范
 
 ### 文件命名

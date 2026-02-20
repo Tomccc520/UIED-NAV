@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-20T06:53:26.877Z",
+  "generatedAt": "2026-02-20T14:08:58.965Z",
   "rows": [
     {
       "status": "pass",
@@ -55,6 +55,20 @@
       "category": "接口",
       "item": "/api/settings/nav-menus",
       "detail": "HTTP 200",
+      "suggestion": ""
+    },
+    {
+      "status": "pass",
+      "category": "路由",
+      "item": "method+path 重复定义",
+      "detail": "未发现重复定义（扫描 444 条路由）",
+      "suggestion": ""
+    },
+    {
+      "status": "pass",
+      "category": "路由",
+      "item": "兼容别名路由",
+      "detail": "检测到 9 条非 /api 前缀兼容路由（用于历史前端平滑迁移）",
       "suggestion": ""
     },
     {

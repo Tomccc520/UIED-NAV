@@ -38,4 +38,12 @@ SET component = 'uied/articleConfig/index',
     update_time = UNIX_TIMESTAMP()
 WHERE id = 890;
 
+-- 交付初始化 -> 独立页面
+UPDATE la_system_auth_menu
+SET component = 'uied/deliveryInit/index',
+    selected = '/uied/delivery-init',
+    params = '',
+    update_time = UNIX_TIMESTAMP()
+WHERE id = 894;
+
 COMMIT;

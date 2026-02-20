@@ -16,6 +16,11 @@ const ROOT_DIR = path.resolve(__dirname, '..');
 const DEFAULT_BASE_URL = process.env.PREFLIGHT_BASE_URL || 'http://127.0.0.1:8002';
 const REPORT_DIR = path.join(ROOT_DIR, 'docs', 'API', 'reports');
 const REPORT_FILE = path.join(REPORT_DIR, 'commercial_preflight_latest.json');
+const ROUTER_FILES = [
+  path.join(ROOT_DIR, 'server', 'server', 'app', 'router', 'frontend.js'),
+  path.join(ROOT_DIR, 'server', 'server', 'app', 'router', 'uied.js'),
+  path.join(ROOT_DIR, 'server', 'server', 'app', 'router', 'system.js'),
+];
 
 /**
  * 解析命令行参数
@@ -266,6 +271,62 @@ function writeJsonReport(rows) {
 }
 
 /**
+ * 规范化路由方法名
+ */
+function normalizeHttpMethod(method = '') {
+  const text = String(method || '').trim().toLowerCase();
+  if (text === 'del') return 'delete';
+  return text;
+}
+
+/**
+ * 解析单个路由文件中的路由定义
+ */
+function parseRoutesFromFile(filePath) {
+  const relPath = path.relative(ROOT_DIR, filePath);
+  if (!fs.existsSync(filePath)) return [];
+  const content = fs.readFileSync(filePath, 'utf8');
+  const lines = content.split('\n');
+  const routeReg = /(?:router\.)?(get|post|put|patch|delete|del|all)\s*\(\s*['"`]([^'"`]+)['"`]/g;
+  const routes = [];
+  lines.forEach((line, index) => {
+    let match = routeReg.exec(line);
+    while (match) {
+      routes.push({
+        method: normalizeHttpMethod(match[1]),
+        path: String(match[2] || '').trim(),
+        source: `${relPath}:${index + 1}`,
+      });
+      match = routeReg.exec(line);
+    }
+    routeReg.lastIndex = 0;
+  });
+  return routes;
+}
+
+/**
+ * 扫描核心路由文件，检查 method+path 重复定义
+ */
+function scanRouteDuplicates() {
+  const allRoutes = ROUTER_FILES.flatMap(filePath => parseRoutesFromFile(filePath));
+  const routeMap = new Map();
+  allRoutes.forEach(item => {
+    const key = `${item.method} ${item.path}`;
+    if (!routeMap.has(key)) routeMap.set(key, []);
+    routeMap.get(key).push(item.source);
+  });
+  const duplicates = Array.from(routeMap.entries())
+    .filter(([, sources ]) => sources.length > 1)
+    .map(([ key, sources ]) => ({ key, sources }));
+  const compatibilityAliasCount = allRoutes.filter(item => item.path && !item.path.startsWith('/api/')).length;
+  return {
+    total: allRoutes.length,
+    duplicates,
+    compatibilityAliasCount,
+  };
+}
+
+/**
  * 脚本主流程
  */
 async function main() {
@@ -322,6 +383,39 @@ async function main() {
     }
   }
 
+  // 1.5) 路由重复检查
+  try {
+    const routeScan = scanRouteDuplicates();
+    if (routeScan.duplicates.length > 0) {
+      const detail = routeScan.duplicates
+        .slice(0, 5)
+        .map(item => `${item.key} -> ${item.sources.join(', ')}`)
+        .join(' | ');
+      reporter.add(
+        'fail',
+        '路由',
+        'method+path 重复定义',
+        `发现 ${routeScan.duplicates.length} 组重复，示例：${detail}`,
+        '合并重复路由，避免权限或中间件行为不一致。'
+      );
+    } else {
+      reporter.add('pass', '路由', 'method+path 重复定义', `未发现重复定义（扫描 ${routeScan.total} 条路由）`);
+    }
+
+    if (routeScan.compatibilityAliasCount > 0) {
+      reporter.add(
+        'pass',
+        '路由',
+        '兼容别名路由',
+        `检测到 ${routeScan.compatibilityAliasCount} 条非 /api 前缀兼容路由（用于历史前端平滑迁移）`
+      );
+    } else {
+      reporter.add('warn', '路由', '兼容别名路由', '未检测到兼容别名路由', '若仍需兼容旧前端，请确认别名路由是否被误删。');
+    }
+  } catch (error) {
+    reporter.add('fail', '路由', '重复定义检查', String(error.message || error), '检查 router 文件是否可访问。');
+  }
+
   // 2) 菜单检查
   if (mysql) {
     try {
@@ -332,6 +426,9 @@ async function main() {
         'user:level:list',
         'uied:license:info',
         'uied:feature:list',
+        'uied:delivery:init:index',
+        'uied:delivery:init:preview',
+        'uied:delivery:init:execute',
       ];
       const rowsText = queryMysql(
         `SELECT id,pid,menu_type,paths,component,selected,is_show,perms
