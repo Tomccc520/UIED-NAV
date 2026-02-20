@@ -871,6 +871,114 @@ class DeliveryInitService extends Service {
   }
 
   /**
+   * 按软删除规则查询指定表
+   */
+  async selectRowsWithSoftDelete(tableName, { orderBy = 'id ASC', includeDeleted = false } = {}) {
+    const columns = await this.getTableColumns(tableName);
+    let whereClause = '1=1';
+    if (!includeDeleted && columns.has('is_delete')) {
+      whereClause = 'is_delete = 0';
+    }
+    return this.app.model.query(
+      `SELECT * FROM \`${tableName}\`
+       WHERE ${whereClause}
+       ORDER BY ${orderBy}`,
+      { type: this.app.Sequelize.QueryTypes.SELECT }
+    );
+  }
+
+  /**
+   * 导出客户交付包（站点配置 + 分类标签 + license + feature）
+   */
+  async exportCustomerPackage(input = {}) {
+    const options = {
+      includeWebsiteData: this.parseBoolean(input.includeWebsiteData, false),
+      includeArticleData: this.parseBoolean(input.includeArticleData, false),
+    };
+    const settingKeys = [
+      'homepageConfig',
+      'pageGlobalConfig',
+      'searchConfig',
+      'appearanceConfig',
+      'cardStyleConfig',
+      'sidebarConfig',
+      'exitModalConfig',
+      'detailPageConfig',
+      'articleConfig',
+      'articleTopicsConfig',
+    ];
+    const settings = {};
+    for (const key of settingKeys) {
+      settings[key] = await this.ctx.service.uied.setting.get(key);
+    }
+    const siteInfo = await this.ctx.service.uied.setting.getSiteInfo();
+    const websiteCategories = await this.selectRowsWithSoftDelete('uied_category', { orderBy: 'id ASC' });
+    const websiteTags = await this.selectRowsWithSoftDelete('uied_website_tag', { orderBy: 'id ASC' });
+    const articleCategories = await this.selectRowsWithSoftDelete('uied_article_category', { orderBy: 'id ASC' });
+    const articleTags = await this.selectRowsWithSoftDelete('uied_article_tag', { orderBy: 'id ASC' });
+    const licenseInfo = await this.ctx.service.uied.licenseCenter.getLicenseInfo();
+    const featureOverrides = await this.ctx.service.uied.licenseCenter.getFeatureOverrides();
+    const commercialMode = await this.ctx.service.uied.licenseCenter.getCommercialMode();
+    const packageData = {
+      meta: {
+        exportedAt: new Date().toISOString(),
+        profile: 'commercial_delivery_package',
+        edition: String(licenseInfo.effectiveEdition || 'free'),
+        includes: {
+          siteInfo: true,
+          settings: true,
+          websiteCategories: true,
+          websiteTags: true,
+          articleCategories: true,
+          articleTags: true,
+          license: true,
+          featureOverrides: true,
+          commercialMode: true,
+          websiteData: options.includeWebsiteData,
+          articleData: options.includeArticleData,
+        },
+      },
+      siteInfo: siteInfo || {},
+      settings,
+      website: {
+        categories: websiteCategories,
+        tags: websiteTags,
+      },
+      article: {
+        categories: articleCategories,
+        tags: articleTags,
+      },
+      license: {
+        edition: licenseInfo.edition,
+        status: licenseInfo.status,
+        rawStatus: licenseInfo.rawStatus,
+        licenseKey: licenseInfo.licenseKey,
+        customerName: licenseInfo.customerName,
+        companyName: licenseInfo.companyName,
+        contactEmail: licenseInfo.contactEmail,
+        domainLimit: licenseInfo.domainLimit,
+        domainWhitelist: licenseInfo.domainWhitelist,
+        issuedAt: licenseInfo.issuedAt,
+        expiresAt: licenseInfo.expiresAt,
+        note: licenseInfo.note,
+        signVersion: licenseInfo.signVersion,
+        signature: licenseInfo.signature,
+      },
+      featureOverrides,
+      commercialMode,
+    };
+
+    if (options.includeWebsiteData) {
+      packageData.website.websites = await this.selectRowsWithSoftDelete('uied_website', { orderBy: 'id ASC' });
+    }
+    if (options.includeArticleData) {
+      packageData.article.articles = await this.selectRowsWithSoftDelete('uied_article', { orderBy: 'id ASC' });
+    }
+
+    return packageData;
+  }
+
+  /**
    * 获取初始化预览信息（不落库）
    */
   async preview(input = {}) {

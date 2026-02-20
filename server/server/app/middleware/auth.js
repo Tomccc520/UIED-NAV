@@ -240,6 +240,8 @@ module.exports = options => {
       'uied:feature:check': [ 'uied:setting:get' ],
       'uied:license:save': [ 'uied:setting:save' ],
       'uied:feature:save': [ 'uied:setting:save' ],
+      'uied:commercial:mode:get': [ 'uied:setting:get' ],
+      'uied:commercial:mode:save': [ 'uied:setting:save' ],
       'uied:setting:articleConfig': [ 'uied:setting:get' ],
       'uied:setting:articleTopicsConfig': [ 'uied:setting:get' ],
       'uied:setting:saveArticleConfig': [ 'uied:setting:save' ],
@@ -247,6 +249,7 @@ module.exports = options => {
       // 商业版：交付初始化向导复用站点设置权限
       'uied:delivery:init:preview': [ 'uied:setting:get' ],
       'uied:delivery:init:execute': [ 'uied:setting:save' ],
+      'uied:delivery:package:export': [ 'uied:setting:get' ],
     };
     if (perms.some(item => item && (auths === item || auths.startsWith(item + ':')))) {
       return true;

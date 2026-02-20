@@ -45,6 +45,32 @@ class DeliveryInitController extends baseController {
       this.result({ code: 500, message: error.message || '交付初始化执行失败' });
     }
   }
+
+  /**
+   * 导出客户交付包（站点配置 + 分类标签 + license + feature）
+   */
+  async exportPackage() {
+    const { ctx } = this;
+    try {
+      const params = {
+        ...(ctx.query || {}),
+        ...(ctx.request.body || {}),
+      };
+      const data = await ctx.service.uied.deliveryInit.exportCustomerPackage(params);
+      const download = String(params.download || '').trim().toLowerCase();
+      if ([ '1', 'true', 'yes', 'y' ].includes(download)) {
+        const filename = `uied_customer_package_${Date.now()}.json`;
+        ctx.set('Content-Type', 'application/json; charset=utf-8');
+        ctx.set('Content-Disposition', `attachment; filename=${filename}`);
+        ctx.body = JSON.stringify(data, null, 2);
+        return;
+      }
+      this.result({ data });
+    } catch (error) {
+      ctx.logger.error('导出客户交付包失败:', error);
+      this.result({ code: 500, message: error.message || '导出客户交付包失败' });
+    }
+  }
 }
 
 module.exports = DeliveryInitController;

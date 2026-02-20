@@ -275,6 +275,9 @@ function writeJsonReport(rows) {
  */
 function normalizeHttpMethod(method = '') {
   const text = String(method || '').trim().toLowerCase();
+  if (text === 'getlegacy') return 'get';
+  if (text === 'postlegacy') return 'post';
+  if (text === 'dellegacy') return 'delete';
   if (text === 'del') return 'delete';
   return text;
 }
@@ -287,7 +290,7 @@ function parseRoutesFromFile(filePath) {
   if (!fs.existsSync(filePath)) return [];
   const content = fs.readFileSync(filePath, 'utf8');
   const lines = content.split('\n');
-  const routeReg = /(?:router\.)?(get|post|put|patch|delete|del|all)\s*\(\s*['"`]([^'"`]+)['"`]/g;
+  const routeReg = /(?:router\.)?(getlegacy|postlegacy|dellegacy|get|post|put|patch|delete|del|all)\s*\(\s*['"`]([^'"`]+)['"`]/gi;
   const routes = [];
   lines.forEach((line, index) => {
     let match = routeReg.exec(line);
@@ -429,6 +432,9 @@ async function main() {
         'uied:delivery:init:index',
         'uied:delivery:init:preview',
         'uied:delivery:init:execute',
+        'uied:delivery:package:export',
+        'uied:commercial:mode:get',
+        'uied:commercial:mode:save',
       ];
       const rowsText = queryMysql(
         `SELECT id,pid,menu_type,paths,component,selected,is_show,perms

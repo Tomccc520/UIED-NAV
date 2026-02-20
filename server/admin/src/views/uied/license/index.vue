@@ -69,6 +69,36 @@
                 <el-button type="primary" plain @click="goFeaturePage">前往功能开关</el-button>
             </div>
         </el-card>
+
+        <el-card class="!border-none mt-4" shadow="never">
+            <template #header>
+                <div class="flex items-center justify-between">
+                    <span class="font-medium">商业版模式开关</span>
+                    <el-button
+                        v-perms="['uied:commercial:mode:save']"
+                        type="primary"
+                        :loading="modeSaving"
+                        @click="handleSaveMode"
+                    >
+                        保存商业模式
+                    </el-button>
+                </div>
+            </template>
+            <el-form :model="modeForm" label-width="180px" class="max-w-[760px]">
+                <el-form-item label="严格商业版模式">
+                    <el-switch v-model="modeForm.strictLegacyRoutes" />
+                    <span class="ml-3 text-xs text-tx-secondary">
+                        开启后关闭旧兼容路由，仅允许 /api 正式路由访问
+                    </span>
+                </el-form-item>
+                <el-form-item label="强制许可证签名校验">
+                    <el-switch v-model="modeForm.enforceLicenseSignature" />
+                    <span class="ml-3 text-xs text-tx-secondary">
+                        开启后若 license 签名异常将自动降级为 Free 能力
+                    </span>
+                </el-form-item>
+            </el-form>
+        </el-card>
     </div>
 </template>
 
@@ -82,10 +112,16 @@
 import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import feedback from '@/utils/feedback'
-import { uiedLicenseInfo, uiedSaveLicenseInfo } from '@/api/uied'
+import {
+    uiedCommercialModeGet,
+    uiedCommercialModeSave,
+    uiedLicenseInfo,
+    uiedSaveLicenseInfo
+} from '@/api/uied'
 
 const router = useRouter()
 const licenseSaving = ref(false)
+const modeSaving = ref(false)
 
 const licenseForm = reactive({
     edition: 'free',
@@ -98,6 +134,10 @@ const licenseForm = reactive({
     issuedAt: 0,
     expiresAt: 0,
     note: ''
+})
+const modeForm = reactive({
+    strictLegacyRoutes: false,
+    enforceLicenseSignature: false
 })
 
 /**
@@ -115,6 +155,15 @@ const loadLicenseInfo = async () => {
     licenseForm.issuedAt = Number(data?.issuedAt || 0)
     licenseForm.expiresAt = Number(data?.expiresAt || 0)
     licenseForm.note = data?.note || ''
+}
+
+/**
+ * 读取商业版模式配置
+ */
+const loadCommercialMode = async () => {
+    const data = await uiedCommercialModeGet()
+    modeForm.strictLegacyRoutes = data?.strictLegacyRoutes === true
+    modeForm.enforceLicenseSignature = data?.enforceLicenseSignature === true
 }
 
 /**
@@ -139,10 +188,27 @@ const handleSaveLicense = async () => {
 }
 
 /**
+ * 保存商业版模式配置
+ */
+const handleSaveMode = async () => {
+    modeSaving.value = true
+    try {
+        await uiedCommercialModeSave({
+            strictLegacyRoutes: modeForm.strictLegacyRoutes,
+            enforceLicenseSignature: modeForm.enforceLicenseSignature
+        })
+        feedback.msgSuccess('商业模式保存成功')
+        await loadCommercialMode()
+    } finally {
+        modeSaving.value = false
+    }
+}
+
+/**
  * 页面初始化加载
  */
 const initializePage = async () => {
-    await loadLicenseInfo()
+    await Promise.all([loadLicenseInfo(), loadCommercialMode()])
 }
 
 onMounted(() => {

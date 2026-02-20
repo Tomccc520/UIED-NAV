@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-20T14:08:58.965Z",
+  "generatedAt": "2026-02-20T14:42:08.248Z",
   "rows": [
     {
       "status": "pass",
@@ -61,15 +61,15 @@
       "status": "pass",
       "category": "路由",
       "item": "method+path 重复定义",
-      "detail": "未发现重复定义（扫描 444 条路由）",
+      "detail": "未发现重复定义（扫描 438 条路由）",
       "suggestion": ""
     },
     {
-      "status": "pass",
+      "status": "warn",
       "category": "路由",
       "item": "兼容别名路由",
-      "detail": "检测到 9 条非 /api 前缀兼容路由（用于历史前端平滑迁移）",
-      "suggestion": ""
+      "detail": "未检测到兼容别名路由",
+      "suggestion": "若仍需兼容旧前端，请确认别名路由是否被误删。"
     },
     {
       "status": "pass",

@@ -195,6 +195,11 @@ export function uiedDeliveryInitExecute(params: any) {
     return request.post({ url: '/uied/delivery/init/execute', params })
 }
 
+// 导出客户交付包
+export function uiedDeliveryPackageExport(params?: any) {
+    return request.get({ url: '/uied/delivery/package/export', params })
+}
+
 // 获取许可证信息
 export function uiedLicenseInfo() {
     return request.get({ url: '/uied/license/info' })
@@ -213,6 +218,16 @@ export function uiedFeatureList() {
 // 保存功能开关
 export function uiedSaveFeature(params: any) {
     return request.post({ url: '/uied/feature/save', params })
+}
+
+// 获取商业版模式配置
+export function uiedCommercialModeGet() {
+    return request.get({ url: '/uied/commercial/mode/get' })
+}
+
+// 保存商业版模式配置
+export function uiedCommercialModeSave(params: any) {
+    return request.post({ url: '/uied/commercial/mode/save', params })
 }
 
 // 获取文章公开配置

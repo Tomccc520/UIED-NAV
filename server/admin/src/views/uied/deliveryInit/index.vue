@@ -11,6 +11,13 @@
                 <div class="flex items-center justify-between">
                     <span class="font-medium">交付初始化向导</span>
                     <div class="flex gap-2">
+                        <el-button
+                            v-perms="['uied:delivery:package:export']"
+                            :loading="exportLoading"
+                            @click="handleExportPackage"
+                        >
+                            导出客户包
+                        </el-button>
                         <el-button :loading="previewLoading" @click="handlePreview">刷新预览</el-button>
                         <el-button type="primary" :loading="executeLoading" @click="handleExecute">
                             执行初始化
@@ -184,10 +191,11 @@
  */
 import { onMounted, reactive, ref } from 'vue'
 import feedback from '@/utils/feedback'
-import { uiedDeliveryInitExecute, uiedDeliveryInitPreview } from '@/api/uied'
+import { uiedDeliveryInitExecute, uiedDeliveryInitPreview, uiedDeliveryPackageExport } from '@/api/uied'
 
 const previewLoading = ref(false)
 const executeLoading = ref(false)
+const exportLoading = ref(false)
 const domainWhitelistText = ref('')
 const featureOverridesText = ref('{}')
 const previewData = ref<any>(null)
@@ -319,6 +327,36 @@ const handleExecute = async () => {
         feedback.msgError(error?.message || '交付初始化执行失败')
     } finally {
         executeLoading.value = false
+    }
+}
+
+/**
+ * 导出客户交付包并触发本地下载
+ */
+const handleExportPackage = async () => {
+    exportLoading.value = true
+    try {
+        const data = await uiedDeliveryPackageExport({
+            ...buildPayload(),
+            includeWebsiteData: false,
+            includeArticleData: false
+        })
+        const filename = `uied_customer_package_${Date.now()}.json`
+        const content = JSON.stringify(data || {}, null, 2)
+        const blob = new Blob([content], { type: 'application/json;charset=utf-8' })
+        const objectUrl = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = objectUrl
+        link.download = filename
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(objectUrl)
+        feedback.msgSuccess('客户包导出成功')
+    } catch (error: any) {
+        feedback.msgError(error?.message || '客户包导出失败')
+    } finally {
+        exportLoading.value = false
     }
 }
 

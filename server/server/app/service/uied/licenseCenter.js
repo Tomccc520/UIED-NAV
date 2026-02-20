@@ -11,9 +11,12 @@
 'use strict';
 
 const Service = require('egg').Service;
+const crypto = require('crypto');
 
 const LICENSE_INFO_KEY = 'license_center_info';
 const FEATURE_OVERRIDE_KEY = 'license_feature_overrides';
+const COMMERCIAL_MODE_KEY = 'commercial_mode_config';
+const LICENSE_SIGN_VERSION = 'v1';
 
 class LicenseCenterService extends Service {
   /**
@@ -118,11 +121,100 @@ class LicenseCenterService extends Service {
   }
 
   /**
+   * 规范化商业版模式配置
+   */
+  normalizeCommercialMode(payload = {}) {
+    const source = payload && typeof payload === 'object' ? payload : {};
+    return {
+      strictLegacyRoutes: this.parseBoolean(source.strictLegacyRoutes, false),
+      enforceLicenseSignature: this.parseBoolean(source.enforceLicenseSignature, false),
+      updatedAt: Number(source.updatedAt || 0) || Math.floor(Date.now() / 1000),
+    };
+  }
+
+  /**
+   * 获取商业版模式配置
+   */
+  async getCommercialMode() {
+    const { ctx } = this;
+    const raw = await ctx.service.uied.setting.get(COMMERCIAL_MODE_KEY);
+    return this.normalizeCommercialMode(raw || {});
+  }
+
+  /**
+   * 保存商业版模式配置
+   */
+  async saveCommercialMode(payload = {}) {
+    const next = this.normalizeCommercialMode(payload);
+    next.updatedAt = Math.floor(Date.now() / 1000);
+    await this.ctx.service.uied.setting.save({ [COMMERCIAL_MODE_KEY]: next });
+    return this.getCommercialMode();
+  }
+
+  /**
+   * 获取许可证签名密钥（优先环境变量）
+   */
+  getLicenseSignSecret() {
+    const appConfig = this.app.config || {};
+    const envSecret = String(process.env.UIED_LICENSE_SIGN_SECRET || '').trim();
+    if (envSecret) return envSecret;
+    const cfgSecret = String(appConfig.uiedLicenseSignSecret || '').trim();
+    if (cfgSecret) return cfgSecret;
+    const firstKey = String(appConfig.keys || '').split(',')[0].trim();
+    if (firstKey) return firstKey;
+    return 'uied-license-secret-change-me';
+  }
+
+  /**
+   * 构建许可证签名载荷（固定字段顺序，避免签名漂移）
+   */
+  buildLicenseSignPayload(payload = {}) {
+    const source = payload && typeof payload === 'object' ? payload : {};
+    return {
+      edition: this.normalizeEdition(source.edition || 'free'),
+      status: String(source.status || 'active').trim().toLowerCase() || 'active',
+      licenseKey: String(source.licenseKey || '').trim(),
+      customerName: String(source.customerName || '').trim(),
+      companyName: String(source.companyName || '').trim(),
+      contactEmail: String(source.contactEmail || '').trim(),
+      domainLimit: Math.max(1, Number.parseInt(String(source.domainLimit || 1), 10) || 1),
+      domainWhitelist: Array.isArray(source.domainWhitelist)
+        ? source.domainWhitelist.map(item => String(item || '').trim()).filter(Boolean).sort()
+        : [],
+      issuedAt: Number(source.issuedAt || 0) || 0,
+      expiresAt: Number(source.expiresAt || 0) || 0,
+      note: String(source.note || '').trim(),
+      signVersion: String(source.signVersion || LICENSE_SIGN_VERSION),
+    };
+  }
+
+  /**
+   * 计算许可证签名
+   */
+  signLicensePayload(payload = {}) {
+    const secret = this.getLicenseSignSecret();
+    const content = JSON.stringify(this.buildLicenseSignPayload(payload));
+    return crypto.createHmac('sha256', secret).update(content).digest('hex');
+  }
+
+  /**
+   * 校验许可证签名
+   */
+  verifyLicenseSignature(payload = {}) {
+    const signature = String(payload.signature || '').trim().toLowerCase();
+    if (!signature) return false;
+    const expected = String(this.signLicensePayload(payload) || '').trim().toLowerCase();
+    if (!expected || signature.length !== expected.length) return false;
+    return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+  }
+
+  /**
    * 获取许可证信息（带有效性判定）
    */
   async getLicenseInfo() {
     const { ctx } = this;
     const raw = await ctx.service.uied.setting.get(LICENSE_INFO_KEY);
+    const mode = await this.getCommercialMode();
     const now = Math.floor(Date.now() / 1000);
     const defaults = {
       edition: 'free',
@@ -136,6 +228,8 @@ class LicenseCenterService extends Service {
       issuedAt: 0,
       expiresAt: 0,
       note: '',
+      signVersion: LICENSE_SIGN_VERSION,
+      signature: '',
       updatedAt: now,
     };
     const source = raw && typeof raw === 'object' ? raw : {};
@@ -150,16 +244,27 @@ class LicenseCenterService extends Service {
         : [],
       issuedAt: Number(source.issuedAt || 0) || 0,
       expiresAt: Number(source.expiresAt || 0) || 0,
+      signVersion: String(source.signVersion || defaults.signVersion),
+      signature: String(source.signature || defaults.signature).trim().toLowerCase(),
       updatedAt: Number(source.updatedAt || 0) || now,
     };
+    const rawStatus = normalized.status;
+    const signatureRequired = mode.enforceLicenseSignature === true;
+    const isSignatureValid = this.verifyLicenseSignature(normalized);
+    const signatureBlocked = signatureRequired && !isSignatureValid;
     const isExpired = normalized.expiresAt > 0 && normalized.expiresAt < now;
-    const isActive = normalized.status === 'active' && !isExpired;
+    const isActive = rawStatus === 'active' && !isExpired && !signatureBlocked;
     const effectiveEdition = isActive ? normalized.edition : 'free';
+    const status = signatureBlocked ? 'invalid_signature' : rawStatus;
     return {
       ...normalized,
+      rawStatus,
+      status,
       isExpired,
       isActive,
       effectiveEdition,
+      isSignatureValid,
+      signatureRequired,
       now,
     };
   }
@@ -184,8 +289,10 @@ class LicenseCenterService extends Service {
       issuedAt: Number(source.issuedAt || 0) || 0,
       expiresAt: Number(source.expiresAt || 0) || 0,
       note: String(source.note || '').trim(),
+      signVersion: LICENSE_SIGN_VERSION,
       updatedAt: now,
     };
+    next.signature = this.signLicensePayload(next);
     await this.ctx.service.uied.setting.save({ [LICENSE_INFO_KEY]: next });
     return this.getLicenseInfo();
   }

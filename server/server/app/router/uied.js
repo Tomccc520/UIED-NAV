@@ -63,6 +63,7 @@ module.exports = app => {
   // ==================== 交付初始化向导 ====================
   router.all('/api/uied/delivery/init/preview', controller.uied.deliveryInit.preview);
   router.all('/api/uied/delivery/init/execute', controller.uied.deliveryInit.execute);
+  router.all('/api/uied/delivery/package/export', controller.uied.deliveryInit.exportPackage);
 
   // ==================== 许可证中心 ====================
   router.all('/api/uied/license/info', controller.uied.licenseCenter.info);
@@ -70,6 +71,8 @@ module.exports = app => {
   router.all('/api/uied/feature/list', controller.uied.licenseCenter.featureList);
   router.all('/api/uied/feature/check', controller.uied.licenseCenter.featureCheck);
   router.all('/api/uied/feature/save', controller.uied.licenseCenter.saveFeature);
+  router.all('/api/uied/commercial/mode/get', controller.uied.licenseCenter.commercialMode);
+  router.all('/api/uied/commercial/mode/save', controller.uied.licenseCenter.saveCommercialMode);
   
   // ==================== 导航菜单 ====================
   router.all('/api/uied/navMenu/list', controller.uied.navMenu.list);

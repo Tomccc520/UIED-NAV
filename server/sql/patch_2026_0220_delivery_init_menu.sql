@@ -32,7 +32,8 @@ INSERT INTO la_system_auth_menu
 (id, pid, menu_type, menu_name, menu_icon, menu_sort, perms, paths, component, selected, params, is_cache, is_show, is_disable, create_time, update_time)
 VALUES
 (895, 894, 'A', '交付初始化预览', '', 10, 'uied:delivery:init:preview', '', '', '', '', 0, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-(896, 894, 'A', '交付初始化执行', '', 11, 'uied:delivery:init:execute', '', '', '', '', 0, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
+(896, 894, 'A', '交付初始化执行', '', 11, 'uied:delivery:init:execute', '', '', '', '', 0, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+(897, 894, 'A', '客户包导出', '', 12, 'uied:delivery:package:export', '', '', '', '', 0, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
 ON DUPLICATE KEY UPDATE
 pid = VALUES(pid),
 menu_type = VALUES(menu_type),
@@ -47,7 +48,7 @@ INSERT INTO la_system_auth_perm (id, role_id, menu_id)
 SELECT REPLACE(UUID(), '-', ''), 1, m.id
 FROM la_system_auth_menu m
 LEFT JOIN la_system_auth_perm p ON p.role_id = 1 AND p.menu_id = m.id
-WHERE m.id IN (894, 895, 896)
+WHERE m.id IN (894, 895, 896, 897)
   AND p.id IS NULL;
 
 COMMIT;

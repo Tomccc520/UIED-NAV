@@ -106,6 +106,35 @@ class LicenseCenterController extends baseController {
       this.result({ code: 500, message: '检查功能开关失败' });
     }
   }
+
+  /**
+   * 获取商业版模式配置
+   */
+  async commercialMode() {
+    const { ctx } = this;
+    try {
+      const data = await ctx.service.uied.licenseCenter.getCommercialMode();
+      this.result({ data });
+    } catch (error) {
+      ctx.logger.error('获取商业版模式失败:', error);
+      this.result({ code: 500, message: '获取商业版模式失败' });
+    }
+  }
+
+  /**
+   * 保存商业版模式配置
+   */
+  async saveCommercialMode() {
+    const { ctx } = this;
+    try {
+      const body = ctx.request.body || {};
+      const data = await ctx.service.uied.licenseCenter.saveCommercialMode(body);
+      this.result({ data, message: '保存成功' });
+    } catch (error) {
+      ctx.logger.error('保存商业版模式失败:', error);
+      this.result({ code: 500, message: error.message || '保存商业版模式失败' });
+    }
+  }
 }
 
 module.exports = LicenseCenterController;
