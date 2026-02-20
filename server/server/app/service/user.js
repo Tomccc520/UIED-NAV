@@ -192,6 +192,61 @@ class UserService extends Service {
   }
 
   /**
+   * 获取性别文案
+   */
+  getSexLabel(sex) {
+    const value = Number(sex || 0);
+    if (value === 1) return '男';
+    if (value === 2) return '女';
+    return '未知';
+  }
+
+  /**
+   * 获取注册来源文案
+   */
+  getChannelLabel(channel) {
+    const channelMap = {
+      1: '微信小程序',
+      2: '微信公众号',
+      3: '手机H5',
+      4: '电脑PC',
+      5: '苹果APP',
+      6: '安卓APP',
+    };
+    return channelMap[Number(channel || 0)] || '未知';
+  }
+
+  /**
+   * Unix 时间戳转标准时间字符串
+   */
+  formatUnixTime(timestamp) {
+    const value = Number(timestamp || 0);
+    if (!value) return '-';
+    return moment(value * 1000).format('YYYY-MM-DD HH:mm:ss');
+  }
+
+  /**
+   * 手机号脱敏
+   */
+  getMaskedMobile(mobile) {
+    const value = String(mobile || '').trim();
+    if (!value) return '';
+    if (value.length < 7) return value;
+    return `${value.slice(0, 3)}****${value.slice(-4)}`;
+  }
+
+  /**
+   * 统一用户头像路径（兼容历史默认头像路径）
+   */
+  normalizeUserAvatar(avatar) {
+    const value = String(avatar || '').trim();
+    if (!value || value.includes('default_avatar.png')) {
+      return '/api/static/backend_avatar.png';
+    }
+    return value;
+  }
+
+  /**
    * 确保用户身份表存在（兼容历史库）
    */
   async ensureUserIdentityTable() {
@@ -483,7 +538,7 @@ class UserService extends Service {
   formatAuthorProfile(user, profile, forcePublic = false) {
     const userId = Number(user?.id || 0);
     const nickname = String(profile?.display_name || user?.nickname || user?.username || '');
-    const avatar = user?.avatar ? urlUtil.toAbsoluteUrl(user.avatar) : '';
+    const avatar = urlUtil.toAbsoluteUrl(this.normalizeUserAvatar(user?.avatar));
     const isPublic = Number(profile?.is_public ?? 1) === 1 ? 1 : 0;
     const bio = isPublic || !forcePublic ? String(profile?.bio || '') : '';
     const homepage = isPublic || !forcePublic ? String(profile?.homepage || '') : '';
@@ -599,7 +654,7 @@ class UserService extends Service {
       username: String(row.username || ''),
       nickname: String(row.nickname || ''),
       realName: String(row.realName || ''),
-      avatar: row.avatar ? urlUtil.toAbsoluteUrl(row.avatar) : '',
+      avatar: urlUtil.toAbsoluteUrl(this.normalizeUserAvatar(row.avatar)),
       mobile: String(row.mobile || ''),
       sex: Number(row.sex || 0),
       isDisable: Number(row.isDisable || 0),
@@ -1874,6 +1929,10 @@ class UserService extends Service {
    */
   async addressList(userId, params = {}) {
     const { ctx } = this;
+    if (!this.hasModel('UserAddress')) {
+      ctx.logger.warn('[user.addressList] UserAddress 模型未注册，返回空列表');
+      return [];
+    }
     const { type } = params;
     const where = { userId, isDelete: 0 };
     if (type !== undefined && type !== null && type !== '') {
@@ -3017,7 +3076,7 @@ class UserService extends Service {
       if (!userId) {
         const created = await ctx.model.User.create({
           sn: 0,
-          avatar: '/api/static/default_avatar.png',
+          avatar: '/api/static/backend_avatar.png',
           realName: item.realName,
           nickname: item.nickname,
           username: item.username,
@@ -3038,7 +3097,7 @@ class UserService extends Service {
       } else {
         action = 'updated';
         await ctx.model.User.update({
-          avatar: '/api/static/default_avatar.png',
+          avatar: '/api/static/backend_avatar.png',
           realName: item.realName,
           nickname: item.nickname,
           username: item.username,
@@ -3317,8 +3376,15 @@ class UserService extends Service {
 
     const lists = rows.map(item => {
       const data = item.toJSON();
-      data.avatar = urlUtil.toAbsoluteUrl(data.avatar || '');
+      data.avatar = urlUtil.toAbsoluteUrl(this.normalizeUserAvatar(data.avatar));
       data.ip = data.lastLoginIp || '';
+      data.mobileMask = this.getMaskedMobile(data.mobile);
+      data.sexName = this.getSexLabel(data.sex);
+      data.channelName = this.getChannelLabel(data.channel);
+      data.createTimeRaw = Number(data.createTime || 0);
+      data.lastLoginTimeRaw = Number(data.lastLoginTime || 0);
+      data.createTime = this.formatUnixTime(data.createTimeRaw);
+      data.lastLoginTime = this.formatUnixTime(data.lastLoginTimeRaw);
       const vipLevelValue = userColumns.vipLevel ? Number(data.vipLevel || 0) : 0;
       data.groupName = userColumns.groupId ? (groupMap.get(data.groupId) || '') : '';
       data.levelName = levelMap.get(vipLevelValue) || (vipLevelValue === 1 ? 'VIP' : vipLevelValue === 2 ? 'SVIP' : '普通');
@@ -3352,8 +3418,15 @@ class UserService extends Service {
       throw new Error('用户不存在');
     }
     const data = user.toJSON();
-    data.avatar = urlUtil.toAbsoluteUrl(data.avatar || '');
+    data.avatar = urlUtil.toAbsoluteUrl(this.normalizeUserAvatar(data.avatar));
     data.ip = data.lastLoginIp || '';
+    data.mobileMask = this.getMaskedMobile(data.mobile);
+    data.sexName = this.getSexLabel(data.sex);
+    data.channelName = this.getChannelLabel(data.channel);
+    data.createTimeRaw = Number(data.createTime || 0);
+    data.lastLoginTimeRaw = Number(data.lastLoginTime || 0);
+    data.createTime = this.formatUnixTime(data.createTimeRaw);
+    data.lastLoginTime = this.formatUnixTime(data.lastLoginTimeRaw);
     const [ levelMap, groupMap, tagMaps, userTypeMap ] = await Promise.all([
       this.getLevelMap(),
       this.getGroupMap(userColumns.groupId ? [ data.groupId ].filter(Boolean) : []),
@@ -3368,17 +3441,20 @@ class UserService extends Service {
     const tagList = tagMaps.userTagMap.get(data.id) || [];
     data.tags = tagList.map(tag => tag.name);
     data.tagIds = tagList.map(tag => tag.id);
-    const [ walletInfo, rechargeRows, addresses, loginLogsData, walletLogsData ] = await Promise.all([
+    const [ walletInfo, addresses, loginLogsData, walletLogsData ] = await Promise.all([
       this.walletInfo(data.id),
-      ctx.model.UserWalletFlow.findAll({
-        where: { userId: data.id, flowType: 'recharge' },
-        order: [[ 'id', 'DESC' ]],
-        limit: 5,
-      }),
       this.addressList(data.id),
       this.loginLog(data.id, { pageNo: 1, pageSize: 5 }),
       this.walletLog(data.id, { pageNo: 1, pageSize: 5, type: 'all' }),
     ]);
+    let rechargeRows = [];
+    if (this.hasModel('UserWalletFlow')) {
+      rechargeRows = await ctx.model.UserWalletFlow.findAll({
+        where: { userId: data.id, flowType: 'recharge' },
+        order: [[ 'id', 'DESC' ]],
+        limit: 5,
+      });
+    }
 
     data.walletBalance = walletInfo.balance;
     data.walletTotalRecharge = walletInfo.totalRecharge;

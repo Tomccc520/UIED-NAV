@@ -57,13 +57,13 @@
                 </el-table-column>
                 <el-table-column label="昵称" prop="nickname" min-width="100" />
                 <el-table-column label="账号" prop="username" min-width="120" />
-                <el-table-column label="手机号码" prop="mobile" min-width="100" />
+                <el-table-column label="手机号码" prop="mobileMask" min-width="120" />
                 <el-table-column label="用户类型" prop="userTypeName" min-width="110" />
                 <el-table-column label="用户等级" prop="levelName" min-width="110" />
-                <el-table-column label="性别" prop="sex" min-width="100" />
+                <el-table-column label="性别" prop="sexName" min-width="100" />
                 <el-table-column label="注册来源" min-width="100">
                     <template #default="{ row }">
-                        {{ getChannelLabel(row.channel) }}
+                        {{ row.channelName || getChannelLabel(row.channel) }}
                     </template>
                 </el-table-column>
                 <el-table-column label="注册时间" prop="createTime" min-width="120" />
@@ -72,7 +72,7 @@
                         <el-button v-perms="['user:detail']" type="primary" link>
                             <router-link
                                 :to="{
-                                    path: getRoutePath('user:detail'),
+                                    path: getUserDetailRoutePath(),
                                     query: {
                                         id: row.id
                                     }
@@ -91,6 +91,12 @@
     </div>
 </template>
 <script lang="ts" setup name="consumerLists">
+/**
+ * @copyright Tomda (https://www.tomda.top)
+ * @copyright UIED技术团队 (https://fsuied.com)
+ * @author UIED技术团队
+ * @createDate 2026-02-20
+ */
 import { usePaging } from '@/hooks/usePaging'
 import { getRoutePath } from '@/router'
 import { getUserList, seedUserTestUsers } from '@/api/consumer'
@@ -134,9 +140,18 @@ const getChannelLabel = (channel: any) => {
     const key = Number(channel) as keyof typeof ClientMap
     return ClientMap[key] || channel || '-'
 }
-onActivated(() => {
-    getLists()
-})
 
-getLists()
+/**
+ * 获取用户详情路由（兼容旧菜单路由异常）
+ */
+const getUserDetailRoutePath = () => {
+    const routePath = getRoutePath('user:detail') || ''
+    if (routePath.endsWith('/consumer/detail')) {
+        return routePath.replace('/consumer/detail', '/detail')
+    }
+    return routePath || '/user-center/detail'
+}
+onActivated(() => {
+    getLists().catch(() => {})
+})
 </script>

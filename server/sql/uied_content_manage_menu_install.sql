@@ -33,7 +33,7 @@ VALUES
 (819, 816, 'A', '文章编辑操作', '', 2, 'article:edit', '', '', '', '', 0, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
 (820, 816, 'A', '文章删除', '', 3, 'article:del', '', '', '', '', 0, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
 (821, 816, 'A', '文章状态', '', 4, 'article:change', '', '', '', '', 0, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-(822, 816, 'A', '文章栏目状态', '', 5, 'article:cate:change', '', '', '', '', 0, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
+(822, 816, 'A', '文章栏目状态', '', 5, 'article:cate:change:list', '', '', '', '', 0, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
 ON DUPLICATE KEY UPDATE
 pid = VALUES(pid), menu_type = VALUES(menu_type), menu_name = VALUES(menu_name), menu_sort = VALUES(menu_sort),
 perms = VALUES(perms), is_show = VALUES(is_show), is_disable = VALUES(is_disable), update_time = UNIX_TIMESTAMP();

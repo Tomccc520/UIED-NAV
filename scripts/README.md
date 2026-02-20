@@ -99,6 +99,35 @@ REACT_APP_API_URL=http://localhost:8002/api
 
 ---
 
+### 4. commercial-preflight-check.js
+**功能**：商业版发布前健康检查（接口 + 菜单 + 资源 + 配置回读）
+
+**使用场景**：
+- 发布 Free/Pro/Enterprise 交付包前的统一验收
+- 排查“后台可配置但前端不生效”问题
+- 排查菜单权限点、默认资源、测试数据是否缺失
+
+**使用方法**：
+```bash
+node scripts/commercial-preflight-check.js
+```
+
+**可选参数**：
+```bash
+node scripts/commercial-preflight-check.js \
+  --base-url http://127.0.0.1:8002 \
+  --mysql-container uied_mysql \
+  --db-user uied \
+  --db-pass uied123456 \
+  --db-name uied_nav
+```
+
+**输出内容**：
+- 终端报告（PASS/WARN/FAIL）
+- JSON 报告：`docs/API/reports/commercial_preflight_latest.json`
+
+---
+
 ## 🔧 脚本开发规范
 
 ### 文件命名
@@ -223,4 +252,3 @@ which npm
 
 **更新日期**: 2026-02-13  
 **维护者**: UIED技术团队
-

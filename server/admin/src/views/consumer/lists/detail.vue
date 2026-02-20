@@ -13,6 +13,9 @@
                 <el-form-item label="用户昵称：">
                     {{ formData.nickname }}
                 </el-form-item>
+                <el-form-item label="用户类型："> {{ formData.userTypeName || '-' }} </el-form-item>
+                <el-form-item label="用户等级："> {{ formData.levelName || '-' }} </el-form-item>
+                <el-form-item label="用户分组："> {{ formData.groupName || '-' }} </el-form-item>
                 <el-form-item label="账号：">
                     {{ formData.username }}
                     <popover-input
@@ -38,7 +41,7 @@
                     </popover-input>
                 </el-form-item>
                 <el-form-item label="性别：">
-                    {{ formData.sex }}
+                    {{ formData.sexName || '未知' }}
                     <popover-input
                         class="ml-[10px]"
                         type="select"
@@ -64,7 +67,7 @@
                     </popover-input>
                 </el-form-item>
                 <el-form-item label="联系电话：">
-                    {{ formData.mobile || '-' }}
+                    {{ formData.mobileMask || '-' }}
                     <popover-input
                         class="ml-[10px]"
                         type="number"
@@ -75,15 +78,25 @@
                         </el-button>
                     </popover-input>
                 </el-form-item>
-                <el-form-item label="注册来源："> {{ formData.channel }} </el-form-item>
+                <el-form-item label="用户标签：">
+                    {{ Array.isArray(formData.tags) && formData.tags.length ? formData.tags.join('、') : '-' }}
+                </el-form-item>
+                <el-form-item label="注册来源："> {{ formData.channelName || '-' }} </el-form-item>
                 <el-form-item label="注册时间："> {{ formData.createTime }} </el-form-item>
                 <el-form-item label="最近登录时间："> {{ formData.lastLoginTime }} </el-form-item>
+                <el-form-item label="最后登录IP："> {{ formData.ip || '-' }} </el-form-item>
             </el-form>
         </el-card>
     </div>
 </template>
 
 <script lang="ts" setup name="consumerDetail">
+/**
+ * @copyright Tomda (https://www.tomda.top)
+ * @copyright UIED技术团队 (https://fsuied.com)
+ * @author UIED技术团队
+ * @createDate 2026-02-20
+ */
 import type { FormInstance } from 'element-plus'
 import { getUserDetail, userEdit } from '@/api/consumer'
 import feedback from '@/utils/feedback'
@@ -93,19 +106,30 @@ const route = useRoute()
 const formData = reactive({
     avatar: '',
     channel: '',
+    channelName: '',
     createTime: '',
+    groupName: '',
+    ip: '',
     lastLoginIp: '',
     lastLoginTime: '',
+    levelName: '',
     mobile: '',
+    mobileMask: '',
     nickname: '',
-    realName: 0,
+    realName: '',
     sex: 0,
+    sexName: '',
     sn: '',
+    tags: [] as string[],
+    userTypeName: '',
     username: ''
 })
 
 const formRef = shallowRef<FormInstance>()
 
+/**
+ * 获取用户详情并回填页面
+ */
 const getDetails = async () => {
     const data = await getUserDetail({
         id: route.query.id
@@ -116,6 +140,9 @@ const getDetails = async () => {
     })
 }
 
+/**
+ * 处理字段内联编辑
+ */
 const handleEdit = async (value: string, field: string) => {
     if (isEmpty(value)) return
     await userEdit({

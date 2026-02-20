@@ -52,7 +52,7 @@ update_time = UNIX_TIMESTAMP();
 INSERT INTO la_system_auth_menu
 (id, pid, menu_type, menu_name, menu_icon, menu_sort, perms, paths, component, selected, params, is_cache, is_show, is_disable, create_time, update_time)
 VALUES
-(862, 861, 'C', '用户详情', '', 20, 'user:detail', 'detail', 'consumer/lists/detail', '/consumer/lists', '', 0, 0, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
+(862, 860, 'C', '用户详情', '', 20, 'user:detail', 'detail', 'consumer/lists/detail', '/user-center/consumer', '', 0, 0, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
 ON DUPLICATE KEY UPDATE
 pid = VALUES(pid),
 menu_type = VALUES(menu_type),

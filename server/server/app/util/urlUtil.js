@@ -10,20 +10,28 @@ function toAbsoluteUrl(u) {
     return '';
   }
   const parsedUrl = new URL(publicUrl);
+  const value = String(u).trim();
 
-  if (u.indexOf('/public/static/') === 0) {
-    parsedUrl.pathname = path.join(parsedUrl.pathname, u);
+  // 站点静态资源（例如默认头像 /api/static/default_avatar.png）
+  if (value.indexOf('/api/static/') === 0 || value.indexOf('/public/static/') === 0) {
+    parsedUrl.pathname = path.join(parsedUrl.pathname, value);
     return parsedUrl.toString();
   }
 
-  if (u.includes('public/uploads/')) {
-    parsedUrl.pathname = path.join(parsedUrl.pathname, u);
+  // 已经是上传资源路径时直接拼域名
+  if (value.indexOf('/api/uploads/') === 0 || value.indexOf('/public/uploads/') === 0 || value.includes('public/uploads/')) {
+    parsedUrl.pathname = path.join(parsedUrl.pathname, value);
     return parsedUrl.toString();
+  }
+
+  // 已经是完整外链直接返回
+  if (/^https?:\/\//i.test(value)) {
+    return value;
   }
 
   const engine = 'local';
   if (engine === 'local') {
-    parsedUrl.pathname = path.join(parsedUrl.pathname, publicPrefix, u);
+    parsedUrl.pathname = path.join(parsedUrl.pathname, publicPrefix, value);
     return parsedUrl.toString();
   }
 

@@ -41,6 +41,16 @@ export function usePaging(options: Options) {
                 return Promise.resolve(res)
             })
             .catch((err: any) => {
+                /**
+                 * 重复请求被取消属于正常行为（如切页/切换路由触发并发请求）
+                 * 这里吞掉取消异常，避免控制台出现 Uncaught (in promise)
+                 */
+                if (err?.code === 'ERR_CANCELED') {
+                    return Promise.resolve({
+                        count: pager.count,
+                        lists: pager.lists
+                    })
+                }
                 return Promise.reject(err)
             })
             .finally(() => {
