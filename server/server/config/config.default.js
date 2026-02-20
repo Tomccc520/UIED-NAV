@@ -63,6 +63,9 @@ module.exports = appInfo => {
         encrypt: true,
     };
 
+    // 商业版许可证签名密钥（建议在部署环境通过环境变量配置）
+    config.uiedLicenseSignSecret = process.env.UIED_LICENSE_SIGN_SECRET || '';
+
     // 设置静态目录
     config.static = {
         prefix: '/public',
