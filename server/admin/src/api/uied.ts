@@ -645,3 +645,77 @@ export function uiedWordpressWidgetEdit(params: any) {
 export function uiedWordpressWidgetDel(params: any) {
     return request.post({ url: '/uied/wordpress/widgets/del', params })
 }
+
+// ==================== 每日热榜 ====================
+
+// 获取每日热榜配置
+export function uiedDailyHotConfigGet() {
+    return request.get({ url: '/uied/dailyHot/config/get' })
+}
+
+// 保存每日热榜配置
+export function uiedDailyHotConfigSave(params: any) {
+    return request.post({ url: '/uied/dailyHot/config/save', params })
+}
+
+// 获取热榜平台列表
+export function uiedDailyHotPlatforms(params?: any) {
+    return request.get({ url: '/uied/dailyHot/platforms', params })
+}
+
+// 获取热榜平台配置列表（持久化）
+export function uiedDailyHotPlatformConfigList(params?: any) {
+    return request.get({ url: '/uied/dailyHot/platformConfig/list', params })
+}
+
+// 保存热榜平台配置（支持批量）
+export function uiedDailyHotPlatformConfigSave(params: any) {
+    return request.post({ url: '/uied/dailyHot/platformConfig/save', params })
+}
+
+// 删除热榜平台配置
+export function uiedDailyHotPlatformConfigDel(params: any) {
+    return request.post({ url: '/uied/dailyHot/platformConfig/del', params })
+}
+
+// 获取每日热榜后台字段草案
+export function uiedDailyHotSchema() {
+    return request.get({ url: '/uied/dailyHot/schema' })
+}
+
+// 获取今日热榜聚合数据
+export function uiedDailyHotList(params?: any) {
+    return request.get({ url: '/uied/dailyHot/list', params })
+}
+
+// 刷新今日热榜缓存
+export function uiedDailyHotRefresh(params?: any) {
+    return request.get({ url: '/uied/dailyHot/refresh', params })
+}
+
+// ==================== 榜单系统 ====================
+
+// 获取榜单配置列表
+export function uiedRankBoardConfigList(params?: any) {
+    return request.get({ url: '/uied/rankBoard/config/list', params })
+}
+
+// 保存榜单配置
+export function uiedRankBoardConfigSave(params: any) {
+    return request.post({ url: '/uied/rankBoard/config/save', params })
+}
+
+// 获取榜单聚合结果
+export function uiedRankBoardList(params?: any) {
+    return request.get({ url: '/uied/rankBoard/list', params })
+}
+
+// 预览单个榜单
+export function uiedRankBoardPreview(params?: any) {
+    return request.get({ url: '/uied/rankBoard/preview', params })
+}
+
+// 获取榜单字段草案
+export function uiedRankBoardSchema() {
+    return request.get({ url: '/uied/rankBoard/schema' })
+}

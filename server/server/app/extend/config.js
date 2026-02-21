@@ -170,6 +170,10 @@ const rsa = {
     'social-media', // GET /api/social-media
     'banners', // GET /api/banners
     'site-info', // GET /api/site-info
+    'daily-hot', // GET /api/daily-hot
+    'daily-hot:platforms', // GET /api/daily-hot/platforms
+    'rankings', // GET /api/rankings
+    'rankings:*', // GET /api/rankings/:key
     'categories', // GET /api/categories
     'categories:*', // GET /api/categories/:idOrSlug
     'tags', // GET /api/tags

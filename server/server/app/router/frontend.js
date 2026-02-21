@@ -121,6 +121,10 @@ module.exports = app => {
   get('/api/favicon-api/fetch', controller.uied.frontend.faviconFetch);
   // GET /api/settings/website/:id/tags - 获取网站标签
   get('/api/settings/website/:id/tags', controller.uied.frontend.websiteTags);
+  // GET /api/websites/:id/tags - 获取网站标签（前端常用路径）
+  get('/api/websites/:id/tags', controller.uied.frontend.websiteTags);
+  // GET /websites/:id/tags - 获取网站标签（兼容旧前端无 /api 前缀）
+  getLegacy('/websites/:id/tags', controller.uied.frontend.websiteTags);
   
   // ==================== 前端兼容路由（原 Express API 路径）====================
   // 导航菜单
@@ -179,6 +183,26 @@ module.exports = app => {
   
   // GET /api/site-info - 获取站点信息
   get('/api/site-info', controller.uied.frontend.siteInfo);
+
+  // ==================== 每日热榜（聚合） ====================
+  // GET /api/daily-hot - 获取今日热榜聚合数据
+  get('/api/daily-hot', controller.uied.frontend.dailyHotList);
+  // GET /api/daily-hot/platforms - 获取热榜平台列表
+  get('/api/daily-hot/platforms', controller.uied.frontend.dailyHotPlatforms);
+  // GET /daily-hot - 兼容旧前端无 /api 前缀
+  getLegacy('/daily-hot', controller.uied.frontend.dailyHotList);
+  // GET /daily-hot/platforms - 兼容旧前端无 /api 前缀
+  getLegacy('/daily-hot/platforms', controller.uied.frontend.dailyHotPlatforms);
+
+  // ==================== 榜单系统 ====================
+  // GET /api/rankings - 获取榜单聚合数据
+  get('/api/rankings', controller.uied.frontend.rankings);
+  // GET /api/rankings/:key - 获取单个榜单数据
+  get('/api/rankings/:key', controller.uied.frontend.rankingDetail);
+  // GET /rankings - 兼容旧前端无 /api 前缀
+  getLegacy('/rankings', controller.uied.frontend.rankings);
+  // GET /rankings/:key - 兼容旧前端无 /api 前缀
+  getLegacy('/rankings/:key', controller.uied.frontend.rankingDetail);
   
   // ==================== 分类和标签（前端公开） ====================
   // GET /api/categories - 获取分类列表（树形结构，含网站数量）

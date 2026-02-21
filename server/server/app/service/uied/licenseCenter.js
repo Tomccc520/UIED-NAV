@@ -39,6 +39,7 @@ class LicenseCenterService extends Service {
         'article_basic',
         'article_meta',
         'theme_basic',
+        'daily_hot',
       ],
       pro: [
         'advanced_search',
@@ -80,6 +81,7 @@ class LicenseCenterService extends Service {
       { key: 'article_basic', name: '文章基础', group: 'content', minEdition: 'free' },
       { key: 'article_meta', name: '文章分类标签', group: 'content', minEdition: 'free' },
       { key: 'theme_basic', name: '基础主题配置', group: 'theme', minEdition: 'free' },
+      { key: 'daily_hot', name: '每日热榜聚合', group: 'ops', minEdition: 'free' },
       { key: 'advanced_search', name: '高级搜索', group: 'core', minEdition: 'pro' },
       { key: 'no_ads', name: '去广告', group: 'theme', minEdition: 'pro' },
       { key: 'comments', name: '评论系统', group: 'content', minEdition: 'pro' },

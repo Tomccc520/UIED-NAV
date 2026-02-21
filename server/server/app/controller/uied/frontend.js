@@ -1040,12 +1040,124 @@ class FrontendController extends Controller {
   }
 
   /**
+   * 获取今日热榜聚合数据
+   * GET /api/daily-hot
+   */
+  async dailyHotList() {
+    const { ctx } = this;
+    const title = String(ctx.query?.title || '').trim();
+    const titles = String(ctx.query?.titles || '').trim();
+    const limit = this.parsePositiveInt(ctx.query?.limit, 10);
+    const platformLimit = this.parsePositiveInt(ctx.query?.platformLimit, 6);
+    const forceRefresh = this.parseBoolean(ctx.query?.refresh, false);
+
+    try {
+      const result = await ctx.service.uied.dailyHot.aggregateTodayHot({
+        title,
+        titles,
+        limit: Math.max(1, Math.min(limit, 30)),
+        platformLimit: Math.max(1, Math.min(platformLimit, 20)),
+        forceRefresh,
+      });
+      ctx.body = result;
+    } catch (error) {
+      ctx.logger.error('获取今日热榜失败:', error);
+      ctx.status = 500;
+      ctx.body = { error: error.message || '获取今日热榜失败' };
+    }
+  }
+
+  /**
+   * 获取热榜平台列表
+   * GET /api/daily-hot/platforms
+   */
+  async dailyHotPlatforms() {
+    const { ctx } = this;
+    const forceRefresh = this.parseBoolean(ctx.query?.refresh, false);
+
+    try {
+      const result = await ctx.service.uied.dailyHot.getPlatforms({ forceRefresh });
+      ctx.body = result;
+    } catch (error) {
+      ctx.logger.error('获取热榜平台列表失败:', error);
+      ctx.status = 500;
+      ctx.body = { error: error.message || '获取热榜平台列表失败' };
+    }
+  }
+
+  /**
+   * 获取榜单系统聚合数据
+   * GET /api/rankings
+   */
+  async rankings() {
+    const { ctx } = this;
+    const boardKey = String(ctx.query?.boardKey || '').trim();
+    const limit = this.parsePositiveInt(ctx.query?.limit, 20);
+    try {
+      const data = await ctx.service.uied.rankBoard.getBoardList({
+        boardKey,
+        limit: Math.max(1, Math.min(limit, 100)),
+      });
+      ctx.body = data;
+    } catch (error) {
+      ctx.logger.error('获取榜单系统数据失败:', error);
+      ctx.status = 500;
+      ctx.body = { error: error.message || '获取榜单系统数据失败' };
+    }
+  }
+
+  /**
+   * 获取单个榜单数据
+   * GET /api/rankings/:key
+   */
+  async rankingDetail() {
+    const { ctx } = this;
+    const boardKey = String(ctx.params?.key || '').trim();
+    const limit = this.parsePositiveInt(ctx.query?.limit, 20);
+    if (!boardKey) {
+      ctx.status = 400;
+      ctx.body = { error: '缺少榜单键' };
+      return;
+    }
+    try {
+      const data = await ctx.service.uied.rankBoard.getBoardList({
+        boardKey,
+        limit: Math.max(1, Math.min(limit, 100)),
+      });
+      const board = Array.isArray(data?.boards) && data.boards.length > 0 ? data.boards[0] : null;
+      if (!board) {
+        ctx.status = 404;
+        ctx.body = { error: '榜单不存在' };
+        return;
+      }
+      ctx.body = board;
+    } catch (error) {
+      ctx.logger.error('获取榜单详情失败:', error);
+      ctx.status = 500;
+      ctx.body = { error: error.message || '获取榜单详情失败' };
+    }
+  }
+
+  /**
    * 解析正整数参数
    */
   parsePositiveInt(value, defaultValue = 0) {
     const parsed = Number.parseInt(String(value ?? ''), 10);
     if (!Number.isInteger(parsed) || parsed <= 0) return defaultValue;
     return parsed;
+  }
+
+  /**
+   * 解析布尔值参数
+   */
+  parseBoolean(value, defaultValue = false) {
+    if (value === undefined || value === null || value === '') return defaultValue;
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'number') return value === 1;
+    const text = String(value).trim().toLowerCase();
+    if ([ '1', 'true', 'yes', 'y', 'on' ].includes(text)) return true;
+    if ([ '0', 'false', 'no', 'n', 'off' ].includes(text)) return false;
+    return defaultValue;
   }
 
   /**

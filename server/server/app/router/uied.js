@@ -56,6 +56,24 @@ module.exports = app => {
   router.all('/api/uied/hotRecommendation/add', controller.uied.hotRecommendation.add);
   router.all('/api/uied/hotRecommendation/edit', controller.uied.hotRecommendation.edit);
   router.all('/api/uied/hotRecommendation/del', controller.uied.hotRecommendation.del);
+
+  // ==================== 每日热榜 ====================
+  router.all('/api/uied/dailyHot/config/get', controller.uied.dailyHot.configGet);
+  router.all('/api/uied/dailyHot/config/save', controller.uied.dailyHot.configSave);
+  router.all('/api/uied/dailyHot/platforms', controller.uied.dailyHot.platforms);
+  router.all('/api/uied/dailyHot/platformConfig/list', controller.uied.dailyHot.platformConfigList);
+  router.all('/api/uied/dailyHot/platformConfig/save', controller.uied.dailyHot.platformConfigSave);
+  router.all('/api/uied/dailyHot/platformConfig/del', controller.uied.dailyHot.platformConfigDel);
+  router.all('/api/uied/dailyHot/schema', controller.uied.dailyHot.schema);
+  router.all('/api/uied/dailyHot/list', controller.uied.dailyHot.list);
+  router.all('/api/uied/dailyHot/refresh', controller.uied.dailyHot.refresh);
+
+  // ==================== 榜单系统 ====================
+  router.all('/api/uied/rankBoard/config/list', controller.uied.rankBoard.configList);
+  router.all('/api/uied/rankBoard/config/save', controller.uied.rankBoard.configSave);
+  router.all('/api/uied/rankBoard/list', controller.uied.rankBoard.list);
+  router.all('/api/uied/rankBoard/preview', controller.uied.rankBoard.preview);
+  router.all('/api/uied/rankBoard/schema', controller.uied.rankBoard.schema);
   
   // ==================== 站点设置 ====================
   router.all('/api/uied/setting/get', controller.uied.setting.get);

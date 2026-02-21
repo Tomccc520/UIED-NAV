@@ -260,6 +260,22 @@ module.exports = options => {
       'uied:wordpress:widgets:add': [ 'uied:wordpress:categories:add' ],
       'uied:wordpress:widgets:edit': [ 'uied:wordpress:categories:edit' ],
       'uied:wordpress:widgets:del': [ 'uied:wordpress:categories:del' ],
+      // 商业版：每日热榜模块复用站点设置权限，兼容历史角色
+      'uied:dailyHot:config:get': [ 'uied:setting:get' ],
+      'uied:dailyHot:platforms': [ 'uied:setting:get' ],
+      'uied:dailyHot:platformConfig:list': [ 'uied:setting:get' ],
+      'uied:dailyHot:schema': [ 'uied:setting:get' ],
+      'uied:dailyHot:list': [ 'uied:setting:get' ],
+      'uied:dailyHot:refresh': [ 'uied:setting:get' ],
+      'uied:dailyHot:config:save': [ 'uied:setting:save' ],
+      'uied:dailyHot:platformConfig:save': [ 'uied:setting:save' ],
+      'uied:dailyHot:platformConfig:del': [ 'uied:setting:save' ],
+      // 商业版：榜单系统复用站点设置权限，兼容历史角色
+      'uied:rankBoard:config:list': [ 'uied:setting:get' ],
+      'uied:rankBoard:list': [ 'uied:setting:get' ],
+      'uied:rankBoard:preview': [ 'uied:setting:get' ],
+      'uied:rankBoard:schema': [ 'uied:setting:get' ],
+      'uied:rankBoard:config:save': [ 'uied:setting:save' ],
       // 商业版：交付初始化向导复用站点设置权限
       'uied:delivery:init:preview': [ 'uied:setting:get' ],
       'uied:delivery:init:execute': [ 'uied:setting:save' ],
