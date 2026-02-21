@@ -719,3 +719,107 @@ export function uiedRankBoardPreview(params?: any) {
 export function uiedRankBoardSchema() {
     return request.get({ url: '/uied/rankBoard/schema' })
 }
+
+// ==================== 专题页工厂 ====================
+
+// 专题模板列表
+export function uiedTopicFactoryTemplateList(params?: any) {
+    return request.get({ url: '/uied/topicFactory/template/list', params })
+}
+
+// 专题模板详情
+export function uiedTopicFactoryTemplateDetail(params?: any) {
+    return request.get({ url: '/uied/topicFactory/template/detail', params })
+}
+
+// 保存专题模板
+export function uiedTopicFactoryTemplateSave(params: any) {
+    return request.post({ url: '/uied/topicFactory/template/save', params })
+}
+
+// 删除专题模板
+export function uiedTopicFactoryTemplateDel(params: any) {
+    return request.post({ url: '/uied/topicFactory/template/del', params })
+}
+
+// 预览专题创建结果
+export function uiedTopicFactoryPreview(params?: any) {
+    return request.get({ url: '/uied/topicFactory/preview', params })
+}
+
+// 一键创建专题页
+export function uiedTopicFactoryCreate(params: any) {
+    return request.post({ url: '/uied/topicFactory/createFromTemplate', params })
+}
+
+// 获取专题页工厂字段草案
+export function uiedTopicFactorySchema() {
+    return request.get({ url: '/uied/topicFactory/schema' })
+}
+
+// ==================== 投稿激励闭环 ====================
+
+// 获取投稿激励设置
+export function uiedContributionSettingsGet() {
+    return request.get({ url: '/uied/contribution/settings/get' })
+}
+
+// 保存投稿激励设置
+export function uiedContributionSettingsSave(params: any) {
+    return request.post({ url: '/uied/contribution/settings/save', params })
+}
+
+// 获取勋章列表
+export function uiedContributionBadgeList(params?: any) {
+    return request.get({ url: '/uied/contribution/badge/list', params })
+}
+
+// 保存勋章
+export function uiedContributionBadgeSave(params: any) {
+    return request.post({ url: '/uied/contribution/badge/save', params })
+}
+
+// 删除勋章
+export function uiedContributionBadgeDel(params: any) {
+    return request.post({ url: '/uied/contribution/badge/del', params })
+}
+
+// 获取推荐位列表
+export function uiedContributionFeaturedList(params?: any) {
+    return request.get({ url: '/uied/contribution/featured/list', params })
+}
+
+// 保存推荐位
+export function uiedContributionFeaturedSave(params: any) {
+    return request.post({ url: '/uied/contribution/featured/save', params })
+}
+
+// 删除推荐位
+export function uiedContributionFeaturedDel(params: any) {
+    return request.post({ url: '/uied/contribution/featured/del', params })
+}
+
+// 获取激励用户列表
+export function uiedContributionUserList(params?: any) {
+    return request.get({ url: '/uied/contribution/user/list', params })
+}
+
+// 获取激励用户详情
+export function uiedContributionUserDetail(params: any) {
+    return request.get({ url: '/uied/contribution/user/detail', params })
+}
+
+// 获取积分日志
+export function uiedContributionLogList(params?: any) {
+    return request.get({ url: '/uied/contribution/log/list', params })
+}
+
+// 获取排行榜
+export function uiedContributionLeaderboard(params?: any) {
+    return request.get({ url: '/uied/contribution/leaderboard', params })
+}
+
+// 获取字段草案
+export function uiedContributionSchema() {
+    return request.get({ url: '/uied/contribution/schema' })
+}

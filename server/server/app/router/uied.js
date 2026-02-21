@@ -49,6 +49,30 @@ module.exports = app => {
   router.all('/api/uied/page/del', controller.uied.page.del);
   router.all('/api/uied/page/categories', controller.uied.page.categories);
   router.all('/api/uied/page/updateCategories', controller.uied.page.updateCategories);
+
+  // ==================== 专题页工厂 ====================
+  router.all('/api/uied/topicFactory/template/list', controller.uied.topicFactory.templateList);
+  router.all('/api/uied/topicFactory/template/detail', controller.uied.topicFactory.templateDetail);
+  router.all('/api/uied/topicFactory/template/save', controller.uied.topicFactory.templateSave);
+  router.all('/api/uied/topicFactory/template/del', controller.uied.topicFactory.templateDel);
+  router.all('/api/uied/topicFactory/preview', controller.uied.topicFactory.preview);
+  router.all('/api/uied/topicFactory/createFromTemplate', controller.uied.topicFactory.createFromTemplate);
+  router.all('/api/uied/topicFactory/schema', controller.uied.topicFactory.schema);
+
+  // ==================== 投稿激励闭环 ====================
+  allFeature('/api/uied/contribution/settings/get', 'user_center', controller.uied.contributionIncentive.settingsGet);
+  allFeature('/api/uied/contribution/settings/save', 'user_center', controller.uied.contributionIncentive.settingsSave);
+  allFeature('/api/uied/contribution/badge/list', 'user_center', controller.uied.contributionIncentive.badgeList);
+  allFeature('/api/uied/contribution/badge/save', 'user_center', controller.uied.contributionIncentive.badgeSave);
+  allFeature('/api/uied/contribution/badge/del', 'user_center', controller.uied.contributionIncentive.badgeDel);
+  allFeature('/api/uied/contribution/featured/list', 'user_center', controller.uied.contributionIncentive.featuredList);
+  allFeature('/api/uied/contribution/featured/save', 'user_center', controller.uied.contributionIncentive.featuredSave);
+  allFeature('/api/uied/contribution/featured/del', 'user_center', controller.uied.contributionIncentive.featuredDel);
+  allFeature('/api/uied/contribution/user/list', 'user_center', controller.uied.contributionIncentive.userList);
+  allFeature('/api/uied/contribution/user/detail', 'user_center', controller.uied.contributionIncentive.userDetail);
+  allFeature('/api/uied/contribution/log/list', 'user_center', controller.uied.contributionIncentive.logList);
+  allFeature('/api/uied/contribution/leaderboard', 'user_center', controller.uied.contributionIncentive.leaderboard);
+  allFeature('/api/uied/contribution/schema', 'user_center', controller.uied.contributionIncentive.schema);
   
   // ==================== 热门推荐 ====================
   router.all('/api/uied/hotRecommendation/list', controller.uied.hotRecommendation.list);

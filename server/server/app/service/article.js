@@ -2903,6 +2903,14 @@ class ArticleService extends Service {
     });
     await this.saveArticleTagRelations(row?.id, params.tagIds);
     await this.saveArticleTopicRelation(row?.id, params.topicId);
+    /**
+     * 投稿提交奖励采用“旁路失败不阻断主流程”，避免积分模块异常影响投稿可用性
+     */
+    try {
+      await ctx.service.uied.contributionIncentive.rewardSubmissionCreated(Number(userId), Number(row?.id || 0));
+    } catch (rewardError) {
+      ctx.logger.warn(`frontAdd rewardSubmissionCreated skipped: ${rewardError.message || rewardError}`);
+    }
     return {
       id: Number(row?.id || 0),
       isShow: 0,
@@ -3291,6 +3299,16 @@ class ArticleService extends Service {
         reviewRemark: isPass ? '' : reviewRemark,
       };
       await ctx.service.user.createUserMessage(ownerUserId, notify.title, notify.content, 'article_audit', extra);
+      /**
+       * 审核通过奖励同样采用“旁路失败不阻断主流程”，确保审核链路稳定
+       */
+      if (isPass) {
+        try {
+          await ctx.service.uied.contributionIncentive.rewardSubmissionPublished(ownerUserId, Number(id), adminId);
+        } catch (rewardError) {
+          ctx.logger.warn(`frontAudit rewardSubmissionPublished skipped: ${rewardError.message || rewardError}`);
+        }
+      }
     }
 
     return {

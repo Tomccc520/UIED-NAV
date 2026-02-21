@@ -2044,6 +2044,46 @@ class FrontendController extends Controller {
   }
 
   /**
+   * 投稿激励排行榜（前台公开）
+   * GET /api/contribution/leaderboard
+   */
+  async contributionLeaderboard() {
+    const { ctx } = this;
+    const limit = Number.parseInt(String(ctx.query?.limit || ''), 10);
+    try {
+      const list = await ctx.service.uied.contributionIncentive.leaderboard(Number.isInteger(limit) ? limit : 20);
+      ctx.body = {
+        list: Array.isArray(list) ? list : [],
+        total: Array.isArray(list) ? list.length : 0,
+      };
+    } catch (error) {
+      ctx.logger.error('获取投稿激励排行榜失败:', error);
+      ctx.status = 500;
+      ctx.body = { error: error.message };
+    }
+  }
+
+  /**
+   * 优质投稿推荐位（前台公开）
+   * GET /api/contribution/featured-submissions
+   */
+  async contributionFeaturedSubmissions() {
+    const { ctx } = this;
+    const limit = Number.parseInt(String(ctx.query?.limit || ''), 10);
+    try {
+      const list = await ctx.service.uied.contributionIncentive.featuredPublicList(Number.isInteger(limit) ? limit : 20);
+      ctx.body = {
+        list: Array.isArray(list) ? list : [],
+        total: Array.isArray(list) ? list.length : 0,
+      };
+    } catch (error) {
+      ctx.logger.error('获取优质投稿推荐位失败:', error);
+      ctx.status = 500;
+      ctx.body = { error: error.message };
+    }
+  }
+
+  /**
    * 安全解析 JSON
    */
   safeJsonParse(str, defaultValue = []) {

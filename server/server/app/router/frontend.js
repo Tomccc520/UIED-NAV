@@ -203,6 +203,16 @@ module.exports = app => {
   getLegacy('/rankings', controller.uied.frontend.rankings);
   // GET /rankings/:key - 兼容旧前端无 /api 前缀
   getLegacy('/rankings/:key', controller.uied.frontend.rankingDetail);
+
+  // ==================== 投稿激励闭环 ====================
+  // GET /api/contribution/leaderboard - 投稿激励排行榜
+  get('/api/contribution/leaderboard', controller.uied.frontend.contributionLeaderboard);
+  // GET /api/contribution/featured-submissions - 优质投稿推荐位
+  get('/api/contribution/featured-submissions', controller.uied.frontend.contributionFeaturedSubmissions);
+  // GET /contribution/leaderboard - 兼容旧前端无 /api 前缀
+  getLegacy('/contribution/leaderboard', controller.uied.frontend.contributionLeaderboard);
+  // GET /contribution/featured-submissions - 兼容旧前端无 /api 前缀
+  getLegacy('/contribution/featured-submissions', controller.uied.frontend.contributionFeaturedSubmissions);
   
   // ==================== 分类和标签（前端公开） ====================
   // GET /api/categories - 获取分类列表（树形结构，含网站数量）
