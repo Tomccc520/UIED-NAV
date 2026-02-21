@@ -388,13 +388,19 @@ class FrontendController extends Controller {
       return;
     }
 
-    // 兼容返回：当前版本暂未启用评分持久化表，先返回可用结构避免前端报错
-    ctx.body = {
-      userRating: rating,
-      averageRating: rating,
-      totalRatings: 1,
-      message: '评分接口处于兼容模式，结果未持久化',
-    };
+    try {
+      const result = await ctx.service.uied.websiteInteraction.rateWebsite(websiteId, rating);
+      ctx.body = {
+        userRating: result.userRating,
+        averageRating: result.averageRating,
+        totalRatings: result.totalRatings,
+        message: '评分成功',
+      };
+    } catch (error) {
+      ctx.logger.error('网站评分失败:', error);
+      ctx.status = 500;
+      ctx.body = { error: error.message || '评分失败' };
+    }
   }
 
   /**
@@ -410,10 +416,18 @@ class FrontendController extends Controller {
       ctx.body = { error: '网站ID无效' };
       return;
     }
-    ctx.body = {
-      favorited: true,
-      message: '收藏接口处于兼容模式，结果未持久化',
-    };
+    try {
+      const result = await ctx.service.uied.websiteInteraction.addFavorite(websiteId);
+      ctx.body = {
+        favorited: true,
+        totalFavorites: result.totalFavorites,
+        message: '收藏成功',
+      };
+    } catch (error) {
+      ctx.logger.error('添加收藏失败:', error);
+      ctx.status = 500;
+      ctx.body = { error: error.message || '收藏失败' };
+    }
   }
 
   /**
@@ -429,10 +443,18 @@ class FrontendController extends Controller {
       ctx.body = { error: '网站ID无效' };
       return;
     }
-    ctx.body = {
-      favorited: false,
-      message: '收藏接口处于兼容模式，结果未持久化',
-    };
+    try {
+      const result = await ctx.service.uied.websiteInteraction.removeFavorite(websiteId);
+      ctx.body = {
+        favorited: false,
+        totalFavorites: result.totalFavorites,
+        message: '已取消收藏',
+      };
+    } catch (error) {
+      ctx.logger.error('取消收藏失败:', error);
+      ctx.status = 500;
+      ctx.body = { error: error.message || '取消收藏失败' };
+    }
   }
 
   /**
@@ -568,8 +590,14 @@ class FrontendController extends Controller {
    */
   async wordpressTags() {
     const { ctx } = this;
-    // 当前后端未维护独立的 WordPress 标签配置表，统一返回空数组
-    ctx.body = [];
+    const pageSlug = String(ctx.query?.pageSlug || '').trim();
+    try {
+      const tags = await ctx.service.uied.wordpressConfig.listTags(pageSlug || undefined);
+      ctx.body = (Array.isArray(tags) ? tags : []).filter(item => item?.visible !== false);
+    } catch (error) {
+      ctx.logger.error('获取 WordPress 标签失败:', error);
+      ctx.body = [];
+    }
   }
 
   /**
@@ -578,8 +606,14 @@ class FrontendController extends Controller {
    */
   async wordpressWidgetsActive() {
     const { ctx } = this;
-    // 当前后端未维护独立组件配置表，统一返回空数组
-    ctx.body = [];
+    const pageSlug = String(ctx.query?.pageSlug || '').trim();
+    try {
+      const widgets = await ctx.service.uied.wordpressConfig.listWidgets(pageSlug || undefined);
+      ctx.body = (Array.isArray(widgets) ? widgets : []).filter(item => item?.visible !== false);
+    } catch (error) {
+      ctx.logger.error('获取 WordPress 组件失败:', error);
+      ctx.body = [];
+    }
   }
 
   /**

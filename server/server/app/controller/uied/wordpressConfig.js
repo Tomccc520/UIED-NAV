@@ -92,7 +92,7 @@ class WordpressConfigController extends baseController {
       if (!id) {
         return this.result({ code: 400, message: '缺少配置ID' });
       }
-      await ctx.service.uied.wordpressConfig.delConfig(parseInt(id));
+      await ctx.service.uied.wordpressConfig.delConfig(Number.parseInt(id, 10));
       this.result({ message: '删除成功' });
     } catch (error) {
       ctx.logger.error('删除WordPress配置失败:', error);
@@ -163,10 +163,152 @@ class WordpressConfigController extends baseController {
       if (!id) {
         return this.result({ code: 400, message: '缺少分类ID' });
       }
-      await ctx.service.uied.wordpressConfig.delCategory(parseInt(id));
+      await ctx.service.uied.wordpressConfig.delCategory(Number.parseInt(id, 10));
       this.result({ message: '删除成功' });
     } catch (error) {
       ctx.logger.error('删除WordPress分类配置失败:', error);
+      this.result({ code: 500, message: '删除失败' });
+    }
+  }
+
+  // ==================== WordPress 标签配置 ====================
+
+  /**
+   * 获取标签配置列表
+   */
+  async tagList() {
+    const { ctx } = this;
+    try {
+      const { pageSlug } = ctx.query;
+      const result = await ctx.service.uied.wordpressConfig.listTags(pageSlug);
+      this.result({ data: result });
+    } catch (error) {
+      ctx.logger.error('获取WordPress标签配置失败:', error);
+      this.result({ code: 500, message: '获取标签失败' });
+    }
+  }
+
+  /**
+   * 创建标签配置
+   */
+  async tagAdd() {
+    const { ctx } = this;
+    try {
+      const data = ctx.request.body;
+      if (!data.wpTagId || !data.wpTagName || !data.displayName || !data.slug) {
+        return this.result({ code: 400, message: 'WordPress标签ID、标签名称、显示名称和slug为必填项' });
+      }
+      const result = await ctx.service.uied.wordpressConfig.addTag(data);
+      this.result({ data: result, message: '创建成功' });
+    } catch (error) {
+      ctx.logger.error('创建WordPress标签配置失败:', error);
+      this.result({ code: 500, message: '创建失败' });
+    }
+  }
+
+  /**
+   * 更新标签配置
+   */
+  async tagEdit() {
+    const { ctx } = this;
+    try {
+      const data = ctx.request.body;
+      if (!data.id) {
+        return this.result({ code: 400, message: '缺少标签ID' });
+      }
+      const result = await ctx.service.uied.wordpressConfig.editTag(data);
+      this.result({ data: result, message: '更新成功' });
+    } catch (error) {
+      ctx.logger.error('更新WordPress标签配置失败:', error);
+      this.result({ code: 500, message: '更新失败' });
+    }
+  }
+
+  /**
+   * 删除标签配置
+   */
+  async tagDel() {
+    const { ctx } = this;
+    try {
+      const { id } = ctx.request.body;
+      if (!id) {
+        return this.result({ code: 400, message: '缺少标签ID' });
+      }
+      await ctx.service.uied.wordpressConfig.delTag(Number.parseInt(id, 10));
+      this.result({ message: '删除成功' });
+    } catch (error) {
+      ctx.logger.error('删除WordPress标签配置失败:', error);
+      this.result({ code: 500, message: '删除失败' });
+    }
+  }
+
+  // ==================== WordPress 组件配置 ====================
+
+  /**
+   * 获取组件配置列表
+   */
+  async widgetList() {
+    const { ctx } = this;
+    try {
+      const { pageSlug } = ctx.query;
+      const result = await ctx.service.uied.wordpressConfig.listWidgets(pageSlug);
+      this.result({ data: result });
+    } catch (error) {
+      ctx.logger.error('获取WordPress组件配置失败:', error);
+      this.result({ code: 500, message: '获取组件失败' });
+    }
+  }
+
+  /**
+   * 创建组件配置
+   */
+  async widgetAdd() {
+    const { ctx } = this;
+    try {
+      const data = ctx.request.body;
+      if (!data.widgetName) {
+        return this.result({ code: 400, message: '组件名称为必填项' });
+      }
+      const result = await ctx.service.uied.wordpressConfig.addWidget(data);
+      this.result({ data: result, message: '创建成功' });
+    } catch (error) {
+      ctx.logger.error('创建WordPress组件配置失败:', error);
+      this.result({ code: 500, message: '创建失败' });
+    }
+  }
+
+  /**
+   * 更新组件配置
+   */
+  async widgetEdit() {
+    const { ctx } = this;
+    try {
+      const data = ctx.request.body;
+      if (!data.id) {
+        return this.result({ code: 400, message: '缺少组件ID' });
+      }
+      const result = await ctx.service.uied.wordpressConfig.editWidget(data);
+      this.result({ data: result, message: '更新成功' });
+    } catch (error) {
+      ctx.logger.error('更新WordPress组件配置失败:', error);
+      this.result({ code: 500, message: '更新失败' });
+    }
+  }
+
+  /**
+   * 删除组件配置
+   */
+  async widgetDel() {
+    const { ctx } = this;
+    try {
+      const { id } = ctx.request.body;
+      if (!id) {
+        return this.result({ code: 400, message: '缺少组件ID' });
+      }
+      await ctx.service.uied.wordpressConfig.delWidget(Number.parseInt(id, 10));
+      this.result({ message: '删除成功' });
+    } catch (error) {
+      ctx.logger.error('删除WordPress组件配置失败:', error);
       this.result({ code: 500, message: '删除失败' });
     }
   }
@@ -183,8 +325,8 @@ class WordpressConfigController extends baseController {
       const result = await ctx.service.uied.wordpressConfig.getPosts({
         categoryId,
         tagId,
-        page: parseInt(page),
-        perPage: parseInt(perPage),
+        page: Number.parseInt(page, 10),
+        perPage: Number.parseInt(perPage, 10),
         orderBy,
         order,
         search,

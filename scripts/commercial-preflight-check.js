@@ -120,15 +120,20 @@ function queryMysql(sql, options) {
 }
 
 /**
- * HTTP GET 请求（带超时）
+ * HTTP 请求（带超时）
  */
-async function getJson(url, headers = {}, timeoutMs = 8000) {
+async function requestJson(url, options = {}) {
+  const method = String(options.method || 'GET').toUpperCase();
+  const headers = options.headers || {};
+  const timeoutMs = Number(options.timeoutMs || 8000);
+  const body = options.body === undefined ? undefined : JSON.stringify(options.body);
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const res = await fetch(url, {
-      method: 'GET',
+      method,
       headers,
+      body,
       signal: controller.signal,
     });
     const text = await res.text();
@@ -147,6 +152,28 @@ async function getJson(url, headers = {}, timeoutMs = 8000) {
   } finally {
     clearTimeout(timer);
   }
+}
+
+/**
+ * HTTP GET 请求（带超时）
+ */
+async function getJson(url, headers = {}, timeoutMs = 8000) {
+  return requestJson(url, { method: 'GET', headers, timeoutMs });
+}
+
+/**
+ * HTTP POST 请求（JSON）
+ */
+async function postJson(url, body = {}, headers = {}, timeoutMs = 8000) {
+  return requestJson(url, {
+    method: 'POST',
+    body,
+    timeoutMs,
+    headers: {
+      'content-type': 'application/json',
+      ...headers,
+    },
+  });
 }
 
 /**
@@ -275,6 +302,11 @@ function writeJsonReport(rows) {
  */
 function normalizeHttpMethod(method = '') {
   const text = String(method || '').trim().toLowerCase();
+  if (text === 'allfeature') return 'all';
+  if (text === 'getfeature') return 'get';
+  if (text === 'postfeature') return 'post';
+  if (text === 'delfeature') return 'delete';
+  if (text === 'postlegacyfeature') return 'post';
   if (text === 'getlegacy') return 'get';
   if (text === 'postlegacy') return 'post';
   if (text === 'dellegacy') return 'delete';
@@ -290,7 +322,7 @@ function parseRoutesFromFile(filePath) {
   if (!fs.existsSync(filePath)) return [];
   const content = fs.readFileSync(filePath, 'utf8');
   const lines = content.split('\n');
-  const routeReg = /(?:router\.)?(getlegacy|postlegacy|dellegacy|get|post|put|patch|delete|del|all)\s*\(\s*['"`]([^'"`]+)['"`]/gi;
+  const routeReg = /(?:router\.)?(allfeature|getfeature|postfeature|delfeature|postlegacyfeature|getlegacy|postlegacy|dellegacy|get|post|put|patch|delete|del|all)\s*\(\s*['"`]([^'"`]+)['"`]/gi;
   const routes = [];
   lines.forEach((line, index) => {
     let match = routeReg.exec(line);
@@ -323,6 +355,7 @@ function scanRouteDuplicates() {
     .map(([ key, sources ]) => ({ key, sources }));
   const compatibilityAliasCount = allRoutes.filter(item => item.path && !item.path.startsWith('/api/')).length;
   return {
+    allRoutes,
     total: allRoutes.length,
     duplicates,
     compatibilityAliasCount,
@@ -386,6 +419,69 @@ async function main() {
     }
   }
 
+  // 1.2) 功能受限接口检查（未授权返回 403 视为可识别状态）
+  const featureEndpoints = [
+    { path: '/api/wordpress/tags', feature: 'wordpress_channel' },
+    { path: '/api/wordpress/widgets/active', feature: 'wordpress_channel' },
+  ];
+  for (const item of featureEndpoints) {
+    const url = `${baseUrl}${item.path}`;
+    try {
+      const res = await getJson(url);
+      if (res.ok && (!res.json || isApiSuccess(res.json))) {
+        reporter.add('pass', '接口', item.path, `HTTP ${res.status}（feature=${item.feature}）`);
+        continue;
+      }
+      if (res.status === 403) {
+        reporter.add('warn', '接口', item.path, `HTTP 403（feature=${item.feature}）`, '当前许可证未开启该能力时属于预期行为。');
+        continue;
+      }
+      reporter.add('fail', '接口', item.path, `HTTP ${res.status}（feature=${item.feature}）`, '检查功能守卫、许可证与接口实现。');
+    } catch (error) {
+      reporter.add('fail', '接口', item.path, `请求失败: ${String(error.message || error)}`, '确认后端服务和路由可访问。');
+    }
+  }
+
+  // 1.3) 网站交互接口检查（评分/收藏持久化链路）
+  if (mysql) {
+    try {
+      const firstWebsiteId = Number(
+        queryMysql('SELECT id FROM uied_website WHERE is_delete = 0 ORDER BY id ASC LIMIT 1', mysql) || 0
+      );
+      if (firstWebsiteId > 0) {
+        const rateRes = await postJson(`${baseUrl}/api/websites/${firstWebsiteId}/rate`, { rating: 5 });
+        if (rateRes.ok && rateRes.json && isApiSuccess(rateRes.json)) {
+          reporter.add('pass', '接口', '/api/websites/:id/rate', `网站ID=${firstWebsiteId} 评分成功`);
+        } else {
+          reporter.add(
+            'fail',
+            '接口',
+            '/api/websites/:id/rate',
+            `响应异常: HTTP ${rateRes.status}, body=${String(rateRes.text || '').slice(0, 160)}`,
+            '检查评分持久化表与控制器逻辑。'
+          );
+        }
+
+        const favoriteRes = await postJson(`${baseUrl}/api/websites/${firstWebsiteId}/favorite`, {});
+        if (favoriteRes.ok && favoriteRes.json && isApiSuccess(favoriteRes.json)) {
+          reporter.add('pass', '接口', '/api/websites/:id/favorite', `网站ID=${firstWebsiteId} 收藏成功`);
+        } else {
+          reporter.add(
+            'fail',
+            '接口',
+            '/api/websites/:id/favorite',
+            `响应异常: HTTP ${favoriteRes.status}, body=${String(favoriteRes.text || '').slice(0, 160)}`,
+            '检查收藏持久化表与控制器逻辑。'
+          );
+        }
+      } else {
+        reporter.add('warn', '接口', '网站交互接口', 'uied_website 无可用记录，跳过评分/收藏联调', '先导入至少一条站点数据再执行该检查。');
+      }
+    } catch (error) {
+      reporter.add('fail', '接口', '网站交互接口', String(error.message || error), '检查数据库连接、路由和交互表结构。');
+    }
+  }
+
   // 1.5) 路由重复检查
   try {
     const routeScan = scanRouteDuplicates();
@@ -414,6 +510,25 @@ async function main() {
       );
     } else {
       reporter.add('warn', '路由', '兼容别名路由', '未检测到兼容别名路由', '若仍需兼容旧前端，请确认别名路由是否被误删。');
+    }
+
+    const requiredRoutes = [
+      'all /api/uied/aiConfig/detail',
+      'all /api/uied/wordpress/tags',
+      'all /api/uied/wordpress/widgets',
+    ];
+    const routeKeySet = new Set(routeScan.allRoutes.map(item => `${item.method} ${item.path}`));
+    const missingRequiredRoutes = requiredRoutes.filter(item => !routeKeySet.has(item));
+    if (missingRequiredRoutes.length > 0) {
+      reporter.add(
+        'fail',
+        '路由',
+        '关键商业版路由',
+        `缺失: ${missingRequiredRoutes.join(', ')}`,
+        '补齐对应 router 注册，避免前后台 API 漂移。'
+      );
+    } else {
+      reporter.add('pass', '路由', '关键商业版路由', '关键路由存在且可被扫描');
     }
   } catch (error) {
     reporter.add('fail', '路由', '重复定义检查', String(error.message || error), '检查 router 文件是否可访问。');
@@ -597,6 +712,32 @@ async function main() {
   // 5) 数据基础检查
   if (mysql) {
     try {
+      const requiredTables = [
+        'uied_website_rating',
+        'uied_website_favorite',
+        'uied_wordpress_tag',
+        'uied_wordpress_widget',
+      ];
+      const tableCount = Number(
+        queryMysql(
+          `SELECT COUNT(1) FROM information_schema.tables
+           WHERE table_schema = '${mysql.database}'
+             AND table_name IN (${requiredTables.map(name => `'${name}'`).join(',')})`,
+          mysql
+        ) || 0
+      );
+      if (tableCount !== requiredTables.length) {
+        reporter.add(
+          'fail',
+          '数据',
+          '商业版新增表',
+          `仅检测到 ${tableCount}/${requiredTables.length} 张表`,
+          '执行 patch_2026_0221_website_interaction_tables.sql 与 patch_2026_0221_wordpress_tag_widget_tables.sql。'
+        );
+      } else {
+        reporter.add('pass', '数据', '商业版新增表', `已检测到 ${requiredTables.length} 张新增表`);
+      }
+
       const userCount = Number(queryMysql('SELECT COUNT(1) FROM la_user WHERE is_delete = 0', mysql) || 0);
       if (userCount <= 0) {
         reporter.add('fail', '数据', '站点用户数据', 'la_user 无可用数据', '执行 /api/user/seed/testUsers 初始化测试用户。');

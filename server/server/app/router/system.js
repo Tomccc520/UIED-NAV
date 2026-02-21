@@ -2,6 +2,14 @@
 
 module.exports = app => {
   const { router, controller } = app;
+  /**
+   * 按功能键创建商业版能力守卫中间件
+   */
+  const featureGuard = featureKey => app.middleware.commercialFeatureGuard({ featureKey });
+  /**
+   * 注册带能力校验的全方法路由
+   */
+  const allFeature = (path, featureKey, action) => router.all(path, featureGuard(featureKey), action);
   router.all('/api/system/login', controller.system.login);
   router.all('/api/system/logout', controller.system.logout);
   router.all('/api/system/menu/route', controller.system.menusRoute);
@@ -107,25 +115,25 @@ module.exports = app => {
   router.all('/api/gen/syncTable', controller.gen.gen.syncTable);
   router.all('/api/gen/previewCode', controller.gen.gen.previewCode);
   router.all('/api/gen/downloadCode', controller.gen.gen.downloadCode);
-  router.all('/api/user/list', controller.user.list);
-  router.all('/api/user/detail', controller.user.detail);
-  router.all('/api/user/edit', controller.user.edit);
-  router.all('/api/user/stats', controller.user.stats);
-  router.all('/api/user/wallet/adjust', controller.user.walletAdjust);
-  router.all('/api/user/group/list', controller.user.groupList);
-  router.all('/api/user/group/add', controller.user.groupAdd);
-  router.all('/api/user/group/edit', controller.user.groupEdit);
-  router.all('/api/user/group/del', controller.user.groupDel);
-  router.all('/api/user/tag/list', controller.user.tagList);
-  router.all('/api/user/tag/add', controller.user.tagAdd);
-  router.all('/api/user/tag/edit', controller.user.tagEdit);
-  router.all('/api/user/tag/del', controller.user.tagDel);
-  router.all('/api/user/tag/bind', controller.user.tagBind);
-  router.all('/api/user/level/list', controller.user.levelList);
-  router.all('/api/user/level/add', controller.user.levelAdd);
-  router.all('/api/user/level/edit', controller.user.levelEdit);
-  router.all('/api/user/level/del', controller.user.levelDel);
-  router.all('/api/user/seed/testUsers', controller.user.seedTestUsers);
+  allFeature('/api/user/list', 'user_center', controller.user.list);
+  allFeature('/api/user/detail', 'user_center', controller.user.detail);
+  allFeature('/api/user/edit', 'user_center', controller.user.edit);
+  allFeature('/api/user/stats', 'user_center', controller.user.stats);
+  allFeature('/api/user/wallet/adjust', 'user_center', controller.user.walletAdjust);
+  allFeature('/api/user/group/list', 'user_center', controller.user.groupList);
+  allFeature('/api/user/group/add', 'user_center', controller.user.groupAdd);
+  allFeature('/api/user/group/edit', 'user_center', controller.user.groupEdit);
+  allFeature('/api/user/group/del', 'user_center', controller.user.groupDel);
+  allFeature('/api/user/tag/list', 'user_center', controller.user.tagList);
+  allFeature('/api/user/tag/add', 'user_center', controller.user.tagAdd);
+  allFeature('/api/user/tag/edit', 'user_center', controller.user.tagEdit);
+  allFeature('/api/user/tag/del', 'user_center', controller.user.tagDel);
+  allFeature('/api/user/tag/bind', 'user_center', controller.user.tagBind);
+  allFeature('/api/user/level/list', 'user_center', controller.user.levelList);
+  allFeature('/api/user/level/add', 'user_center', controller.user.levelAdd);
+  allFeature('/api/user/level/edit', 'user_center', controller.user.levelEdit);
+  allFeature('/api/user/level/del', 'user_center', controller.user.levelDel);
+  allFeature('/api/user/seed/testUsers', 'user_center', controller.user.seedTestUsers);
   // 前台用户中心（登录/资料）
   router.all('/api/user/register', controller.user.register);
   router.all('/api/user/login', controller.user.login);

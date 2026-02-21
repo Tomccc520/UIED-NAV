@@ -528,7 +528,7 @@ export function uiedAiConfigList() {
 
 // AI 配置详情
 export function uiedAiConfigDetail(params: any) {
-    return request.get({ url: '/uied/aiConfig/detail', params })
+    return request.get({ url: '/uied/aiConfig/get', params })
 }
 
 // 添加 AI 配置
@@ -602,4 +602,46 @@ export function uiedAiChat(params: any) {
 // 抓取网站 SEO 信息（含 favicon）
 export function uiedSeoScraperFetch(params: any) {
     return request.post({ url: '/uied/seoScraper/fetch', params })
+}
+
+// ==================== WordPress 标签/组件配置 ====================
+
+// WordPress 标签列表
+export function uiedWordpressTagList(params?: any) {
+    return request.get({ url: '/uied/wordpress/tags', params })
+}
+
+// 新增 WordPress 标签
+export function uiedWordpressTagAdd(params: any) {
+    return request.post({ url: '/uied/wordpress/tags/add', params })
+}
+
+// 编辑 WordPress 标签
+export function uiedWordpressTagEdit(params: any) {
+    return request.post({ url: '/uied/wordpress/tags/edit', params })
+}
+
+// 删除 WordPress 标签
+export function uiedWordpressTagDel(params: any) {
+    return request.post({ url: '/uied/wordpress/tags/del', params })
+}
+
+// WordPress 组件列表
+export function uiedWordpressWidgetList(params?: any) {
+    return request.get({ url: '/uied/wordpress/widgets', params })
+}
+
+// 新增 WordPress 组件
+export function uiedWordpressWidgetAdd(params: any) {
+    return request.post({ url: '/uied/wordpress/widgets/add', params })
+}
+
+// 编辑 WordPress 组件
+export function uiedWordpressWidgetEdit(params: any) {
+    return request.post({ url: '/uied/wordpress/widgets/edit', params })
+}
+
+// 删除 WordPress 组件
+export function uiedWordpressWidgetDel(params: any) {
+    return request.post({ url: '/uied/wordpress/widgets/del', params })
 }

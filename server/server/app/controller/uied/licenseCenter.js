@@ -43,6 +43,42 @@ class LicenseCenterController extends baseController {
   }
 
   /**
+   * 生成许可证签名数据（不落库）
+   */
+  async sign() {
+    const { ctx } = this;
+    try {
+      const payload = {
+        ...(ctx.request.body || {}),
+        ...(ctx.query || {}),
+      };
+      const data = await ctx.service.uied.licenseCenter.buildSignedLicense(payload);
+      this.result({ data, message: '签发成功' });
+    } catch (error) {
+      ctx.logger.error('签发许可证失败:', error);
+      this.result({ code: 500, message: error.message || '签发许可证失败' });
+    }
+  }
+
+  /**
+   * 校验许可证签名（用于导入前验签）
+   */
+  async verify() {
+    const { ctx } = this;
+    try {
+      const payload = {
+        ...(ctx.request.body || {}),
+        ...(ctx.query || {}),
+      };
+      const data = await ctx.service.uied.licenseCenter.verifyLicensePayload(payload);
+      this.result({ data });
+    } catch (error) {
+      ctx.logger.error('校验许可证失败:', error);
+      this.result({ code: 500, message: error.message || '校验许可证失败' });
+    }
+  }
+
+  /**
    * 获取功能列表（前端可读）
    */
   async featureList() {
@@ -133,6 +169,20 @@ class LicenseCenterController extends baseController {
     } catch (error) {
       ctx.logger.error('保存商业版模式失败:', error);
       this.result({ code: 500, message: error.message || '保存商业版模式失败' });
+    }
+  }
+
+  /**
+   * 获取商业版总览（用于后台运营排查）
+   */
+  async overview() {
+    const { ctx } = this;
+    try {
+      const data = await ctx.service.uied.licenseCenter.getCommercialOverview();
+      this.result({ data });
+    } catch (error) {
+      ctx.logger.error('获取商业版总览失败:', error);
+      this.result({ code: 500, message: error.message || '获取商业版总览失败' });
     }
   }
 }

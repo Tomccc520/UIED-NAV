@@ -146,6 +146,48 @@ node scripts/commercial-preflight-check.js \
 
 ---
 
+### 6. release-edition-package.sh
+**功能**：版本化打包发布（Free/Pro/Enterprise）并生成交付目录模板
+
+**使用场景**：
+- 商业版发包前统一生成版本目录
+- 生成标准交付结构（license/feature/config/sql/docs）
+- 发布动作标准化，减少人工漏项
+
+**使用方法**：
+```bash
+./scripts/release-edition-package.sh
+```
+
+**常用参数**：
+```bash
+./scripts/release-edition-package.sh \
+  --editions free,pro,enterprise \
+  --output /tmp/uied_release \
+  --base-url http://127.0.0.1:8002
+```
+
+可选控制：
+```bash
+# 跳过发布前检查
+./scripts/release-edition-package.sh --skip-preflight
+
+# 允许发布前检查失败仍继续
+./scripts/release-edition-package.sh --allow-preflight-fail
+```
+
+**输出结果**：
+- 默认输出目录：`release/YYYYMMDD_HHMMSS/`
+- 每个版本目录包含：
+  - `README-交付说明.md`
+  - `license/customer-license.json`
+  - `feature/feature-overrides.json`
+  - `config/app.env.example`
+  - `meta/release-manifest.json`
+  - `docs/API/*`（商业版关键文档）
+
+---
+
 ## 🔧 脚本开发规范
 
 ### 文件命名

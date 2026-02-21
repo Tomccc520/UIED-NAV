@@ -15,6 +15,10 @@ module.exports = app => {
   const frontendNormalize = app.middleware.frontendResponseNormalizer();
   const legacyRouteGuard = app.middleware.commercialLegacyRouteGuard();
   /**
+   * 按功能键创建商业版能力守卫中间件
+   */
+  const featureGuard = featureKey => app.middleware.commercialFeatureGuard({ featureKey });
+  /**
    * 注册前台 GET 路由（统一挂载响应归一化中间件）
    */
   const get = (path, action) => router.get(path, frontendNormalize, action);
@@ -27,6 +31,14 @@ module.exports = app => {
    */
   const del = (path, action) => router.delete(path, frontendNormalize, action);
   /**
+   * 注册前台 GET 路由（含商业版能力校验）
+   */
+  const getFeature = (path, featureKey, action) => router.get(path, featureGuard(featureKey), frontendNormalize, action);
+  /**
+   * 注册前台 POST 路由（含商业版能力校验）
+   */
+  const postFeature = (path, featureKey, action) => router.post(path, featureGuard(featureKey), frontendNormalize, action);
+  /**
    * 注册旧兼容 GET 路由（可被严格商业版模式一键关闭）
    */
   const getLegacy = (path, action) => router.get(path, legacyRouteGuard, frontendNormalize, action);
@@ -34,6 +46,12 @@ module.exports = app => {
    * 注册旧兼容 POST 路由（可被严格商业版模式一键关闭）
    */
   const postLegacy = (path, action) => router.post(path, legacyRouteGuard, frontendNormalize, action);
+  /**
+   * 注册旧兼容 POST 路由（可被严格模式关闭，且支持能力校验）
+   */
+  const postLegacyFeature = (path, featureKey, action) => (
+    router.post(path, legacyRouteGuard, featureGuard(featureKey), frontendNormalize, action)
+  );
   /**
    * 注册旧兼容 DELETE 路由（可被严格商业版模式一键关闭）
    */
@@ -76,7 +94,7 @@ module.exports = app => {
   // GET /api/websites/:id/comments - 获取网站评论
   get('/api/websites/:id/comments', controller.uied.frontend.websiteComments);
   // POST /api/websites/:id/comments - 发表评论
-  post('/api/websites/:id/comments', controller.uied.frontend.addWebsiteComment);
+  postFeature('/api/websites/:id/comments', 'comments', controller.uied.frontend.addWebsiteComment);
   // POST /api/websites/:id/rate - 网站评分（兼容旧前端）
   post('/api/websites/:id/rate', controller.uied.frontend.websiteRate);
   // POST /api/websites/:id/favorite - 添加收藏（兼容旧前端）
@@ -126,19 +144,19 @@ module.exports = app => {
   // POST /api/submissions - 前端提交网站
   post('/api/submissions', controller.uied.submission.submit);
   // POST /api/ai-config/generate-website-info - AI 生成网站信息
-  post('/api/ai-config/generate-website-info', controller.uied.aiConfig.generateWebsiteInfo);
+  postFeature('/api/ai-config/generate-website-info', 'ai_assistant', controller.uied.aiConfig.generateWebsiteInfo);
   // POST /api/ai-config/chat - AI 聊天
-  post('/api/ai-config/chat', controller.uied.aiConfig.chat);
+  postFeature('/api/ai-config/chat', 'ai_assistant', controller.uied.aiConfig.chat);
   // POST /api/ai-config/smart-search - AI 智能搜索（兼容旧前端）
-  post('/api/ai-config/smart-search', controller.uied.frontend.aiSearch);
+  postFeature('/api/ai-config/smart-search', 'ai_assistant', controller.uied.frontend.aiSearch);
   // POST /api/ai-search - AI 智能搜索（统一前端入口）
-  post('/api/ai-search', controller.uied.frontend.aiSearch);
+  postFeature('/api/ai-search', 'ai_assistant', controller.uied.frontend.aiSearch);
   // GET /api/wordpress/categories/active - WordPress 分类（兼容旧前端）
-  get('/api/wordpress/categories/active', controller.uied.frontend.wordpressCategoriesActive);
+  getFeature('/api/wordpress/categories/active', 'wordpress_channel', controller.uied.frontend.wordpressCategoriesActive);
   // GET /api/wordpress/tags - WordPress 标签（兼容旧前端）
-  get('/api/wordpress/tags', controller.uied.frontend.wordpressTags);
+  getFeature('/api/wordpress/tags', 'wordpress_channel', controller.uied.frontend.wordpressTags);
   // GET /api/wordpress/widgets/active - WordPress 组件（兼容旧前端）
-  get('/api/wordpress/widgets/active', controller.uied.frontend.wordpressWidgetsActive);
+  getFeature('/api/wordpress/widgets/active', 'wordpress_channel', controller.uied.frontend.wordpressWidgetsActive);
   
   // GET /api/nav-menus - 获取导航菜单
   get('/api/nav-menus', controller.uied.frontend.navMenus);
@@ -202,7 +220,7 @@ module.exports = app => {
   // GET /articles/:id/comments - 获取文章评论（兼容旧前端无 /api 前缀）
   getLegacy('/articles/:id/comments', controller.uied.frontend.articleComments);
   // POST /api/articles/:id/comments - 提交文章评论
-  post('/api/articles/:id/comments', controller.uied.frontend.addArticleComment);
+  postFeature('/api/articles/:id/comments', 'comments', controller.uied.frontend.addArticleComment);
   // POST /articles/:id/comments - 提交文章评论（兼容旧前端无 /api 前缀）
-  postLegacy('/articles/:id/comments', controller.uied.frontend.addArticleComment);
+  postLegacyFeature('/articles/:id/comments', 'comments', controller.uied.frontend.addArticleComment);
 };

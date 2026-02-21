@@ -25,6 +25,59 @@ class WordpressConfigService extends Service {
       || message.includes('Unknown column');
   }
 
+  /**
+   * 确保 WordPress 标签与组件配置表存在（新环境兜底）
+   */
+  async ensureTagWidgetTables() {
+    const { app } = this;
+    const cacheKey = '__uiedWordpressTagWidgetTablesReady__';
+    if (app[cacheKey] === true) return;
+    await app.model.query(
+      `CREATE TABLE IF NOT EXISTS \`uied_wordpress_tag\` (
+        \`id\` int unsigned NOT NULL AUTO_INCREMENT,
+        \`config_id\` int unsigned DEFAULT NULL,
+        \`wp_tag_id\` int unsigned NOT NULL DEFAULT 0,
+        \`wp_tag_name\` varchar(128) NOT NULL DEFAULT '',
+        \`display_name\` varchar(128) NOT NULL DEFAULT '',
+        \`slug\` varchar(128) NOT NULL DEFAULT '',
+        \`description\` varchar(500) NOT NULL DEFAULT '',
+        \`sort\` int unsigned NOT NULL DEFAULT 0,
+        \`visible\` tinyint unsigned NOT NULL DEFAULT 1,
+        \`page_slug\` varchar(64) NOT NULL DEFAULT '',
+        \`create_time\` int unsigned NOT NULL DEFAULT 0,
+        \`update_time\` int unsigned NOT NULL DEFAULT 0,
+        PRIMARY KEY (\`id\`),
+        KEY \`idx_page_visible_sort\` (\`page_slug\`,\`visible\`,\`sort\`),
+        KEY \`idx_slug\` (\`slug\`),
+        KEY \`idx_config_id\` (\`config_id\`)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='WordPress 标签映射配置'`,
+      { type: app.Sequelize.QueryTypes.RAW }
+    );
+
+    await app.model.query(
+      `CREATE TABLE IF NOT EXISTS \`uied_wordpress_widget\` (
+        \`id\` int unsigned NOT NULL AUTO_INCREMENT,
+        \`config_id\` int unsigned DEFAULT NULL,
+        \`widget_key\` varchar(100) NOT NULL DEFAULT '',
+        \`widget_name\` varchar(128) NOT NULL DEFAULT '',
+        \`title\` varchar(200) NOT NULL DEFAULT '',
+        \`content\` text,
+        \`meta_json\` text,
+        \`sort\` int unsigned NOT NULL DEFAULT 0,
+        \`visible\` tinyint unsigned NOT NULL DEFAULT 1,
+        \`page_slug\` varchar(64) NOT NULL DEFAULT '',
+        \`create_time\` int unsigned NOT NULL DEFAULT 0,
+        \`update_time\` int unsigned NOT NULL DEFAULT 0,
+        PRIMARY KEY (\`id\`),
+        KEY \`idx_page_visible_sort\` (\`page_slug\`,\`visible\`,\`sort\`),
+        KEY \`idx_widget_key\` (\`widget_key\`),
+        KEY \`idx_config_id\` (\`config_id\`)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='WordPress 组件配置'`,
+      { type: app.Sequelize.QueryTypes.RAW }
+    );
+    app[cacheKey] = true;
+  }
+
   // ==================== WordPress 配置 ====================
 
   /**
@@ -273,6 +326,257 @@ class WordpressConfigService extends Service {
 
     await app.model.query(
       'DELETE FROM uied_wordpress_category WHERE id = ?',
+      { replacements: [ id ], type: app.Sequelize.QueryTypes.DELETE }
+    );
+  }
+
+  // ==================== WordPress 标签配置 ====================
+
+  /**
+   * 获取标签配置列表
+   */
+  async listTags(pageSlug) {
+    const { app } = this;
+    await this.ensureTagWidgetTables();
+
+    let whereClause = '1=1';
+    const replacements = [];
+
+    if (pageSlug) {
+      whereClause += ' AND page_slug = ?';
+      replacements.push(pageSlug);
+    }
+
+    let rows = [];
+    try {
+      rows = await app.model.query(
+        `SELECT * FROM uied_wordpress_tag WHERE ${whereClause} ORDER BY sort ASC, create_time DESC`,
+        { replacements, type: app.Sequelize.QueryTypes.SELECT }
+      );
+    } catch (error) {
+      if (!this.isSchemaCompatibilityError(error)) {
+        throw error;
+      }
+      this.ctx.logger.warn('[wordpressConfig] listTags 降级为空数组:', error.message);
+      return [];
+    }
+
+    return rows.map(item => ({
+      id: item.id,
+      configId: item.config_id,
+      wpTagId: item.wp_tag_id,
+      wpTagName: item.wp_tag_name,
+      displayName: item.display_name,
+      slug: item.slug,
+      description: item.description,
+      order: item.sort,
+      visible: item.visible === 1,
+      pageSlug: item.page_slug,
+    }));
+  }
+
+  /**
+   * 创建标签配置
+   */
+  async addTag(data) {
+    const { app } = this;
+    await this.ensureTagWidgetTables();
+    const now = Math.floor(Date.now() / 1000);
+
+    const [ result ] = await app.model.query(
+      `INSERT INTO uied_wordpress_tag
+       (config_id, wp_tag_id, wp_tag_name, display_name, slug, description, sort, visible, page_slug, create_time, update_time)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      {
+        replacements: [
+          data.configId || null,
+          data.wpTagId,
+          data.wpTagName,
+          data.displayName,
+          data.slug,
+          data.description || '',
+          data.order || 0,
+          data.visible !== false ? 1 : 0,
+          data.pageSlug || '',
+          now,
+          now,
+        ],
+        type: app.Sequelize.QueryTypes.INSERT,
+      }
+    );
+
+    return { id: result, ...data };
+  }
+
+  /**
+   * 更新标签配置
+   */
+  async editTag(data) {
+    const { app } = this;
+    await this.ensureTagWidgetTables();
+    const now = Math.floor(Date.now() / 1000);
+
+    const updates = [];
+    const values = [];
+
+    if (data.configId !== undefined) { updates.push('config_id = ?'); values.push(data.configId || null); }
+    if (data.wpTagId !== undefined) { updates.push('wp_tag_id = ?'); values.push(data.wpTagId); }
+    if (data.wpTagName !== undefined) { updates.push('wp_tag_name = ?'); values.push(data.wpTagName); }
+    if (data.displayName !== undefined) { updates.push('display_name = ?'); values.push(data.displayName); }
+    if (data.slug !== undefined) { updates.push('slug = ?'); values.push(data.slug); }
+    if (data.description !== undefined) { updates.push('description = ?'); values.push(data.description); }
+    if (data.order !== undefined) { updates.push('sort = ?'); values.push(data.order); }
+    if (data.visible !== undefined) { updates.push('visible = ?'); values.push(data.visible ? 1 : 0); }
+    if (data.pageSlug !== undefined) { updates.push('page_slug = ?'); values.push(data.pageSlug || ''); }
+
+    updates.push('update_time = ?');
+    values.push(now);
+    values.push(data.id);
+
+    await app.model.query(
+      `UPDATE uied_wordpress_tag SET ${updates.join(', ')} WHERE id = ?`,
+      { replacements: values, type: app.Sequelize.QueryTypes.UPDATE }
+    );
+
+    return data;
+  }
+
+  /**
+   * 删除标签配置
+   */
+  async delTag(id) {
+    const { app } = this;
+    await this.ensureTagWidgetTables();
+    await app.model.query(
+      'DELETE FROM uied_wordpress_tag WHERE id = ?',
+      { replacements: [ id ], type: app.Sequelize.QueryTypes.DELETE }
+    );
+  }
+
+  // ==================== WordPress 组件配置 ====================
+
+  /**
+   * 获取组件配置列表
+   */
+  async listWidgets(pageSlug) {
+    const { app } = this;
+    await this.ensureTagWidgetTables();
+
+    let whereClause = '1=1';
+    const replacements = [];
+    if (pageSlug) {
+      whereClause += ' AND page_slug = ?';
+      replacements.push(pageSlug);
+    }
+
+    let rows = [];
+    try {
+      rows = await app.model.query(
+        `SELECT * FROM uied_wordpress_widget WHERE ${whereClause} ORDER BY sort ASC, create_time DESC`,
+        { replacements, type: app.Sequelize.QueryTypes.SELECT }
+      );
+    } catch (error) {
+      if (!this.isSchemaCompatibilityError(error)) {
+        throw error;
+      }
+      this.ctx.logger.warn('[wordpressConfig] listWidgets 降级为空数组:', error.message);
+      return [];
+    }
+
+    return rows.map(item => ({
+      id: item.id,
+      configId: item.config_id,
+      widgetKey: item.widget_key,
+      widgetName: item.widget_name,
+      title: item.title,
+      content: item.content || '',
+      meta: (() => {
+        try {
+          return item.meta_json ? JSON.parse(item.meta_json) : {};
+        } catch (error) {
+          return {};
+        }
+      })(),
+      order: item.sort,
+      visible: item.visible === 1,
+      pageSlug: item.page_slug,
+    }));
+  }
+
+  /**
+   * 创建组件配置
+   */
+  async addWidget(data) {
+    const { app } = this;
+    await this.ensureTagWidgetTables();
+    const now = Math.floor(Date.now() / 1000);
+
+    const [ result ] = await app.model.query(
+      `INSERT INTO uied_wordpress_widget
+       (config_id, widget_key, widget_name, title, content, meta_json, sort, visible, page_slug, create_time, update_time)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      {
+        replacements: [
+          data.configId || null,
+          data.widgetKey || '',
+          data.widgetName || '',
+          data.title || '',
+          data.content || '',
+          JSON.stringify(data.meta || {}),
+          data.order || 0,
+          data.visible !== false ? 1 : 0,
+          data.pageSlug || '',
+          now,
+          now,
+        ],
+        type: app.Sequelize.QueryTypes.INSERT,
+      }
+    );
+
+    return { id: result, ...data };
+  }
+
+  /**
+   * 更新组件配置
+   */
+  async editWidget(data) {
+    const { app } = this;
+    await this.ensureTagWidgetTables();
+    const now = Math.floor(Date.now() / 1000);
+
+    const updates = [];
+    const values = [];
+
+    if (data.configId !== undefined) { updates.push('config_id = ?'); values.push(data.configId || null); }
+    if (data.widgetKey !== undefined) { updates.push('widget_key = ?'); values.push(data.widgetKey || ''); }
+    if (data.widgetName !== undefined) { updates.push('widget_name = ?'); values.push(data.widgetName || ''); }
+    if (data.title !== undefined) { updates.push('title = ?'); values.push(data.title || ''); }
+    if (data.content !== undefined) { updates.push('content = ?'); values.push(data.content || ''); }
+    if (data.meta !== undefined) { updates.push('meta_json = ?'); values.push(JSON.stringify(data.meta || {})); }
+    if (data.order !== undefined) { updates.push('sort = ?'); values.push(data.order || 0); }
+    if (data.visible !== undefined) { updates.push('visible = ?'); values.push(data.visible ? 1 : 0); }
+    if (data.pageSlug !== undefined) { updates.push('page_slug = ?'); values.push(data.pageSlug || ''); }
+
+    updates.push('update_time = ?');
+    values.push(now);
+    values.push(data.id);
+
+    await app.model.query(
+      `UPDATE uied_wordpress_widget SET ${updates.join(', ')} WHERE id = ?`,
+      { replacements: values, type: app.Sequelize.QueryTypes.UPDATE }
+    );
+
+    return data;
+  }
+
+  /**
+   * 删除组件配置
+   */
+  async delWidget(id) {
+    const { app } = this;
+    await this.ensureTagWidgetTables();
+    await app.model.query(
+      'DELETE FROM uied_wordpress_widget WHERE id = ?',
       { replacements: [ id ], type: app.Sequelize.QueryTypes.DELETE }
     );
   }

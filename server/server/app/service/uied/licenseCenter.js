@@ -12,11 +12,14 @@
 
 const Service = require('egg').Service;
 const crypto = require('crypto');
+const { dbTablePrefix = 'la_' } = require('../../extend/config');
 
 const LICENSE_INFO_KEY = 'license_center_info';
 const FEATURE_OVERRIDE_KEY = 'license_feature_overrides';
 const COMMERCIAL_MODE_KEY = 'commercial_mode_config';
 const LICENSE_SIGN_VERSION = 'v1';
+const USER_TABLE = `${dbTablePrefix}user`;
+const MENU_TABLE = `${dbTablePrefix}system_auth_menu`;
 
 class LicenseCenterService extends Service {
   /**
@@ -121,6 +124,18 @@ class LicenseCenterService extends Service {
   }
 
   /**
+   * 将输入值规范化为字符串数组（支持数组/逗号分隔字符串）
+   */
+  toStringList(value) {
+    if (Array.isArray(value)) {
+      return value.map(item => String(item || '').trim()).filter(Boolean);
+    }
+    const text = String(value || '').trim();
+    if (!text) return [];
+    return text.split(',').map(item => item.trim()).filter(Boolean);
+  }
+
+  /**
    * 规范化商业版模式配置
    */
   normalizeCommercialMode(payload = {}) {
@@ -178,13 +193,27 @@ class LicenseCenterService extends Service {
       companyName: String(source.companyName || '').trim(),
       contactEmail: String(source.contactEmail || '').trim(),
       domainLimit: Math.max(1, Number.parseInt(String(source.domainLimit || 1), 10) || 1),
-      domainWhitelist: Array.isArray(source.domainWhitelist)
-        ? source.domainWhitelist.map(item => String(item || '').trim()).filter(Boolean).sort()
-        : [],
+      domainWhitelist: this.toStringList(source.domainWhitelist).sort(),
       issuedAt: Number(source.issuedAt || 0) || 0,
       expiresAt: Number(source.expiresAt || 0) || 0,
       note: String(source.note || '').trim(),
       signVersion: String(source.signVersion || LICENSE_SIGN_VERSION),
+    };
+  }
+
+  /**
+   * 构建并签发许可证数据（用于授权中心发放客户 License 文件）
+   */
+  buildSignedLicense(payload = {}) {
+    const now = Math.floor(Date.now() / 1000);
+    const signed = {
+      ...this.buildLicenseSignPayload(payload),
+      updatedAt: Number(payload?.updatedAt || 0) || now,
+    };
+    signed.signature = this.signLicensePayload(signed);
+    return {
+      ...signed,
+      isSignatureValid: true,
     };
   }
 
@@ -206,6 +235,28 @@ class LicenseCenterService extends Service {
     const expected = String(this.signLicensePayload(payload) || '').trim().toLowerCase();
     if (!expected || signature.length !== expected.length) return false;
     return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+  }
+
+  /**
+   * 校验外部许可证载荷（给后台“验签/导入前校验”使用）
+   */
+  verifyLicensePayload(payload = {}) {
+    const now = Math.floor(Date.now() / 1000);
+    const normalized = {
+      ...this.buildLicenseSignPayload(payload),
+      signature: String(payload?.signature || '').trim().toLowerCase(),
+      updatedAt: Number(payload?.updatedAt || 0) || now,
+    };
+    const isSignatureValid = this.verifyLicenseSignature(normalized);
+    const isExpired = normalized.expiresAt > 0 && normalized.expiresAt < now;
+    const isActive = normalized.status === 'active' && !isExpired && isSignatureValid;
+    return {
+      ...normalized,
+      isSignatureValid,
+      isExpired,
+      isActive,
+      now,
+    };
   }
 
   /**
@@ -283,9 +334,7 @@ class LicenseCenterService extends Service {
       companyName: String(source.companyName || '').trim(),
       contactEmail: String(source.contactEmail || '').trim(),
       domainLimit: Math.max(1, Number.parseInt(String(source.domainLimit || 1), 10) || 1),
-      domainWhitelist: Array.isArray(source.domainWhitelist)
-        ? source.domainWhitelist.map(item => String(item || '').trim()).filter(Boolean)
-        : [],
+      domainWhitelist: this.toStringList(source.domainWhitelist),
       issuedAt: Number(source.issuedAt || 0) || 0,
       expiresAt: Number(source.expiresAt || 0) || 0,
       note: String(source.note || '').trim(),
@@ -324,6 +373,191 @@ class LicenseCenterService extends Service {
     });
     await this.ctx.service.uied.setting.save({ [FEATURE_OVERRIDE_KEY]: next });
     return next;
+  }
+
+  /**
+   * 读取表数据总数（可降级，避免商业版诊断接口因单表异常直接 500）
+   */
+  async safeCount(tableName, whereSql = '1=1', replacements = []) {
+    const { app } = this;
+    try {
+      const [ row ] = await app.model.query(
+        `SELECT COUNT(*) AS total FROM \`${tableName}\` WHERE ${whereSql}`,
+        { replacements, type: app.Sequelize.QueryTypes.SELECT }
+      );
+      return {
+        available: true,
+        count: Number(row?.total || 0),
+        error: '',
+      };
+    } catch (error) {
+      this.ctx.logger.warn(`[licenseCenter] safeCount(${tableName}) 降级: ${error.message}`);
+      return {
+        available: false,
+        count: 0,
+        error: String(error?.message || 'count_failed'),
+      };
+    }
+  }
+
+  /**
+   * 检测商业版关键菜单权限是否出现重复（用于排查“菜单重复显示”）
+   */
+  async scanCommercialMenuDuplicates() {
+    const { app } = this;
+    const targetPerms = [
+      'uied:license:info',
+      'uied:feature:list',
+      'uied:delivery:init:index',
+      'uied:user:center:index',
+    ];
+    try {
+      const placeholders = targetPerms.map(() => '?').join(',');
+      const rows = await app.model.query(
+        `SELECT perms, COUNT(*) AS total, GROUP_CONCAT(id ORDER BY id ASC) AS ids
+         FROM \`${MENU_TABLE}\`
+         WHERE is_delete = 0
+           AND perms IN (${placeholders})
+         GROUP BY perms
+         HAVING COUNT(*) > 1`,
+        {
+          replacements: targetPerms,
+          type: app.Sequelize.QueryTypes.SELECT,
+        }
+      );
+      return (Array.isArray(rows) ? rows : []).map(item => ({
+        perms: String(item?.perms || ''),
+        total: Number(item?.total || 0),
+        ids: String(item?.ids || '').split(',').map(v => Number(v || 0)).filter(Boolean),
+      })).filter(item => item.perms);
+    } catch (error) {
+      this.ctx.logger.warn(`[licenseCenter] scanCommercialMenuDuplicates 降级: ${error.message}`);
+      return [];
+    }
+  }
+
+  /**
+   * 获取商业版总览（运营态检查：许可证、能力开关、数据量、菜单重复）
+   */
+  async getCommercialOverview() {
+    const { ctx } = this;
+    const now = Math.floor(Date.now() / 1000);
+    const [ licenseInfo, commercialMode, featureList, articleConfig ] = await Promise.all([
+      this.getLicenseInfo(),
+      this.getCommercialMode(),
+      this.getFeatureList(),
+      ctx.service.uied.setting.get('articleConfig').catch(() => null),
+    ]);
+    const normalizedArticleConfig = ctx.service.uied.setting.normalizeArticleConfig(articleConfig || {});
+
+    const [
+      websiteCount,
+      websiteCategoryCount,
+      websiteTagCount,
+      articleCount,
+      articleCategoryCount,
+      articleTagCount,
+      userCount,
+      testUserCount,
+      duplicateMenuPerms,
+    ] = await Promise.all([
+      this.safeCount('uied_website', 'is_delete = 0'),
+      this.safeCount('uied_category', 'is_delete = 0'),
+      this.safeCount('uied_website_tag', 'is_delete = 0'),
+      this.safeCount('uied_article', 'is_delete = 0'),
+      this.safeCount('uied_article_category', 'is_delete = 0'),
+      this.safeCount('uied_article_tag', 'is_delete = 0'),
+      this.safeCount(USER_TABLE, 'is_delete = 0'),
+      this.safeCount(USER_TABLE, 'is_delete = 0 AND username LIKE ?', [ 'uied_test_%' ]),
+      this.scanCommercialMenuDuplicates(),
+    ]);
+
+    const checks = [];
+    checks.push({
+      key: 'license_active',
+      status: licenseInfo.isActive ? 'pass' : 'fail',
+      message: licenseInfo.isActive
+        ? `许可证状态正常（${licenseInfo.effectiveEdition}）`
+        : `许可证未生效（status=${licenseInfo.status}）`,
+    });
+    checks.push({
+      key: 'strict_legacy_routes',
+      status: commercialMode.strictLegacyRoutes ? 'pass' : 'warn',
+      message: commercialMode.strictLegacyRoutes
+        ? '严格商业版模式已开启（旧兼容路由关闭）'
+        : '严格商业版模式未开启（旧兼容路由仍可访问）',
+    });
+    checks.push({
+      key: 'license_signature_enforce',
+      status: commercialMode.enforceLicenseSignature ? 'pass' : 'warn',
+      message: commercialMode.enforceLicenseSignature
+        ? '许可证签名强校验已开启'
+        : '许可证签名强校验未开启',
+    });
+    checks.push({
+      key: 'article_module_enabled',
+      status: normalizedArticleConfig.enabled ? 'pass' : 'warn',
+      message: normalizedArticleConfig.enabled
+        ? '文章模块已启用'
+        : '文章模块已关闭（前端文章入口可能为空）',
+    });
+    checks.push({
+      key: 'test_users_seeded',
+      status: testUserCount.count > 0 ? 'pass' : 'warn',
+      message: testUserCount.count > 0
+        ? `已存在测试用户 ${testUserCount.count} 个`
+        : '未检测到测试用户（建议初始化用于交付联调）',
+    });
+    checks.push({
+      key: 'commercial_menu_duplicate',
+      status: duplicateMenuPerms.length > 0 ? 'warn' : 'pass',
+      message: duplicateMenuPerms.length > 0
+        ? `发现 ${duplicateMenuPerms.length} 组商业菜单权限重复`
+        : '未发现商业菜单权限重复',
+    });
+
+    const failCount = checks.filter(item => item.status === 'fail').length;
+    const warnCount = checks.filter(item => item.status === 'warn').length;
+    const score = Math.max(0, 100 - failCount * 25 - warnCount * 8);
+    const level = failCount > 0 ? 'risk' : (warnCount > 2 ? 'attention' : 'ready');
+
+    return {
+      generatedAt: now,
+      score,
+      level,
+      checks,
+      license: {
+        edition: licenseInfo.edition,
+        effectiveEdition: licenseInfo.effectiveEdition,
+        status: licenseInfo.status,
+        isActive: licenseInfo.isActive,
+        isExpired: licenseInfo.isExpired,
+        isSignatureValid: licenseInfo.isSignatureValid,
+        signatureRequired: licenseInfo.signatureRequired,
+        expiresAt: licenseInfo.expiresAt,
+        updatedAt: licenseInfo.updatedAt,
+      },
+      commercialMode,
+      featureSummary: {
+        edition: featureList.edition,
+        totalCount: featureList.totalCount,
+        enabledCount: featureList.enabledCount,
+        disabledCount: Math.max(0, Number(featureList.totalCount || 0) - Number(featureList.enabledCount || 0)),
+      },
+      dataStats: {
+        websites: websiteCount,
+        websiteCategories: websiteCategoryCount,
+        websiteTags: websiteTagCount,
+        articles: articleCount,
+        articleCategories: articleCategoryCount,
+        articleTags: articleTagCount,
+        users: userCount,
+        testUsers: testUserCount,
+      },
+      diagnostics: {
+        duplicateMenuPerms,
+      },
+    };
   }
 
   /**
