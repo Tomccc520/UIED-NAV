@@ -79,7 +79,26 @@ class DailyHotService extends Service {
       defaultPlatforms: [ '哔哩哔哩', '知乎', '微博', '今日头条', 'IT之家', '稀土掘金' ],
       defaultLimit: 10,
       maxPlatforms: 20,
+      displayPlacements: [ 'home_menu', 'footer_link' ],
+      displayLabel: '每日热榜',
+      displayPath: '/p/daily-hot',
+      displaySort: 90,
+      displayDesktop: true,
+      displayMobile: true,
+      displayOpenInNewTab: false,
     };
+  }
+
+  /**
+   * 获取“显示位置”可选项定义
+   */
+  getDisplayPlacementOptions() {
+    return [
+      { value: 'home_menu', label: '首页菜单入口' },
+      { value: 'footer_link', label: '页脚链接' },
+      { value: 'fixed_link', label: '固定悬浮入口' },
+      { value: 'nav_quick_entry', label: '导航快捷入口' },
+    ];
   }
 
   /**
@@ -120,6 +139,18 @@ class DailyHotService extends Service {
   }
 
   /**
+   * 规范化显示位置配置项（只保留白名单值）
+   */
+  normalizeDisplayPlacements(value) {
+    const options = this.getDisplayPlacementOptions();
+    const allowSet = new Set(options.map(item => item.value));
+    const list = this.toStringList(value)
+      .map(item => String(item || '').trim())
+      .filter(item => allowSet.has(item));
+    return Array.from(new Set(list));
+  }
+
+  /**
    * 规范化每日热榜配置
    */
   normalizeConfig(payload = {}) {
@@ -131,6 +162,9 @@ class DailyHotService extends Service {
     const defaultPlatforms = this.toStringList(source.defaultPlatforms);
     const maxPlatforms = this.parsePositiveInt(source.maxPlatforms, defaults.maxPlatforms, 1, 50);
     const defaultLimit = this.parsePositiveInt(source.defaultLimit, defaults.defaultLimit, 1, 30);
+    const displayPlacements = this.normalizeDisplayPlacements(source.displayPlacements);
+    const displayPath = String(source.displayPath || defaults.displayPath).trim() || defaults.displayPath;
+    const displayLabel = String(source.displayLabel || defaults.displayLabel).trim() || defaults.displayLabel;
 
     return {
       enabled: this.parseBoolean(source.enabled, defaults.enabled),
@@ -140,6 +174,13 @@ class DailyHotService extends Service {
       defaultPlatforms: defaultPlatforms.length > 0 ? defaultPlatforms : defaults.defaultPlatforms,
       defaultLimit,
       maxPlatforms,
+      displayPlacements: displayPlacements.length > 0 ? displayPlacements : defaults.displayPlacements,
+      displayLabel,
+      displayPath: displayPath.startsWith('/') ? displayPath : `/${displayPath}`,
+      displaySort: this.parsePositiveInt(source.displaySort, defaults.displaySort, 1, 9999),
+      displayDesktop: this.parseBoolean(source.displayDesktop, defaults.displayDesktop),
+      displayMobile: this.parseBoolean(source.displayMobile, defaults.displayMobile),
+      displayOpenInNewTab: this.parseBoolean(source.displayOpenInNewTab, defaults.displayOpenInNewTab),
       updatedAt: Math.floor(Date.now() / 1000),
     };
   }
@@ -375,6 +416,7 @@ class DailyHotService extends Service {
    * 获取后台页面字段草案
    */
   getFieldDraft() {
+    const placementOptions = this.getDisplayPlacementOptions();
     return {
       globalFields: [
         { key: 'enabled', type: 'switch', label: '启用每日热榜', required: true, defaultValue: true },
@@ -384,6 +426,13 @@ class DailyHotService extends Service {
         { key: 'defaultLimit', type: 'number', label: '默认每平台返回条数', required: true, min: 1, max: 30, defaultValue: 10 },
         { key: 'maxPlatforms', type: 'number', label: '最多聚合平台数', required: true, min: 1, max: 50, defaultValue: 20 },
         { key: 'defaultPlatforms', type: 'array-string', label: '默认平台（按序）', required: true, defaultValue: [ '哔哩哔哩', '知乎', '微博' ] },
+        { key: 'displayPlacements', type: 'checkbox-group', label: '前台显示位置', required: true, options: placementOptions, defaultValue: [ 'home_menu', 'footer_link' ] },
+        { key: 'displayLabel', type: 'input', label: '入口名称', required: true, defaultValue: '每日热榜' },
+        { key: 'displayPath', type: 'input', label: '入口路径', required: true, defaultValue: '/p/daily-hot' },
+        { key: 'displaySort', type: 'number', label: '入口排序', required: true, min: 1, max: 9999, defaultValue: 90 },
+        { key: 'displayDesktop', type: 'switch', label: '桌面端显示', required: true, defaultValue: true },
+        { key: 'displayMobile', type: 'switch', label: '移动端显示', required: true, defaultValue: true },
+        { key: 'displayOpenInNewTab', type: 'switch', label: '新窗口打开', required: true, defaultValue: false },
       ],
       platformFields: [
         { key: 'platformTitle', type: 'input', label: '平台标题', required: true, remark: '需与第三方接口 title 参数一致' },
@@ -398,6 +447,7 @@ class DailyHotService extends Service {
         strategy: 'global + platform 双层缓存策略',
         keyPattern: [ 'uied:dailyhot:platforms:all', 'uied:dailyhot:platform:{title}' ],
       },
+      displayPlacementOptions: placementOptions,
     };
   }
 

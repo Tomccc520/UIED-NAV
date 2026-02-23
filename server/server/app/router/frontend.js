@@ -191,10 +191,14 @@ module.exports = app => {
   get('/api/site-info', controller.uied.frontend.siteInfo);
 
   // ==================== 每日热榜（聚合） ====================
+  // GET /api/daily-hot/config - 获取每日热榜公开显示配置
+  get('/api/daily-hot/config', controller.uied.frontend.dailyHotConfig);
   // GET /api/daily-hot - 获取今日热榜聚合数据
   get('/api/daily-hot', controller.uied.frontend.dailyHotList);
   // GET /api/daily-hot/platforms - 获取热榜平台列表
   get('/api/daily-hot/platforms', controller.uied.frontend.dailyHotPlatforms);
+  // GET /daily-hot/config - 兼容旧前端无 /api 前缀
+  getLegacy('/daily-hot/config', controller.uied.frontend.dailyHotConfig);
   // GET /daily-hot - 兼容旧前端无 /api 前缀
   getLegacy('/daily-hot', controller.uied.frontend.dailyHotList);
   // GET /daily-hot/platforms - 兼容旧前端无 /api 前缀

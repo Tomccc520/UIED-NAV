@@ -57,6 +57,49 @@
                             />
                         </el-form-item>
                     </el-col>
+                    <el-col :span="24">
+                        <el-form-item label="前台显示位置">
+                            <el-checkbox-group v-model="globalForm.displayPlacements">
+                                <el-checkbox
+                                    v-for="item in displayPlacementOptions"
+                                    :key="item.value"
+                                    :label="item.value"
+                                >
+                                    {{ item.label }}
+                                </el-checkbox>
+                            </el-checkbox-group>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item label="入口名称">
+                            <el-input v-model="globalForm.displayLabel" placeholder="每日热榜" />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="10">
+                        <el-form-item label="入口路径">
+                            <el-input v-model="globalForm.displayPath" placeholder="/p/daily-hot" />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-form-item label="入口排序">
+                            <el-input-number v-model="globalForm.displaySort" :min="1" :max="9999" class="!w-full" />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item label="桌面端显示">
+                            <el-switch v-model="globalForm.displayDesktop" />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item label="移动端显示">
+                            <el-switch v-model="globalForm.displayMobile" />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item label="新窗口打开">
+                            <el-switch v-model="globalForm.displayOpenInNewTab" />
+                        </el-form-item>
+                    </el-col>
                 </el-row>
             </el-form>
         </el-card>
@@ -77,6 +120,12 @@
             <el-alert
                 title="平台字段：平台选择/默认排序/缓存策略（平台缓存秒数 + 平台超时）"
                 type="info"
+                :closable="false"
+                class="mb-4"
+            />
+            <el-alert
+                title="显示位置说明：导航菜单/页脚入口会按“每日热榜全局配置”自动注入，无需在前端配置中重复手工维护。"
+                type="success"
                 :closable="false"
                 class="mb-4"
             />
@@ -164,6 +213,13 @@ interface GlobalForm {
     defaultPlatforms: string[]
     defaultLimit: number
     maxPlatforms: number
+    displayPlacements: string[]
+    displayLabel: string
+    displayPath: string
+    displaySort: number
+    displayDesktop: boolean
+    displayMobile: boolean
+    displayOpenInNewTab: boolean
 }
 
 interface PlatformRow {
@@ -184,6 +240,12 @@ const platformSaving = ref(false)
 const schemaLoading = ref(false)
 const schemaData = ref<Record<string, any>>({})
 const platformRows = ref<PlatformRow[]>([])
+const displayPlacementOptions = [
+    { value: 'home_menu', label: '首页菜单入口' },
+    { value: 'footer_link', label: '页脚链接' },
+    { value: 'fixed_link', label: '固定悬浮入口' },
+    { value: 'nav_quick_entry', label: '导航快捷入口' }
+]
 
 const globalForm = reactive<GlobalForm>({
     enabled: true,
@@ -192,7 +254,14 @@ const globalForm = reactive<GlobalForm>({
     cacheTtlSeconds: 600,
     defaultPlatforms: [ '哔哩哔哩', '知乎', '微博' ],
     defaultLimit: 10,
-    maxPlatforms: 20
+    maxPlatforms: 20,
+    displayPlacements: [ 'home_menu', 'footer_link' ],
+    displayLabel: '每日热榜',
+    displayPath: '/p/daily-hot',
+    displaySort: 90,
+    displayDesktop: true,
+    displayMobile: true,
+    displayOpenInNewTab: false
 })
 
 /**
@@ -240,6 +309,15 @@ const loadGlobalConfig = async () => {
         globalForm.defaultLimit = toInt(data?.defaultLimit, 10, 1, 30)
         globalForm.maxPlatforms = toInt(data?.maxPlatforms, 20, 1, 50)
         globalForm.defaultPlatforms = Array.isArray(data?.defaultPlatforms) ? data.defaultPlatforms : []
+        globalForm.displayPlacements = Array.isArray(data?.displayPlacements)
+            ? data.displayPlacements.map((item: any) => String(item || '')).filter(Boolean)
+            : [ 'home_menu', 'footer_link' ]
+        globalForm.displayLabel = String(data?.displayLabel || '每日热榜')
+        globalForm.displayPath = String(data?.displayPath || '/p/daily-hot')
+        globalForm.displaySort = toInt(data?.displaySort, 90, 1, 9999)
+        globalForm.displayDesktop = data?.displayDesktop !== false
+        globalForm.displayMobile = data?.displayMobile !== false
+        globalForm.displayOpenInNewTab = data?.displayOpenInNewTab === true
     } finally {
         globalLoading.value = false
     }
@@ -301,7 +379,16 @@ const handleSaveGlobalConfig = async () => {
             cacheTtlSeconds: toInt(globalForm.cacheTtlSeconds, 600, 30, 86400),
             defaultPlatforms: Array.isArray(globalForm.defaultPlatforms) ? globalForm.defaultPlatforms : [],
             defaultLimit: toInt(globalForm.defaultLimit, 10, 1, 30),
-            maxPlatforms: toInt(globalForm.maxPlatforms, 20, 1, 50)
+            maxPlatforms: toInt(globalForm.maxPlatforms, 20, 1, 50),
+            displayPlacements: Array.isArray(globalForm.displayPlacements)
+                ? globalForm.displayPlacements.map((item) => String(item || '').trim()).filter(Boolean)
+                : [],
+            displayLabel: String(globalForm.displayLabel || '').trim() || '每日热榜',
+            displayPath: String(globalForm.displayPath || '').trim() || '/p/daily-hot',
+            displaySort: toInt(globalForm.displaySort, 90, 1, 9999),
+            displayDesktop: globalForm.displayDesktop !== false,
+            displayMobile: globalForm.displayMobile !== false,
+            displayOpenInNewTab: globalForm.displayOpenInNewTab === true
         })
         feedback.msgSuccess('全局配置保存成功')
     } finally {

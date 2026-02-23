@@ -847,10 +847,14 @@ class FrontendController extends Controller {
         parentId: menu.parentId ? String(menu.parentId) : null,
         order: menu.sort || 0,
         visible: menu.isShow !== false,
+        builtinKey: menu.builtinKey || '',
+        linkMode: menu.linkMode || 'custom',
         children: (menu.children || []).map(transformMenu),
       });
 
-      ctx.body = menus.map(transformMenu);
+      const dailyHotConfig = await this.getDailyHotDisplayConfig().catch(() => null);
+      const result = this.applyBuiltinNavMenuRefs(menus.map(transformMenu), { dailyHotConfig });
+      ctx.body = this.appendDailyHotNavMenuItem(result, dailyHotConfig);
     } catch (error) {
       ctx.logger.error('获取导航菜单失败:', error);
       ctx.status = 500;
@@ -912,10 +916,14 @@ class FrontendController extends Controller {
           external: link.external || false,
           order: link.sort || 0,
           visible: link.isShow !== false,
+          builtinKey: link.builtinKey || '',
+          linkMode: link.linkMode || 'custom',
         })),
       }));
 
-      ctx.body = result;
+      const dailyHotConfig = await this.getDailyHotDisplayConfig().catch(() => null);
+      const resolved = this.applyBuiltinFooterLinks(result, { dailyHotConfig });
+      ctx.body = this.appendDailyHotFooterLink(resolved, dailyHotConfig);
     } catch (error) {
       ctx.logger.error('获取页脚设置失败:', error);
       ctx.status = 500;
@@ -1036,6 +1044,33 @@ class FrontendController extends Controller {
       ctx.logger.error('获取站点信息失败:', error);
       ctx.status = 500;
       ctx.body = { error: error.message };
+    }
+  }
+
+  /**
+   * 获取每日热榜公开显示配置
+   * GET /api/daily-hot/config
+   */
+  async dailyHotConfig() {
+    const { ctx } = this;
+
+    try {
+      const config = await ctx.service.uied.dailyHot.getConfig();
+      ctx.body = {
+        enabled: config?.enabled !== false,
+        displayPlacements: Array.isArray(config?.displayPlacements) ? config.displayPlacements : [],
+        displayLabel: String(config?.displayLabel || '每日热榜'),
+        displayPath: String(config?.displayPath || '/p/daily-hot'),
+        displaySort: Number(config?.displaySort || 90),
+        displayDesktop: config?.displayDesktop !== false,
+        displayMobile: config?.displayMobile !== false,
+        displayOpenInNewTab: config?.displayOpenInNewTab === true,
+        updatedAt: Number(config?.updatedAt || 0),
+      };
+    } catch (error) {
+      ctx.logger.error('获取每日热榜公开配置失败:', error);
+      ctx.status = 500;
+      ctx.body = { error: error.message || '获取每日热榜公开配置失败' };
     }
   }
 
@@ -2098,6 +2133,193 @@ class FrontendController extends Controller {
       ctx.status = 500;
       ctx.body = { error: error.message };
     }
+  }
+
+  /**
+   * 获取每日热榜显示配置（供导航菜单/页脚自动注入使用）
+   */
+  async getDailyHotDisplayConfig() {
+    const { ctx } = this;
+    const config = await ctx.service.uied.dailyHot.getConfig();
+    const placements = Array.isArray(config?.displayPlacements)
+      ? config.displayPlacements.map(item => String(item || '').trim()).filter(Boolean)
+      : [];
+    return {
+      enabled: config?.enabled !== false,
+      displayPlacements: Array.from(new Set(placements)),
+      displayLabel: String(config?.displayLabel || '每日热榜').trim() || '每日热榜',
+      displayPath: this.normalizePath(config?.displayPath || '/p/daily-hot'),
+      displaySort: this.parsePositiveInt(config?.displaySort, 90),
+      displayDesktop: config?.displayDesktop !== false,
+      displayMobile: config?.displayMobile !== false,
+      displayOpenInNewTab: config?.displayOpenInNewTab === true,
+    };
+  }
+
+  /**
+   * 规范化路径（确保前导斜杠）
+   */
+  normalizePath(path) {
+    const text = String(path || '').trim();
+    if (!text) return '/';
+    if (/^(https?:)?\/\//i.test(text)) return text;
+    return text.startsWith('/') ? text : `/${text}`;
+  }
+
+  /**
+   * 按内置入口配置解析导航菜单项（当前先支持 daily_hot）
+   */
+  applyBuiltinNavMenuRefs(rows = [], context = {}) {
+    const list = Array.isArray(rows) ? rows : [];
+    const dailyHotConfig = context?.dailyHotConfig || null;
+
+    return list.map(item => {
+      const next = {
+        ...item,
+        children: this.applyBuiltinNavMenuRefs(item?.children || [], context),
+      };
+      const builtinKey = String(next?.builtinKey || '').trim().toLowerCase();
+      if (builtinKey === 'daily_hot' && dailyHotConfig) {
+        next.link = dailyHotConfig.displayPath || next.link || '/p/daily-hot';
+        if (!String(next.text || '').trim()) {
+          next.text = dailyHotConfig.displayLabel || '每日热榜';
+        }
+      }
+      return next;
+    });
+  }
+
+  /**
+   * 按内置入口配置解析页脚链接（当前先支持 daily_hot）
+   */
+  applyBuiltinFooterLinks(groups = [], context = {}) {
+    const list = Array.isArray(groups) ? groups : [];
+    const dailyHotConfig = context?.dailyHotConfig || null;
+
+    return list.map(group => ({
+      ...group,
+      links: (Array.isArray(group?.links) ? group.links : []).map(link => {
+        const next = { ...link };
+        const builtinKey = String(next?.builtinKey || '').trim().toLowerCase();
+        if (builtinKey === 'daily_hot' && dailyHotConfig) {
+          next.url = dailyHotConfig.displayPath || next.url || '/p/daily-hot';
+          if (!String(next.text || '').trim()) {
+            next.text = dailyHotConfig.displayLabel || '每日热榜';
+          }
+        }
+        return next;
+      }),
+    }));
+  }
+
+  /**
+   * 判断导航菜单是否已存在同目标链接（避免重复注入）
+   */
+  hasNavMenuLink(rows = [], targetPath = '') {
+    const list = Array.isArray(rows) ? rows : [];
+    const normalizedTarget = this.normalizePath(targetPath);
+    const walk = items => items.some(item => {
+      const builtinKey = String(item?.builtinKey || '').trim().toLowerCase();
+      if (builtinKey === 'daily_hot') return true;
+      const currentLink = item?.link ? this.normalizePath(item.link) : '';
+      if (currentLink && currentLink === normalizedTarget) return true;
+      return Array.isArray(item?.children) && walk(item.children);
+    });
+    return walk(list);
+  }
+
+  /**
+   * 按每日热榜配置自动注入导航菜单入口（首页菜单）
+   */
+  appendDailyHotNavMenuItem(rows = [], config = null) {
+    const list = Array.isArray(rows) ? rows.slice() : [];
+    if (!config || config.enabled === false) return list;
+    if (!Array.isArray(config.displayPlacements) || !config.displayPlacements.includes('home_menu')) return list;
+    if (!config.displayPath || this.hasNavMenuLink(list, config.displayPath)) return list;
+
+    list.push({
+      id: 'builtin:daily-hot',
+      text: config.displayLabel,
+      link: config.displayPath,
+      external: config.displayOpenInNewTab === true,
+      label: '内置',
+      labelType: 'info',
+      icon: 'TrendCharts',
+      parentId: null,
+      order: Number(config.displaySort || 90),
+      visible: true,
+      children: [],
+      builtin: true,
+      builtinKey: 'daily_hot',
+      displayDesktop: config.displayDesktop !== false,
+      displayMobile: config.displayMobile !== false,
+    });
+
+    return list.sort((a, b) => Number(a?.order || 0) - Number(b?.order || 0));
+  }
+
+  /**
+   * 判断页脚链接是否已存在同目标链接（避免重复注入）
+   */
+  hasFooterLink(groups = [], targetPath = '') {
+    const normalizedTarget = this.normalizePath(targetPath);
+    return (Array.isArray(groups) ? groups : []).some(group =>
+      Array.isArray(group?.links) && group.links.some(link => {
+        const builtinKey = String(link?.builtinKey || '').trim().toLowerCase();
+        if (builtinKey === 'daily_hot') return true;
+        const currentLink = link?.url ? this.normalizePath(link.url) : '';
+        return currentLink && currentLink === normalizedTarget;
+      })
+    );
+  }
+
+  /**
+   * 按每日热榜配置自动注入页脚链接（页脚显示）
+   */
+  appendDailyHotFooterLink(groups = [], config = null) {
+    const list = Array.isArray(groups) ? groups.map(group => ({
+      ...group,
+      links: Array.isArray(group?.links) ? group.links.slice() : [],
+    })) : [];
+
+    if (!config || config.enabled === false) return list;
+    if (!Array.isArray(config.displayPlacements) || !config.displayPlacements.includes('footer_link')) return list;
+    if (!config.displayPath || this.hasFooterLink(list, config.displayPath)) return list;
+
+    const targetGroup = list.find(group => group?.visible !== false)
+      || null;
+
+    const builtinLink = {
+      id: 'builtin:daily-hot-footer',
+      text: config.displayLabel,
+      url: config.displayPath,
+      external: config.displayOpenInNewTab === true,
+      order: Number(config.displaySort || 90),
+      visible: true,
+      builtin: true,
+      builtinKey: 'daily_hot',
+      displayDesktop: config.displayDesktop !== false,
+      displayMobile: config.displayMobile !== false,
+    };
+
+    if (targetGroup) {
+      targetGroup.links.push(builtinLink);
+      targetGroup.links.sort((a, b) => Number(a?.order || 0) - Number(b?.order || 0));
+      return list;
+    }
+
+    return [
+      ...list,
+      {
+        id: 'builtin:daily-hot-group',
+        title: '热门榜单',
+        order: 999,
+        visible: true,
+        links: [ builtinLink ],
+        builtin: true,
+        builtinKey: 'daily_hot',
+      },
+    ];
   }
 
   /**

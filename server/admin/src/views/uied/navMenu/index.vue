@@ -69,6 +69,13 @@
                         </el-tag>
                     </template>
                 </el-table-column>
+                <el-table-column label="链接类型" width="100" align="center">
+                    <template #default="{ row }">
+                        <el-tag :type="row.linkMode === 'builtin' ? 'warning' : 'info'" size="small">
+                            {{ row.linkMode === 'builtin' ? '内置功能' : '自定义' }}
+                        </el-tag>
+                    </template>
+                </el-table-column>
                 <el-table-column label="链接" prop="url" min-width="200" show-overflow-tooltip />
                 <el-table-column label="排序" prop="sortOrder" width="80" align="center" />
                 <el-table-column label="新窗口" width="80" align="center">
@@ -113,7 +120,27 @@
                 <el-form-item label="菜单名称" prop="name">
                     <el-input v-model="editData.name" placeholder="请输入菜单名称" />
                 </el-form-item>
-                <el-form-item label="链接地址">
+                <el-form-item label="链接类型">
+                    <el-radio-group v-model="editData.linkMode">
+                        <el-radio label="custom">自定义链接</el-radio>
+                        <el-radio label="builtin">内置功能</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item v-if="editData.linkMode === 'builtin'" label="内置功能" prop="builtinKey">
+                    <el-select v-model="editData.builtinKey" placeholder="请选择内置功能" style="width: 100%">
+                        <el-option
+                            v-for="item in builtinNavEntryOptions"
+                            :key="item.key"
+                            :label="item.label"
+                            :value="item.key"
+                        />
+                    </el-select>
+                    <div class="text-xs text-gray-400 mt-1">
+                        运营只需配置标题/标签/排序，路径由系统自动维护
+                        <span v-if="builtinLinkPreview">（当前预览：{{ builtinLinkPreview }}）</span>
+                    </div>
+                </el-form-item>
+                <el-form-item v-else label="链接地址">
                     <el-input v-model="editData.url" placeholder="请输入链接地址" />
                 </el-form-item>
                 <el-form-item label="图标">
@@ -182,7 +209,15 @@ interface NavMenuItem {
     labelType: string
     openInNewTab: boolean
     isActive: boolean
+    builtinKey?: string
+    linkMode?: 'custom' | 'builtin'
     children?: NavMenuItem[]
+}
+
+interface BuiltinNavEntryOption {
+    key: string
+    label: string
+    defaultPath: string
 }
 
 const loading = ref(false)
@@ -191,6 +226,9 @@ const menuTreeOptions = ref<any[]>([])
 const isExpanded = ref(true)
 const tableRef = ref<TableInstance>()
 const iconNameSet = new Set<string>([...getElementPlusIconNames(), ...getLocalIconNames()])
+const builtinNavEntryOptions: BuiltinNavEntryOption[] = [
+    { key: 'daily_hot', label: '每日热榜', defaultPath: '/p/daily-hot' }
+]
 
 // 计算菜单统计
 const totalMenus = computed(() => {
@@ -209,6 +247,8 @@ const editData = reactive({
     id: 0,
     parentId: 0,
     name: '',
+    linkMode: 'custom' as 'custom' | 'builtin',
+    builtinKey: '',
     url: '',
     icon: '',
     sortOrder: 0,
@@ -218,8 +258,34 @@ const editData = reactive({
     isActive: true
 })
 const editRules: FormRules = {
-    name: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }]
+    name: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }],
+    builtinKey: [{
+        validator: (_rule, value, callback) => {
+            if (editData.linkMode === 'builtin' && !String(value || '').trim()) {
+                callback(new Error('请选择内置功能'))
+                return
+            }
+            callback()
+        },
+        trigger: 'change'
+    }]
 }
+
+/**
+ * 获取内置入口默认路径（用于内置功能模式自动回填）
+ */
+const getBuiltinDefaultPath = (builtinKey?: string): string => {
+    const option = builtinNavEntryOptions.find((item) => item.key === String(builtinKey || '').trim())
+    return option?.defaultPath || ''
+}
+
+/**
+ * 内置入口路径预览
+ */
+const builtinLinkPreview = computed(() => {
+    if (editData.linkMode !== 'builtin') return ''
+    return getBuiltinDefaultPath(editData.builtinKey)
+})
 
 /**
  * 解析并规范化图标名称，兼容历史无前缀图标值
@@ -251,7 +317,8 @@ const getLists = async () => {
         // request interceptor 已解包 data，res 直接就是数组
         menuTree.value = (Array.isArray(res) ? res : res || []).map((item: NavMenuItem) => ({
             ...item,
-            icon: normalizeIconName(item.icon)
+            icon: normalizeIconName(item.icon),
+            linkMode: item.builtinKey ? 'builtin' : 'custom'
         }))
         menuTreeOptions.value = [
             { value: 0, label: '顶级菜单' },
@@ -281,6 +348,8 @@ const resetEditData = () =>
         id: 0,
         parentId: 0,
         name: '',
+        linkMode: 'custom',
+        builtinKey: '',
         url: '',
         icon: '',
         sortOrder: 0,
@@ -303,9 +372,28 @@ const handleAdd = (parentId: number) => {
  * 打开编辑菜单弹窗
  */
 const handleEdit = (row: NavMenuItem) => {
-    Object.assign(editData, row, { icon: normalizeIconName(row.icon) })
+    Object.assign(editData, row, {
+        icon: normalizeIconName(row.icon),
+        linkMode: row.builtinKey ? 'builtin' : 'custom',
+        builtinKey: String(row.builtinKey || '')
+    })
     showEdit.value = true
 }
+
+/**
+ * 当链接类型切换为内置功能时，同步默认路径（仅做回填预览/保存兜底）
+ */
+watch(
+    () => [editData.linkMode, editData.builtinKey],
+    ([linkMode]) => {
+        if (linkMode !== 'builtin') return
+        const defaultPath = getBuiltinDefaultPath(editData.builtinKey)
+        if (defaultPath) {
+            editData.url = defaultPath
+        }
+    },
+    { immediate: false }
+)
 
 /**
  * 提交菜单编辑数据
@@ -316,7 +404,11 @@ const handleSubmit = async () => {
     try {
         const submitData = {
             ...editData,
-            icon: normalizeIconName(editData.icon)
+            icon: normalizeIconName(editData.icon),
+            builtinKey: editData.linkMode === 'builtin' ? String(editData.builtinKey || '').trim() : '',
+            url: editData.linkMode === 'builtin'
+                ? (getBuiltinDefaultPath(editData.builtinKey) || String(editData.url || ''))
+                : String(editData.url || '').trim()
         }
         if (editData.id) {
             await uiedNavMenuEdit(submitData)

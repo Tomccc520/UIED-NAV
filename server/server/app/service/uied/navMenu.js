@@ -14,6 +14,73 @@ const Service = require('egg').Service;
 
 class NavMenuService extends Service {
   /**
+   * 规范化内置入口键（当前先支持 daily_hot，后续可扩展）
+   */
+  normalizeBuiltinKey(value) {
+    const key = String(value || '').trim().toLowerCase();
+    if (!key) return '';
+    const allowSet = new Set([ 'daily_hot' ]);
+    return allowSet.has(key) ? key : '';
+  }
+
+  /**
+   * 从 old_id 中提取内置入口键
+   */
+  parseBuiltinKeyFromOldId(oldId) {
+    const text = String(oldId || '').trim();
+    if (!text.startsWith('builtin:')) return '';
+    return this.normalizeBuiltinKey(text.slice('builtin:'.length));
+  }
+
+  /**
+   * 生成 old_id 存储值（内置入口模式）
+   */
+  buildOldIdFromBuiltinKey(builtinKey) {
+    const normalized = this.normalizeBuiltinKey(builtinKey);
+    return normalized ? `builtin:${normalized}` : null;
+  }
+
+  /**
+   * 获取内置入口默认链接（用于后台保存时兜底）
+   */
+  getBuiltinDefaultLink(builtinKey) {
+    const normalized = this.normalizeBuiltinKey(builtinKey);
+    if (normalized === 'daily_hot') return '/p/daily-hot';
+    return '';
+  }
+
+  /**
+   * 构建菜单保存数据（统一处理内置入口/自定义链接）
+   */
+  buildPersistPayload(data = {}) {
+    const linkMode = String(data.linkMode || '').trim().toLowerCase();
+    const builtinKey = this.normalizeBuiltinKey(data.builtinKey);
+    const useBuiltin = linkMode === 'builtin' && Boolean(builtinKey);
+    const rawOldId = String(data.oldId || '').trim();
+    const oldId = useBuiltin
+      ? this.buildOldIdFromBuiltinKey(builtinKey)
+      : (this.parseBuiltinKeyFromOldId(rawOldId) ? null : (rawOldId || null));
+    const rawLink = String(data.link || data.url || '').trim();
+    const link = useBuiltin ? (rawLink || this.getBuiltinDefaultLink(builtinKey)) : rawLink;
+
+    return {
+      text: data.text || data.name || '',
+      link,
+      icon: data.icon || '',
+      parentId: data.parentId || null,
+      sort: data.sort || data.sortOrder || 0,
+      isShow: data.isShow !== false ? 1 : 0,
+      external: data.external || data.openInNewTab ? 1 : 0,
+      label: data.label || null,
+      labelType: data.labelType || null,
+      builtinKey: useBuiltin ? builtinKey : '',
+      oldId,
+      hasBuiltinControl: Object.prototype.hasOwnProperty.call(data, 'builtinKey')
+        || Object.prototype.hasOwnProperty.call(data, 'linkMode'),
+    };
+  }
+
+  /**
    * 导航菜单列表（分页）
    */
   async list(params = {}) {
@@ -33,7 +100,7 @@ class NavMenuService extends Service {
     );
 
     return {
-      lists: lists.map(this.formatItem),
+      lists: lists.map(item => this.formatItem(item)),
       count: countResult.total,
       pageNo: page,
       pageSize,
@@ -49,7 +116,7 @@ class NavMenuService extends Service {
       'SELECT * FROM uied_nav_menu WHERE is_delete = 0 ORDER BY sort ASC, id ASC',
       { type: app.Sequelize.QueryTypes.SELECT }
     );
-    return this.buildTree(items.map(this.formatItem));
+    return this.buildTree(items.map(item => this.formatItem(item)));
   }
 
   /**
@@ -70,21 +137,23 @@ class NavMenuService extends Service {
   async add(data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
+    const payload = this.buildPersistPayload(data);
 
     const [ result ] = await app.model.query(
-      `INSERT INTO uied_nav_menu (text, link, icon, parent_id, sort, is_show, external, label, label_type, create_time, update_time)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO uied_nav_menu (old_id, text, link, icon, parent_id, sort, is_show, external, label, label_type, create_time, update_time)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       {
         replacements: [
-          data.text || data.name || '',
-          data.link || data.url || '',
-          data.icon || '',
-          data.parentId || null,
-          data.sort || data.sortOrder || 0,
-          data.isShow !== false ? 1 : 0,
-          data.external || data.openInNewTab ? 1 : 0,
-          data.label || null,
-          data.labelType || null,
+          payload.oldId,
+          payload.text,
+          payload.link,
+          payload.icon,
+          payload.parentId,
+          payload.sort,
+          payload.isShow,
+          payload.external,
+          payload.label,
+          payload.labelType,
           now, now,
         ],
         type: app.Sequelize.QueryTypes.INSERT,
@@ -100,21 +169,46 @@ class NavMenuService extends Service {
   async edit(data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
+    const payload = this.buildPersistPayload(data);
+
+    if (payload.hasBuiltinControl) {
+      await app.model.query(
+        `UPDATE uied_nav_menu SET old_id = ?, text = ?, link = ?, icon = ?, parent_id = ?,
+         sort = ?, is_show = ?, external = ?, label = ?, label_type = ?, update_time = ? WHERE id = ?`,
+        {
+          replacements: [
+            payload.oldId,
+            payload.text,
+            payload.link,
+            payload.icon,
+            payload.parentId,
+            payload.sort,
+            payload.isShow,
+            payload.external,
+            payload.label,
+            payload.labelType,
+            now, data.id,
+          ],
+          type: app.Sequelize.QueryTypes.UPDATE,
+        }
+      );
+      return;
+    }
 
     await app.model.query(
       `UPDATE uied_nav_menu SET text = ?, link = ?, icon = ?, parent_id = ?,
        sort = ?, is_show = ?, external = ?, label = ?, label_type = ?, update_time = ? WHERE id = ?`,
       {
         replacements: [
-          data.text || data.name || '',
-          data.link || data.url || '',
-          data.icon || '',
-          data.parentId || null,
-          data.sort || data.sortOrder || 0,
-          data.isShow !== false ? 1 : 0,
-          data.external || data.openInNewTab ? 1 : 0,
-          data.label || null,
-          data.labelType || null,
+          payload.text,
+          payload.link,
+          payload.icon,
+          payload.parentId,
+          payload.sort,
+          payload.isShow,
+          payload.external,
+          payload.label,
+          payload.labelType,
           now, data.id,
         ],
         type: app.Sequelize.QueryTypes.UPDATE,
@@ -155,8 +249,12 @@ class NavMenuService extends Service {
    * 格式化数据 - 映射数据库字段到前端字段
    */
   formatItem(item) {
+    const builtinKey = this.parseBuiltinKeyFromOldId(item.old_id);
     return {
       id: item.id,
+      oldId: item.old_id,
+      builtinKey,
+      linkMode: builtinKey ? 'builtin' : 'custom',
       text: item.text,
       name: item.text, // 兼容前端
       link: item.link,

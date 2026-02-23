@@ -13,6 +13,70 @@
 const Service = require('egg').Service;
 
 class FooterService extends Service {
+  /**
+   * 规范化内置入口键（当前先支持 daily_hot，后续可扩展）
+   */
+  normalizeBuiltinKey(value) {
+    const key = String(value || '').trim().toLowerCase();
+    if (!key) return '';
+    const allowSet = new Set([ 'daily_hot' ]);
+    return allowSet.has(key) ? key : '';
+  }
+
+  /**
+   * 从 old_id 中提取内置入口键
+   */
+  parseBuiltinKeyFromOldId(oldId) {
+    const text = String(oldId || '').trim();
+    if (!text.startsWith('builtin:')) return '';
+    return this.normalizeBuiltinKey(text.slice('builtin:'.length));
+  }
+
+  /**
+   * 生成 old_id 存储值（内置入口模式）
+   */
+  buildOldIdFromBuiltinKey(builtinKey) {
+    const normalized = this.normalizeBuiltinKey(builtinKey);
+    return normalized ? `builtin:${normalized}` : null;
+  }
+
+  /**
+   * 获取内置入口默认链接（用于后台保存时兜底）
+   */
+  getBuiltinDefaultUrl(builtinKey) {
+    const normalized = this.normalizeBuiltinKey(builtinKey);
+    if (normalized === 'daily_hot') return '/p/daily-hot';
+    return '';
+  }
+
+  /**
+   * 构建页脚链接保存数据（统一处理内置入口/自定义链接）
+   */
+  buildLinkPersistPayload(data = {}) {
+    const linkMode = String(data.linkMode || '').trim().toLowerCase();
+    const builtinKey = this.normalizeBuiltinKey(data.builtinKey);
+    const useBuiltin = linkMode === 'builtin' && Boolean(builtinKey);
+    const rawOldId = String(data.oldId || '').trim();
+    const oldId = useBuiltin
+      ? this.buildOldIdFromBuiltinKey(builtinKey)
+      : (this.parseBuiltinKeyFromOldId(rawOldId) ? null : (rawOldId || null));
+    const rawUrl = String(data.url || '').trim();
+    const url = useBuiltin ? (rawUrl || this.getBuiltinDefaultUrl(builtinKey)) : rawUrl;
+
+    return {
+      groupId: data.groupId || 0,
+      text: data.text || data.name || '',
+      url,
+      external: data.external || data.openInNewTab ? 1 : 0,
+      sort: data.sort || data.sortOrder || 0,
+      isShow: data.isShow !== false ? 1 : 0,
+      builtinKey: useBuiltin ? builtinKey : '',
+      oldId,
+      hasBuiltinControl: Object.prototype.hasOwnProperty.call(data, 'builtinKey')
+        || Object.prototype.hasOwnProperty.call(data, 'linkMode'),
+    };
+  }
+
   // ==================== 页脚分组 ====================
   async groupList(params = {}) {
     const { app } = this;
@@ -36,11 +100,11 @@ class FooterService extends Service {
         'SELECT * FROM uied_footer_link WHERE group_id = ? AND is_delete = 0 ORDER BY sort ASC',
         { replacements: [ group.id ], type: app.Sequelize.QueryTypes.SELECT }
       );
-      group.links = links.map(this.formatLink);
+      group.links = links.map(item => this.formatLink(item));
     }
 
     return {
-      lists: groups.map(this.formatGroup),
+      lists: groups.map(item => this.formatGroup(item)),
       count: countResult.total,
       pageNo: page,
       pageSize,
@@ -60,10 +124,10 @@ class FooterService extends Service {
         'SELECT * FROM uied_footer_link WHERE group_id = ? AND is_delete = 0 ORDER BY sort ASC',
         { replacements: [ group.id ], type: app.Sequelize.QueryTypes.SELECT }
       );
-      group.links = links.map(this.formatLink);
+      group.links = links.map(item => this.formatLink(item));
     }
 
-    return groups.map(this.formatGroup);
+    return groups.map(item => this.formatGroup(item));
   }
 
   async groupAdd(data) {
@@ -147,7 +211,7 @@ class FooterService extends Service {
     );
 
     return {
-      lists: lists.map(this.formatLink),
+      lists: lists.map(item => this.formatLink(item)),
       count: countResult.total,
       pageNo: page,
       pageSize,
@@ -157,18 +221,20 @@ class FooterService extends Service {
   async linkAdd(data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
+    const payload = this.buildLinkPersistPayload(data);
 
     const [ result ] = await app.model.query(
-      `INSERT INTO uied_footer_link (group_id, text, url, external, sort, is_show, create_time, update_time)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO uied_footer_link (old_id, group_id, text, url, external, sort, is_show, create_time, update_time)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       {
         replacements: [
-          data.groupId || 0,
-          data.text || data.name || '',
-          data.url || '',
-          data.external || data.openInNewTab ? 1 : 0,
-          data.sort || data.sortOrder || 0,
-          data.isShow !== false ? 1 : 0,
+          payload.oldId,
+          payload.groupId,
+          payload.text,
+          payload.url,
+          payload.external,
+          payload.sort,
+          payload.isShow,
           now, now,
         ],
         type: app.Sequelize.QueryTypes.INSERT,
@@ -181,18 +247,40 @@ class FooterService extends Service {
   async linkEdit(data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
+    const payload = this.buildLinkPersistPayload(data);
+
+    if (payload.hasBuiltinControl) {
+      await app.model.query(
+        `UPDATE uied_footer_link SET old_id = ?, group_id = ?, text = ?, url = ?, external = ?,
+         sort = ?, is_show = ?, update_time = ? WHERE id = ?`,
+        {
+          replacements: [
+            payload.oldId,
+            payload.groupId,
+            payload.text,
+            payload.url,
+            payload.external,
+            payload.sort,
+            payload.isShow,
+            now, data.id,
+          ],
+          type: app.Sequelize.QueryTypes.UPDATE,
+        }
+      );
+      return;
+    }
 
     await app.model.query(
       `UPDATE uied_footer_link SET group_id = ?, text = ?, url = ?, external = ?,
        sort = ?, is_show = ?, update_time = ? WHERE id = ?`,
       {
         replacements: [
-          data.groupId || 0,
-          data.text || data.name || '',
-          data.url || '',
-          data.external || data.openInNewTab ? 1 : 0,
-          data.sort || data.sortOrder || 0,
-          data.isShow !== false ? 1 : 0,
+          payload.groupId,
+          payload.text,
+          payload.url,
+          payload.external,
+          payload.sort,
+          payload.isShow,
           now, data.id,
         ],
         type: app.Sequelize.QueryTypes.UPDATE,
@@ -225,8 +313,12 @@ class FooterService extends Service {
   }
 
   formatLink(item) {
+    const builtinKey = this.parseBuiltinKeyFromOldId(item.old_id);
     return {
       id: item.id,
+      oldId: item.old_id,
+      builtinKey,
+      linkMode: builtinKey ? 'builtin' : 'custom',
       groupId: item.group_id,
       groupName: item.group_name,
       text: item.text,

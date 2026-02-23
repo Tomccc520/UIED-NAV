@@ -74,6 +74,13 @@
                             min-width="200"
                             show-overflow-tooltip
                         />
+                        <el-table-column label="链接类型" width="100">
+                            <template #default="{ row }">
+                                <el-tag :type="row.linkMode === 'builtin' ? 'warning' : 'info'" size="small">
+                                    {{ row.linkMode === 'builtin' ? '内置功能' : '自定义' }}
+                                </el-tag>
+                            </template>
+                        </el-table-column>
                         <el-table-column label="排序" prop="sortOrder" width="80" />
                         <el-table-column label="状态" width="80">
                             <template #default="{ row }">
@@ -149,7 +156,26 @@
                 <el-form-item label="链接名称" prop="name">
                     <el-input v-model="linkData.name" placeholder="请输入链接名称" />
                 </el-form-item>
-                <el-form-item label="链接地址" prop="url">
+                <el-form-item label="链接类型">
+                    <el-radio-group v-model="linkData.linkMode">
+                        <el-radio label="custom">自定义链接</el-radio>
+                        <el-radio label="builtin">内置功能</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item v-if="linkData.linkMode === 'builtin'" label="内置功能" prop="builtinKey">
+                    <el-select v-model="linkData.builtinKey" placeholder="请选择内置功能" style="width: 100%">
+                        <el-option
+                            v-for="item in builtinFooterEntryOptions"
+                            :key="item.key"
+                            :label="item.label"
+                            :value="item.key"
+                        />
+                    </el-select>
+                    <div class="text-xs text-gray-400 mt-1">
+                        路径由系统自动维护，当前预览：{{ builtinFooterLinkPreview || '-' }}
+                    </div>
+                </el-form-item>
+                <el-form-item v-else label="链接地址" prop="url">
                     <el-input v-model="linkData.url" placeholder="请输入链接地址" />
                 </el-form-item>
                 <el-form-item label="图标">
@@ -226,6 +252,8 @@ const linkData = reactive({
     id: 0,
     groupId: undefined as number | undefined,
     name: '',
+    linkMode: 'custom' as 'custom' | 'builtin',
+    builtinKey: '',
     url: '',
     icon: '',
     sortOrder: 0,
@@ -235,8 +263,50 @@ const linkData = reactive({
 const linkRules: FormRules = {
     groupId: [{ required: true, message: '请选择分组', trigger: 'change' }],
     name: [{ required: true, message: '请输入链接名称', trigger: 'blur' }],
-    url: [{ required: true, message: '请输入链接地址', trigger: 'blur' }]
+    url: [{
+        validator: (_rule, value, callback) => {
+            if (linkData.linkMode === 'custom' && !String(value || '').trim()) {
+                callback(new Error('请输入链接地址'))
+                return
+            }
+            callback()
+        },
+        trigger: 'blur'
+    }],
+    builtinKey: [{
+        validator: (_rule, value, callback) => {
+            if (linkData.linkMode === 'builtin' && !String(value || '').trim()) {
+                callback(new Error('请选择内置功能'))
+                return
+            }
+            callback()
+        },
+        trigger: 'change'
+    }]
 }
+
+/**
+ * 内置页脚入口选项（当前先支持每日热榜）
+ */
+const builtinFooterEntryOptions = [
+    { key: 'daily_hot', label: '每日热榜', defaultPath: '/p/daily-hot' }
+]
+
+/**
+ * 获取内置页脚入口默认路径
+ */
+const getBuiltinFooterDefaultPath = (builtinKey?: string): string => {
+    const option = builtinFooterEntryOptions.find((item) => item.key === String(builtinKey || '').trim())
+    return option?.defaultPath || ''
+}
+
+/**
+ * 内置页脚入口路径预览
+ */
+const builtinFooterLinkPreview = computed(() => {
+    if (linkData.linkMode !== 'builtin') return ''
+    return getBuiltinFooterDefaultPath(linkData.builtinKey)
+})
 
 const loadGroupOptions = async () => {
     const res = await uiedFooterGroupList({ pageSize: 100 })
@@ -284,6 +354,8 @@ const handleAddLink = () => {
         id: 0,
         groupId: undefined,
         name: '',
+        linkMode: 'custom',
+        builtinKey: '',
         url: '',
         icon: '',
         sortOrder: 0,
@@ -293,18 +365,42 @@ const handleAddLink = () => {
     showLinkEdit.value = true
 }
 const handleEditLink = (row: any) => {
-    Object.assign(linkData, row)
+    Object.assign(linkData, row, {
+        linkMode: row?.builtinKey ? 'builtin' : 'custom',
+        builtinKey: String(row?.builtinKey || '')
+    })
     showLinkEdit.value = true
 }
+
+/**
+ * 链接类型/内置功能变化时回填默认路径（便于预览与保存兜底）
+ */
+watch(
+    () => [linkData.linkMode, linkData.builtinKey],
+    ([linkMode]) => {
+        if (linkMode !== 'builtin') return
+        const defaultPath = getBuiltinFooterDefaultPath(linkData.builtinKey)
+        if (defaultPath) {
+            linkData.url = defaultPath
+        }
+    }
+)
 const handleSubmitLink = async () => {
     await linkFormRef.value?.validate()
     linkLoading.value = true
     try {
+        const submitData = {
+            ...linkData,
+            builtinKey: linkData.linkMode === 'builtin' ? String(linkData.builtinKey || '').trim() : '',
+            url: linkData.linkMode === 'builtin'
+                ? (getBuiltinFooterDefaultPath(linkData.builtinKey) || String(linkData.url || ''))
+                : String(linkData.url || '').trim()
+        }
         if (linkData.id) {
-            await uiedFooterLinkEdit(linkData)
+            await uiedFooterLinkEdit(submitData)
             feedback.msgSuccess('编辑成功')
         } else {
-            await uiedFooterLinkAdd(linkData)
+            await uiedFooterLinkAdd(submitData)
             feedback.msgSuccess('添加成功')
         }
         showLinkEdit.value = false
