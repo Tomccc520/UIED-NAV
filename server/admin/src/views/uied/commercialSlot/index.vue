@@ -6,6 +6,7 @@
 -->
 <template>
     <div class="uied-commercial-slot-page">
+        <template v-if="!featureDeniedState.denied">
         <el-alert
             title="商业位体系：置顶位 / 分类广告位 / 专题赞助位（按天/周售卖）"
             type="info"
@@ -242,6 +243,19 @@
                 <el-button type="primary" :loading="bookingDialog.saving" @click="handleSaveBooking">保存</el-button>
             </template>
         </el-dialog>
+        </template>
+
+        <el-card v-else class="!border-none" shadow="never">
+            <el-result icon="warning" title="当前版本未授权该功能">
+                <template #sub-title>
+                    <div class="text-center leading-6">
+                        <div>功能键：{{ featureDeniedState.featureKey || 'operations_blocks' }}</div>
+                        <div>当前版本：{{ String(featureDeniedState.edition || 'free').toUpperCase() }}</div>
+                        <div>请到「许可证中心 / 功能开关」升级或开启后再使用。</div>
+                    </div>
+                </template>
+            </el-result>
+        </el-card>
     </div>
 </template>
 
@@ -269,6 +283,11 @@ const slotLoading = ref(false)
 const bookingLoading = ref(false)
 const slotRows = ref<any[]>([])
 const bookingRows = ref<any[]>([])
+const featureDeniedState = reactive({
+    denied: false,
+    featureKey: '',
+    edition: 'free'
+})
 const schemaDraft = reactive<any>({
     slotTypeOptions: [],
     scopeTypeOptions: [],
@@ -338,6 +357,30 @@ const bookingDialog = reactive<any>({
  * 字段草案文本
  */
 const schemaText = computed(() => JSON.stringify(schemaDraft, null, 2))
+
+/**
+ * 解析商业版功能未授权错误
+ */
+const parseCommercialFeatureDenied = (error: any) => {
+    const status = Number(error?.response?.status || 0)
+    const body = error?.response?.data || {}
+    if (status !== 403 || Number(body?.code || 0) !== 403) return null
+    const featureKey = String(body?.data?.featureKey || '').trim()
+    if (!featureKey) return null
+    return {
+        featureKey,
+        edition: String(body?.data?.edition || 'free').trim().toLowerCase() || 'free'
+    }
+}
+
+/**
+ * 设置页面未授权状态（用于降级展示）
+ */
+const setFeatureDeniedState = (payload: any) => {
+    featureDeniedState.denied = true
+    featureDeniedState.featureKey = String(payload?.featureKey || 'operations_blocks')
+    featureDeniedState.edition = String(payload?.edition || 'free')
+}
 
 /**
  * 重置广告位弹窗表单
@@ -565,12 +608,24 @@ const handleBookingPageChange = async (pageNo: number) => {
  * 页面初始化
  */
 const initPage = async () => {
-    await Promise.all([loadSchema(), loadSlots()])
-    await loadBookings()
+    featureDeniedState.denied = false
+    featureDeniedState.featureKey = ''
+    featureDeniedState.edition = 'free'
+    try {
+        await Promise.all([loadSchema(), loadSlots()])
+        await loadBookings()
+    } catch (error: any) {
+        const denied = parseCommercialFeatureDenied(error)
+        if (denied) {
+            setFeatureDeniedState(denied)
+            return
+        }
+        throw error
+    }
 }
 
 onMounted(async () => {
-    await initPage()
+    await initPage().catch(() => undefined)
 })
 </script>
 

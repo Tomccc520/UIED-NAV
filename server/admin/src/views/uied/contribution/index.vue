@@ -6,6 +6,7 @@
 -->
 <template>
     <div class="uied-contribution-page">
+        <template v-if="!featureDeniedState.denied">
         <el-alert
             title="投稿激励闭环：投稿积分、等级、勋章、优质投稿推荐位"
             type="info"
@@ -325,6 +326,19 @@
                 </el-card>
             </template>
         </el-drawer>
+        </template>
+
+        <el-card v-else class="!border-none" shadow="never">
+            <el-result icon="warning" title="当前版本未授权该功能">
+                <template #sub-title>
+                    <div class="text-center leading-6">
+                        <div>功能键：{{ featureDeniedState.featureKey || 'user_center' }}</div>
+                        <div>当前版本：{{ String(featureDeniedState.edition || 'free').toUpperCase() }}</div>
+                        <div>请到「许可证中心 / 功能开关」升级或开启后再使用。</div>
+                    </div>
+                </template>
+            </el-result>
+        </el-card>
     </div>
 </template>
 
@@ -380,6 +394,11 @@ interface FeaturedRow {
 }
 
 const activeTab = ref('settings')
+const featureDeniedState = reactive({
+    denied: false,
+    featureKey: '',
+    edition: 'free'
+})
 const savingSettings = ref(false)
 const userLoading = ref(false)
 const leaderboardRows = ref<any[]>([])
@@ -453,6 +472,30 @@ const toInt = (value: any, fallback: number, min: number, max: number) => {
  * 格式化字段草案文本
  */
 const schemaText = computed(() => JSON.stringify(schemaData.value || {}, null, 2))
+
+/**
+ * 解析商业版功能未授权错误
+ */
+const parseCommercialFeatureDenied = (error: any) => {
+    const status = Number(error?.response?.status || 0)
+    const body = error?.response?.data || {}
+    if (status !== 403 || Number(body?.code || 0) !== 403) return null
+    const featureKey = String(body?.data?.featureKey || '').trim()
+    if (!featureKey) return null
+    return {
+        featureKey,
+        edition: String(body?.data?.edition || 'free').trim().toLowerCase() || 'free'
+    }
+}
+
+/**
+ * 设置页面未授权状态（用于降级展示）
+ */
+const setFeatureDeniedState = (payload: any) => {
+    featureDeniedState.denied = true
+    featureDeniedState.featureKey = String(payload?.featureKey || 'user_center')
+    featureDeniedState.edition = String(payload?.edition || 'free')
+}
 
 /**
  * 拉取积分设置
@@ -721,19 +764,31 @@ const loadSchema = async () => {
  * 初始化页面数据
  */
 const initPageData = async () => {
-    await Promise.all([
-        loadSettings(),
-        loadBadges(),
-        loadFeatured(),
-        loadUsers(),
-        loadLogs(),
-        loadLeaderboard(),
-        loadSchema()
-    ])
+    featureDeniedState.denied = false
+    featureDeniedState.featureKey = ''
+    featureDeniedState.edition = 'free'
+    try {
+        await Promise.all([
+            loadSettings(),
+            loadBadges(),
+            loadFeatured(),
+            loadUsers(),
+            loadLogs(),
+            loadLeaderboard(),
+            loadSchema()
+        ])
+    } catch (error: any) {
+        const denied = parseCommercialFeatureDenied(error)
+        if (denied) {
+            setFeatureDeniedState(denied)
+            return
+        }
+        throw error
+    }
 }
 
 onMounted(async () => {
-    await initPageData()
+    await initPageData().catch(() => undefined)
 })
 </script>
 

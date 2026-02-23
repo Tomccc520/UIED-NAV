@@ -10,6 +10,21 @@ import { AxiosError, type AxiosRequestConfig } from 'axios'
 import router from '@/router'
 import { PageEnum } from '@/enums/pageEnum'
 
+/**
+ * 解析商业版功能拦截 403 错误（用于显示更友好的提示）
+ */
+function parseCommercialFeatureGuardError(error: any) {
+    const status = Number(error?.response?.status || 0)
+    const body = error?.response?.data || {}
+    if (status !== 403 || Number(body?.code || 0) !== 403) return null
+    const featureKey = String(body?.data?.featureKey || '').trim()
+    if (!featureKey) return null
+    return {
+        featureKey,
+        edition: String(body?.data?.edition || 'free').trim().toLowerCase() || 'free'
+    }
+}
+
 // 处理axios的钩子函数
 const axiosHooks: AxiosHooks = {
     requestInterceptorsHook(config) {
@@ -85,7 +100,14 @@ const axiosHooks: AxiosHooks = {
     responseInterceptorsCatchHook(error) {
         NProgress.done()
         if (error.code !== AxiosError.ERR_CANCELED) {
-            error.message && feedback.msgError(error.message)
+            const featureDenied = parseCommercialFeatureGuardError(error)
+            if (featureDenied) {
+                feedback.msgError(
+                    `当前版本未授权该功能（${featureDenied.featureKey}，当前版本：${featureDenied.edition.toUpperCase()}）`
+                )
+            } else {
+                error.message && feedback.msgError(error.message)
+            }
         }
         return Promise.reject(error)
     }

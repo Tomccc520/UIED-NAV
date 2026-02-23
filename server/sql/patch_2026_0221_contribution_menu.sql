@@ -1,7 +1,7 @@
 -- ============================================
 -- UIED 投稿激励闭环菜单补丁（可重复执行）
 -- 目标：
--- 1) 在系统设置下新增“投稿激励”菜单
+-- 1) 在运营管理下新增“投稿激励”菜单
 -- 2) 增加积分设置/勋章/推荐位/用户/日志/草案权限按钮
 -- 3) 自动授权给超级管理员（role_id=1）
 -- ============================================
@@ -12,7 +12,7 @@ START TRANSACTION;
 INSERT INTO la_system_auth_menu
 (id, pid, menu_type, menu_name, menu_icon, menu_sort, perms, paths, component, selected, params, is_cache, is_show, is_disable, create_time, update_time)
 VALUES
-(940, 814, 'C', '投稿激励', 'el-icon-StarFilled', 47, 'uied:contribution:index', 'contribution', 'uied/contribution/index', '/uied/contribution', '', 0, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
+(940, 815, 'C', '投稿激励', 'el-icon-StarFilled', 47, 'uied:contribution:index', 'contribution', 'uied/contribution/index', '/uied/contribution', '', 0, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
 ON DUPLICATE KEY UPDATE
 pid = VALUES(pid),
 menu_type = VALUES(menu_type),
@@ -55,9 +55,14 @@ is_disable = VALUES(is_disable),
 update_time = UNIX_TIMESTAMP();
 
 INSERT INTO la_system_auth_perm (id, role_id, menu_id)
-SELECT REPLACE(UUID(), '-', ''), 1, m.id
+SELECT REPLACE(UUID(), '-', ''), r.role_id, m.id
 FROM la_system_auth_menu m
-LEFT JOIN la_system_auth_perm p ON p.role_id = 1 AND p.menu_id = m.id
+JOIN (
+  SELECT 0 AS role_id
+  UNION ALL
+  SELECT 1 AS role_id
+) r
+LEFT JOIN la_system_auth_perm p ON p.role_id = r.role_id AND p.menu_id = m.id
 WHERE m.id IN (940, 941, 942, 943, 944, 945, 946, 947, 948, 949, 950, 951, 952, 953)
   AND p.id IS NULL;
 

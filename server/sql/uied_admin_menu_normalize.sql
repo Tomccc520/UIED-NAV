@@ -50,7 +50,7 @@ UPDATE la_system_auth_menu
 SET pid = 702,
     menu_type = 'M',
     menu_name = '运营管理',
-    menu_icon = 'el-icon-DataAnalysis',
+    menu_icon = 'el-icon-Operation',
     menu_sort = 40,
     paths = 'operation',
     update_time = UNIX_TIMESTAMP()

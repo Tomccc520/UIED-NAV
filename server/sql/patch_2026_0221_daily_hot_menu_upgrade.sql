@@ -26,9 +26,14 @@ is_disable = VALUES(is_disable),
 update_time = UNIX_TIMESTAMP();
 
 INSERT INTO la_system_auth_perm (id, role_id, menu_id)
-SELECT REPLACE(UUID(), '-', ''), 1, m.id
+SELECT REPLACE(UUID(), '-', ''), r.role_id, m.id
 FROM la_system_auth_menu m
-LEFT JOIN la_system_auth_perm p ON p.role_id = 1 AND p.menu_id = m.id
+JOIN (
+  SELECT 0 AS role_id
+  UNION ALL
+  SELECT 1 AS role_id
+) r
+LEFT JOIN la_system_auth_perm p ON p.role_id = r.role_id AND p.menu_id = m.id
 WHERE m.id IN (916, 917, 918, 919)
   AND p.id IS NULL;
 

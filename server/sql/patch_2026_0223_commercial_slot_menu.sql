@@ -1,7 +1,7 @@
 -- ============================================
 -- UIED 商业位体系菜单补丁（可重复执行）
 -- 目标：
--- 1) 在系统设置下新增“商业位体系”菜单
+-- 1) 在运营管理下新增“商业位体系”菜单
 -- 2) 增加广告位配置/投放记录/字段草案权限按钮
 -- 3) 自动授权给超级管理员（role_id=1）
 -- ============================================
@@ -12,7 +12,7 @@ START TRANSACTION;
 INSERT INTO la_system_auth_menu
 (id, pid, menu_type, menu_name, menu_icon, menu_sort, perms, paths, component, selected, params, is_cache, is_show, is_disable, create_time, update_time)
 VALUES
-(960, 814, 'C', '商业位体系', 'el-icon-Coin', 48, 'uied:commercialSlot:index', 'commercial-slot', 'uied/commercialSlot/index', '/uied/commercial-slot', '', 0, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
+(960, 815, 'C', '商业位体系', 'el-icon-PriceTag', 48, 'uied:commercialSlot:index', 'commercial-slot', 'uied/commercialSlot/index', '/uied/commercial-slot', '', 0, 1, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
 ON DUPLICATE KEY UPDATE
 pid = VALUES(pid),
 menu_type = VALUES(menu_type),
@@ -49,9 +49,14 @@ is_disable = VALUES(is_disable),
 update_time = UNIX_TIMESTAMP();
 
 INSERT INTO la_system_auth_perm (id, role_id, menu_id)
-SELECT REPLACE(UUID(), '-', ''), 1, m.id
+SELECT REPLACE(UUID(), '-', ''), r.role_id, m.id
 FROM la_system_auth_menu m
-LEFT JOIN la_system_auth_perm p ON p.role_id = 1 AND p.menu_id = m.id
+JOIN (
+  SELECT 0 AS role_id
+  UNION ALL
+  SELECT 1 AS role_id
+) r
+LEFT JOIN la_system_auth_perm p ON p.role_id = r.role_id AND p.menu_id = m.id
 WHERE m.id IN (960, 961, 962, 963, 964, 965, 966, 967)
   AND p.id IS NULL;
 
