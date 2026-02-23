@@ -171,6 +171,15 @@ module.exports = app => {
   router.all('/api/uied/banner/add', controller.uied.banner.add);
   router.all('/api/uied/banner/edit', controller.uied.banner.edit);
   router.all('/api/uied/banner/del', controller.uied.banner.del);
+
+  // ==================== 商业位体系 ====================
+  allFeature('/api/uied/commercialSlot/slot/list', 'operations_blocks', controller.uied.commercialSlot.slotList);
+  allFeature('/api/uied/commercialSlot/slot/save', 'operations_blocks', controller.uied.commercialSlot.slotSave);
+  allFeature('/api/uied/commercialSlot/slot/del', 'operations_blocks', controller.uied.commercialSlot.slotDel);
+  allFeature('/api/uied/commercialSlot/booking/list', 'operations_blocks', controller.uied.commercialSlot.bookingList);
+  allFeature('/api/uied/commercialSlot/booking/save', 'operations_blocks', controller.uied.commercialSlot.bookingSave);
+  allFeature('/api/uied/commercialSlot/booking/del', 'operations_blocks', controller.uied.commercialSlot.bookingDel);
+  allFeature('/api/uied/commercialSlot/schema', 'operations_blocks', controller.uied.commercialSlot.schema);
   
   // ==================== Favicon API ====================
   router.all('/api/uied/faviconApi/list', controller.uied.faviconApi.list);

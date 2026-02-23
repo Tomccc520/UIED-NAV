@@ -823,3 +823,40 @@ export function uiedContributionLeaderboard(params?: any) {
 export function uiedContributionSchema() {
     return request.get({ url: '/uied/contribution/schema' })
 }
+
+// ==================== 商业位体系 ====================
+
+// 广告位配置列表
+export function uiedCommercialSlotList(params?: any) {
+    return request.get({ url: '/uied/commercialSlot/slot/list', params })
+}
+
+// 保存广告位配置
+export function uiedCommercialSlotSave(params: any) {
+    return request.post({ url: '/uied/commercialSlot/slot/save', params })
+}
+
+// 删除广告位配置
+export function uiedCommercialSlotDel(params: any) {
+    return request.post({ url: '/uied/commercialSlot/slot/del', params })
+}
+
+// 投放记录列表
+export function uiedCommercialBookingList(params?: any) {
+    return request.get({ url: '/uied/commercialSlot/booking/list', params })
+}
+
+// 保存投放记录
+export function uiedCommercialBookingSave(params: any) {
+    return request.post({ url: '/uied/commercialSlot/booking/save', params })
+}
+
+// 删除投放记录
+export function uiedCommercialBookingDel(params: any) {
+    return request.post({ url: '/uied/commercialSlot/booking/del', params })
+}
+
+// 字段草案
+export function uiedCommercialSlotSchema() {
+    return request.get({ url: '/uied/commercialSlot/schema' })
+}

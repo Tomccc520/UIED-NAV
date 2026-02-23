@@ -43,6 +43,12 @@ module.exports = app => {
    */
   const getLegacy = (path, action) => router.get(path, legacyRouteGuard, frontendNormalize, action);
   /**
+   * 注册旧兼容 GET 路由（可被严格模式关闭，且支持能力校验）
+   */
+  const getLegacyFeature = (path, featureKey, action) => (
+    router.get(path, legacyRouteGuard, featureGuard(featureKey), frontendNormalize, action)
+  );
+  /**
    * 注册旧兼容 POST 路由（可被严格商业版模式一键关闭）
    */
   const postLegacy = (path, action) => router.post(path, legacyRouteGuard, frontendNormalize, action);
@@ -213,6 +219,12 @@ module.exports = app => {
   getLegacy('/contribution/leaderboard', controller.uied.frontend.contributionLeaderboard);
   // GET /contribution/featured-submissions - 兼容旧前端无 /api 前缀
   getLegacy('/contribution/featured-submissions', controller.uied.frontend.contributionFeaturedSubmissions);
+
+  // ==================== 商业位体系 ====================
+  // GET /api/commercial/placements - 获取当前生效商业位投放
+  getFeature('/api/commercial/placements', 'operations_blocks', controller.uied.frontend.commercialPlacements);
+  // GET /commercial/placements - 兼容旧前端无 /api 前缀
+  getLegacyFeature('/commercial/placements', 'operations_blocks', controller.uied.frontend.commercialPlacements);
   
   // ==================== 分类和标签（前端公开） ====================
   // GET /api/categories - 获取分类列表（树形结构，含网站数量）

@@ -276,6 +276,14 @@ module.exports = options => {
       'uied:rankBoard:preview': [ 'uied:setting:get' ],
       'uied:rankBoard:schema': [ 'uied:setting:get' ],
       'uied:rankBoard:config:save': [ 'uied:setting:save' ],
+      // 商业版：商业位体系复用广告管理/站点设置权限，兼容历史角色
+      'uied:commercialSlot:slot:list': [ 'uied:banner:list', 'uied:setting:get' ],
+      'uied:commercialSlot:booking:list': [ 'uied:banner:list', 'uied:setting:get' ],
+      'uied:commercialSlot:schema': [ 'uied:banner:list', 'uied:setting:get' ],
+      'uied:commercialSlot:slot:save': [ 'uied:banner:add', 'uied:banner:edit', 'uied:setting:save' ],
+      'uied:commercialSlot:slot:del': [ 'uied:banner:del', 'uied:setting:save' ],
+      'uied:commercialSlot:booking:save': [ 'uied:banner:add', 'uied:banner:edit', 'uied:setting:save' ],
+      'uied:commercialSlot:booking:del': [ 'uied:banner:del', 'uied:setting:save' ],
       // 商业版：专题页工厂复用页面管理权限，兼容历史角色
       'uied:topicFactory:template:list': [ 'uied:page:list' ],
       'uied:topicFactory:template:detail': [ 'uied:page:list' ],

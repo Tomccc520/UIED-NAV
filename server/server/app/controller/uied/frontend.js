@@ -2084,6 +2084,23 @@ class FrontendController extends Controller {
   }
 
   /**
+   * 商业位公开投放列表（前台公开）
+   * GET /api/commercial/placements
+   */
+  async commercialPlacements() {
+    const { ctx } = this;
+    const params = ctx.query || {};
+    try {
+      const data = await ctx.service.uied.commercialSlot.publicPlacements(params);
+      ctx.body = data;
+    } catch (error) {
+      ctx.logger.error('获取商业位投放列表失败:', error);
+      ctx.status = 500;
+      ctx.body = { error: error.message };
+    }
+  }
+
+  /**
    * 安全解析 JSON
    */
   safeJsonParse(str, defaultValue = []) {
