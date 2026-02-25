@@ -10,6 +10,11 @@ description: UIED-NAV 前后端同步联动开发技能。用于在 server(egg l
 - 需要边做后端边做前端，但又要保持 likeadmin 规范与 UIED 配置体系一致。
 - 需求类型：CRUD 模块、配置项、运营位、频道页、详情页行为。
 
+## 仓库边界说明（重要）
+- 本技能中的 `frontend` 指当前仓库的 **UIED-NAV 导航站前端（React）**。
+- 不适用于你另一个官网前端（Nuxt 3）的 `website-*` 项目。
+- 若是官网前端需求，改用 `website-nuxt-page-module`、`website-api-contract-sync` 等技能链。
+
 ## 推荐技能组合（按顺序）
 1. `likeadmin-node-module` 或 `likeadmin-node-codegen`
 2. `likeadmin-node-auth-menu`
@@ -36,6 +41,7 @@ description: UIED-NAV 前后端同步联动开发技能。用于在 server(egg l
 - 接口线：`controller/service/router` + 返回结构
 - 管理线：`admin` 页面/API/菜单/权限点
 - 前台线：`frontend services/hooks/pages/components`
+- 可直接套用模板：`references/task-template.md`
 
 ### 2. 先冻结接口契约（并行边界）
 - 输出最小契约：
@@ -84,3 +90,5 @@ description: UIED-NAV 前后端同步联动开发技能。用于在 server(egg l
 - 注释使用中文。
 - 页面文件按项目规范补版权头（适用的文件类型必须加）。
 
+## 参考资料
+- 同步开发任务模板：`references/task-template.md`
