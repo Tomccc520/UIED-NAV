@@ -156,16 +156,36 @@ node scripts/commercial-preflight-check.js \
 
 **使用方法**：
 ```bash
-./scripts/release-edition-package.sh
+./scripts/release-edition-package.sh --preset first-pro
 ```
 
 **常用参数**：
 ```bash
 ./scripts/release-edition-package.sh \
-  --editions free,pro,enterprise \
+  --preset first-pro \
   --output /tmp/uied_release \
-  --base-url http://127.0.0.1:8002
+  --base-url http://127.0.0.1:8002 \
+  --customer-name "客户A" \
+  --company-name "客户A科技有限公司" \
+  --contact-email "ops@client-a.com" \
+  --domain-limit 2 \
+  --domains "nav.client-a.com,www.client-a.com" \
+  --expires-in-days 365
 ```
+
+自动签发许可证（推荐在本地后台已登录且可获取 token 时使用）：
+```bash
+./scripts/release-edition-package.sh \
+  --preset first-pro \
+  --auto-sign-license \
+  --admin-token "你的后台token" \
+  --output /tmp/uied_release_first_pro
+```
+
+说明：
+- 会调用后端 `POST /api/uied/license/sign` 为 `license/customer-license.json` 写入签名
+- 不会自动落库（仍是交付包模板）
+- 若网络或 token 不可用，可不启用该参数
 
 可选控制：
 ```bash
@@ -174,6 +194,21 @@ node scripts/commercial-preflight-check.js \
 
 # 允许发布前检查失败仍继续
 ./scripts/release-edition-package.sh --allow-preflight-fail
+
+# 自动签发失败仍继续打包（不推荐常态使用）
+./scripts/release-edition-package.sh --auto-sign-license --allow-sign-fail --admin-token "token"
+```
+
+版本预设（推荐）：
+```bash
+# 首发开源版（Free）
+./scripts/release-edition-package.sh --preset first-free
+
+# 首发付费版（Pro，推荐）
+./scripts/release-edition-package.sh --preset first-pro
+
+# 全矩阵发包（Free/Pro/Enterprise）
+./scripts/release-edition-package.sh --preset full-matrix
 ```
 
 **输出结果**：
@@ -184,6 +219,7 @@ node scripts/commercial-preflight-check.js \
   - `feature/feature-overrides.json`
   - `config/app.env.example`
   - `meta/release-manifest.json`
+  - `RELEASE-SUMMARY.md`（打包汇总，便于发包记录）
   - `docs/API/*`（商业版关键文档）
 
 ---
