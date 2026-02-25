@@ -23,6 +23,20 @@ export function getUserLevelList() {
 }
 
 /**
+ * 获取用户分组列表
+ */
+export function getUserGroupList() {
+    return request.get({ url: '/user/group/list' })
+}
+
+/**
+ * 获取用户标签列表
+ */
+export function getUserTagList() {
+    return request.get({ url: '/user/tag/list' })
+}
+
+/**
  * 新增用户等级
  */
 export function addUserLevel(params: any) {

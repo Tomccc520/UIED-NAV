@@ -56,12 +56,18 @@ const emit = defineEmits<{
 const editorRef = shallowRef()
 const materialPickerRef = shallowRef<InstanceType<typeof MaterialPicker>>()
 const fileType = ref('')
+const isFirefoxBrowser =
+    typeof window !== 'undefined' && /firefox/i.test(window.navigator.userAgent || '')
 
 let insertFn: any
 
 // 注册 AI 悬浮菜单按钮（只注册一次）
 let aiMenuRegistered = false
+/**
+ * 注册 AI 悬浮菜单（Firefox 下关闭，避免 Slate + hoverbar 在中文输入法下出现 DOM 同步异常）
+ */
 function registerAiHoverMenu() {
+    if (isFirefoxBrowser) return
     if (aiMenuRegistered) return
     aiMenuRegistered = true
 
@@ -133,22 +139,25 @@ const editorConfig: Partial<IEditorConfig> = {
             }
         }
     },
-    hoverbarKeys: {
-        // 选中文本时的悬浮菜单
-        text: {
-            menuKeys: [
-                'headerSelect',
-                'bold',
-                'italic',
-                'underline',
-                'through',
-                'color',
-                'bgColor',
-                'insertLink',
-                'aiHoverMenu'
-            ]
-        }
-    }
+    // Firefox + 中文输入法场景下，悬浮菜单更新容易触发 Slate DOM 点位异常，这里做兼容降级
+    hoverbarKeys: isFirefoxBrowser
+        ? {}
+        : {
+              // 选中文本时的悬浮菜单
+              text: {
+                  menuKeys: [
+                      'headerSelect',
+                      'bold',
+                      'italic',
+                      'underline',
+                      'through',
+                      'color',
+                      'bgColor',
+                      'insertLink',
+                      'aiHoverMenu'
+                  ]
+              }
+          }
 }
 
 const styles = computed<CSSProperties>(() => ({
@@ -157,7 +166,9 @@ const styles = computed<CSSProperties>(() => ({
 }))
 const valueHtml = computed({
     get() {
-        return props.modelValue
+        // WangEditor/Slate 在空字符串 + Firefox 中文输入法场景下稳定性较差，统一返回最小合法段落
+        const html = typeof props.modelValue === 'string' ? props.modelValue : ''
+        return html.trim() ? html : '<p><br></p>'
     },
     set(value) {
         emit('update:modelValue', value)

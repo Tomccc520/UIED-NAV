@@ -90,6 +90,168 @@ class AiConfigService extends Service {
   }
 
   /**
+   * AI 配置高级参数设置键（存放在 uied_site_setting）
+   * 说明：避免频繁改动 uied_ai_config 表结构，先用 JSON 做兼容扩展
+   * @return {string} 设置键名
+   */
+  getAiConfigAdvancedSettingKey() {
+    return 'ai_config_advanced_map';
+  }
+
+  /**
+   * 规范化 AI 配置高级参数
+   * @param {Object} payload - 原始参数
+   * @param {Object} [fallback={}] - 兜底参数
+   * @return {{modelPreset:string, reasoningEnabled:boolean, reasoningModel:string, thinkingBudget:number}}
+   */
+  normalizeAiConfigAdvanced(payload = {}, fallback = {}) {
+    const source = payload && typeof payload === 'object' ? payload : {};
+    const base = fallback && typeof fallback === 'object' ? fallback : {};
+    const parseBool = value => {
+      if (value === undefined || value === null || value === '') return undefined;
+      if (typeof value === 'boolean') return value;
+      if (typeof value === 'number') return value === 1;
+      return [ '1', 'true', 'yes', 'on' ].includes(String(value).trim().toLowerCase());
+    };
+    const parseBudget = value => {
+      const parsed = Number.parseInt(String(value ?? ''), 10);
+      if (!Number.isInteger(parsed)) return undefined;
+      return Math.max(0, Math.min(parsed, 65536));
+    };
+    const normalized = {
+      modelPreset: String(
+        source.modelPreset !== undefined ? source.modelPreset : (base.modelPreset || '')
+      ).trim(),
+      reasoningEnabled: base.reasoningEnabled === true,
+      reasoningModel: String(
+        source.reasoningModel !== undefined ? source.reasoningModel : (base.reasoningModel || '')
+      ).trim(),
+      thinkingBudget: Number.isInteger(Number(base.thinkingBudget))
+        ? Math.max(0, Math.min(Number(base.thinkingBudget), 65536))
+        : 0,
+    };
+    const reasoningEnabled = parseBool(source.reasoningEnabled);
+    if (reasoningEnabled !== undefined) {
+      normalized.reasoningEnabled = reasoningEnabled;
+    }
+    const thinkingBudget = parseBudget(source.thinkingBudget);
+    if (thinkingBudget !== undefined) {
+      normalized.thinkingBudget = thinkingBudget;
+    }
+    return normalized;
+  }
+
+  /**
+   * 读取 AI 配置高级参数映射表
+   * @return {Promise<Object>} 以配置ID为键的高级配置映射
+   */
+  async getAiConfigAdvancedMap() {
+    const { app } = this;
+    const [ setting ] = await app.model.query(
+      'SELECT `value` FROM uied_site_setting WHERE `key` = ? LIMIT 1',
+      {
+        replacements: [ this.getAiConfigAdvancedSettingKey() ],
+        type: app.Sequelize.QueryTypes.SELECT,
+      }
+    );
+    if (!setting || !setting.value) return {};
+    try {
+      const parsed = JSON.parse(setting.value);
+      return parsed && typeof parsed === 'object' ? parsed : {};
+    } catch (error) {
+      return {};
+    }
+  }
+
+  /**
+   * 保存 AI 配置高级参数映射表
+   * @param {Object} data - 以配置ID为键的高级配置映射
+   * @return {Promise<void>}
+   */
+  async saveAiConfigAdvancedMap(data = {}) {
+    const { app } = this;
+    const now = Math.floor(Date.now() / 1000);
+    const value = JSON.stringify(data || {});
+    await app.model.query(
+      `INSERT INTO uied_site_setting (\`key\`, \`value\`, create_time, update_time)
+       VALUES (?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE \`value\` = VALUES(\`value\`), update_time = VALUES(update_time)`,
+      {
+        replacements: [ this.getAiConfigAdvancedSettingKey(), value, now, now ],
+        type: app.Sequelize.QueryTypes.INSERT,
+      }
+    );
+  }
+
+  /**
+   * 保存单个 AI 配置的高级参数
+   * @param {number} configId - 配置ID
+   * @param {Object} payload - 高级参数
+   * @return {Promise<Object>} 保存后的高级参数
+   */
+  async saveAiConfigAdvancedById(configId, payload = {}) {
+    const id = Number(configId || 0);
+    if (!id) return this.normalizeAiConfigAdvanced(payload);
+    const advancedMap = await this.getAiConfigAdvancedMap();
+    const current = advancedMap[String(id)] || {};
+    const nextValue = this.normalizeAiConfigAdvanced(payload, current);
+    advancedMap[String(id)] = nextValue;
+    await this.saveAiConfigAdvancedMap(advancedMap);
+    return nextValue;
+  }
+
+  /**
+   * 为配置对象附加高级参数
+   * @param {Object} item - 基础配置对象
+   * @param {Object} advancedMap - 高级参数映射
+   * @return {Object} 合并后的配置对象
+   */
+  attachAiConfigAdvanced(item = {}, advancedMap = {}) {
+    const configId = Number(item.id || 0);
+    const extra = this.normalizeAiConfigAdvanced(
+      advancedMap && typeof advancedMap === 'object' ? advancedMap[String(configId)] : {}
+    );
+    return {
+      ...item,
+      ...extra,
+    };
+  }
+
+  /**
+   * 判断请求参数是否携带 AI 配置高级字段
+   * @param {Object} payload - 请求参数
+   * @return {boolean} 是否包含高级字段
+   */
+  hasAiConfigAdvancedPayload(payload = {}) {
+    const source = payload && typeof payload === 'object' ? payload : {};
+    return [ 'modelPreset', 'reasoningEnabled', 'reasoningModel', 'thinkingBudget' ]
+      .some(key => Object.prototype.hasOwnProperty.call(source, key));
+  }
+
+  /**
+   * 将思考模型参数注入请求体（兼容 OpenAI 风格扩展字段）
+   * @param {Object} config - AI 配置（可能已含高级参数）
+   * @param {Object} requestData - 原始请求体
+   * @return {Object} 最终请求体
+   */
+  buildChatRequestData(config = {}, requestData = {}) {
+    const advanced = this.normalizeAiConfigAdvanced(config);
+    const nextData = { ...(requestData || {}) };
+    const provider = String(config.provider || '').trim().toLowerCase();
+    if (advanced.reasoningEnabled && advanced.reasoningModel) {
+      nextData.model = advanced.reasoningModel;
+    }
+    if (
+      advanced.reasoningEnabled &&
+      provider === 'siliconflow' &&
+      Number(advanced.thinkingBudget || 0) > 0
+    ) {
+      nextData.thinking_budget = Number(advanced.thinkingBudget);
+    }
+    return nextData;
+  }
+
+  /**
    * 获取所有已启用 AI 配置（默认配置优先）
    * @return {Promise<Array<{id:number,name:string,provider:string,apiUrl:string,apiKey:string,model:string,isDefault:boolean}>>}
    */
@@ -99,7 +261,8 @@ class AiConfigService extends Service {
       'SELECT * FROM uied_ai_config WHERE is_enabled = 1 ORDER BY is_default DESC, id DESC',
       { type: app.Sequelize.QueryTypes.SELECT }
     );
-    return (rows || []).map(item => ({
+    const advancedMap = await this.getAiConfigAdvancedMap();
+    return (rows || []).map(item => this.attachAiConfigAdvanced({
       id: Number(item.id || 0),
       name: String(item.name || ''),
       provider: String(item.provider || ''),
@@ -107,7 +270,7 @@ class AiConfigService extends Service {
       apiKey: String(item.api_key || ''),
       model: String(item.model || ''),
       isDefault: Number(item.is_default || 0) === 1,
-    }));
+    }, advancedMap));
   }
 
   /**
@@ -247,8 +410,9 @@ class AiConfigService extends Service {
       { type: app.Sequelize.QueryTypes.SELECT }
     );
 
+    const advancedMap = await this.getAiConfigAdvancedMap();
     // 隐藏 API Key 的部分内容
-    return configs.map(c => ({
+    return configs.map(c => this.attachAiConfigAdvanced({
       id: c.id,
       name: c.name,
       provider: c.provider,
@@ -258,7 +422,7 @@ class AiConfigService extends Service {
       enabled: c.is_enabled === 1,
       isDefault: c.is_default === 1,
       createdAt: c.create_time,
-    }));
+    }, advancedMap));
   }
 
   /**
@@ -281,14 +445,43 @@ class AiConfigService extends Service {
 
     if (!config) return null;
 
-    return {
+    const advancedMap = await this.getAiConfigAdvancedMap();
+    return this.attachAiConfigAdvanced({
       id: config.id,
       name: config.name,
       provider: config.provider,
       apiUrl: config.api_url,
       apiKey: config.api_key,
       model: config.model,
-    };
+    }, advancedMap);
+  }
+
+  /**
+   * 按 ID 获取 AI 配置详情（后台编辑使用，返回完整 API Key）
+   * @param {number|string} id - 配置ID
+   * @return {Promise<Object|null>} 配置详情
+   */
+  async getDetail(id) {
+    const { app } = this;
+    const configId = Number.parseInt(String(id || ''), 10);
+    if (!configId) return null;
+    const [ config ] = await app.model.query(
+      'SELECT * FROM uied_ai_config WHERE id = ? LIMIT 1',
+      { replacements: [ configId ], type: app.Sequelize.QueryTypes.SELECT }
+    );
+    if (!config) return null;
+    const advancedMap = await this.getAiConfigAdvancedMap();
+    return this.attachAiConfigAdvanced({
+      id: Number(config.id || 0),
+      name: String(config.name || ''),
+      provider: String(config.provider || ''),
+      apiUrl: String(config.api_url || ''),
+      apiKey: String(config.api_key || ''),
+      model: String(config.model || ''),
+      enabled: Number(config.is_enabled || 0) === 1,
+      isDefault: Number(config.is_default || 0) === 1,
+      createdAt: Number(config.create_time || 0),
+    }, advancedMap);
   }
 
   /**
@@ -325,6 +518,9 @@ class AiConfigService extends Service {
       }
     );
 
+    if (this.hasAiConfigAdvancedPayload(data)) {
+      await this.saveAiConfigAdvancedById(result, data);
+    }
     return { id: result, ...data };
   }
 
@@ -363,6 +559,10 @@ class AiConfigService extends Service {
       { replacements: values, type: app.Sequelize.QueryTypes.UPDATE }
     );
 
+    if (this.hasAiConfigAdvancedPayload(data)) {
+      await this.saveAiConfigAdvancedById(data.id, data);
+    }
+
     return data;
   }
 
@@ -371,11 +571,20 @@ class AiConfigService extends Service {
    */
   async del(id) {
     const { app } = this;
+    const configId = Number(id || 0);
 
     await app.model.query(
       'DELETE FROM uied_ai_config WHERE id = ?',
-      { replacements: [ id ], type: app.Sequelize.QueryTypes.DELETE }
+      { replacements: [ configId ], type: app.Sequelize.QueryTypes.DELETE }
     );
+
+    if (configId) {
+      const advancedMap = await this.getAiConfigAdvancedMap();
+      if (advancedMap[String(configId)] !== undefined) {
+        delete advancedMap[String(configId)];
+        await this.saveAiConfigAdvancedMap(advancedMap);
+      }
+    }
   }
 
   /**
@@ -404,13 +613,18 @@ class AiConfigService extends Service {
         apiKey: '',
         apiUrl: 'https://api.siliconflow.cn/v1/chat/completions',
         model: 'deepseek-ai/DeepSeek-V3.2',
+        modelPreset: 'siliconflow.chat.deepseek-v3.2',
+        reasoningEnabled: false,
+        reasoningModel: '',
+        thinkingBudget: 0,
         maxTokens: 2000,
         temperature: 0.7,
       };
     }
 
     const provider = String(config.provider || 'siliconflow').trim().toLowerCase() || 'siliconflow';
-    return {
+    const advancedMap = await this.getAiConfigAdvancedMap();
+    return this.attachAiConfigAdvanced({
       id: config.id,
       enabled: config.is_enabled === 1,
       provider,
@@ -419,7 +633,7 @@ class AiConfigService extends Service {
       model: this.resolveChatModel(provider, config.model || ''),
       maxTokens: 2000,
       temperature: 0.7,
-    };
+    }, advancedMap);
   }
 
   /**
@@ -454,6 +668,9 @@ class AiConfigService extends Service {
           type: app.Sequelize.QueryTypes.UPDATE,
         }
       );
+      if (this.hasAiConfigAdvancedPayload(data)) {
+        await this.saveAiConfigAdvancedById(existing.id, data);
+      }
       return { id: existing.id, ...data };
     }
     // 创建新配置
@@ -474,6 +691,9 @@ class AiConfigService extends Service {
         type: app.Sequelize.QueryTypes.INSERT,
       }
     );
+    if (this.hasAiConfigAdvancedPayload(data)) {
+      await this.saveAiConfigAdvancedById(result, data);
+    }
     return { id: result, ...data };
 
   }
@@ -564,12 +784,12 @@ class AiConfigService extends Service {
       const response = await this.requestChatCompletions({
         url: requestUrl,
         apiKey: config.apiKey,
-        data: {
+        data: this.buildChatRequestData(config, {
           model: requestModel,
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.7,
           max_tokens: 500,
-        },
+        }),
         timeout: 30000,
       });
 
@@ -911,12 +1131,12 @@ class AiConfigService extends Service {
       const response = await this.requestChatCompletions({
         url: requestUrl,
         apiKey: config.apiKey,
-        data: {
+        data: this.buildChatRequestData(config, {
           model: requestModel,
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.7,
           max_tokens: 2000,
-        },
+        }),
         timeout: 60000,
       });
 
@@ -1014,13 +1234,14 @@ class AiConfigService extends Service {
         const response = await this.requestChatCompletions({
           url: requestUrl,
           apiKey: config.apiKey,
-          data: {
+          data: this.buildChatRequestData(config, {
             model: requestModel,
             messages,
             temperature: 0.7,
             max_tokens: 1200,
-          },
-          timeout: 45000,
+          }),
+          // 详情页写作/润色场景耗时较长，适当放宽超时避免后台已生成但管理端先超时
+          timeout: 90000,
         });
 
         if (response.status !== 200) {

@@ -41,12 +41,28 @@
                                 <el-tag size="small">{{ getProviderLabel(row.provider) }}</el-tag>
                             </template>
                         </el-table-column>
-                        <el-table-column
-                            label="模型"
-                            prop="model"
-                            min-width="150"
-                            show-overflow-tooltip
-                        />
+                        <el-table-column label="模型" min-width="220" show-overflow-tooltip>
+                            <template #default="{ row }">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span>{{ row.model || '-' }}</span>
+                                    <el-tag
+                                        v-if="row.reasoningEnabled"
+                                        size="small"
+                                        type="warning"
+                                        effect="plain"
+                                    >
+                                        推理
+                                    </el-tag>
+                                    <el-tag
+                                        v-if="row.reasoningEnabled && Number(row.thinkingBudget || 0) > 0"
+                                        size="small"
+                                        effect="plain"
+                                    >
+                                        budget={{ Number(row.thinkingBudget) }}
+                                    </el-tag>
+                                </div>
+                            </template>
+                        </el-table-column>
                         <el-table-column label="状态" width="90" align="center">
                             <template #default="{ row }">
                                 <el-switch
@@ -535,6 +551,59 @@
                         placeholder="请输入模型名称，如：deepseek-ai/DeepSeek-V3.2"
                     />
                 </el-form-item>
+                <el-form-item label="模型预设">
+                    <el-select
+                        v-model="editForm.modelPreset"
+                        clearable
+                        filterable
+                        placeholder="可选：从预设快速填充模型"
+                        style="width: 100%"
+                        @change="handleModelPresetChange"
+                    >
+                        <el-option
+                            v-for="item in getProviderModelPresets(editForm.provider)"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                        />
+                    </el-select>
+                </el-form-item>
+                <el-divider>思考模型（推理）</el-divider>
+                <el-form-item label="启用思考模型">
+                    <el-switch v-model="editForm.reasoningEnabled" />
+                    <span class="text-xs text-gray-400 ml-3">
+                        启用后会向兼容接口附加推理参数（如 thinking_budget）
+                    </span>
+                </el-form-item>
+                <el-form-item label="思考模型" v-if="editForm.reasoningEnabled">
+                    <el-select
+                        v-model="editForm.reasoningModel"
+                        clearable
+                        filterable
+                        allow-create
+                        default-first-option
+                        placeholder="可选：覆盖主模型，使用推理模型"
+                        style="width: 100%"
+                    >
+                        <el-option
+                            v-for="item in getProviderReasoningPresets(editForm.provider)"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                        />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="思考预算" v-if="editForm.reasoningEnabled">
+                    <el-input-number
+                        v-model="editForm.thinkingBudget"
+                        :min="0"
+                        :max="65536"
+                        :step="128"
+                    />
+                    <span class="text-xs text-gray-400 ml-3">
+                        0 表示不传该参数；建议先从 1024-4096 试起
+                    </span>
+                </el-form-item>
                 <el-row :gutter="16">
                     <el-col :span="12">
                         <el-form-item label="启用">
@@ -582,6 +651,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import {
     uiedAiConfigList,
+    uiedAiConfigDetail,
     uiedAiConfigAdd,
     uiedAiConfigEdit,
     uiedAiConfigDelete,
@@ -612,8 +682,50 @@ const providerMap: Record<string, string> = {
     other: '其他'
 }
 
+const providerModelPresetMap: Record<string, Array<{ label: string; value: string; model: string }>> = {
+    siliconflow: [
+        { label: 'SiliconFlow / DeepSeek-V3.2（通用）', value: 'siliconflow.chat.deepseek-v3.2', model: 'deepseek-ai/DeepSeek-V3.2' },
+        { label: 'SiliconFlow / Qwen3-32B（通用）', value: 'siliconflow.chat.qwen3-32b', model: 'Qwen/Qwen3-32B' },
+        { label: 'SiliconFlow / GLM-4.5（通用）', value: 'siliconflow.chat.glm-4.5', model: 'zai-org/GLM-4.5' }
+    ],
+    deepseek: [
+        { label: 'DeepSeek Chat', value: 'deepseek.chat', model: 'deepseek-chat' },
+        { label: 'DeepSeek Reasoner', value: 'deepseek.reasoner', model: 'deepseek-reasoner' }
+    ],
+    openai: [
+        { label: 'OpenAI / GPT-4o-mini', value: 'openai.gpt-4o-mini', model: 'gpt-4o-mini' },
+        { label: 'OpenAI / GPT-4.1-mini', value: 'openai.gpt-4.1-mini', model: 'gpt-4.1-mini' }
+    ]
+}
+
+const providerReasoningPresetMap: Record<string, Array<{ label: string; value: string }>> = {
+    siliconflow: [
+        { label: 'DeepSeek-R1（推理）', value: 'deepseek-ai/DeepSeek-R1' },
+        { label: 'Qwen3-32B（思考）', value: 'Qwen/Qwen3-32B' }
+    ],
+    deepseek: [
+        { label: 'DeepSeek Reasoner', value: 'deepseek-reasoner' }
+    ]
+}
+
 const getProviderLabel = (provider: string): string => {
     return providerMap[provider] || provider || '未知'
+}
+
+/**
+ * 获取当前提供商模型预设列表
+ */
+const getProviderModelPresets = (provider: string) => {
+    const key = String(provider || '').trim().toLowerCase()
+    return providerModelPresetMap[key] || []
+}
+
+/**
+ * 获取当前提供商推理模型预设列表
+ */
+const getProviderReasoningPresets = (provider: string) => {
+    const key = String(provider || '').trim().toLowerCase()
+    return providerReasoningPresetMap[key] || []
 }
 
 // ==================== 配置列表 ====================
@@ -643,6 +755,10 @@ const normalizeConfigItem = (row: any) => {
         apiUrl: String(source.apiUrl ?? source.api_url ?? ''),
         apiKey: String(source.apiKey ?? source.api_key ?? ''),
         model: String(source.model || ''),
+        modelPreset: String(source.modelPreset || source.model_preset || ''),
+        reasoningEnabled: normalizeBoolean(source.reasoningEnabled ?? source.reasoning_enabled, false),
+        reasoningModel: String(source.reasoningModel || source.reasoning_model || ''),
+        thinkingBudget: Number.parseInt(String(source.thinkingBudget ?? source.thinking_budget ?? 0), 10) || 0,
         enabled: normalizeBoolean(source.enabled ?? source.is_enabled, true),
         isDefault: normalizeBoolean(source.isDefault ?? source.is_default, false),
         createdAt: source.createdAt ?? source.create_time ?? 0
@@ -759,6 +875,10 @@ const editForm = reactive({
     apiUrl: '',
     apiKey: '',
     model: '',
+    modelPreset: '',
+    reasoningEnabled: false,
+    reasoningModel: '',
+    thinkingBudget: 0,
     enabled: true,
     isDefault: false
 })
@@ -778,18 +898,21 @@ const getProviderDefaults = (provider: string) => {
     const current = String(provider || '')
         .trim()
         .toLowerCase()
-    const defaults: Record<string, { apiUrl: string; model: string }> = {
+    const defaults: Record<string, { apiUrl: string; model: string; modelPreset: string }> = {
         siliconflow: {
             apiUrl: 'https://api.siliconflow.cn/v1/chat/completions',
-            model: 'deepseek-ai/DeepSeek-V3.2'
+            model: 'deepseek-ai/DeepSeek-V3.2',
+            modelPreset: 'siliconflow.chat.deepseek-v3.2'
         },
         openai: {
             apiUrl: 'https://api.openai.com/v1/chat/completions',
-            model: 'gpt-4o-mini'
+            model: 'gpt-4o-mini',
+            modelPreset: 'openai.gpt-4o-mini'
         },
         deepseek: {
             apiUrl: 'https://api.deepseek.com/v1/chat/completions',
-            model: 'deepseek-chat'
+            model: 'deepseek-chat',
+            modelPreset: 'deepseek.chat'
         }
     }
     return defaults[current] || defaults.siliconflow
@@ -806,6 +929,19 @@ const applyProviderDefaults = (provider: string, force = false) => {
     if (force || !String(editForm.model || '').trim()) {
         editForm.model = defaults.model
     }
+    if (force || !String(editForm.modelPreset || '').trim()) {
+        editForm.modelPreset = defaults.modelPreset
+    }
+}
+
+/**
+ * 应用模型预设到当前表单
+ */
+const handleModelPresetChange = (presetValue: string) => {
+    const presets = getProviderModelPresets(editForm.provider)
+    const matched = presets.find((item) => item.value === presetValue)
+    if (!matched) return
+    editForm.model = matched.model
 }
 
 /** 重置编辑表单 */
@@ -816,6 +952,10 @@ const resetEditForm = () => {
     editForm.apiUrl = ''
     editForm.apiKey = ''
     editForm.model = ''
+    editForm.modelPreset = ''
+    editForm.reasoningEnabled = false
+    editForm.reasoningModel = ''
+    editForm.thinkingBudget = 0
     editForm.enabled = true
     editForm.isDefault = false
     applyProviderDefaults(editForm.provider, true)
@@ -832,8 +972,15 @@ const handleAdd = () => {
 }
 
 /** 编辑配置 */
-const handleEdit = (row: any) => {
-    const normalizedRow = normalizeConfigItem(row)
+const handleEdit = async (row: any) => {
+    let sourceRow = row
+    try {
+        const detailRes = await uiedAiConfigDetail({ id: row?.id })
+        sourceRow = detailRes?.data || detailRes || row
+    } catch (error) {
+        console.warn('[uied.aiConfig] 获取配置详情失败，回退使用列表数据', error)
+    }
+    const normalizedRow = normalizeConfigItem(sourceRow)
     resetEditForm()
     editForm.id = normalizedRow.id
     editForm.name = normalizedRow.name
@@ -841,6 +988,10 @@ const handleEdit = (row: any) => {
     editForm.apiUrl = normalizedRow.apiUrl
     editForm.apiKey = normalizedRow.apiKey
     editForm.model = normalizedRow.model
+    editForm.modelPreset = normalizedRow.modelPreset || ''
+    editForm.reasoningEnabled = !!normalizedRow.reasoningEnabled
+    editForm.reasoningModel = normalizedRow.reasoningModel || ''
+    editForm.thinkingBudget = Number(normalizedRow.thinkingBudget || 0)
     editForm.enabled = normalizedRow.enabled
     editForm.isDefault = normalizedRow.isDefault
     applyProviderDefaults(editForm.provider, false)
@@ -861,6 +1012,10 @@ const handleSave = async () => {
             apiUrl: editForm.apiUrl,
             apiKey: editForm.apiKey,
             model: editForm.model,
+            modelPreset: editForm.modelPreset,
+            reasoningEnabled: editForm.reasoningEnabled,
+            reasoningModel: editForm.reasoningModel,
+            thinkingBudget: Number(editForm.thinkingBudget || 0),
             enabled: editForm.enabled,
             isDefault: editForm.isDefault
         }
@@ -1223,6 +1378,13 @@ watch(
     () => editForm.provider,
     (provider) => {
         applyProviderDefaults(String(provider || ''), false)
+        const presetOptions = getProviderModelPresets(String(provider || ''))
+        if (
+            editForm.modelPreset &&
+            !presetOptions.some((item) => item.value === editForm.modelPreset)
+        ) {
+            editForm.modelPreset = ''
+        }
     }
 )
 

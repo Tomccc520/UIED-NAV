@@ -31,6 +31,51 @@
                     >
                 </el-form-item>
 
+                <el-form-item label="缩略图展示样式">
+                    <el-select
+                        v-model="config.thumbnailLayoutStyle"
+                        style="width: 260px"
+                        :disabled="!config.screenshotsEnabled"
+                    >
+                        <el-option label="设备框（Laptop）" value="device" />
+                        <el-option label="分屏展示（主图+侧图）" value="split" />
+                        <el-option label="轮播缩略图（主图+缩略条）" value="carousel" />
+                    </el-select>
+                    <span class="form-tip">
+                        控制详情页顶部缩略图区的展示样式。建议首发版默认使用「设备框」。
+                    </span>
+                </el-form-item>
+
+                <el-form-item
+                    v-if="config.thumbnailLayoutStyle === 'split'"
+                    label="分屏侧图数量"
+                >
+                    <el-input-number
+                        v-model="config.thumbnailSplitSideCount"
+                        :min="1"
+                        :max="4"
+                        :disabled="!config.screenshotsEnabled"
+                    />
+                    <span class="form-tip">
+                        分屏展示模式下，右侧小图显示数量。建议 2-3 张，过多会影响信息密度。
+                    </span>
+                </el-form-item>
+
+                <el-form-item
+                    v-if="config.thumbnailLayoutStyle === 'carousel'"
+                    label="轮播缩略条数量"
+                >
+                    <el-input-number
+                        v-model="config.thumbnailCarouselThumbCount"
+                        :min="2"
+                        :max="12"
+                        :disabled="!config.screenshotsEnabled"
+                    />
+                    <span class="form-tip">
+                        轮播缩略条最多展示多少张截图（不含主图），超出后需横向滚动查看。
+                    </span>
+                </el-form-item>
+
                 <el-form-item label="评分功能">
                     <el-switch v-model="config.ratingsEnabled" />
                     <span class="form-tip"
@@ -221,6 +266,9 @@ import feedback from '@/utils/feedback'
 const defaultConfig = {
     // 区块显示控制
     screenshotsEnabled: true,
+    thumbnailLayoutStyle: 'device',
+    thumbnailSplitSideCount: 2,
+    thumbnailCarouselThumbCount: 6,
     ratingsEnabled: true,
     commentsEnabled: true,
     sharingEnabled: true,

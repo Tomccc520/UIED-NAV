@@ -18,6 +18,7 @@
                         placeholder="搜索名称/描述/URL"
                         clearable
                         @keyup.enter="resetPage"
+                        @clear="resetPage"
                     />
                 </el-form-item>
                 <el-form-item label="所属分类">
@@ -26,13 +27,60 @@
                         v-model="queryParams.categoryId"
                         clearable
                         placeholder="全部分类"
+                        @change="resetPage"
                     >
                         <el-option
-                            v-for="item in categoryList"
+                            v-for="item in categoryOptions"
                             :key="item.id"
-                            :label="item.name"
+                            :label="item.label"
                             :value="item.id"
                         />
+                    </el-select>
+                </el-form-item>
+                <el-form-item>
+                    <el-checkbox
+                        v-model="queryParams.includeChildren"
+                        :disabled="!queryParams.categoryId"
+                        @change="resetPage"
+                    >
+                        包含子分类
+                    </el-checkbox>
+                </el-form-item>
+                <el-form-item label="显示状态">
+                    <el-select
+                        class="w-[160px]"
+                        v-model="queryParams.status"
+                        clearable
+                        placeholder="全部状态"
+                        @change="resetPage"
+                    >
+                        <el-option label="显示/正常" value="normal" />
+                        <el-option label="隐藏" value="disabled" />
+                        <el-option label="待审核" value="unchecked" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="详情内容">
+                    <el-select
+                        class="w-[140px]"
+                        v-model="queryParams.hasDetailContent"
+                        clearable
+                        placeholder="全部"
+                        @change="resetPage"
+                    >
+                        <el-option label="有详情" value="1" />
+                        <el-option label="无详情" value="0" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="缩略图">
+                    <el-select
+                        class="w-[140px]"
+                        v-model="queryParams.hasThumbnail"
+                        clearable
+                        placeholder="全部"
+                        @change="resetPage"
+                    >
+                        <el-option label="有缩略图" value="1" />
+                        <el-option label="无缩略图" value="0" />
                     </el-select>
                 </el-form-item>
                 <el-form-item>
@@ -144,7 +192,11 @@ const getFrontendUrl = (row: any) => {
 
 const queryParams = reactive({
     keyword: '',
-    categoryId: ''
+    categoryId: '',
+    includeChildren: true,
+    status: '',
+    hasDetailContent: '',
+    hasThumbnail: ''
 })
 
 const { pager, getLists, resetPage, resetParams } = usePaging({
@@ -154,6 +206,59 @@ const { pager, getLists, resetPage, resetParams } = usePaging({
 
 // 分类列表
 const categoryList = ref<any[]>([])
+const categoryOptions = computed(() => buildCategoryOptions(categoryList.value))
+
+/**
+ * 构建带层级缩进的分类下拉选项，便于后台筛选父子分类
+ */
+const buildCategoryOptions = (categories: any[]) => {
+    if (!Array.isArray(categories) || categories.length === 0) return []
+
+    const parentMap = new Map<any, any[]>()
+    const nodeMap = new Map<any, any>()
+    const visited = new Set<any>()
+    const options: any[] = []
+
+    categories.forEach((item) => {
+        nodeMap.set(item.id, item)
+        const parentId = item.parentId ?? null
+        if (!parentMap.has(parentId)) parentMap.set(parentId, [])
+        parentMap.get(parentId)?.push(item)
+    })
+
+    const walk = (parentId: any, level = 0) => {
+        const children = parentMap.get(parentId) || []
+        children.forEach((item) => {
+            if (visited.has(item.id)) return
+            visited.add(item.id)
+            const indent = level > 0 ? `${'　'.repeat(level)}└ ` : ''
+            options.push({
+                ...item,
+                label: `${indent}${item.name}`
+            })
+            walk(item.id, level + 1)
+        })
+    }
+
+    walk(null, 0)
+    walk(undefined, 0)
+
+    // 兜底：异常 parentId 数据仍然可选，避免后台无法筛选
+    categories.forEach((item) => {
+        if (visited.has(item.id)) return
+        const hasParent = item.parentId && nodeMap.has(item.parentId)
+        options.push({
+            ...item,
+            label: `${hasParent ? '　└ ' : ''}${item.name}`
+        })
+    })
+
+    return options
+}
+
+/**
+ * 获取分类列表
+ */
 const getCategoryList = async () => {
     try {
         const res = await uiedCategoryAll()

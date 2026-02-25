@@ -1218,12 +1218,27 @@ class ContributionIncentiveService extends Service {
     const pageSize = this.parseIntSafe(params.pageSize, 20, 1, 100);
     const offset = (pageNo - 1) * pageSize;
     const keyword = String(params.keyword || '').trim();
+    const levelName = String(params.levelName || '').trim();
+    const minPoints = Number.parseInt(String(params.minPoints ?? ''), 10);
+    const maxPoints = Number.parseInt(String(params.maxPoints ?? ''), 10);
 
     let whereSql = 'u.is_delete = 0';
     const replacements = [];
     if (keyword) {
       whereSql += ' AND (u.nickname LIKE ? OR u.username LIKE ?)';
       replacements.push(`%${keyword}%`, `%${keyword}%`);
+    }
+    if (levelName) {
+      whereSql += ' AND COALESCE(c.level_name, \'\') = ?';
+      replacements.push(levelName);
+    }
+    if (Number.isInteger(minPoints)) {
+      whereSql += ' AND COALESCE(c.total_points, 0) >= ?';
+      replacements.push(minPoints);
+    }
+    if (Number.isInteger(maxPoints)) {
+      whereSql += ' AND COALESCE(c.total_points, 0) <= ?';
+      replacements.push(maxPoints);
     }
 
     const [ countRow ] = await app.model.query(
@@ -1343,6 +1358,8 @@ class ContributionIncentiveService extends Service {
     const pageSize = this.parseIntSafe(params.pageSize, 20, 1, 100);
     const offset = (pageNo - 1) * pageSize;
     const eventType = String(params.eventType || '').trim();
+    const keyword = String(params.keyword || '').trim();
+    const userId = Number.parseInt(String(params.userId ?? ''), 10);
 
     let whereSql = 'l.is_delete = 0';
     const replacements = [];
@@ -1350,10 +1367,19 @@ class ContributionIncentiveService extends Service {
       whereSql += ' AND l.event_type = ?';
       replacements.push(eventType);
     }
+    if (Number.isInteger(userId) && userId > 0) {
+      whereSql += ' AND l.user_id = ?';
+      replacements.push(userId);
+    }
+    if (keyword) {
+      whereSql += ' AND (u.nickname LIKE ? OR u.username LIKE ?)';
+      replacements.push(`%${keyword}%`, `%${keyword}%`);
+    }
 
     const [ countRow ] = await app.model.query(
       `SELECT COUNT(*) AS total
        FROM ${CONTRIBUTION_LOG_TABLE} l
+       LEFT JOIN la_user u ON u.id = l.user_id
        WHERE ${whereSql}`,
       {
         replacements,

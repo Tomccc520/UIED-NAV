@@ -19,7 +19,16 @@ class WebsiteController extends baseController {
   async list() {
     const { ctx } = this;
     try {
-      const { pageNo = 1, pageSize = 15, categoryId, keyword, status, includeChildren } = ctx.query;
+      const {
+        pageNo = 1,
+        pageSize = 15,
+        categoryId,
+        keyword,
+        status,
+        includeChildren,
+        hasDetailContent,
+        hasThumbnail,
+      } = ctx.query;
       const result = await ctx.service.uied.website.list({
         page: parseInt(pageNo),
         pageSize: parseInt(pageSize),
@@ -27,6 +36,8 @@ class WebsiteController extends baseController {
         keyword,
         status,
         includeChildren: includeChildren === 'true' || includeChildren === '1',
+        hasDetailContent,
+        hasThumbnail,
       });
       this.result({ data: result });
     } catch (error) {

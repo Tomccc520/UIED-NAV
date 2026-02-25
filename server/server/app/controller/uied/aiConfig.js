@@ -154,6 +154,12 @@ const normalizeAiConfigPayload = payload => {
     apiUrl: source.apiUrl !== undefined ? source.apiUrl : source.api_url,
     apiKey: source.apiKey !== undefined ? source.apiKey : source.api_key,
     model: source.model,
+    modelPreset: source.modelPreset !== undefined ? source.modelPreset : source.model_preset,
+    reasoningEnabled: normalizeOptionalBoolean(
+      source.reasoningEnabled !== undefined ? source.reasoningEnabled : source.reasoning_enabled
+    ),
+    reasoningModel: source.reasoningModel !== undefined ? source.reasoningModel : source.reasoning_model,
+    thinkingBudget: source.thinkingBudget !== undefined ? source.thinkingBudget : source.thinking_budget,
     enabled: normalizeOptionalBoolean(source.enabled !== undefined ? source.enabled : source.is_enabled),
     isDefault: normalizeOptionalBoolean(source.isDefault !== undefined ? source.isDefault : source.is_default),
   };
@@ -205,7 +211,10 @@ class AiConfigController extends baseController {
   async get() {
     const { ctx } = this;
     try {
-      const result = await ctx.service.uied.aiConfig.getConfig();
+      const id = Number(ctx.request.query?.id || 0);
+      const result = id
+        ? await ctx.service.uied.aiConfig.getDetail(id)
+        : await ctx.service.uied.aiConfig.getConfig();
       this.result({ data: result });
     } catch (error) {
       ctx.logger.error('获取AI配置失败:', error);

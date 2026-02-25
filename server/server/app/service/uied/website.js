@@ -19,7 +19,7 @@ class WebsiteService extends Service {
    * @param {number} params.categoryId - 分类ID
    * @param {boolean} params.includeChildren - 是否包含子分类的网站
    */
-  async list({ page = 1, pageSize = 20, categoryId, keyword, status, includeChildren }) {
+  async list({ page = 1, pageSize = 20, categoryId, keyword, status, includeChildren, hasDetailContent, hasThumbnail }) {
     const { app } = this;
     const offset = (page - 1) * pageSize;
 
@@ -39,14 +39,26 @@ class WebsiteService extends Service {
     }
 
     if (keyword) {
-      whereClause += ' AND (w.name LIKE ? OR w.description LIKE ? OR w.url LIKE ?)';
+      whereClause += ' AND (w.name LIKE ? OR w.description LIKE ? OR w.url LIKE ? OR w.slug LIKE ? OR w.tags LIKE ?)';
       const likeKeyword = `%${keyword}%`;
-      replacements.push(likeKeyword, likeKeyword, likeKeyword);
+      replacements.push(likeKeyword, likeKeyword, likeKeyword, likeKeyword, likeKeyword);
     }
 
     if (status) {
       whereClause += ' AND w.status = ?';
       replacements.push(status);
+    }
+
+    if (hasDetailContent === '1') {
+      whereClause += " AND w.detail_content IS NOT NULL AND TRIM(w.detail_content) != ''";
+    } else if (hasDetailContent === '0') {
+      whereClause += " AND (w.detail_content IS NULL OR TRIM(w.detail_content) = '')";
+    }
+
+    if (hasThumbnail === '1') {
+      whereClause += " AND w.thumbnail IS NOT NULL AND TRIM(w.thumbnail) != ''";
+    } else if (hasThumbnail === '0') {
+      whereClause += " AND (w.thumbnail IS NULL OR TRIM(w.thumbnail) = '')";
     }
 
     // 获取总数
@@ -196,7 +208,7 @@ class WebsiteService extends Service {
           data.screenshots ? JSON.stringify(data.screenshots) : null,
           data.thumbnail || null,
           data.visitBtnText || null,
-          'unchecked',
+          data.status || (data.isActive !== undefined ? (Number(data.isActive) === 1 ? 'normal' : 'disabled') : 'unchecked'),
           now,
           now,
         ],
@@ -258,6 +270,11 @@ class WebsiteService extends Service {
     if (data.screenshots !== undefined) { updates.push('screenshots = ?'); values.push(JSON.stringify(data.screenshots)); }
     if (data.thumbnail !== undefined) { updates.push('thumbnail = ?'); values.push(data.thumbnail); }
     if (data.visitBtnText !== undefined) { updates.push('visit_btn_text = ?'); values.push(data.visitBtnText); }
+    if (data.status !== undefined) { updates.push('status = ?'); values.push(data.status); }
+    if (data.status === undefined && data.isActive !== undefined) {
+      updates.push('status = ?');
+      values.push(Number(data.isActive) === 1 ? 'normal' : 'disabled');
+    }
 
     updates.push('update_time = ?');
     values.push(now);

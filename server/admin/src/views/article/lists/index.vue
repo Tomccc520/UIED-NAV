@@ -14,12 +14,20 @@
                     <el-input
                         class="w-[280px]"
                         v-model="queryParams.title"
+                        placeholder="输入标题关键词"
                         clearable
                         @keyup.enter="resetPage"
+                        @clear="resetPage"
                     />
                 </el-form-item>
                 <el-form-item label="栏目名称">
-                    <el-select class="w-[280px]" v-model="queryParams.cid">
+                    <el-select
+                        class="w-[280px]"
+                        v-model="queryParams.cid"
+                        clearable
+                        filterable
+                        @change="handleSearchFieldChange"
+                    >
                         <el-option label="全部" value />
                         <el-option
                             v-for="item in optionsData.articleCate"
@@ -30,14 +38,14 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="发布状态">
-                    <el-select class="w-[280px]" v-model="queryParams.isShow">
+                    <el-select class="w-[220px]" v-model="queryParams.isShow" clearable @change="handleSearchFieldChange">
                         <el-option label="全部" value />
                         <el-option label="已发布" :value="1" />
                         <el-option label="待发布" :value="0" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="审核状态">
-                    <el-select class="w-[280px]" v-model="queryParams.reviewStatus">
+                    <el-select class="w-[220px]" v-model="queryParams.reviewStatus" clearable @change="handleSearchFieldChange">
                         <el-option label="全部" value />
                         <el-option label="待审核" :value="1" />
                         <el-option label="已通过" :value="2" />
@@ -46,7 +54,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="文章标签">
-                    <el-select class="w-[280px]" v-model="queryParams.tagId" clearable>
+                    <el-select class="w-[280px]" v-model="queryParams.tagId" clearable filterable @change="handleSearchFieldChange">
                         <el-option label="全部" value />
                         <el-option
                             v-for="item in optionsData.articleTag"
@@ -57,7 +65,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="所属专题">
-                    <el-select class="w-[280px]" v-model="queryParams.topicId" clearable>
+                    <el-select class="w-[280px]" v-model="queryParams.topicId" clearable filterable @change="handleSearchFieldChange">
                         <el-option label="全部" value />
                         <el-option
                             v-for="item in optionsData.articleTopic"
@@ -100,6 +108,19 @@
                 <el-tag type="warning" effect="plain">待审核 {{ pageAuditPendingCount }} 条</el-tag>
                 <el-tag type="success" effect="plain">已发布 {{ pagePublishedCount }} 条</el-tag>
                 <el-tag type="info" effect="plain">待发布 {{ pageDraftCount }} 条</el-tag>
+            </div>
+            <div class="article-quick-filters mb-3">
+                <span class="article-quick-filters__label">快捷筛选</span>
+                <el-button size="small" @click="applyQuickFilter('all')">全部</el-button>
+                <el-button size="small" type="warning" plain @click="applyQuickFilter('pendingReview')">
+                    待审核
+                </el-button>
+                <el-button size="small" type="success" plain @click="applyQuickFilter('published')">
+                    已发布
+                </el-button>
+                <el-button size="small" type="info" plain @click="applyQuickFilter('draft')">
+                    待发布
+                </el-button>
             </div>
             <el-table size="large" stripe v-loading="pager.loading" :data="safeLists">
                 <el-table-column label="ID" prop="id" min-width="80" />
@@ -314,6 +335,13 @@ const { pager, getLists, resetPage, resetParams } = usePaging({
     params: queryParams
 })
 
+/**
+ * 统一处理搜索筛选项变更，减少重复点击查询按钮
+ */
+const handleSearchFieldChange = () => {
+    resetPage()
+}
+
 const { optionsData } = useDictOptions<{
     articleCate: ArticleOptionItem[]
     articleTag: ArticleOptionItem[]
@@ -489,6 +517,29 @@ const handleSeedTestData = async () => {
     }
 }
 
+/**
+ * 应用文章列表快捷筛选
+ */
+const applyQuickFilter = (type: 'all' | 'pendingReview' | 'published' | 'draft') => {
+    if (type === 'all') {
+        queryParams.isShow = ''
+        queryParams.reviewStatus = ''
+    }
+    if (type === 'pendingReview') {
+        queryParams.isShow = ''
+        queryParams.reviewStatus = 1 as any
+    }
+    if (type === 'published') {
+        queryParams.isShow = 1 as any
+        queryParams.reviewStatus = ''
+    }
+    if (type === 'draft') {
+        queryParams.isShow = 0 as any
+        queryParams.reviewStatus = ''
+    }
+    resetPage()
+}
+
 onActivated(() => {
     getLists()
 })
@@ -508,5 +559,17 @@ getLists()
     display: inline-flex;
     align-items: center;
     gap: 4px;
+}
+
+.article-quick-filters {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.article-quick-filters__label {
+    font-size: 12px;
+    color: #909399;
 }
 </style>

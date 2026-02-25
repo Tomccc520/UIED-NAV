@@ -543,6 +543,9 @@ class SettingService extends Service {
 
     const defaultDetailPage = {
       screenshotsEnabled: true,
+      thumbnailLayoutStyle: 'device',
+      thumbnailSplitSideCount: 2,
+      thumbnailCarouselThumbCount: 6,
       ratingsEnabled: true,
       commentsEnabled: true,
       sharingEnabled: true,

@@ -13,9 +13,10 @@
                     <el-input
                         class="w-[280px]"
                         v-model="queryParams.keyword"
-                        placeholder="用户编号/昵称/手机号码"
+                        placeholder="用户编号/昵称/账号/手机"
                         clearable
                         @keyup.enter="resetPage"
+                        @clear="resetPage"
                     />
                 </el-form-item>
                 <el-form-item label="注册时间">
@@ -25,12 +26,95 @@
                     />
                 </el-form-item>
                 <el-form-item label="注册来源">
-                    <el-select class="w-[280px]" v-model="queryParams.channel">
+                    <el-select
+                        class="w-[240px]"
+                        v-model="queryParams.channel"
+                        clearable
+                        filterable
+                        @change="handleSearchFieldChange"
+                    >
+                        <el-option label="全部来源" value="" />
                         <el-option
                             v-for="(item, key) in ClientMap"
                             :key="key"
                             :label="item"
                             :value="key"
+                        />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="状态">
+                    <el-select
+                        class="w-[180px]"
+                        v-model="queryParams.status"
+                        clearable
+                        @change="handleSearchFieldChange"
+                    >
+                        <el-option label="全部状态" value="" />
+                        <el-option label="正常" :value="0" />
+                        <el-option label="禁用" :value="1" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="用户类型">
+                    <el-select
+                        class="w-[180px]"
+                        v-model="queryParams.userType"
+                        clearable
+                        @change="handleSearchFieldChange"
+                    >
+                        <el-option label="全部类型" value="" />
+                        <el-option label="普通用户" :value="0" />
+                        <el-option label="作者" :value="1" />
+                        <el-option label="管理员" :value="2" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="用户等级">
+                    <el-select
+                        class="w-[220px]"
+                        v-model="queryParams.vipLevel"
+                        clearable
+                        filterable
+                        @change="handleSearchFieldChange"
+                    >
+                        <el-option label="全部等级" value="" />
+                        <el-option
+                            v-for="item in userLevelOptions"
+                            :key="item.id"
+                            :label="`${item.name}${item.levelValue !== '' ? ` (Lv${item.levelValue})` : ''}`"
+                            :value="item.levelValue"
+                        />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="用户分组">
+                    <el-select
+                        class="w-[220px]"
+                        v-model="queryParams.groupId"
+                        clearable
+                        filterable
+                        @change="handleSearchFieldChange"
+                    >
+                        <el-option label="全部分组" value="" />
+                        <el-option
+                            v-for="item in userGroupOptions"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id"
+                        />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="用户标签">
+                    <el-select
+                        class="w-[220px]"
+                        v-model="queryParams.tagId"
+                        clearable
+                        filterable
+                        @change="handleSearchFieldChange"
+                    >
+                        <el-option label="全部标签" value="" />
+                        <el-option
+                            v-for="item in userTagOptions"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id"
                         />
                     </el-select>
                 </el-form-item>
@@ -135,17 +219,32 @@
  */
 import { usePaging } from '@/hooks/usePaging'
 import { getRoutePath } from '@/router'
-import { getUserDetail, getUserList, seedUserTestUsers } from '@/api/consumer'
+import {
+    getUserDetail,
+    getUserGroupList,
+    getUserLevelList,
+    getUserList,
+    getUserTagList,
+    seedUserTestUsers
+} from '@/api/consumer'
 import { ClientMap } from '@/enums/appEnums'
 import feedback from '@/utils/feedback'
 import { Loading } from '@element-plus/icons-vue'
 const queryParams = reactive({
     keyword: '',
     channel: '',
+    status: '',
+    userType: '',
+    vipLevel: '',
+    groupId: '',
+    tagId: '',
     startTime: '',
     endTime: '',
     autoSeed: 1
 })
+const userLevelOptions = ref<any[]>([])
+const userGroupOptions = ref<any[]>([])
+const userTagOptions = ref<any[]>([])
 const seedLoading = ref(false)
 const detailVisible = ref(false)
 const detailLoading = ref(false)
@@ -170,6 +269,55 @@ const { pager, getLists, resetPage, resetParams } = usePaging({
     fetchFun: getUserList,
     params: queryParams
 })
+
+/**
+ * 统一处理筛选项变化，提升搜索操作效率
+ */
+const handleSearchFieldChange = () => {
+    resetPage()
+}
+
+/**
+ * 规范化下拉选项数组，兼容接口返回包裹结构
+ */
+const normalizeOptionList = (payload: any) => {
+    if (Array.isArray(payload)) return payload
+    if (Array.isArray(payload?.lists)) return payload.lists
+    if (Array.isArray(payload?.list)) return payload.list
+    if (Array.isArray(payload?.data)) return payload.data
+    if (Array.isArray(payload?.data?.lists)) return payload.data.lists
+    if (Array.isArray(payload?.data?.list)) return payload.data.list
+    return []
+}
+
+/**
+ * 加载用户等级/分组/标签筛选项
+ */
+const loadSearchOptions = async () => {
+    try {
+        const [levels, groups, tags] = await Promise.all([
+            getUserLevelList(),
+            getUserGroupList(),
+            getUserTagList()
+        ])
+        userLevelOptions.value = normalizeOptionList(levels).map((item: any) => ({
+            id: Number(item?.id || 0),
+            name: String(item?.name || ''),
+            levelValue: item?.levelValue ?? item?.level_value ?? ''
+        }))
+        userGroupOptions.value = normalizeOptionList(groups).map((item: any) => ({
+            id: Number(item?.id || 0),
+            name: String(item?.name || '')
+        }))
+        userTagOptions.value = normalizeOptionList(tags).map((item: any) => ({
+            id: Number(item?.id || 0),
+            name: String(item?.name || '')
+        }))
+    } catch (error) {
+        // 下拉选项失败不阻断列表加载
+        console.warn('[consumer.list] 加载筛选项失败', error)
+    }
+}
 
 /**
  * 初始化测试用户并刷新列表
@@ -237,5 +385,6 @@ const handleOpenDetailPage = () => {
 
 onActivated(() => {
     getLists().catch(() => {})
+    loadSearchOptions().catch(() => {})
 })
 </script>

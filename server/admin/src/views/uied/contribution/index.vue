@@ -160,19 +160,46 @@
             <el-tab-pane label="用户激励数据" name="users">
                 <el-card class="!border-none" shadow="never">
                     <template #header>
-                        <div class="flex items-center justify-between">
-                            <span class="font-medium">用户积分与等级</span>
-                            <div class="flex items-center gap-2">
-                                <el-input
-                                    v-model="userQuery.keyword"
-                                    placeholder="昵称/账号"
-                                    clearable
-                                    style="width: 220px"
-                                    @keyup.enter="loadUsers"
-                                />
-                                <el-button type="primary" @click="loadUsers">查询</el-button>
+                            <div class="flex items-center justify-between">
+                                <span class="font-medium">用户积分与等级</span>
+                                <div class="flex items-center gap-2 flex-wrap justify-end">
+                                    <el-input
+                                        v-model="userQuery.keyword"
+                                        placeholder="昵称/账号"
+                                        clearable
+                                        style="width: 220px"
+                                        @keyup.enter="loadUsers"
+                                        @clear="handleUserSearchChange"
+                                    />
+                                    <el-input
+                                        v-model="userQuery.levelName"
+                                        placeholder="等级名称（如 普通/VIP）"
+                                        clearable
+                                        style="width: 200px"
+                                        @keyup.enter="loadUsers"
+                                        @clear="handleUserSearchChange"
+                                    />
+                                    <el-input-number
+                                        v-model="userQuery.minPoints"
+                                        :min="0"
+                                        :max="99999999"
+                                        placeholder="最低积分"
+                                        style="width: 150px"
+                                        @change="handleUserSearchChange"
+                                    />
+                                    <span class="text-xs text-[#909399]">-</span>
+                                    <el-input-number
+                                        v-model="userQuery.maxPoints"
+                                        :min="0"
+                                        :max="99999999"
+                                        placeholder="最高积分"
+                                        style="width: 150px"
+                                        @change="handleUserSearchChange"
+                                    />
+                                    <el-button type="primary" @click="loadUsers">查询</el-button>
+                                    <el-button @click="resetUserSearch">重置</el-button>
+                                </div>
                             </div>
-                        </div>
                     </template>
                     <el-table :data="userRows" v-loading="userLoading" size="small">
                         <el-table-column prop="id" label="用户ID" width="90" />
@@ -206,19 +233,37 @@
             <el-tab-pane label="积分日志" name="logs">
                 <el-card class="!border-none" shadow="never">
                     <template #header>
-                        <div class="flex items-center justify-between">
-                            <span class="font-medium">积分变更日志</span>
-                            <div class="flex items-center gap-2">
-                                <el-input
-                                    v-model="logQuery.eventType"
-                                    placeholder="事件类型（可选）"
-                                    clearable
-                                    style="width: 200px"
-                                    @keyup.enter="loadLogs"
-                                />
-                                <el-button type="primary" @click="loadLogs">查询</el-button>
+                            <div class="flex items-center justify-between">
+                                <span class="font-medium">积分变更日志</span>
+                                <div class="flex items-center gap-2 flex-wrap justify-end">
+                                    <el-input
+                                        v-model="logQuery.eventType"
+                                        placeholder="事件类型（可选）"
+                                        clearable
+                                        style="width: 200px"
+                                        @keyup.enter="loadLogs"
+                                        @clear="handleLogSearchChange"
+                                    />
+                                    <el-input
+                                        v-model="logQuery.keyword"
+                                        placeholder="昵称/账号"
+                                        clearable
+                                        style="width: 180px"
+                                        @keyup.enter="loadLogs"
+                                        @clear="handleLogSearchChange"
+                                    />
+                                    <el-input-number
+                                        v-model="logQuery.userId"
+                                        :min="0"
+                                        :max="99999999"
+                                        placeholder="用户ID"
+                                        style="width: 150px"
+                                        @change="handleLogSearchChange"
+                                    />
+                                    <el-button type="primary" @click="loadLogs">查询</el-button>
+                                    <el-button @click="resetLogSearch">重置</el-button>
+                                </div>
                             </div>
-                        </div>
                     </template>
                     <el-table :data="logRows" size="small">
                         <el-table-column prop="id" label="ID" width="90" />
@@ -421,7 +466,10 @@ const settingsForm = reactive({
 const userQuery = reactive({
     pageNo: 1,
     pageSize: 20,
-    keyword: ''
+    keyword: '',
+    levelName: '',
+    minPoints: undefined as number | undefined,
+    maxPoints: undefined as number | undefined
 })
 
 const userPagination = reactive({
@@ -433,7 +481,9 @@ const userPagination = reactive({
 const logQuery = reactive({
     pageNo: 1,
     pageSize: 20,
-    eventType: ''
+    eventType: '',
+    keyword: '',
+    userId: undefined as number | undefined
 })
 
 const featuredDialog = reactive({
@@ -701,7 +751,10 @@ const loadUsers = async () => {
         const data = await uiedContributionUserList({
             pageNo: userQuery.pageNo,
             pageSize: userQuery.pageSize,
-            keyword: String(userQuery.keyword || '').trim()
+            keyword: String(userQuery.keyword || '').trim(),
+            levelName: String(userQuery.levelName || '').trim(),
+            minPoints: userQuery.minPoints,
+            maxPoints: userQuery.maxPoints
         })
         userRows.value = Array.isArray(data?.lists) ? data.lists : []
         userPagination.pageNo = toInt(data?.pageNo, userQuery.pageNo, 1, 9999)
@@ -710,6 +763,25 @@ const loadUsers = async () => {
     } finally {
         userLoading.value = false
     }
+}
+
+/**
+ * 用户激励列表筛选变更后回到第一页
+ */
+const handleUserSearchChange = async () => {
+    userQuery.pageNo = 1
+    await loadUsers()
+}
+
+/**
+ * 重置用户激励列表筛选项
+ */
+const resetUserSearch = async () => {
+    userQuery.keyword = ''
+    userQuery.levelName = ''
+    userQuery.minPoints = undefined
+    userQuery.maxPoints = undefined
+    await handleUserSearchChange()
 }
 
 /**
@@ -739,9 +811,29 @@ const loadLogs = async () => {
     const data = await uiedContributionLogList({
         pageNo: logQuery.pageNo,
         pageSize: logQuery.pageSize,
-        eventType: String(logQuery.eventType || '').trim()
+        eventType: String(logQuery.eventType || '').trim(),
+        keyword: String(logQuery.keyword || '').trim(),
+        userId: logQuery.userId
     })
     logRows.value = Array.isArray(data?.lists) ? data.lists : []
+}
+
+/**
+ * 积分日志筛选变更后回到第一页
+ */
+const handleLogSearchChange = async () => {
+    logQuery.pageNo = 1
+    await loadLogs()
+}
+
+/**
+ * 重置积分日志筛选项
+ */
+const resetLogSearch = async () => {
+    logQuery.eventType = ''
+    logQuery.keyword = ''
+    logQuery.userId = undefined
+    await handleLogSearchChange()
 }
 
 /**

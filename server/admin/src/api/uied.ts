@@ -594,7 +594,16 @@ export function uiedAiSaveFeatureToggle(params: any) {
 
 // AI 对话（用于编辑器 AI 功能）
 export function uiedAiChat(params: any) {
-    return request.post({ url: '/uied/aiConfig/chat', params })
+    return request.post(
+        {
+            url: '/uied/aiConfig/chat',
+            params,
+            timeout: 90 * 1000
+        },
+        {
+            ignoreCancelToken: true
+        }
+    )
 }
 
 // ==================== SEO 抓取 ====================

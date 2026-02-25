@@ -122,7 +122,7 @@
                 </el-tab-pane>
 
                 <!-- 详情页内容 -->
-                <el-tab-pane label="详情页" name="detail">
+                <el-tab-pane label="详情页" name="detail" lazy>
                     <el-form :model="editData" label-width="100px">
                         <el-form-item label="访问按钮">
                             <el-input
@@ -186,7 +186,57 @@
                     <!-- AI 编辑器布局：左编辑器 + 右AI助手 -->
                     <div class="ai-editor-layout">
                         <div class="ai-editor-layout__main">
-                            <editor v-model="editData.detailContent" :height="560" mode="default" />
+                            <div class="ai-editor-layout__mode-bar">
+                                <div class="ai-editor-layout__mode-left">
+                                    <el-tag v-if="isFirefoxBrowser" size="small" type="warning">
+                                        Firefox 建议开启兼容输入模式
+                                    </el-tag>
+                                    <span class="ai-editor-layout__mode-tip">
+                                        可视化编辑异常时切换兼容模式（直接编辑 HTML）
+                                    </span>
+                                </div>
+                                <div class="ai-editor-layout__mode-actions">
+                                    <span class="ai-editor-layout__mode-label">兼容输入模式</span>
+                                    <el-switch
+                                        v-model="detailEditorCompatMode"
+                                        inline-prompt
+                                        active-text="开"
+                                        inactive-text="关"
+                                        :disabled="isFirefoxBrowser"
+                                    />
+                                    <el-button link type="primary" @click="router.push('/uied/aiConfig')">
+                                        AI配置
+                                    </el-button>
+                                </div>
+                            </div>
+
+                            <div v-if="detailEditorCompatMode" class="ai-editor-layout__compat">
+                                <el-input
+                                    v-model="editData.detailContent"
+                                    type="textarea"
+                                    :rows="22"
+                                    resize="none"
+                                    placeholder="兼容模式：直接编辑 HTML 内容（可粘贴 AI 输出或手工调整）"
+                                    class="ai-editor-layout__compat-textarea"
+                                />
+                                <div class="ai-editor-layout__compat-tip">
+                                    兼容模式用于 Firefox/输入法异常场景，建议在 Chrome 中使用可视化编辑器获得最佳体验。
+                                </div>
+                            </div>
+                            <editor
+                                v-else-if="detailEditorReady && !isFirefoxBrowser"
+                                v-model="editData.detailContent"
+                                :height="560"
+                                mode="default"
+                            />
+                            <div v-else class="ai-editor-layout__placeholder">
+                                {{
+                                    isFirefoxBrowser
+                                        ? 'Firefox 已启用稳定兼容模式（HTML编辑），如需可视化编辑建议使用 Chrome。'
+                                        : '切换到“详情页”后初始化编辑器...'
+                                }}
+                            </div>
+
                         </div>
                         <aside class="ai-editor-layout__sidebar">
                             <div class="ai-chat">
@@ -436,8 +486,46 @@ const router = useRouter()
 const pageLoading = ref(false)
 const submitLoading = ref(false)
 const activeTab = ref('basic')
+const detailEditorReady = ref(false)
+const isFirefoxBrowser =
+    typeof window !== 'undefined' && /firefox/i.test(window.navigator.userAgent || '')
+const detailEditorCompatMode = ref(isFirefoxBrowser)
 const editFormRef = ref<FormInstance>()
 const isEdit = computed(() => !!route.query.id)
+
+/**
+ * 仅在详情页签激活后初始化富文本编辑器，避免隐藏容器下编辑器无法输入
+ */
+const ensureDetailEditorReady = () => {
+    if (activeTab.value !== 'detail' || detailEditorReady.value) return
+    detailEditorReady.value = true
+    nextTick(() => {
+        window.dispatchEvent(new Event('resize'))
+    })
+}
+
+watch(
+    activeTab,
+    (tab) => {
+        if (tab === 'detail') ensureDetailEditorReady()
+    },
+    { immediate: true }
+)
+
+watch(
+    detailEditorCompatMode,
+    (enabled) => {
+        // Firefox 下强制使用兼容输入模式，避免 WangEditor(Slate) 在中文输入法场景下出现 DOM 异常
+        if (isFirefoxBrowser && !enabled) {
+            detailEditorCompatMode.value = true
+            return
+        }
+        if (!enabled && activeTab.value === 'detail') {
+            ensureDetailEditorReady()
+        }
+    },
+    { immediate: false }
+)
 
 // 分类列表
 const categoryList = ref<any[]>([])
@@ -651,6 +739,37 @@ const clearAiDraft = () => {
     aiDraftText.value = ''
 }
 
+/**
+ * 解析 AI 助手错误提示，给出可执行的排查方向
+ */
+const resolveAiAssistantErrorMessage = (error: any) => {
+    const status = Number(error?.response?.status || error?.status || 0)
+    const responseCode = Number(error?.response?.data?.code || 0)
+    const bodyMessage = String(error?.response?.data?.msg || error?.response?.data?.message || '').trim()
+    const rawMessage = String(error?.msg || error?.message || bodyMessage || '').trim()
+
+    // 商业版 403 已由请求拦截器统一提示，页面层不重复弹窗
+    if (status === 403 && responseCode === 403) {
+        return ''
+    }
+    if (status === 403) {
+        return '当前版本未授权或无权限访问 AI 写作助手，请检查账号权限与许可证配置'
+    }
+    if (/token参数为空|token empty|token invalid/i.test(rawMessage)) {
+        return '登录状态已失效，请重新登录后台后再使用 AI 写作助手'
+    }
+    if (/没有可用的 AI 配置/.test(rawMessage)) {
+        return '未检测到可用 AI 配置，请先到「系统设置 -> AI配置」启用至少一套配置'
+    }
+    if (/API Key/i.test(rawMessage)) {
+        return 'AI 配置缺少 API Key，请先到「系统设置 -> AI配置」补全并启用配置'
+    }
+    if (/SSL 证书校验失败|certificate/i.test(rawMessage)) {
+        return 'AI 服务证书校验失败，请检查 AI 接口地址或服务器证书链配置'
+    }
+    return rawMessage || 'AI 处理失败，请稍后重试'
+}
+
 // 纯文本转 HTML
 const plainTextToHtml = (text: string) => {
     if (!text.trim()) return ''
@@ -731,7 +850,8 @@ const handleAiGenerate = async (mode: AiGenerateMode) => {
         const draft = await requestAiDraft(mode)
         if (draft) feedback.msgSuccess('AI 已返回结果')
     } catch (error: any) {
-        feedback.msgError(error?.msg || error?.message || 'AI 处理失败')
+        const errorMessage = resolveAiAssistantErrorMessage(error)
+        errorMessage && feedback.msgError(errorMessage)
     } finally {
         aiGenerating.value = false
     }
@@ -756,7 +876,8 @@ const handleSendChatPrompt = async () => {
         const draft = await requestAiDraft(mode, prompt)
         if (draft) feedback.msgSuccess('AI 已返回结果')
     } catch (error: any) {
-        feedback.msgError(error?.msg || error?.message || 'AI 处理失败')
+        const errorMessage = resolveAiAssistantErrorMessage(error)
+        errorMessage && feedback.msgError(errorMessage)
     } finally {
         aiGenerating.value = false
     }
@@ -847,7 +968,8 @@ const handleAiHover = async (e: Event) => {
             feedback.msgSuccess('AI 改写完成')
         }
     } catch (error: any) {
-        feedback.msgError(error?.msg || 'AI 改写失败')
+        const errorMessage = resolveAiAssistantErrorMessage(error)
+        errorMessage && feedback.msgError(errorMessage)
     } finally {
         aiRewriting.value = false
     }
@@ -886,6 +1008,66 @@ onBeforeUnmount(() => {
 }
 .ai-editor-layout__main {
     min-width: 0;
+}
+.ai-editor-layout__mode-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--el-border-color-light);
+    border-radius: 10px;
+    background: #fff;
+}
+.ai-editor-layout__mode-left {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.ai-editor-layout__mode-tip {
+    color: var(--el-text-color-secondary);
+    font-size: 12px;
+    line-height: 1.4;
+}
+.ai-editor-layout__mode-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+.ai-editor-layout__mode-label {
+    color: var(--el-text-color-secondary);
+    font-size: 12px;
+}
+.ai-editor-layout__compat {
+    border: 1px solid var(--el-border-color);
+    border-radius: 10px;
+    background: #fff;
+    padding: 12px;
+}
+.ai-editor-layout__compat :deep(.el-textarea__inner) {
+    min-height: 560px !important;
+    font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;
+    line-height: 1.6;
+}
+.ai-editor-layout__compat-tip {
+    margin-top: 8px;
+    color: var(--el-text-color-secondary);
+    font-size: 12px;
+    line-height: 1.5;
+}
+.ai-editor-layout__placeholder {
+    height: 560px;
+    border: 1px dashed var(--el-border-color);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--el-text-color-secondary);
+    background: #fff;
 }
 .ai-editor-layout__sidebar {
     min-width: 0;
@@ -1005,6 +1187,15 @@ onBeforeUnmount(() => {
 @media (max-width: 1400px) {
     .ai-editor-layout {
         grid-template-columns: 1fr;
+    }
+    .ai-editor-layout__mode-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .ai-editor-layout__mode-actions {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
     }
     .ai-editor-layout__sidebar {
         position: static;
