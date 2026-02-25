@@ -486,10 +486,53 @@ class DailyHotService extends Service {
   }
 
   /**
+   * 判断是否为 TLS 证书链错误（第三方免费接口在部分环境下会触发）
+   */
+  isTlsCertificateError(error) {
+    const message = String(error?.message || '').toLowerCase();
+    return [
+      'unable to get local issuer certificate',
+      'self signed certificate',
+      'certificate has expired',
+      'unable to verify the first certificate',
+    ].some(keyword => message.includes(keyword));
+  }
+
+  /**
+   * 发起第三方接口请求（支持在证书链异常时的安全降级重试）
+   */
+  async doProviderRequest(url, timeoutMs, allowInsecureRetry = true) {
+    const { ctx } = this;
+    const requestOptions = {
+      timeout: timeoutMs,
+      dataType: 'json',
+      method: 'GET',
+      headers: {
+        'User-Agent': 'UIED-NAV/Commercial',
+        Accept: 'application/json',
+      },
+    };
+
+    try {
+      return await ctx.curl(url, requestOptions);
+    } catch (error) {
+      if (!allowInsecureRetry || !this.isTlsCertificateError(error)) {
+        throw error;
+      }
+
+      // 仅在证书链异常时降级一次，兼容部分本地/客户服务器缺失 CA 链的情况
+      ctx.logger.warn(`[dailyHot] TLS 证书校验失败，降级重试第三方热榜接口: ${url}`);
+      return await ctx.curl(url, {
+        ...requestOptions,
+        rejectUnauthorized: false,
+      });
+    }
+  }
+
+  /**
    * 请求第三方每日热榜接口
    */
   async requestProvider(params = {}, options = {}) {
-    const { ctx } = this;
     const config = options.config || await this.getConfig();
     const timeoutMs = this.parsePositiveInt(options.timeoutMs, config.timeoutMs, 1000, 30000);
     const query = new URLSearchParams();
@@ -500,16 +543,7 @@ class DailyHotService extends Service {
     });
     const queryText = query.toString();
     const url = `${config.apiBaseUrl}${queryText ? `?${queryText}` : ''}`;
-
-    const res = await ctx.curl(url, {
-      timeout: timeoutMs,
-      dataType: 'json',
-      method: 'GET',
-      headers: {
-        'User-Agent': 'UIED-NAV/Commercial',
-        Accept: 'application/json',
-      },
-    });
+    const res = await this.doProviderRequest(url, timeoutMs, true);
 
     if (res.status !== 200) {
       throw new Error(`每日热榜接口异常: HTTP ${res.status}`);
