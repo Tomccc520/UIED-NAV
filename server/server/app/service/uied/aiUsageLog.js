@@ -169,8 +169,8 @@ class AiUsageLogService extends Service {
 
     const [ result ] = await app.model.query(
       `INSERT INTO uied_ai_usage_log 
-       (config_id, feature_type, request_content, response_status, error_message, tokens_used, duration_ms, is_delete, create_time, update_time, delete_time)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, 0)`,
+       (config_id, feature_type, request_content, response_status, error_message, tokens_used, duration_ms, is_delete, create_time, update_time, delete_time, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, 0, FROM_UNIXTIME(?), FROM_UNIXTIME(?))`,
       {
         replacements: [
           configId,
@@ -180,6 +180,8 @@ class AiUsageLogService extends Service {
           errorMessage || null,
           tokensUsed,
           durationMs,
+          now,
+          now,
           now,
           now,
         ],

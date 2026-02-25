@@ -568,7 +568,47 @@
                         />
                     </el-select>
                 </el-form-item>
+                <el-form-item
+                    v-if="getProviderModelPresets(editForm.provider).length"
+                    label="快捷模型"
+                >
+                    <div class="ai-form-chip-wrap">
+                        <el-button
+                            v-for="item in getProviderModelPresets(editForm.provider)"
+                            :key="item.value"
+                            size="small"
+                            plain
+                            @click="applyModelPresetQuick(item.value)"
+                        >
+                            {{ item.label }}
+                        </el-button>
+                    </div>
+                </el-form-item>
                 <el-divider>思考模型（推理）</el-divider>
+                <el-form-item v-if="editForm.provider === 'siliconflow'">
+                    <el-alert
+                        type="info"
+                        :closable="false"
+                        show-icon
+                        class="ai-reasoning-alert"
+                    >
+                        <template #title>
+                            SiliconFlow 推理能力配置（支持思考模型与 thinking budget）
+                        </template>
+                        <template #default>
+                            <div class="ai-reasoning-alert__content">
+                                <span>建议先用通用模型测试连通，再开启推理模型与思考预算。</span>
+                                <el-button
+                                    link
+                                    type="primary"
+                                    @click="openSiliconflowReasoningDocs"
+                                >
+                                    打开官方文档
+                                </el-button>
+                            </div>
+                        </template>
+                    </el-alert>
+                </el-form-item>
                 <el-form-item label="启用思考模型">
                     <el-switch v-model="editForm.reasoningEnabled" />
                     <span class="text-xs text-gray-400 ml-3">
@@ -593,6 +633,25 @@
                         />
                     </el-select>
                 </el-form-item>
+                <el-form-item
+                    label="快捷推理模型"
+                    v-if="
+                        editForm.reasoningEnabled &&
+                        getProviderReasoningPresets(editForm.provider).length
+                    "
+                >
+                    <div class="ai-form-chip-wrap">
+                        <el-button
+                            v-for="item in getProviderReasoningPresets(editForm.provider)"
+                            :key="item.value"
+                            size="small"
+                            plain
+                            @click="applyReasoningPresetQuick(item.value)"
+                        >
+                            {{ item.label }}
+                        </el-button>
+                    </div>
+                </el-form-item>
                 <el-form-item label="思考预算" v-if="editForm.reasoningEnabled">
                     <el-input-number
                         v-model="editForm.thinkingBudget"
@@ -603,6 +662,21 @@
                     <span class="text-xs text-gray-400 ml-3">
                         0 表示不传该参数；建议先从 1024-4096 试起
                     </span>
+                    <el-button
+                        text
+                        type="primary"
+                        style="margin-left: 8px"
+                        @click="applyReasoningBudgetPreset(2048)"
+                    >
+                        设为 2048
+                    </el-button>
+                    <el-button
+                        text
+                        type="primary"
+                        @click="applyReasoningBudgetPreset(4096)"
+                    >
+                        设为 4096
+                    </el-button>
                 </el-form-item>
                 <el-row :gutter="16">
                     <el-col :span="12">
@@ -831,7 +905,11 @@ const handleTestConnection = async (row: any) => {
         await uiedAiConfigTest({
             provider: row.provider,
             apiKey: row.apiKey,
-            apiUrl: row.apiUrl
+            apiUrl: row.apiUrl,
+            model: row.model,
+            reasoningEnabled: row.reasoningEnabled,
+            reasoningModel: row.reasoningModel,
+            thinkingBudget: row.thinkingBudget
         })
         ElMessage.success('连接成功')
     } catch (error: any) {
@@ -852,7 +930,11 @@ const handleTestFromDialog = async () => {
         await uiedAiConfigTest({
             provider: editForm.provider,
             apiKey: editForm.apiKey,
-            apiUrl: editForm.apiUrl
+            apiUrl: editForm.apiUrl,
+            model: editForm.model,
+            reasoningEnabled: editForm.reasoningEnabled,
+            reasoningModel: editForm.reasoningModel,
+            thinkingBudget: editForm.thinkingBudget
         })
         ElMessage.success('连接成功')
     } catch (error: any) {
@@ -942,6 +1024,37 @@ const handleModelPresetChange = (presetValue: string) => {
     const matched = presets.find((item) => item.value === presetValue)
     if (!matched) return
     editForm.model = matched.model
+}
+
+/**
+ * 快捷应用模型预设（用于按钮操作）
+ */
+const applyModelPresetQuick = (presetValue: string) => {
+    editForm.modelPreset = presetValue
+    handleModelPresetChange(presetValue)
+}
+
+/**
+ * 快捷应用推理模型预设
+ */
+const applyReasoningPresetQuick = (model: string) => {
+    editForm.reasoningEnabled = true
+    editForm.reasoningModel = String(model || '').trim()
+}
+
+/**
+ * 快捷设置思考预算预设值
+ */
+const applyReasoningBudgetPreset = (budget: number) => {
+    editForm.reasoningEnabled = true
+    editForm.thinkingBudget = Number(budget || 0)
+}
+
+/**
+ * 打开 SiliconFlow 推理能力文档
+ */
+const openSiliconflowReasoningDocs = () => {
+    window.open('https://docs.siliconflow.cn/cn/userguide/capabilities/reasoning', '_blank')
 }
 
 /** 重置编辑表单 */
@@ -1436,5 +1549,21 @@ onMounted(() => {
     font-size: 12px;
     color: #909399;
     margin-top: 4px;
+}
+.ai-form-chip-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+}
+.ai-reasoning-alert {
+    width: 100%;
+}
+.ai-reasoning-alert__content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 </style>

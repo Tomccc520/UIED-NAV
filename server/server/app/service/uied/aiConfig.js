@@ -701,7 +701,7 @@ class AiConfigService extends Service {
   /**
    * 测试 AI 连接
    */
-  async testConnection(provider, apiKey, apiUrl) {
+  async testConnection(provider, apiKey, apiUrl, options = {}) {
     const { ctx } = this;
 
     if (!apiKey) {
@@ -710,16 +710,22 @@ class AiConfigService extends Service {
 
     try {
       const testUrl = this.resolveChatApiUrl(provider, apiUrl);
-      const testModel = this.resolveChatModel(provider, '');
+      const testModel = this.resolveChatModel(provider, options.model || '');
+      const requestConfig = {
+        provider: String(provider || '').trim().toLowerCase(),
+        reasoningEnabled: !!options.reasoningEnabled,
+        reasoningModel: String(options.reasoningModel || '').trim(),
+        thinkingBudget: Number.parseInt(String(options.thinkingBudget ?? ''), 10) || 0,
+      };
 
       const response = await this.requestChatCompletions({
         url: testUrl,
         apiKey,
-        data: {
+        data: this.buildChatRequestData(requestConfig, {
           model: testModel,
           messages: [{ role: 'user', content: 'Hello' }],
           max_tokens: 5,
-        },
+        }),
         timeout: 10000,
       });
 
@@ -1249,8 +1255,17 @@ class AiConfigService extends Service {
         }
 
         const content = String(response.data?.choices?.[0]?.message?.content || '').trim();
+        const reasoningContent = String(
+          response.data?.choices?.[0]?.message?.reasoning_content || ''
+        ).trim();
         if (!content) {
-          throw new Error('AI 返回内容为空');
+          if (reasoningContent) {
+            ctx.logger.warn(
+              `AI 对话仅返回 reasoning_content，使用推理内容作为兜底输出: configId=${config.id}, provider=${config.provider}`
+            );
+          } else {
+            throw new Error('AI 返回内容为空');
+          }
         }
 
         const tokensUsed = Number(response.data?.usage?.total_tokens || 0);
@@ -1277,7 +1292,8 @@ class AiConfigService extends Service {
         }
 
         return {
-          reply: content,
+          reply: content || reasoningContent,
+          reasoningContent: reasoningContent || '',
           usage: response.data?.usage || null,
         };
       } catch (error) {

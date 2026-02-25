@@ -1,5 +1,5 @@
 <template>
-    <div class="border border-br flex flex-col" :style="styles">
+    <div ref="editorWrapRef" class="border border-br flex flex-col" :style="styles">
         <toolbar
             class="border-b border-br"
             :editor="editorRef"
@@ -54,10 +54,14 @@ const emit = defineEmits<{
 
 // 编辑器实例，必须用 shallowRef
 const editorRef = shallowRef()
+const editorWrapRef = ref<HTMLElement | null>(null)
 const materialPickerRef = shallowRef<InstanceType<typeof MaterialPicker>>()
 const fileType = ref('')
 const isFirefoxBrowser =
     typeof window !== 'undefined' && /firefox/i.test(window.navigator.userAgent || '')
+const localHtml = ref('')
+const isComposing = ref(false)
+let editableDomEl: HTMLElement | null = null
 
 let insertFn: any
 
@@ -164,16 +168,85 @@ const styles = computed<CSSProperties>(() => ({
     height: addUnit(props.height),
     width: addUnit(props.width)
 }))
+
+/**
+ * 规范化编辑器 HTML 值，避免空字符串在部分浏览器下触发 Slate 组合输入异常
+ */
+const normalizeEditorHtml = (value: unknown) => {
+    const html = typeof value === 'string' ? value : ''
+    return html.trim() ? html : '<p><br></p>'
+}
+
+/**
+ * 绑定编辑区组合输入事件，避免 Firefox 中文输入过程中被父级同步打断
+ */
+const bindCompositionListeners = () => {
+    if (typeof window === 'undefined') return
+    const root = editorWrapRef.value
+    if (!root) return
+
+    const nextEditable = root.querySelector('[data-slate-editor="true"]') as HTMLElement | null
+    if (!nextEditable || nextEditable === editableDomEl) return
+
+    if (editableDomEl) {
+        editableDomEl.removeEventListener('compositionstart', handleCompositionStart)
+        editableDomEl.removeEventListener('compositionend', handleCompositionEnd)
+    }
+
+    editableDomEl = nextEditable
+    editableDomEl.addEventListener('compositionstart', handleCompositionStart)
+    editableDomEl.addEventListener('compositionend', handleCompositionEnd)
+}
+
+/**
+ * 组合输入开始时标记状态，延迟外部值回灌
+ */
+const handleCompositionStart = () => {
+    isComposing.value = true
+}
+
+/**
+ * 组合输入结束后恢复外部同步，确保编辑器内容稳定回写
+ */
+const handleCompositionEnd = () => {
+    window.setTimeout(() => {
+        isComposing.value = false
+        const current = props.modelValue
+        const normalized = normalizeEditorHtml(current)
+        if (normalized !== localHtml.value) {
+            localHtml.value = normalized
+        }
+    }, 0)
+}
+
 const valueHtml = computed({
     get() {
-        // WangEditor/Slate 在空字符串 + Firefox 中文输入法场景下稳定性较差，统一返回最小合法段落
-        const html = typeof props.modelValue === 'string' ? props.modelValue : ''
-        return html.trim() ? html : '<p><br></p>'
+        return localHtml.value
     },
     set(value) {
-        emit('update:modelValue', value)
+        localHtml.value = normalizeEditorHtml(value)
     }
 })
+
+watch(
+    () => props.modelValue,
+    (value) => {
+        const normalized = normalizeEditorHtml(value)
+        if (isComposing.value) return
+        if (normalized === localHtml.value) return
+        localHtml.value = normalized
+    },
+    { immediate: true }
+)
+
+watch(
+    localHtml,
+    (value) => {
+        if (value === normalizeEditorHtml(props.modelValue)) return
+        emit('update:modelValue', value)
+    },
+    { flush: 'post' }
+)
 
 const selectChange = (fileUrl: string[]) => {
     fileUrl.forEach((url) => {
@@ -183,6 +256,11 @@ const selectChange = (fileUrl: string[]) => {
 
 // 组件销毁时，也及时销毁编辑器
 onBeforeUnmount(() => {
+    if (editableDomEl) {
+        editableDomEl.removeEventListener('compositionstart', handleCompositionStart)
+        editableDomEl.removeEventListener('compositionend', handleCompositionEnd)
+        editableDomEl = null
+    }
     const editor = editorRef.value
     if (editor == null) return
     editor.destroy()
@@ -190,6 +268,9 @@ onBeforeUnmount(() => {
 
 const handleCreated = (editor: any) => {
     editorRef.value = editor // 记录 editor 实例，重要！
+    nextTick(() => {
+        bindCompositionListeners()
+    })
 }
 </script>
 

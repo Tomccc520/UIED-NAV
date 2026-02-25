@@ -123,64 +123,79 @@
 
                 <!-- 详情页内容 -->
                 <el-tab-pane label="详情页" name="detail" lazy>
-                    <el-form :model="editData" label-width="100px">
-                        <el-form-item label="访问按钮">
-                            <el-input
-                                v-model="editData.visitBtnText"
-                                placeholder="默认：访问网站"
-                                style="max-width: 400px"
-                            />
-                        </el-form-item>
-                    </el-form>
-
-                    <el-divider content-position="left">缩略图</el-divider>
-                    <el-form :model="editData" label-width="100px" style="max-width: 900px">
-                        <el-form-item>
-                            <template #label>
-                                <span>缩略图</span>
-                                <el-tooltip
-                                    content="网站预览缩略图，支持从素材中心选择或输入URL"
-                                    placement="top"
-                                >
-                                    <el-icon style="margin-left: 4px; cursor: help; color: #909399"
-                                        ><QuestionFilled
-                                    /></el-icon>
-                                </el-tooltip>
-                            </template>
-                            <div style="width: 100%">
-                                <div class="flex gap-2 mb-2">
+                    <div class="detail-config-grid">
+                        <section class="detail-config-card">
+                            <div class="detail-config-card__title">详情页基础设置</div>
+                            <el-form :model="editData" label-width="100px">
+                                <el-form-item label="访问按钮">
                                     <el-input
-                                        v-model="editData.thumbnail"
-                                        placeholder="输入缩略图URL或从素材中心选择"
-                                        clearable
+                                        v-model="editData.visitBtnText"
+                                        placeholder="默认：访问网站"
+                                        style="max-width: 400px"
                                     />
-                                    <el-button @click="openThumbnailPicker">
-                                        <el-icon class="mr-1"><FolderOpened /></el-icon>
-                                        素材中心
-                                    </el-button>
-                                    <el-button
-                                        @click="handleCaptureThumbnail"
-                                        :loading="capturingThumbnail"
-                                    >
-                                        截图获取
-                                    </el-button>
-                                </div>
-                                <div v-if="editData.thumbnail" class="mt-2">
-                                    <el-image
-                                        :src="editData.thumbnail"
-                                        style="
-                                            max-width: 320px;
-                                            max-height: 200px;
-                                            border-radius: 4px;
-                                            border: 1px solid #eee;
-                                        "
-                                        fit="contain"
-                                        :preview-src-list="[editData.thumbnail]"
-                                    />
-                                </div>
-                            </div>
-                        </el-form-item>
-                    </el-form>
+                                </el-form-item>
+                            </el-form>
+                        </section>
+
+                        <section class="detail-config-card">
+                            <div class="detail-config-card__title">缩略图预览</div>
+                            <el-form :model="editData" label-width="100px">
+                                <el-form-item>
+                                    <template #label>
+                                        <span>缩略图</span>
+                                        <el-tooltip
+                                            content="网站预览缩略图，支持从素材中心选择或输入URL"
+                                            placement="top"
+                                        >
+                                            <el-icon style="margin-left: 4px; cursor: help; color: #909399"
+                                                ><QuestionFilled
+                                            /></el-icon>
+                                        </el-tooltip>
+                                    </template>
+                                    <div style="width: 100%">
+                                        <div class="detail-thumbnail-toolbar">
+                                            <el-input
+                                                v-model="editData.thumbnail"
+                                                placeholder="输入缩略图URL或从素材中心选择"
+                                                clearable
+                                            />
+                                            <el-button @click="openThumbnailPicker">
+                                                <el-icon class="mr-1"><FolderOpened /></el-icon>
+                                                素材中心
+                                            </el-button>
+                                            <el-button
+                                                @click="handleCaptureThumbnail"
+                                                :loading="capturingThumbnail"
+                                            >
+                                                截图获取
+                                            </el-button>
+                                        </div>
+                                        <div class="detail-thumbnail-preview mt-2">
+                                            <template v-if="editData.thumbnail">
+                                                <div class="detail-thumbnail-preview__toolbar">
+                                                    <span class="dot"></span>
+                                                    <span class="dot"></span>
+                                                    <span class="dot"></span>
+                                                    <span class="detail-thumbnail-preview__url">
+                                                        {{ editData.url || 'https://example.com' }}
+                                                    </span>
+                                                </div>
+                                                <el-image
+                                                    :src="editData.thumbnail"
+                                                    class="detail-thumbnail-preview__image"
+                                                    fit="contain"
+                                                    :preview-src-list="[editData.thumbnail]"
+                                                />
+                                            </template>
+                                            <div v-else class="detail-thumbnail-preview__empty">
+                                                暂无缩略图，建议使用「截图获取」或从素材中心选择
+                                            </div>
+                                        </div>
+                                    </div>
+                                </el-form-item>
+                            </el-form>
+                        </section>
+                    </div>
 
                     <el-divider content-position="left">详情内容（AI 辅助编辑）</el-divider>
                     <!-- AI 编辑器布局：左编辑器 + 右AI助手 -->
@@ -189,21 +204,17 @@
                             <div class="ai-editor-layout__mode-bar">
                                 <div class="ai-editor-layout__mode-left">
                                     <el-tag v-if="isFirefoxBrowser" size="small" type="warning">
-                                        Firefox 建议开启兼容输入模式
+                                        Firefox 输入兼容优化已启用
                                     </el-tag>
                                     <span class="ai-editor-layout__mode-tip">
-                                        可视化编辑异常时切换兼容模式（直接编辑 HTML）
+                                        {{
+                                            isFirefoxBrowser
+                                                ? '已对 Firefox 做组合输入兼容优化；如仍异常请把控制台报错发我继续定位'
+                                                : '可视化编辑器 + AI 助手联动编辑'
+                                        }}
                                     </span>
                                 </div>
                                 <div class="ai-editor-layout__mode-actions">
-                                    <span class="ai-editor-layout__mode-label">兼容输入模式</span>
-                                    <el-switch
-                                        v-model="detailEditorCompatMode"
-                                        inline-prompt
-                                        active-text="开"
-                                        inactive-text="关"
-                                        :disabled="isFirefoxBrowser"
-                                    />
                                     <el-button link type="primary" @click="router.push('/uied/aiConfig')">
                                         AI配置
                                     </el-button>
@@ -220,20 +231,18 @@
                                     class="ai-editor-layout__compat-textarea"
                                 />
                                 <div class="ai-editor-layout__compat-tip">
-                                    兼容模式用于 Firefox/输入法异常场景，建议在 Chrome 中使用可视化编辑器获得最佳体验。
+                                    当前已进入 HTML 兜底输入模式（仅在富文本异常时使用）。
                                 </div>
                             </div>
                             <editor
-                                v-else-if="detailEditorReady && !isFirefoxBrowser"
+                                v-else-if="detailEditorReady"
                                 v-model="editData.detailContent"
                                 :height="560"
                                 mode="default"
                             />
                             <div v-else class="ai-editor-layout__placeholder">
                                 {{
-                                    isFirefoxBrowser
-                                        ? 'Firefox 已启用稳定兼容模式（HTML编辑），如需可视化编辑建议使用 Chrome。'
-                                        : '切换到“详情页”后初始化编辑器...'
+                                    '切换到“详情页”后初始化编辑器...'
                                 }}
                             </div>
 
@@ -489,7 +498,7 @@ const activeTab = ref('basic')
 const detailEditorReady = ref(false)
 const isFirefoxBrowser =
     typeof window !== 'undefined' && /firefox/i.test(window.navigator.userAgent || '')
-const detailEditorCompatMode = ref(isFirefoxBrowser)
+const detailEditorCompatMode = ref(false)
 const editFormRef = ref<FormInstance>()
 const isEdit = computed(() => !!route.query.id)
 
@@ -515,11 +524,6 @@ watch(
 watch(
     detailEditorCompatMode,
     (enabled) => {
-        // Firefox 下强制使用兼容输入模式，避免 WangEditor(Slate) 在中文输入法场景下出现 DOM 异常
-        if (isFirefoxBrowser && !enabled) {
-            detailEditorCompatMode.value = true
-            return
-        }
         if (!enabled && activeTab.value === 'detail') {
             ensureDetailEditorReady()
         }
@@ -825,10 +829,18 @@ const buildPrompt = (mode: AiGenerateMode, userPrompt = '') => {
 const requestAiDraft = async (mode: AiGenerateMode, userPrompt = '') => {
     const message = buildPrompt(mode, userPrompt)
     const res = await uiedAiChat({ message, context: '网站详情内容编辑' })
-    const reply = res?.reply || res?.content || res?.data?.reply || ''
+    const reply =
+        res?.reply ||
+        res?.content ||
+        res?.reasoningContent ||
+        res?.reasoning_content ||
+        res?.data?.reply ||
+        res?.data?.reasoningContent ||
+        ''
     const draft = normalizeDraft(reply)
     if (!draft) {
-        feedback.msgWarning('AI 未返回可用结果，请调整后重试')
+        console.warn('[uied.website.ai] 空响应', res)
+        feedback.msgWarning('AI 未返回可用结果，请调整模型配置后重试')
         return ''
     }
     aiDraftText.value = draft
@@ -962,7 +974,13 @@ const handleAiHover = async (e: Event) => {
             message: `请优化改写以下文本，保持原意但使其更加专业流畅，直接返回改写后的文本：\n\n${text}`,
             context: '网站详情内容编辑'
         })
-        const newText = res?.reply || res?.content || res?.data?.reply
+        const newText =
+            res?.reply ||
+            res?.content ||
+            res?.reasoningContent ||
+            res?.reasoning_content ||
+            res?.data?.reply ||
+            res?.data?.reasoningContent
         if (newText && ed) {
             ed.insertText(newText)
             feedback.msgSuccess('AI 改写完成')
@@ -999,15 +1017,87 @@ onBeforeUnmount(() => {
     margin: 0 -20px -20px;
 }
 
+.detail-config-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 12px;
+    margin-bottom: 6px;
+}
+.detail-config-card {
+    border: 1px solid var(--el-border-color-light);
+    border-radius: 12px;
+    padding: 12px;
+    background: #fff;
+}
+.detail-config-card__title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #303133;
+    margin-bottom: 10px;
+}
+.detail-thumbnail-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 8px;
+}
+.detail-thumbnail-preview {
+    border: 1px solid var(--el-border-color-light);
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;
+    min-height: 220px;
+}
+.detail-thumbnail-preview__toolbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--el-border-color-lighter);
+    background: #fafafa;
+}
+.detail-thumbnail-preview__toolbar .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #d0d7de;
+}
+.detail-thumbnail-preview__url {
+    margin-left: 6px;
+    font-size: 12px;
+    color: #606266;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.detail-thumbnail-preview__image {
+    width: 100%;
+    height: 200px;
+    display: block;
+}
+.detail-thumbnail-preview__empty {
+    min-height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 12px;
+    color: #909399;
+    font-size: 13px;
+}
+
 /* AI 编辑器布局 */
 .ai-editor-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 420px;
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 400px);
     gap: 12px;
     align-items: start;
 }
 .ai-editor-layout__main {
     min-width: 0;
+}
+.ai-editor-layout__sidebar {
+    position: sticky;
+    top: 12px;
 }
 .ai-editor-layout__mode-bar {
     display: flex;
@@ -1058,6 +1148,12 @@ onBeforeUnmount(() => {
     color: var(--el-text-color-secondary);
     font-size: 12px;
     line-height: 1.5;
+}
+.ai-chat {
+    border: 1px solid var(--el-border-color-light);
+    border-radius: 10px;
+    background: #fff;
+    padding: 12px;
 }
 .ai-editor-layout__placeholder {
     height: 560px;
@@ -1163,6 +1259,21 @@ onBeforeUnmount(() => {
 .ai-chat__apply-bar {
     border-top: 1px dashed var(--el-border-color-light);
     padding-top: 10px;
+}
+
+@media (max-width: 1280px) {
+    .detail-config-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .detail-thumbnail-toolbar {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .ai-editor-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .ai-editor-layout__sidebar {
+        position: static;
+    }
 }
 .ai-chat__apply-title {
     display: flex;

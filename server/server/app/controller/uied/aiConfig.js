@@ -244,8 +244,13 @@ class AiConfigController extends baseController {
     const { ctx } = this;
     try {
       const data = normalizeAiConfigPayload(ctx.request.body);
-      const { provider, apiKey, apiUrl } = data;
-      const result = await ctx.service.uied.aiConfig.testConnection(provider, apiKey, apiUrl);
+      const { provider, apiKey, apiUrl, model, reasoningEnabled, reasoningModel, thinkingBudget } = data;
+      const result = await ctx.service.uied.aiConfig.testConnection(provider, apiKey, apiUrl, {
+        model,
+        reasoningEnabled,
+        reasoningModel,
+        thinkingBudget,
+      });
       if (result.success) {
         this.result({ message: '连接成功' });
       } else {
