@@ -1,89 +1,75 @@
 {
-  "generatedAt": "2026-02-25T04:09:54.722Z",
+  "generatedAt": "2026-02-25T12:06:22.782Z",
   "rows": [
     {
-      "status": "pass",
+      "status": "fail",
       "category": "环境",
       "item": "MySQL 容器探测",
-      "detail": "使用容器: uied_mysql，数据库: uied_nav",
-      "suggestion": ""
+      "detail": "Command failed: docker ps --format {{.Names}}\npermission denied while trying to connect to the Docker daemon socket at unix:///Users/tangxiaoda/.docker/run/docker.sock: Get \"http://%2FUsers%2Ftangxiaoda%2F.docker%2Frun%2Fdocker.sock/v1.47/containers/json\": dial unix /Users/tangxiaoda/.docker/run/docker.sock: connect: operation not permitted\n",
+      "suggestion": "确认 Docker 已启动，或通过 --mysql-container 指定容器名。"
     },
     {
-      "status": "pass",
+      "status": "fail",
       "category": "接口",
       "item": "/api/settings/public",
-      "detail": "HTTP 200",
-      "suggestion": ""
+      "detail": "请求失败: fetch failed",
+      "suggestion": "确认后端 8002 服务可访问。"
     },
     {
-      "status": "pass",
+      "status": "fail",
       "category": "接口",
       "item": "/api/settings/frontend-config",
-      "detail": "HTTP 200",
-      "suggestion": ""
+      "detail": "请求失败: fetch failed",
+      "suggestion": "确认后端 8002 服务可访问。"
     },
     {
-      "status": "pass",
+      "status": "fail",
       "category": "接口",
       "item": "/api/articles?limit=1",
-      "detail": "HTTP 200",
-      "suggestion": ""
+      "detail": "请求失败: fetch failed",
+      "suggestion": "确认后端 8002 服务可访问。"
     },
     {
-      "status": "pass",
+      "status": "fail",
       "category": "接口",
       "item": "/api/articles/meta/categories",
-      "detail": "HTTP 200",
-      "suggestion": ""
+      "detail": "请求失败: fetch failed",
+      "suggestion": "确认后端 8002 服务可访问。"
     },
     {
-      "status": "pass",
+      "status": "fail",
       "category": "接口",
       "item": "/api/articles/meta/tags",
-      "detail": "HTTP 200",
-      "suggestion": ""
+      "detail": "请求失败: fetch failed",
+      "suggestion": "确认后端 8002 服务可访问。"
     },
     {
-      "status": "pass",
+      "status": "fail",
       "category": "接口",
       "item": "/api/site-info",
-      "detail": "HTTP 200",
-      "suggestion": ""
+      "detail": "请求失败: fetch failed",
+      "suggestion": "确认后端 8002 服务可访问。"
     },
     {
-      "status": "pass",
+      "status": "fail",
       "category": "接口",
       "item": "/api/settings/nav-menus",
-      "detail": "HTTP 200",
-      "suggestion": ""
+      "detail": "请求失败: fetch failed",
+      "suggestion": "确认后端 8002 服务可访问。"
     },
     {
-      "status": "pass",
+      "status": "fail",
       "category": "接口",
       "item": "/api/wordpress/tags",
-      "detail": "HTTP 200（feature=wordpress_channel）",
-      "suggestion": ""
+      "detail": "请求失败: fetch failed",
+      "suggestion": "确认后端服务和路由可访问。"
     },
     {
-      "status": "pass",
+      "status": "fail",
       "category": "接口",
       "item": "/api/wordpress/widgets/active",
-      "detail": "HTTP 200（feature=wordpress_channel）",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "接口",
-      "item": "/api/websites/:id/rate",
-      "detail": "网站ID=1 评分成功",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "接口",
-      "item": "/api/websites/:id/favorite",
-      "detail": "网站ID=1 收藏成功",
-      "suggestion": ""
+      "detail": "请求失败: fetch failed",
+      "suggestion": "确认后端服务和路由可访问。"
     },
     {
       "status": "pass",
@@ -108,79 +94,9 @@
     },
     {
       "status": "pass",
-      "category": "菜单",
-      "item": "关键权限点",
-      "detail": "关键菜单权限点完整",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "菜单",
-      "item": "user:detail 路由",
-      "detail": "挂载关系与隐藏路由配置正确",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "菜单",
-      "item": "重复权限点",
-      "detail": "未发现重复 perms",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
       "category": "资源",
       "item": "默认头像文件",
       "detail": "backend_avatar.png 存在",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "资源",
-      "item": "历史默认头像路径",
-      "detail": "未发现 default_avatar.png 残留引用",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "配置",
-      "item": "关键配置项",
-      "detail": "关键配置项已落库",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "配置",
-      "item": "配置 JSON 格式",
-      "detail": "关键配置 JSON 可解析",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "配置",
-      "item": "弹窗配置回读",
-      "detail": "DB 与 API 返回一致",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "数据",
-      "item": "商业版新增表",
-      "detail": "已检测到 4 张新增表",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "数据",
-      "item": "站点用户数据",
-      "detail": "当前用户数: 4",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "数据",
-      "item": "文章数据",
-      "detail": "已发布文章数: 6",
       "suggestion": ""
     }
   ]
