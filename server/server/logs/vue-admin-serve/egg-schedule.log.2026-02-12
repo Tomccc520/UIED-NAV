@@ -1,0 +1,12 @@
+2026-02-12 12:10:53,410 INFO 21074 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-multipart/app/schedule/clean_tmpdir.js
+2026-02-12 12:10:53,410 INFO 21074 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/clean_log.js
+2026-02-12 12:10:53,410 INFO 21074 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/rotate_by_file.js
+2026-02-12 12:10:54,148 INFO 21055 [Timer] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-multipart/app/schedule/clean_tmpdir.js next time will execute after 58745853ms at 2026-02-13 04:30:00.001
+2026-02-12 12:10:54,149 INFO 21055 [Timer] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/clean_log.js next time will execute after 42545852ms at 2026-02-13 00:00:00.001
+2026-02-12 12:10:54,149 INFO 21055 [Timer] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/rotate_by_file.js next time will execute after 42546851ms at 2026-02-13 00:00:01.000
+2026-02-13 00:00:00,072 INFO 21074 [Job#1770912000027460863869294581] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/clean_log.js executing by app
+2026-02-13 00:00:00,081 INFO 21074 [Job#1770912000027460863869294581] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/clean_log.js execute succeed, used 7ms. 
+2026-02-13 00:00:00,072 INFO 21055 [Timer] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/clean_log.js next time will execute after 86399951ms at 2026-02-14 00:00:00.021
+2026-02-13 00:00:01,009 INFO 21074 [Job#1770912001006460873657246251] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/rotate_by_file.js executing by app
+2026-02-13 00:00:01,015 INFO 21074 [Job#1770912001006460873657246251] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/rotate_by_file.js execute succeed, used 5ms. 
+2026-02-13 00:00:01,011 INFO 21055 [Timer] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/rotate_by_file.js next time will execute after 86399994ms at 2026-02-14 00:00:01.005

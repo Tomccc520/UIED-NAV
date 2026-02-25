@@ -1,0 +1,2862 @@
+2026-02-14 01:47:44,104 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:47:44,109 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:47:44,262 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:47:44,262 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:47:44,465 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:47:44,466 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:47:44,722 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:47:44,722 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:47:45,025 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:47:45,028 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:47:45,382 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:47:45,383 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:47:45,787 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:47:45,788 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:47:46,242 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:47:46,243 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:47:46,746 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:47:46,746 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:47:47,301 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:47:47,301 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:47:47,903 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:47:47,903 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:47:48,556 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:47:48,556 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:47:49,258 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:47:49,258 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:47:50,012 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:47:50,012 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:47:50,271 ERROR 1156 [-/127.0.0.1/-/4ms GET /api/common/index/config] systemController.config error: Error: IndexService.config error: Error: ConfigUtilService.get error: SequelizeConnectionRefusedError: connect ECONNREFUSED 127.0.0.1:3308
+2026-02-14 01:47:50,815 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:47:50,815 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:47:51,669 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:47:51,670 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:47:52,572 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:47:52,573 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:47:53,090 ERROR 1156 [-/127.0.0.1/-/2ms GET /api/settings/nav-menus] 获取导航菜单失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,098 ERROR 1156 [-/127.0.0.1/-/4ms GET /api/settings/nav-menus] 获取导航菜单失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,110 ERROR 1156 [-/127.0.0.1/-/5ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,113 ERROR 1156 [-/127.0.0.1/-/7ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,113 ERROR 1156 [-/127.0.0.1/-/6ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,113 ERROR 1156 [-/127.0.0.1/-/2ms GET /api/pages] 获取页面列表失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,115 ERROR 1156 [-/127.0.0.1/-/3ms GET /api/settings/permalink] 获取固定链接配置失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,115 ERROR 1156 [-/127.0.0.1/-/3ms GET /api/hot-recommendations/active?limit=100&pageSlug=uiux] 获取激活热门推荐失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,115 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/uied/setting/public] 获取公开设置失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,116 ERROR 1156 [-/127.0.0.1/-/2ms GET /api/uied/setting/public] 获取公开设置失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,118 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,124 ERROR 1156 [-/127.0.0.1/-/2ms GET /api/social-media] 获取社交媒体失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,124 ERROR 1156 [-/127.0.0.1/-/2ms GET /api/social-media] 获取社交媒体失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,124 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,124 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,126 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/hot-recommendations/active?limit=100&pageSlug=uiux] 获取激活热门推荐失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,126 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/pages/uiux/full] 获取页面完整数据失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,126 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/pages/uiux/full] 获取页面完整数据失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,127 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/pages/uiux/hot-tags?limit=10] 获取热门标签失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,128 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/settings/footer-groups] 获取页脚设置失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,129 ERROR 1156 [-/127.0.0.1/-/2ms GET /api/pages/uiux/full] 获取页面完整数据失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,130 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/websites?pageSize=1] 获取网站列表失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,130 ERROR 1156 [-/127.0.0.1/-/0ms GET /api/uied/setting/public] 获取公开设置失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,131 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/settings/friend-links] 获取友情链接失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,132 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/pages] 获取页面列表失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,132 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/settings/friend-links] 获取友情链接失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,133 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/pages/uiux/hot-tags?limit=10] 获取热门标签失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,133 ERROR 1156 [-/127.0.0.1/-/0ms GET /api/pages/uiux/full] 获取页面完整数据失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,134 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/settings/footer-groups] 获取页脚设置失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,149 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/websites?pageSize=1] 获取网站列表失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:53,525 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:47:53,525 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:47:54,123 ERROR 1156 [-/127.0.0.1/-/10ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,124 ERROR 1156 [-/127.0.0.1/-/5ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,125 ERROR 1156 [-/127.0.0.1/-/4ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,126 ERROR 1156 [-/127.0.0.1/-/3ms GET /api/pages] 获取页面列表失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,137 ERROR 1156 [-/127.0.0.1/-/2ms GET /api/hot-recommendations/active?limit=100&pageSlug=uiux] 获取激活热门推荐失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,155 ERROR 1156 [-/127.0.0.1/-/7ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,157 ERROR 1156 [-/127.0.0.1/-/8ms GET /api/social-media] 获取社交媒体失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,158 ERROR 1156 [-/127.0.0.1/-/7ms GET /api/social-media] 获取社交媒体失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,159 ERROR 1156 [-/127.0.0.1/-/7ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,160 ERROR 1156 [-/127.0.0.1/-/7ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,161 ERROR 1156 [-/127.0.0.1/-/5ms GET /api/hot-recommendations/active?limit=100&pageSlug=uiux] 获取激活热门推荐失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,167 ERROR 1156 [-/127.0.0.1/-/5ms GET /api/pages/uiux/full] 获取页面完整数据失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,167 ERROR 1156 [-/127.0.0.1/-/3ms GET /api/pages/uiux/full] 获取页面完整数据失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,168 ERROR 1156 [-/127.0.0.1/-/3ms GET /api/pages/uiux/full] 获取页面完整数据失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,168 ERROR 1156 [-/127.0.0.1/-/2ms GET /api/pages/uiux/hot-tags?limit=10] 获取热门标签失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,170 ERROR 1156 [-/127.0.0.1/-/4ms GET /api/settings/footer-groups] 获取页脚设置失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,170 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/settings/friend-links] 获取友情链接失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,170 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/websites?pageSize=1] 获取网站列表失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,171 ERROR 1156 [-/127.0.0.1/-/2ms GET /api/pages] 获取页面列表失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,171 ERROR 1156 [-/127.0.0.1/-/2ms GET /api/settings/friend-links] 获取友情链接失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,172 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/pages/uiux/full] 获取页面完整数据失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,172 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/pages/uiux/hot-tags?limit=10] 获取热门标签失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,172 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/websites?pageSize=1] 获取网站列表失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,173 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/settings/footer-groups] 获取页脚设置失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:54,527 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:47:54,528 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:47:55,580 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:47:55,580 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:47:56,137 ERROR 1156 [-/127.0.0.1/-/5ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,139 ERROR 1156 [-/127.0.0.1/-/6ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,140 ERROR 1156 [-/127.0.0.1/-/5ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,141 ERROR 1156 [-/127.0.0.1/-/5ms GET /api/pages] 获取页面列表失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,147 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/hot-recommendations/active?limit=100&pageSlug=uiux] 获取激活热门推荐失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,174 ERROR 1156 [-/127.0.0.1/-/13ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,179 ERROR 1156 [-/127.0.0.1/-/16ms GET /api/social-media] 获取社交媒体失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,180 ERROR 1156 [-/127.0.0.1/-/15ms GET /api/social-media] 获取社交媒体失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,181 ERROR 1156 [-/127.0.0.1/-/11ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,183 ERROR 1156 [-/127.0.0.1/-/11ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,185 ERROR 1156 [-/127.0.0.1/-/9ms GET /api/hot-recommendations/active?limit=100&pageSlug=uiux] 获取激活热门推荐失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,187 ERROR 1156 [-/127.0.0.1/-/10ms GET /api/pages/uiux/full] 获取页面完整数据失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,188 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/pages/uiux/full] 获取页面完整数据失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,222 ERROR 1156 [-/127.0.0.1/-/11ms GET /api/pages/uiux/full] 获取页面完整数据失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,224 ERROR 1156 [-/127.0.0.1/-/9ms GET /api/pages/uiux/hot-tags?limit=10] 获取热门标签失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,224 ERROR 1156 [-/127.0.0.1/-/7ms GET /api/settings/footer-groups] 获取页脚设置失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,225 ERROR 1156 [-/127.0.0.1/-/6ms GET /api/settings/friend-links] 获取友情链接失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,225 ERROR 1156 [-/127.0.0.1/-/5ms GET /api/websites?pageSize=1] 获取网站列表失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,226 ERROR 1156 [-/127.0.0.1/-/5ms GET /api/pages] 获取页面列表失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,227 ERROR 1156 [-/127.0.0.1/-/4ms GET /api/settings/friend-links] 获取友情链接失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,228 ERROR 1156 [-/127.0.0.1/-/2ms GET /api/pages/uiux/full] 获取页面完整数据失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,228 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/pages/uiux/hot-tags?limit=10] 获取热门标签失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,228 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/websites?pageSize=1] 获取网站列表失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,229 ERROR 1156 [-/127.0.0.1/-/2ms GET /api/settings/footer-groups] 获取页脚设置失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:47:56,683 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:47:56,684 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:47:57,836 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:47:57,837 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:47:59,039 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:47:59,039 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:48:00,290 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:48:00,290 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:48:00,460 ERROR 1156 [-/127.0.0.1/-/8ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:48:00,461 ERROR 1156 [-/127.0.0.1/-/6ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:48:00,463 ERROR 1156 [-/127.0.0.1/-/6ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:48:00,467 ERROR 1156 [-/127.0.0.1/-/10ms GET /api/pages] 获取页面列表失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:48:00,468 ERROR 1156 [-/127.0.0.1/-/10ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:48:00,471 ERROR 1156 [-/127.0.0.1/-/5ms GET /api/hot-recommendations/active?limit=100&pageSlug=uiux] 获取激活热门推荐失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:48:00,477 ERROR 1156 [-/127.0.0.1/-/11ms GET /api/hot-recommendations/active?limit=100&pageSlug=uiux] 获取激活热门推荐失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:48:00,483 ERROR 1156 [-/127.0.0.1/-/4ms GET /api/pages/uiux/full] 获取页面完整数据失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:48:00,483 ERROR 1156 [-/127.0.0.1/-/3ms GET /api/social-media] 获取社交媒体失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:48:00,484 ERROR 1156 [-/127.0.0.1/-/1ms GET /api/pages/uiux/full] 获取页面完整数据失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:48:01,456 ERROR 1156 [-/127.0.0.1/-/2ms GET /api/social-media] 获取社交媒体失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:48:01,592 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:48:01,593 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:48:02,487 ERROR 1156 [-/127.0.0.1/-/7ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:48:02,490 ERROR 1156 [-/127.0.0.1/-/7ms GET /api/site-info] 获取站点信息失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:48:02,945 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:48:02,945 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:48:03,496 ERROR 1156 [-/127.0.0.1/-/7ms GET /api/pages/uiux/full] 获取页面完整数据失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:48:03,499 ERROR 1156 [-/127.0.0.1/-/2ms GET /api/pages/uiux/hot-tags?limit=10] 获取热门标签失败: ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3308
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:92:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24) {
+  parent: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  },
+  original: Error: connect ECONNREFUSED 127.0.0.1:3308
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 3308,
+    fatal: true
+  }
+}
+2026-02-14 01:48:04,346 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:48:04,346 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:48:05,797 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:48:05,798 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:48:07,301 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:48:07,301 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 01:48:08,864 ERROR 1156 [egg-redis] client error: Error: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6380
+}
+2026-02-14 01:48:08,865 ERROR 1156 nodejs.ECONNREFUSEDError: connect ECONNREFUSED 127.0.0.1:6380
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+errno: -61
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 6380
+name: "ECONNREFUSEDError"
+pid: 1156
+hostname: Mac-Studio.local
+
+2026-02-14 10:56:12,029 ERROR 9944 nodejs.Error: [ClusterClient.server.create:Watcher] port should be a number, but got undefined
+    at ClusterServer.create (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/cluster-client/lib/server.js:176:13)
+    at [ClusterClient#createClient] (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/cluster-client/lib/wrapper/cluster.js:36:36)
+    at [ClusterClient#init] (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/cluster-client/lib/wrapper/base.js:72:49)
+    at new WrapperBase (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/cluster-client/lib/wrapper/base.js:43:15)
+    at new ClusterClient (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/cluster-client/lib/wrapper/cluster.js:21:5)
+    at ClientGenerator.create (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/cluster-client/lib/index.js:111:20)
+    at client.create (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg/lib/egg.js:485:33)
+    at module.exports (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-watcher/lib/init.js:10:6)
+    at Hook.configDidLoad (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-core/lib/lifecycle.js:99:9)
+    at Lifecycle.triggerConfigDidLoad (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-core/lib/lifecycle.js:154:14)
+
+pid: 9944
+hostname: Mac-Studio.local
+
+2026-02-14 10:59:08,866 ERROR 12282 nodejs.Error: [ClusterClient.server.create:Watcher] port should be a number, but got undefined
+    at ClusterServer.create (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/cluster-client/lib/server.js:176:13)
+    at [ClusterClient#createClient] (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/cluster-client/lib/wrapper/cluster.js:36:36)
+    at [ClusterClient#init] (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/cluster-client/lib/wrapper/base.js:72:49)
+    at new WrapperBase (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/cluster-client/lib/wrapper/base.js:43:15)
+    at new ClusterClient (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/cluster-client/lib/wrapper/cluster.js:21:5)
+    at ClientGenerator.create (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/cluster-client/lib/index.js:111:20)
+    at client.create (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg/lib/egg.js:485:33)
+    at module.exports (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-watcher/lib/init.js:10:6)
+    at Hook.configDidLoad (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-core/lib/lifecycle.js:99:9)
+    at Lifecycle.triggerConfigDidLoad (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-core/lib/lifecycle.js:154:14)
+
+pid: 12282
+hostname: Mac-Studio.local
+
+2026-02-14 11:22:28,865 ERROR 24731 [-/127.0.0.1/-/4ms POST /api/websites/65/click] 记录点击失败: TypeError: ctx.service.uied.website.click is not a function
+    at FrontendController.websiteClick (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/controller/uied/frontend.js:217:38)
+    at Object.callFn (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-core/lib/utils/index.js:44:21)
+    at Object.classControllerMiddleware (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-core/lib/loader/mixin/controller.js:87:20)
+    at Object.callFn (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/@eggjs/router/lib/utils.js:17:21)
+    at wrappedController (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/@eggjs/router/lib/egg_router.js:322:18)
+    at dispatch (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/koa-compose/index.js:44:32)
+    at next (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/koa-compose/index.js:45:18)
+    at frontendResponseNormalizer (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/middleware/frontend_response_normalizer.js:20:11)
+    at dispatch (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/koa-compose/index.js:44:32)
+    at next (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/koa-compose/index.js:45:18)
+2026-02-14 11:27:16,500 ERROR 24734 [-/127.0.0.1/-/2ms POST /api/websites/3/click] 记录点击失败: TypeError: ctx.service.uied.website.click is not a function
+    at FrontendController.websiteClick (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/controller/uied/frontend.js:217:38)
+    at Object.callFn (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-core/lib/utils/index.js:44:21)
+    at Object.classControllerMiddleware (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-core/lib/loader/mixin/controller.js:87:20)
+    at Object.callFn (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/@eggjs/router/lib/utils.js:17:21)
+    at wrappedController (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/@eggjs/router/lib/egg_router.js:322:18)
+    at dispatch (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/koa-compose/index.js:44:32)
+    at next (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/koa-compose/index.js:45:18)
+    at frontendResponseNormalizer (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/middleware/frontend_response_normalizer.js:20:11)
+    at dispatch (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/koa-compose/index.js:44:32)
+    at next (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/koa-compose/index.js:45:18)
+2026-02-14 11:38:45,122 ERROR 24733 [-/127.0.0.1/-/2ms POST /api/websites/2440/click] 记录点击失败: TypeError: ctx.service.uied.website.click is not a function
+    at FrontendController.websiteClick (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/controller/uied/frontend.js:217:38)
+    at Object.callFn (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-core/lib/utils/index.js:44:21)
+    at Object.classControllerMiddleware (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-core/lib/loader/mixin/controller.js:87:20)
+    at Object.callFn (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/@eggjs/router/lib/utils.js:17:21)
+    at wrappedController (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/@eggjs/router/lib/egg_router.js:322:18)
+    at dispatch (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/koa-compose/index.js:44:32)
+    at next (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/koa-compose/index.js:45:18)
+    at frontendResponseNormalizer (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/middleware/frontend_response_normalizer.js:20:11)
+    at dispatch (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/koa-compose/index.js:44:32)
+    at next (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/koa-compose/index.js:45:18)
+2026-02-14 18:16:45,597 ERROR 92155 nodejs.Error: [ClusterClient.server.create:Watcher] port should be a number, but got undefined
+    at ClusterServer.create (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/cluster-client/lib/server.js:176:13)
+    at [ClusterClient#createClient] (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/cluster-client/lib/wrapper/cluster.js:36:36)
+    at [ClusterClient#init] (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/cluster-client/lib/wrapper/base.js:72:49)
+    at new WrapperBase (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/cluster-client/lib/wrapper/base.js:43:15)
+    at new ClusterClient (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/cluster-client/lib/wrapper/cluster.js:21:5)
+    at ClientGenerator.create (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/cluster-client/lib/index.js:111:20)
+    at client.create (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg/lib/egg.js:485:33)
+    at module.exports (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-watcher/lib/init.js:10:6)
+    at Hook.configDidLoad (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-core/lib/lifecycle.js:99:9)
+    at Lifecycle.triggerConfigDidLoad (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-core/lib/lifecycle.js:154:14)
+
+pid: 92155
+hostname: Mac-Studio.local
+
+2026-02-14 21:13:44,053 ERROR 63242 [-/127.0.0.1/-/12ms POST /api/websites/28/click] 记录点击失败: TypeError: ctx.service.uied.website.click is not a function
+    at FrontendController.websiteClick (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/controller/uied/frontend.js:217:38)
+    at Object.callFn (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-core/lib/utils/index.js:44:21)
+    at Object.classControllerMiddleware (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-core/lib/loader/mixin/controller.js:87:20)
+    at Object.callFn (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/@eggjs/router/lib/utils.js:17:21)
+    at wrappedController (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/@eggjs/router/lib/egg_router.js:322:18)
+    at dispatch (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/koa-compose/index.js:44:32)
+    at next (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/koa-compose/index.js:45:18)
+    at frontendResponseNormalizer (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/middleware/frontend_response_normalizer.js:20:11)
+    at dispatch (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/koa-compose/index.js:44:32)
+    at next (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/koa-compose/index.js:45:18)
+2026-02-14 21:13:47,912 ERROR 63245 [-/127.0.0.1/-/15ms POST /api/uied/setting/saveSiteInfo] 保存站点信息失败: Error
+    at Query.run (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/query.js:52:25)
+    at /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/sequelize.js:315:28
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SettingService.saveSiteInfo (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/service/uied/setting.js:226:7)
+    at async SettingController.saveSiteInfo (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/controller/uied/setting.js:72:7)
+    at async tokenAuth (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/middleware/auth.js:25:7)
+    at async verify (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/middleware/authority.js:21:7)
+    at async /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-development/app/middleware/egg_loader_trace.js:9:50
+    at async xframe (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-security/lib/middlewares/xframe.js:7:5)
+    at async xssProtection (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-security/lib/middlewares/xssProtection.js:7:5) {
+  name: 'SequelizeDatabaseError',
+  parent: Error: Unknown column 'site_description' in 'field list'
+      at Packet.asError (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/packets/packet.js:728:17)
+      at Query.execute (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/commands/command.js:29:26)
+      at Connection.handlePacket (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:456:32)
+      at PacketParser.onPacket (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:85:12)
+      at PacketParser.executeStart (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/packet_parser.js:75:16)
+      at Socket.<anonymous> (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:92:25)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5) {
+    code: 'ER_BAD_FIELD_ERROR',
+    errno: 1054,
+    sqlState: '42S22',
+    sqlMessage: "Unknown column 'site_description' in 'field list'",
+    sql: 'UPDATE uied_site_info SET\n' +
+      "          site_name = 'UIED设计导航', site_title = 'UIED设计导航 - 设计师的工具导航平台', site_description = '', site_keywords = '',\n" +
+      "          logo = '/logo-3.svg', favicon = '/favicon.ico', icp = '粤ICP备2022056875号', copyright = '© 2025 UIED设计导航 · 佛山市南海区迅捷腾达电子商务服务中心', contact_email = '',\n" +
+      "          analytics_code = '', update_time = 1771074827\n" +
+      '         WHERE id = 1',
+    parameters: undefined
+  },
+  original: Error: Unknown column 'site_description' in 'field list'
+      at Packet.asError (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/packets/packet.js:728:17)
+      at Query.execute (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/commands/command.js:29:26)
+      at Connection.handlePacket (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:456:32)
+      at PacketParser.onPacket (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:85:12)
+      at PacketParser.executeStart (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/packet_parser.js:75:16)
+      at Socket.<anonymous> (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:92:25)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5) {
+    code: 'ER_BAD_FIELD_ERROR',
+    errno: 1054,
+    sqlState: '42S22',
+    sqlMessage: "Unknown column 'site_description' in 'field list'",
+    sql: 'UPDATE uied_site_info SET\n' +
+      "          site_name = 'UIED设计导航', site_title = 'UIED设计导航 - 设计师的工具导航平台', site_description = '', site_keywords = '',\n" +
+      "          logo = '/logo-3.svg', favicon = '/favicon.ico', icp = '粤ICP备2022056875号', copyright = '© 2025 UIED设计导航 · 佛山市南海区迅捷腾达电子商务服务中心', contact_email = '',\n" +
+      "          analytics_code = '', update_time = 1771074827\n" +
+      '         WHERE id = 1',
+    parameters: undefined
+  },
+  sql: 'UPDATE uied_site_info SET\n' +
+    "          site_name = 'UIED设计导航', site_title = 'UIED设计导航 - 设计师的工具导航平台', site_description = '', site_keywords = '',\n" +
+    "          logo = '/logo-3.svg', favicon = '/favicon.ico', icp = '粤ICP备2022056875号', copyright = '© 2025 UIED设计导航 · 佛山市南海区迅捷腾达电子商务服务中心', contact_email = '',\n" +
+    "          analytics_code = '', update_time = 1771074827\n" +
+    '         WHERE id = 1',
+  parameters: {}
+}

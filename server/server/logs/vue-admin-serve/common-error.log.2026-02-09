@@ -1,0 +1,255 @@
+2026-02-09 22:48:42,252 ERROR 67717 [-/undefined/-/30074ms POST /api/uied/aiConfig/chat] AI日志记录失败: Error
+    at Query.run (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/query.js:52:25)
+    at /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/sequelize.js:315:28
+    at async AiUsageLogService.add (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/service/uied/aiUsageLog.js:170:22)
+    at async AiConfigService.chat (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/service/uied/aiConfig.js:829:9)
+    at async AiConfigController.chat (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/controller/uied/aiConfig.js:281:22)
+    at async tokenAuth (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/middleware/auth.js:25:7)
+    at async verify (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/middleware/authority.js:21:7)
+    at async /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-development/app/middleware/egg_loader_trace.js:9:50
+    at async xframe (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-security/lib/middlewares/xframe.js:7:5)
+    at async xssProtection (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-security/lib/middlewares/xssProtection.js:7:5) {
+  name: 'SequelizeDatabaseError',
+  parent: Error: Field 'createdAt' doesn't have a default value
+      at Packet.asError (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/packets/packet.js:728:17)
+      at Query.execute (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/commands/command.js:29:26)
+      at Connection.handlePacket (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:456:32)
+      at PacketParser.onPacket (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:85:12)
+      at PacketParser.executeStart (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/packet_parser.js:75:16)
+      at Socket.<anonymous> (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:92:25)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5) {
+    code: 'ER_NO_DEFAULT_FOR_FIELD',
+    errno: 1364,
+    sqlState: 'HY000',
+    sqlMessage: "Field 'createdAt' doesn't have a default value",
+    sql: 'INSERT INTO uied_ai_usage_log \n' +
+      '       (config_id, feature_type, request_content, response_status, error_message, tokens_used, duration_ms, is_delete, create_time, update_time, delete_time)\n' +
+      `       VALUES (1, 'chat', '请优化改写以下文本，保持原意但使其更加专业流畅，直接返回改写后的文本：\\n\\n需要哪方面的支持，比如：', 'failed', 'Connect timeout for 30000ms, POST https://api.openai.com/v1/chat/completions -2 (connected: false, keepalive socket: false, agent status: {\\"createSocketCount\\":1,\\"createSocketErrorCount\\":0,\\"closeSocketCount\\":1,\\"errorSocketCount\\":0,\\"timeoutSocketCount\\":0,\\"requestCount\\":0,\\"freeSockets\\":{},\\"sockets\\":{},\\"requests\\":{}}, socketHandledRequests: 1, socketHandledResponses: 0)\\nheaders: {}', 0, 30031, 0, 1770648522, 1770648522, 0)`,
+    parameters: undefined
+  },
+  original: Error: Field 'createdAt' doesn't have a default value
+      at Packet.asError (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/packets/packet.js:728:17)
+      at Query.execute (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/commands/command.js:29:26)
+      at Connection.handlePacket (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:456:32)
+      at PacketParser.onPacket (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:85:12)
+      at PacketParser.executeStart (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/packet_parser.js:75:16)
+      at Socket.<anonymous> (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:92:25)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5) {
+    code: 'ER_NO_DEFAULT_FOR_FIELD',
+    errno: 1364,
+    sqlState: 'HY000',
+    sqlMessage: "Field 'createdAt' doesn't have a default value",
+    sql: 'INSERT INTO uied_ai_usage_log \n' +
+      '       (config_id, feature_type, request_content, response_status, error_message, tokens_used, duration_ms, is_delete, create_time, update_time, delete_time)\n' +
+      `       VALUES (1, 'chat', '请优化改写以下文本，保持原意但使其更加专业流畅，直接返回改写后的文本：\\n\\n需要哪方面的支持，比如：', 'failed', 'Connect timeout for 30000ms, POST https://api.openai.com/v1/chat/completions -2 (connected: false, keepalive socket: false, agent status: {\\"createSocketCount\\":1,\\"createSocketErrorCount\\":0,\\"closeSocketCount\\":1,\\"errorSocketCount\\":0,\\"timeoutSocketCount\\":0,\\"requestCount\\":0,\\"freeSockets\\":{},\\"sockets\\":{},\\"requests\\":{}}, socketHandledRequests: 1, socketHandledResponses: 0)\\nheaders: {}', 0, 30031, 0, 1770648522, 1770648522, 0)`,
+    parameters: undefined
+  },
+  sql: 'INSERT INTO uied_ai_usage_log \n' +
+    '       (config_id, feature_type, request_content, response_status, error_message, tokens_used, duration_ms, is_delete, create_time, update_time, delete_time)\n' +
+    `       VALUES (1, 'chat', '请优化改写以下文本，保持原意但使其更加专业流畅，直接返回改写后的文本：\\n\\n需要哪方面的支持，比如：', 'failed', 'Connect timeout for 30000ms, POST https://api.openai.com/v1/chat/completions -2 (connected: false, keepalive socket: false, agent status: {\\"createSocketCount\\":1,\\"createSocketErrorCount\\":0,\\"closeSocketCount\\":1,\\"errorSocketCount\\":0,\\"timeoutSocketCount\\":0,\\"requestCount\\":0,\\"freeSockets\\":{},\\"sockets\\":{},\\"requests\\":{}}, socketHandledRequests: 1, socketHandledResponses: 0)\\nheaders: {}', 0, 30031, 0, 1770648522, 1770648522, 0)`,
+  parameters: {}
+}
+2026-02-09 22:48:42,253 ERROR 67717 [-/undefined/-/30076ms POST /api/uied/aiConfig/chat] AI对话失败: Error [ConnectionTimeoutError]: Connect timeout for 30000ms, POST https://api.openai.com/v1/chat/completions -2 (connected: false, keepalive socket: false, agent status: {"createSocketCount":1,"createSocketErrorCount":0,"closeSocketCount":1,"errorSocketCount":0,"timeoutSocketCount":0,"requestCount":0,"freeSockets":{},"sockets":{},"requests":{}}, socketHandledRequests: 1, socketHandledResponses: 0)
+headers: {}
+    at Timeout._onTimeout (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/urllib/lib/urllib.js:988:15)
+    at listOnTimeout (node:internal/timers:608:17)
+    at process.processTimers (node:internal/timers:543:7) {
+  requestId: 1,
+  data: undefined,
+  path: '/v1/chat/completions',
+  status: -2,
+  headers: {},
+  res: {
+    status: -2,
+    statusCode: -2,
+    statusMessage: null,
+    headers: {},
+    size: 0,
+    aborted: false,
+    rt: 30023,
+    keepAliveSocket: false,
+    data: undefined,
+    requestUrls: [ 'https://api.openai.com/v1/chat/completions' ],
+    timing: null,
+    remoteAddress: '4.78.139.54',
+    remotePort: '',
+    socketHandledRequests: 1,
+    socketHandledResponses: 0
+  }
+}
+2026-02-09 22:49:57,386 ERROR 67717 [-/undefined/-/30026ms POST /api/uied/aiConfig/chat] AI日志记录失败: Error
+    at Query.run (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/query.js:52:25)
+    at /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/sequelize.js:315:28
+    at async AiUsageLogService.add (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/service/uied/aiUsageLog.js:170:22)
+    at async AiConfigService.chat (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/service/uied/aiConfig.js:829:9)
+    at async AiConfigController.chat (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/controller/uied/aiConfig.js:281:22)
+    at async tokenAuth (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/middleware/auth.js:25:7)
+    at async verify (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/middleware/authority.js:21:7)
+    at async /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-development/app/middleware/egg_loader_trace.js:9:50
+    at async xframe (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-security/lib/middlewares/xframe.js:7:5)
+    at async xssProtection (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-security/lib/middlewares/xssProtection.js:7:5) {
+  name: 'SequelizeDatabaseError',
+  parent: Error: Field 'createdAt' doesn't have a default value
+      at Packet.asError (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/packets/packet.js:728:17)
+      at Query.execute (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/commands/command.js:29:26)
+      at Connection.handlePacket (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:456:32)
+      at PacketParser.onPacket (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:85:12)
+      at PacketParser.executeStart (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/packet_parser.js:75:16)
+      at Socket.<anonymous> (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:92:25)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5) {
+    code: 'ER_NO_DEFAULT_FOR_FIELD',
+    errno: 1364,
+    sqlState: 'HY000',
+    sqlMessage: "Field 'createdAt' doesn't have a default value",
+    sql: 'INSERT INTO uied_ai_usage_log \n' +
+      '       (config_id, feature_type, request_content, response_status, error_message, tokens_used, duration_ms, is_delete, create_time, update_time, delete_time)\n' +
+      `       VALUES (1, 'chat', '网站名称：爱派 AiPy \\n网站地址：https://www.aipyaipy.com/?referral=BJHAQ6K\\n网站描述：爱派（AiPy）是一款融合LLM与Python生态的开源AI智能体，通过“代码即代理”模式，实现需求解析、动态生成代码、自动执行到优化的全流程闭环，支持本地化部署，一句话指令即可完成数据分析、信息聚合等自动化任务。\\n\\n请为这个网站生成一段完整的详情介绍，结构清晰，适', 'failed', 'Connect timeout for 30000ms, POST https://api.openai.com/v1/chat/completions -2 (connected: false, keepalive socket: false, agent status: {\\"createSocketCount\\":2,\\"createSocketErrorCount\\":0,\\"closeSocketCount\\":2,\\"errorSocketCount\\":0,\\"timeoutSocketCount\\":0,\\"requestCount\\":0,\\"freeSockets\\":{},\\"sockets\\":{},\\"requests\\":{}}, socketHandledRequests: 1, socketHandledResponses: 0)\\nheaders: {}', 0, 30003, 0, 1770648597, 1770648597, 0)`,
+    parameters: undefined
+  },
+  original: Error: Field 'createdAt' doesn't have a default value
+      at Packet.asError (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/packets/packet.js:728:17)
+      at Query.execute (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/commands/command.js:29:26)
+      at Connection.handlePacket (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:456:32)
+      at PacketParser.onPacket (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:85:12)
+      at PacketParser.executeStart (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/packet_parser.js:75:16)
+      at Socket.<anonymous> (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:92:25)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5) {
+    code: 'ER_NO_DEFAULT_FOR_FIELD',
+    errno: 1364,
+    sqlState: 'HY000',
+    sqlMessage: "Field 'createdAt' doesn't have a default value",
+    sql: 'INSERT INTO uied_ai_usage_log \n' +
+      '       (config_id, feature_type, request_content, response_status, error_message, tokens_used, duration_ms, is_delete, create_time, update_time, delete_time)\n' +
+      `       VALUES (1, 'chat', '网站名称：爱派 AiPy \\n网站地址：https://www.aipyaipy.com/?referral=BJHAQ6K\\n网站描述：爱派（AiPy）是一款融合LLM与Python生态的开源AI智能体，通过“代码即代理”模式，实现需求解析、动态生成代码、自动执行到优化的全流程闭环，支持本地化部署，一句话指令即可完成数据分析、信息聚合等自动化任务。\\n\\n请为这个网站生成一段完整的详情介绍，结构清晰，适', 'failed', 'Connect timeout for 30000ms, POST https://api.openai.com/v1/chat/completions -2 (connected: false, keepalive socket: false, agent status: {\\"createSocketCount\\":2,\\"createSocketErrorCount\\":0,\\"closeSocketCount\\":2,\\"errorSocketCount\\":0,\\"timeoutSocketCount\\":0,\\"requestCount\\":0,\\"freeSockets\\":{},\\"sockets\\":{},\\"requests\\":{}}, socketHandledRequests: 1, socketHandledResponses: 0)\\nheaders: {}', 0, 30003, 0, 1770648597, 1770648597, 0)`,
+    parameters: undefined
+  },
+  sql: 'INSERT INTO uied_ai_usage_log \n' +
+    '       (config_id, feature_type, request_content, response_status, error_message, tokens_used, duration_ms, is_delete, create_time, update_time, delete_time)\n' +
+    `       VALUES (1, 'chat', '网站名称：爱派 AiPy \\n网站地址：https://www.aipyaipy.com/?referral=BJHAQ6K\\n网站描述：爱派（AiPy）是一款融合LLM与Python生态的开源AI智能体，通过“代码即代理”模式，实现需求解析、动态生成代码、自动执行到优化的全流程闭环，支持本地化部署，一句话指令即可完成数据分析、信息聚合等自动化任务。\\n\\n请为这个网站生成一段完整的详情介绍，结构清晰，适', 'failed', 'Connect timeout for 30000ms, POST https://api.openai.com/v1/chat/completions -2 (connected: false, keepalive socket: false, agent status: {\\"createSocketCount\\":2,\\"createSocketErrorCount\\":0,\\"closeSocketCount\\":2,\\"errorSocketCount\\":0,\\"timeoutSocketCount\\":0,\\"requestCount\\":0,\\"freeSockets\\":{},\\"sockets\\":{},\\"requests\\":{}}, socketHandledRequests: 1, socketHandledResponses: 0)\\nheaders: {}', 0, 30003, 0, 1770648597, 1770648597, 0)`,
+  parameters: {}
+}
+2026-02-09 22:49:57,393 ERROR 67717 [-/undefined/-/30034ms POST /api/uied/aiConfig/chat] AI对话失败: Error [ConnectionTimeoutError]: Connect timeout for 30000ms, POST https://api.openai.com/v1/chat/completions -2 (connected: false, keepalive socket: false, agent status: {"createSocketCount":2,"createSocketErrorCount":0,"closeSocketCount":2,"errorSocketCount":0,"timeoutSocketCount":0,"requestCount":0,"freeSockets":{},"sockets":{},"requests":{}}, socketHandledRequests: 1, socketHandledResponses: 0)
+headers: {}
+    at Timeout._onTimeout (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/urllib/lib/urllib.js:988:15)
+    at listOnTimeout (node:internal/timers:608:17)
+    at process.processTimers (node:internal/timers:543:7) {
+  requestId: 2,
+  data: undefined,
+  path: '/v1/chat/completions',
+  status: -2,
+  headers: {},
+  res: {
+    status: -2,
+    statusCode: -2,
+    statusMessage: null,
+    headers: {},
+    size: 0,
+    aborted: false,
+    rt: 30002,
+    keepAliveSocket: false,
+    data: undefined,
+    requestUrls: [ 'https://api.openai.com/v1/chat/completions' ],
+    timing: null,
+    remoteAddress: '4.78.139.54',
+    remotePort: '',
+    socketHandledRequests: 1,
+    socketHandledResponses: 0
+  }
+}
+2026-02-09 22:52:55,813 ERROR 67717 [-/undefined/-/30014ms POST /api/uied/aiConfig/chat] AI日志记录失败: Error
+    at Query.run (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/query.js:52:25)
+    at /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/sequelize.js:315:28
+    at async AiUsageLogService.add (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/service/uied/aiUsageLog.js:170:22)
+    at async AiConfigService.chat (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/service/uied/aiConfig.js:829:9)
+    at async AiConfigController.chat (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/controller/uied/aiConfig.js:281:22)
+    at async tokenAuth (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/middleware/auth.js:25:7)
+    at async verify (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/middleware/authority.js:21:7)
+    at async /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-development/app/middleware/egg_loader_trace.js:9:50
+    at async xframe (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-security/lib/middlewares/xframe.js:7:5)
+    at async xssProtection (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-security/lib/middlewares/xssProtection.js:7:5) {
+  name: 'SequelizeDatabaseError',
+  parent: Error: Field 'createdAt' doesn't have a default value
+      at Packet.asError (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/packets/packet.js:728:17)
+      at Query.execute (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/commands/command.js:29:26)
+      at Connection.handlePacket (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:456:32)
+      at PacketParser.onPacket (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:85:12)
+      at PacketParser.executeStart (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/packet_parser.js:75:16)
+      at Socket.<anonymous> (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:92:25)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5) {
+    code: 'ER_NO_DEFAULT_FOR_FIELD',
+    errno: 1364,
+    sqlState: 'HY000',
+    sqlMessage: "Field 'createdAt' doesn't have a default value",
+    sql: 'INSERT INTO uied_ai_usage_log \n' +
+      '       (config_id, feature_type, request_content, response_status, error_message, tokens_used, duration_ms, is_delete, create_time, update_time, delete_time)\n' +
+      `       VALUES (1, 'chat', '网站名称：爱派 AiPy \\n网站地址：https://www.aipyaipy.com/?referral=BJHAQ6K\\n网站描述：爱派（AiPy）是一款融合LLM与Python生态的开源AI智能体，通过“代码即代理”模式，实现需求解析、动态生成代码、自动执行到优化的全流程闭环，支持本地化部署，一句话指令即可完成数据分析、信息聚合等自动化任务。\\n\\n请为这个网站生成一段完整的详情介绍，结构清晰，适', 'failed', 'Connect timeout for 30000ms, POST https://api.openai.com/v1/chat/completions -2 (connected: false, keepalive socket: false, agent status: {\\"createSocketCount\\":3,\\"createSocketErrorCount\\":0,\\"closeSocketCount\\":3,\\"errorSocketCount\\":0,\\"timeoutSocketCount\\":0,\\"requestCount\\":0,\\"freeSockets\\":{},\\"sockets\\":{},\\"requests\\":{}}, socketHandledRequests: 1, socketHandledResponses: 0)\\nheaders: {}', 0, 30001, 0, 1770648775, 1770648775, 0)`,
+    parameters: undefined
+  },
+  original: Error: Field 'createdAt' doesn't have a default value
+      at Packet.asError (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/packets/packet.js:728:17)
+      at Query.execute (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/commands/command.js:29:26)
+      at Connection.handlePacket (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:456:32)
+      at PacketParser.onPacket (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:85:12)
+      at PacketParser.executeStart (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/packet_parser.js:75:16)
+      at Socket.<anonymous> (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/mysql2/lib/connection.js:92:25)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5) {
+    code: 'ER_NO_DEFAULT_FOR_FIELD',
+    errno: 1364,
+    sqlState: 'HY000',
+    sqlMessage: "Field 'createdAt' doesn't have a default value",
+    sql: 'INSERT INTO uied_ai_usage_log \n' +
+      '       (config_id, feature_type, request_content, response_status, error_message, tokens_used, duration_ms, is_delete, create_time, update_time, delete_time)\n' +
+      `       VALUES (1, 'chat', '网站名称：爱派 AiPy \\n网站地址：https://www.aipyaipy.com/?referral=BJHAQ6K\\n网站描述：爱派（AiPy）是一款融合LLM与Python生态的开源AI智能体，通过“代码即代理”模式，实现需求解析、动态生成代码、自动执行到优化的全流程闭环，支持本地化部署，一句话指令即可完成数据分析、信息聚合等自动化任务。\\n\\n请为这个网站生成一段完整的详情介绍，结构清晰，适', 'failed', 'Connect timeout for 30000ms, POST https://api.openai.com/v1/chat/completions -2 (connected: false, keepalive socket: false, agent status: {\\"createSocketCount\\":3,\\"createSocketErrorCount\\":0,\\"closeSocketCount\\":3,\\"errorSocketCount\\":0,\\"timeoutSocketCount\\":0,\\"requestCount\\":0,\\"freeSockets\\":{},\\"sockets\\":{},\\"requests\\":{}}, socketHandledRequests: 1, socketHandledResponses: 0)\\nheaders: {}', 0, 30001, 0, 1770648775, 1770648775, 0)`,
+    parameters: undefined
+  },
+  sql: 'INSERT INTO uied_ai_usage_log \n' +
+    '       (config_id, feature_type, request_content, response_status, error_message, tokens_used, duration_ms, is_delete, create_time, update_time, delete_time)\n' +
+    `       VALUES (1, 'chat', '网站名称：爱派 AiPy \\n网站地址：https://www.aipyaipy.com/?referral=BJHAQ6K\\n网站描述：爱派（AiPy）是一款融合LLM与Python生态的开源AI智能体，通过“代码即代理”模式，实现需求解析、动态生成代码、自动执行到优化的全流程闭环，支持本地化部署，一句话指令即可完成数据分析、信息聚合等自动化任务。\\n\\n请为这个网站生成一段完整的详情介绍，结构清晰，适', 'failed', 'Connect timeout for 30000ms, POST https://api.openai.com/v1/chat/completions -2 (connected: false, keepalive socket: false, agent status: {\\"createSocketCount\\":3,\\"createSocketErrorCount\\":0,\\"closeSocketCount\\":3,\\"errorSocketCount\\":0,\\"timeoutSocketCount\\":0,\\"requestCount\\":0,\\"freeSockets\\":{},\\"sockets\\":{},\\"requests\\":{}}, socketHandledRequests: 1, socketHandledResponses: 0)\\nheaders: {}', 0, 30001, 0, 1770648775, 1770648775, 0)`,
+  parameters: {}
+}
+2026-02-09 22:52:55,813 ERROR 67717 [-/undefined/-/30014ms POST /api/uied/aiConfig/chat] AI对话失败: Error [ConnectionTimeoutError]: Connect timeout for 30000ms, POST https://api.openai.com/v1/chat/completions -2 (connected: false, keepalive socket: false, agent status: {"createSocketCount":3,"createSocketErrorCount":0,"closeSocketCount":3,"errorSocketCount":0,"timeoutSocketCount":0,"requestCount":0,"freeSockets":{},"sockets":{},"requests":{}}, socketHandledRequests: 1, socketHandledResponses: 0)
+headers: {}
+    at Timeout._onTimeout (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/urllib/lib/urllib.js:988:15)
+    at listOnTimeout (node:internal/timers:608:17)
+    at process.processTimers (node:internal/timers:543:7) {
+  requestId: 3,
+  data: undefined,
+  path: '/v1/chat/completions',
+  status: -2,
+  headers: {},
+  res: {
+    status: -2,
+    statusCode: -2,
+    statusMessage: null,
+    headers: {},
+    size: 0,
+    aborted: false,
+    rt: 30001,
+    keepAliveSocket: false,
+    data: undefined,
+    requestUrls: [ 'https://api.openai.com/v1/chat/completions' ],
+    timing: null,
+    remoteAddress: '128.242.245.180',
+    remotePort: '',
+    socketHandledRequests: 1,
+    socketHandledResponses: 0
+  }
+}

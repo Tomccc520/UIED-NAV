@@ -1,0 +1,17 @@
+2026-02-08 12:33:52,863 ERROR 89383 nodejs.SequelizeAccessDeniedError: Access denied for user 'root'@'172.17.0.1' (using password: NO)
+    at ConnectionManager.connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/mysql/connection-manager.js:94:17)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at ConnectionManager._connect (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:222:24)
+    at /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:174:32
+    at ConnectionManager.getConnection (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:197:7)
+    at /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/sequelize.js:305:26
+    at Sequelize.authenticate (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/sequelize/lib/sequelize.js:457:5)
+    at authenticate (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-sequelize/lib/loader.js:134:7)
+    at authenticate (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-sequelize/lib/loader.js:142:7)
+    at authenticate (/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-sequelize/lib/loader.js:142:7)
+name: "SequelizeAccessDeniedError"
+parent: {"code":"ER_ACCESS_DENIED_ERROR","errno":1045,"sqlState":"28000","sqlMessage":"Access denied for user 'root'@'172.17.0.1' (using password: NO)"}
+original: {"code":"ER_ACCESS_DENIED_ERROR","errno":1045,"sqlState":"28000","sqlMessage":"Access denied for user 'root'@'172.17.0.1' (using password: NO)"}
+pid: 89383
+hostname: Mac-Studio.local
+

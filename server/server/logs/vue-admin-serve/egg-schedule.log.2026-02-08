@@ -1,0 +1,48 @@
+2026-02-08 12:41:53,514 INFO 95214 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-multipart/app/schedule/clean_tmpdir.js
+2026-02-08 12:41:53,514 INFO 95214 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/clean_log.js
+2026-02-08 12:41:53,514 INFO 95214 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/rotate_by_file.js
+2026-02-08 12:41:54,131 INFO 95180 [Timer] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-multipart/app/schedule/clean_tmpdir.js next time will execute after 56885870ms at 2026-02-09 04:30:00.001
+2026-02-08 12:41:54,131 INFO 95180 [Timer] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/clean_log.js next time will execute after 40685869ms at 2026-02-09 00:00:00.000
+2026-02-08 12:41:54,131 INFO 95180 [Timer] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/rotate_by_file.js next time will execute after 40686869ms at 2026-02-09 00:00:01.000
+2026-02-08 13:42:06,863 INFO 32854 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-multipart/app/schedule/clean_tmpdir.js
+2026-02-08 13:42:06,863 INFO 32854 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/clean_log.js
+2026-02-08 13:42:06,863 INFO 32854 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/rotate_by_file.js
+2026-02-08 13:42:20,510 INFO 33059 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-multipart/app/schedule/clean_tmpdir.js
+2026-02-08 13:42:20,510 INFO 33059 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/clean_log.js
+2026-02-08 13:42:20,510 INFO 33059 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/rotate_by_file.js
+2026-02-08 13:42:30,536 INFO 33184 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-multipart/app/schedule/clean_tmpdir.js
+2026-02-08 13:42:30,536 INFO 33184 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/clean_log.js
+2026-02-08 13:42:30,536 INFO 33184 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/rotate_by_file.js
+2026-02-08 13:42:40,249 INFO 33297 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-multipart/app/schedule/clean_tmpdir.js
+2026-02-08 13:42:40,249 INFO 33297 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/clean_log.js
+2026-02-08 13:42:40,249 INFO 33297 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/rotate_by_file.js
+2026-02-08 15:06:03,310 INFO 88150 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-multipart/app/schedule/clean_tmpdir.js
+2026-02-08 15:06:03,310 INFO 88150 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/clean_log.js
+2026-02-08 15:06:03,310 INFO 88150 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/rotate_by_file.js
+2026-02-08 15:50:08,024 INFO 9762 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-multipart/app/schedule/clean_tmpdir.js
+2026-02-08 15:50:08,024 INFO 9762 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/clean_log.js
+2026-02-08 15:50:08,024 INFO 9762 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/rotate_by_file.js
+2026-02-08 15:50:08,585 INFO 9726 [Timer] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-multipart/app/schedule/clean_tmpdir.js next time will execute after 45591416ms at 2026-02-09 04:30:00.001
+2026-02-08 15:50:08,585 INFO 9726 [Timer] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/clean_log.js next time will execute after 29391415ms at 2026-02-09 00:00:00.000
+2026-02-08 15:50:08,585 INFO 9726 [Timer] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/rotate_by_file.js next time will execute after 29392415ms at 2026-02-09 00:00:01.000
+2026-02-08 16:27:44,882 INFO 32120 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-multipart/app/schedule/clean_tmpdir.js
+2026-02-08 16:27:44,882 INFO 32120 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/clean_log.js
+2026-02-08 16:27:44,882 INFO 32120 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/rotate_by_file.js
+2026-02-08 16:27:55,447 INFO 32157 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-multipart/app/schedule/clean_tmpdir.js
+2026-02-08 16:27:55,447 INFO 32157 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/clean_log.js
+2026-02-08 16:27:55,447 INFO 32157 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/rotate_by_file.js
+2026-02-08 23:44:01,997 INFO 84870 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-multipart/app/schedule/clean_tmpdir.js
+2026-02-08 23:44:01,997 INFO 84870 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/clean_log.js
+2026-02-08 23:44:01,997 INFO 84870 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/rotate_by_file.js
+2026-02-08 23:46:36,368 INFO 86418 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-multipart/app/schedule/clean_tmpdir.js
+2026-02-08 23:46:36,368 INFO 86418 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/clean_log.js
+2026-02-08 23:46:36,368 INFO 86418 [egg-schedule]: register schedule /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/rotate_by_file.js
+2026-02-08 23:46:36,853 INFO 86406 [Timer] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-multipart/app/schedule/clean_tmpdir.js next time will execute after 17003148ms at 2026-02-09 04:30:00.001
+2026-02-08 23:46:36,853 INFO 86406 [Timer] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/clean_log.js next time will execute after 803147ms at 2026-02-09 00:00:00.000
+2026-02-08 23:46:36,853 INFO 86406 [Timer] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/rotate_by_file.js next time will execute after 804147ms at 2026-02-09 00:00:01.000
+2026-02-09 00:00:00,011 INFO 86418 [Job#1770566400005496904131720411] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/clean_log.js executing by app
+2026-02-09 00:00:00,018 INFO 86418 [Job#1770566400005496904131720411] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/clean_log.js execute succeed, used 7ms. 
+2026-02-09 00:00:00,010 INFO 86406 [Timer] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/clean_log.js next time will execute after 86399993ms at 2026-02-10 00:00:00.003
+2026-02-09 00:00:01,001 INFO 86418 [Job#1770566400999496914077268751] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/rotate_by_file.js executing by app
+2026-02-09 00:00:01,005 INFO 86418 [Job#1770566400999496914077268751] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/rotate_by_file.js execute succeed, used 4ms. 
+2026-02-09 00:00:01,001 INFO 86406 [Timer] /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/node_modules/egg-logrotator/app/schedule/rotate_by_file.js next time will execute after 86400000ms at 2026-02-10 00:00:01.000

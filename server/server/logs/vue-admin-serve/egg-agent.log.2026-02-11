@@ -1,0 +1,49 @@
+2026-02-09 23:59:58,980 INFO 9893 [egg-logrotator] agent logger reload: got log-reload message
+2026-02-10 11:00:46,113 INFO 6663 [egg-sequelize](1ms) Executed (default): SELECT 1+1 AS result
+2026-02-10 11:00:45,845 INFO 6663 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"agent"}
+2026-02-10 11:00:46,061 INFO 6663 [egg:core] dump config after load, 2ms
+2026-02-10 11:00:46,078 INFO 6663 [egg-watcher] Start watching: ["/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/config","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/mocks","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/mocks_proxy","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app.js"]
+2026-02-10 11:00:46,078 INFO 6663 [egg-watcher] Start watching: "/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app"
+2026-02-10 11:00:46,078 INFO 6663 [egg-watcher] Start watching: "/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/config"
+2026-02-10 11:00:46,078 INFO 6663 [egg-watcher] Start watching: "/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/mocks"
+2026-02-10 11:00:46,078 INFO 6663 [egg-watcher] Start watching: "/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/mocks_proxy"
+2026-02-10 11:00:46,078 INFO 6663 [egg-watcher] Start watching: "/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app.js"
+2026-02-10 11:00:46,078 INFO 6663 [egg-watcher:agent] watcher start success
+2026-02-10 11:00:46,115 INFO 6663 [egg:core] dump config after ready, 1ms
+2026-02-10 12:35:34,528 WARN 6663 [agent:development] reload worker because /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/service/uied/seoScraper.js change
+2026-02-10 12:35:34,323 INFO 6663 [egg-watcher] Received a change event from eventSource: {"event":"change","path":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/service/uied/seoScraper.js","stat":{"dev":16777231,"mode":33188,"nlink":1,"uid":501,"gid":20,"rdev":0,"blksize":4096,"ino":408038127,"size":5189,"blocks":16,"atimeMs":1770571022244.3518,"mtimeMs":1770698134257.0698,"ctimeMs":1770698134257.0698,"birthtimeMs":1770023160250.503},"remove":false,"isDirectory":false,"isFile":true}
+2026-02-10 12:36:20,246 INFO 38216 [egg-sequelize](1ms) Executed (default): SELECT 1+1 AS result
+2026-02-10 12:36:20,024 INFO 38216 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"agent"}
+2026-02-10 12:36:20,197 INFO 38216 [egg:core] dump config after load, 2ms
+2026-02-10 12:36:20,214 INFO 38216 [egg-watcher] Start watching: ["/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/config","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/mocks","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/mocks_proxy","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app.js"]
+2026-02-10 12:36:20,214 INFO 38216 [egg-watcher] Start watching: "/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app"
+2026-02-10 12:36:20,214 INFO 38216 [egg-watcher] Start watching: "/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/config"
+2026-02-10 12:36:20,214 INFO 38216 [egg-watcher] Start watching: "/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/mocks"
+2026-02-10 12:36:20,214 INFO 38216 [egg-watcher] Start watching: "/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/mocks_proxy"
+2026-02-10 12:36:20,215 INFO 38216 [egg-watcher] Start watching: "/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app.js"
+2026-02-10 12:36:20,215 INFO 38216 [egg-watcher:agent] watcher start success
+2026-02-10 12:36:20,248 INFO 38216 [egg:core] dump config after ready, 1ms
+2026-02-10 18:57:20,842 INFO 54117 [egg-sequelize](1ms) Executed (default): SELECT 1+1 AS result
+2026-02-10 18:57:20,544 INFO 54117 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"agent"}
+2026-02-10 18:57:20,791 INFO 54117 [egg:core] dump config after load, 2ms
+2026-02-10 18:57:20,811 INFO 54117 [egg-watcher] Start watching: ["/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/config","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/mocks","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/mocks_proxy","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app.js"]
+2026-02-10 18:57:20,811 INFO 54117 [egg-watcher] Start watching: "/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app"
+2026-02-10 18:57:20,811 INFO 54117 [egg-watcher] Start watching: "/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/config"
+2026-02-10 18:57:20,811 INFO 54117 [egg-watcher] Start watching: "/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/mocks"
+2026-02-10 18:57:20,811 INFO 54117 [egg-watcher] Start watching: "/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/mocks_proxy"
+2026-02-10 18:57:20,811 INFO 54117 [egg-watcher] Start watching: "/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app.js"
+2026-02-10 18:57:20,811 INFO 54117 [egg-watcher:agent] watcher start success
+2026-02-10 18:57:20,844 INFO 54117 [egg:core] dump config after ready, 1ms
+2026-02-11 17:08:58,733 INFO 14996 [egg-sequelize](1ms) Executed (default): SELECT 1+1 AS result
+2026-02-11 17:08:58,361 INFO 14996 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"agent"}
+2026-02-11 17:08:58,666 INFO 14996 [egg:core] dump config after load, 3ms
+2026-02-11 17:08:58,699 INFO 14996 [egg-watcher] Start watching: ["/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/config","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/mocks","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/mocks_proxy","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app.js"]
+2026-02-11 17:08:58,699 INFO 14996 [egg-watcher] Start watching: "/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app"
+2026-02-11 17:08:58,699 INFO 14996 [egg-watcher] Start watching: "/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/config"
+2026-02-11 17:08:58,699 INFO 14996 [egg-watcher] Start watching: "/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/mocks"
+2026-02-11 17:08:58,699 INFO 14996 [egg-watcher] Start watching: "/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/mocks_proxy"
+2026-02-11 17:08:58,699 INFO 14996 [egg-watcher] Start watching: "/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app.js"
+2026-02-11 17:08:58,699 INFO 14996 [egg-watcher:agent] watcher start success
+2026-02-11 17:08:58,736 INFO 14996 [egg:core] dump config after ready, 2ms
+2026-02-11 21:36:42,034 WARN 14996 [agent:development] reload worker because /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/controller/uied/frontend.js change
+2026-02-11 21:36:41,770 INFO 14996 [egg-watcher] Received a change event from eventSource: {"event":"change","path":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/controller/uied/frontend.js","stat":{"dev":16777232,"mode":33188,"nlink":1,"uid":501,"gid":20,"rdev":0,"blksize":4096,"ino":408620718,"size":32317,"blocks":64,"atimeMs":1770602140906.326,"mtimeMs":1770817001622.404,"ctimeMs":1770817001622.404,"birthtimeMs":1770044677742.5603},"remove":false,"isDirectory":false,"isFile":true}

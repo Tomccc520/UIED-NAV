@@ -1,0 +1,1428 @@
+2026-02-17 00:00:01,428 INFO 94155 [egg-logrotator] app logger reload: got log-reload message
+2026-02-17 00:54:40,556 INFO 42104 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 00:54:40,566 INFO 42104 [egg-multipart] stream mode enable
+2026-02-17 00:54:40,862 INFO 42104 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 00:54:41,021 INFO 42104 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 00:54:41,023 INFO 42104 [egg-security] use methodnoallow middleware
+2026-02-17 00:54:41,023 INFO 42104 [egg-security] use noopen middleware
+2026-02-17 00:54:41,023 INFO 42104 [egg-security] use nosniff middleware
+2026-02-17 00:54:41,024 INFO 42104 [egg-security] use xssProtection middleware
+2026-02-17 00:54:41,024 INFO 42104 [egg-security] use xframe middleware
+2026-02-17 00:54:41,024 INFO 42104 [egg-security] use dta middleware
+2026-02-17 00:54:41,024 INFO 42104 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 00:54:41,049 INFO 42104 [egg:core] dump config after load, 4ms
+2026-02-17 00:54:41,055 INFO 42104 [egg-redis] client connect success
+2026-02-17 00:54:41,058 INFO 42104 [egg-watcher:application] watcher start success
+2026-02-17 00:54:41,069 INFO 42104 [egg-redis] instance[0] status OK, client ready
+2026-02-17 00:54:41,255 INFO 42104 [egg:core] dump config after ready, 5ms
+2026-02-17 00:55:54,480 INFO 43413 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 00:55:54,491 INFO 43413 [egg-multipart] stream mode enable
+2026-02-17 00:55:54,787 INFO 43413 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 00:55:54,962 INFO 43413 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 00:55:54,963 INFO 43413 [egg-security] use methodnoallow middleware
+2026-02-17 00:55:54,964 INFO 43413 [egg-security] use noopen middleware
+2026-02-17 00:55:54,964 INFO 43413 [egg-security] use nosniff middleware
+2026-02-17 00:55:54,966 INFO 43413 [egg-security] use xssProtection middleware
+2026-02-17 00:55:54,966 INFO 43413 [egg-security] use xframe middleware
+2026-02-17 00:55:54,966 INFO 43413 [egg-security] use dta middleware
+2026-02-17 00:55:54,966 INFO 43413 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 00:55:55,004 INFO 43413 [egg:core] dump config after load, 9ms
+2026-02-17 00:55:55,012 INFO 43413 [egg-redis] client connect success
+2026-02-17 00:55:55,021 INFO 43413 [egg-redis] instance[0] status OK, client ready
+2026-02-17 00:55:55,022 INFO 43413 [egg-watcher:application] watcher start success
+2026-02-17 00:55:55,229 INFO 43413 [egg:core] dump config after ready, 4ms
+2026-02-17 01:10:15,882 INFO 59934 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 01:10:15,893 INFO 59934 [egg-multipart] stream mode enable
+2026-02-17 01:10:16,207 INFO 59934 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 01:10:16,381 INFO 59934 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 01:10:16,382 INFO 59934 [egg-security] use methodnoallow middleware
+2026-02-17 01:10:16,382 INFO 59934 [egg-security] use noopen middleware
+2026-02-17 01:10:16,383 INFO 59934 [egg-security] use nosniff middleware
+2026-02-17 01:10:16,383 INFO 59934 [egg-security] use xssProtection middleware
+2026-02-17 01:10:16,383 INFO 59934 [egg-security] use xframe middleware
+2026-02-17 01:10:16,383 INFO 59934 [egg-security] use dta middleware
+2026-02-17 01:10:16,383 INFO 59934 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 01:10:16,414 INFO 59934 [egg:core] dump config after load, 7ms
+2026-02-17 01:10:16,420 INFO 59934 [egg-redis] client connect success
+2026-02-17 01:10:16,422 INFO 59934 [egg-watcher:application] watcher start success
+2026-02-17 01:10:16,429 INFO 59934 [egg-redis] instance[0] status OK, client ready
+2026-02-17 01:10:16,654 INFO 59934 [egg:core] dump config after ready, 4ms
+2026-02-17 01:10:21,481 INFO 60029 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 01:10:21,491 INFO 60029 [egg-multipart] stream mode enable
+2026-02-17 01:10:21,711 INFO 60029 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 01:10:21,838 INFO 60029 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 01:10:21,839 INFO 60029 [egg-security] use methodnoallow middleware
+2026-02-17 01:10:21,839 INFO 60029 [egg-security] use noopen middleware
+2026-02-17 01:10:21,839 INFO 60029 [egg-security] use nosniff middleware
+2026-02-17 01:10:21,840 INFO 60029 [egg-security] use xssProtection middleware
+2026-02-17 01:10:21,840 INFO 60029 [egg-security] use xframe middleware
+2026-02-17 01:10:21,840 INFO 60029 [egg-security] use dta middleware
+2026-02-17 01:10:21,840 INFO 60029 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 01:10:21,864 INFO 60029 [egg:core] dump config after load, 4ms
+2026-02-17 01:10:21,872 INFO 60029 [egg-redis] client connect success
+2026-02-17 01:10:21,873 INFO 60029 [egg-watcher:application] watcher start success
+2026-02-17 01:10:21,880 INFO 60029 [egg-redis] instance[0] status OK, client ready
+2026-02-17 01:10:22,024 INFO 60029 [egg:core] dump config after ready, 4ms
+2026-02-17 01:23:49,035 INFO 75900 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 01:23:49,045 INFO 75900 [egg-multipart] stream mode enable
+2026-02-17 01:23:49,285 INFO 75900 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 01:23:49,424 INFO 75900 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 01:23:49,425 INFO 75900 [egg-security] use methodnoallow middleware
+2026-02-17 01:23:49,426 INFO 75900 [egg-security] use noopen middleware
+2026-02-17 01:23:49,426 INFO 75900 [egg-security] use nosniff middleware
+2026-02-17 01:23:49,426 INFO 75900 [egg-security] use xssProtection middleware
+2026-02-17 01:23:49,426 INFO 75900 [egg-security] use xframe middleware
+2026-02-17 01:23:49,427 INFO 75900 [egg-security] use dta middleware
+2026-02-17 01:23:49,427 INFO 75900 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 01:23:49,460 INFO 75900 [egg:core] dump config after load, 5ms
+2026-02-17 01:23:49,465 INFO 75900 [egg-redis] client connect success
+2026-02-17 01:23:49,473 INFO 75900 [egg-watcher:application] watcher start success
+2026-02-17 01:23:49,474 INFO 75900 [egg-redis] instance[0] status OK, client ready
+2026-02-17 01:23:49,651 INFO 75900 [egg:core] dump config after ready, 4ms
+2026-02-17 01:24:31,281 INFO 76770 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 01:24:31,290 INFO 76770 [egg-multipart] stream mode enable
+2026-02-17 01:24:31,497 INFO 76770 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 01:24:31,630 INFO 76770 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 01:24:31,633 INFO 76770 [egg-security] use methodnoallow middleware
+2026-02-17 01:24:31,634 INFO 76770 [egg-security] use noopen middleware
+2026-02-17 01:24:31,634 INFO 76770 [egg-security] use nosniff middleware
+2026-02-17 01:24:31,634 INFO 76770 [egg-security] use xssProtection middleware
+2026-02-17 01:24:31,634 INFO 76770 [egg-security] use xframe middleware
+2026-02-17 01:24:31,635 INFO 76770 [egg-security] use dta middleware
+2026-02-17 01:24:31,635 INFO 76770 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 01:24:31,654 INFO 76770 [egg:core] dump config after load, 3ms
+2026-02-17 01:24:31,660 INFO 76770 [egg-redis] client connect success
+2026-02-17 01:24:31,662 INFO 76770 [egg-redis] instance[0] status OK, client ready
+2026-02-17 01:24:31,663 INFO 76770 [egg-watcher:application] watcher start success
+2026-02-17 01:24:31,842 INFO 76770 [egg:core] dump config after ready, 4ms
+2026-02-17 01:24:48,380 INFO 77330 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 01:24:48,390 INFO 77330 [egg-multipart] stream mode enable
+2026-02-17 01:24:48,612 INFO 77330 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 01:24:48,745 INFO 77330 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 01:24:48,746 INFO 77330 [egg-security] use methodnoallow middleware
+2026-02-17 01:24:48,746 INFO 77330 [egg-security] use noopen middleware
+2026-02-17 01:24:48,747 INFO 77330 [egg-security] use nosniff middleware
+2026-02-17 01:24:48,747 INFO 77330 [egg-security] use xssProtection middleware
+2026-02-17 01:24:48,747 INFO 77330 [egg-security] use xframe middleware
+2026-02-17 01:24:48,747 INFO 77330 [egg-security] use dta middleware
+2026-02-17 01:24:48,747 INFO 77330 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 01:24:48,775 INFO 77330 [egg:core] dump config after load, 3ms
+2026-02-17 01:24:48,818 INFO 77330 [egg-redis] client connect success
+2026-02-17 01:24:48,826 INFO 77330 [egg-redis] instance[0] status OK, client ready
+2026-02-17 01:24:48,843 INFO 77330 [egg-watcher:application] watcher start success
+2026-02-17 01:24:49,042 INFO 77330 [egg:core] dump config after ready, 3ms
+2026-02-17 01:24:55,701 INFO 77492 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 01:24:55,711 INFO 77492 [egg-multipart] stream mode enable
+2026-02-17 01:24:55,936 INFO 77492 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 01:24:56,068 INFO 77492 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 01:24:56,069 INFO 77492 [egg-security] use methodnoallow middleware
+2026-02-17 01:24:56,070 INFO 77492 [egg-security] use noopen middleware
+2026-02-17 01:24:56,070 INFO 77492 [egg-security] use nosniff middleware
+2026-02-17 01:24:56,070 INFO 77492 [egg-security] use xssProtection middleware
+2026-02-17 01:24:56,070 INFO 77492 [egg-security] use xframe middleware
+2026-02-17 01:24:56,071 INFO 77492 [egg-security] use dta middleware
+2026-02-17 01:24:56,071 INFO 77492 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 01:24:56,097 INFO 77492 [egg:core] dump config after load, 5ms
+2026-02-17 01:24:56,106 INFO 77492 [egg-redis] client connect success
+2026-02-17 01:24:56,114 INFO 77492 [egg-redis] instance[0] status OK, client ready
+2026-02-17 01:24:56,115 INFO 77492 [egg-watcher:application] watcher start success
+2026-02-17 01:24:56,275 INFO 77492 [egg:core] dump config after ready, 4ms
+2026-02-17 01:25:07,191 INFO 77680 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 01:25:07,261 INFO 77680 [egg-multipart] stream mode enable
+2026-02-17 01:25:07,470 INFO 77680 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 01:25:07,602 INFO 77680 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 01:25:07,603 INFO 77680 [egg-security] use methodnoallow middleware
+2026-02-17 01:25:07,604 INFO 77680 [egg-security] use noopen middleware
+2026-02-17 01:25:07,604 INFO 77680 [egg-security] use nosniff middleware
+2026-02-17 01:25:07,604 INFO 77680 [egg-security] use xssProtection middleware
+2026-02-17 01:25:07,605 INFO 77680 [egg-security] use xframe middleware
+2026-02-17 01:25:07,605 INFO 77680 [egg-security] use dta middleware
+2026-02-17 01:25:07,605 INFO 77680 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 01:25:07,628 INFO 77680 [egg:core] dump config after load, 3ms
+2026-02-17 01:25:07,637 INFO 77680 [egg-redis] client connect success
+2026-02-17 01:25:07,639 INFO 77680 [egg-watcher:application] watcher start success
+2026-02-17 01:25:07,649 INFO 77680 [egg-redis] instance[0] status OK, client ready
+2026-02-17 01:25:07,806 INFO 77680 [egg:core] dump config after ready, 4ms
+2026-02-17 01:26:54,221 INFO 79432 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 01:26:54,231 INFO 79432 [egg-multipart] stream mode enable
+2026-02-17 01:26:54,442 INFO 79432 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 01:26:54,574 INFO 79432 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 01:26:54,575 INFO 79432 [egg-security] use methodnoallow middleware
+2026-02-17 01:26:54,575 INFO 79432 [egg-security] use noopen middleware
+2026-02-17 01:26:54,575 INFO 79432 [egg-security] use nosniff middleware
+2026-02-17 01:26:54,576 INFO 79432 [egg-security] use xssProtection middleware
+2026-02-17 01:26:54,576 INFO 79432 [egg-security] use xframe middleware
+2026-02-17 01:26:54,576 INFO 79432 [egg-security] use dta middleware
+2026-02-17 01:26:54,576 INFO 79432 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 01:26:54,599 INFO 79432 [egg:core] dump config after load, 3ms
+2026-02-17 01:26:54,608 INFO 79432 [egg-redis] client connect success
+2026-02-17 01:26:54,617 INFO 79432 [egg-redis] instance[0] status OK, client ready
+2026-02-17 01:26:54,617 INFO 79432 [egg-watcher:application] watcher start success
+2026-02-17 01:26:54,796 INFO 79432 [egg:core] dump config after ready, 3ms
+2026-02-17 01:26:57,681 INFO 79532 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 01:26:57,690 INFO 79532 [egg-multipart] stream mode enable
+2026-02-17 01:26:57,811 INFO 79532 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 01:26:57,880 INFO 79532 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 01:26:57,881 INFO 79532 [egg-security] use methodnoallow middleware
+2026-02-17 01:26:57,881 INFO 79532 [egg-security] use noopen middleware
+2026-02-17 01:26:57,881 INFO 79532 [egg-security] use nosniff middleware
+2026-02-17 01:26:57,881 INFO 79532 [egg-security] use xssProtection middleware
+2026-02-17 01:26:57,881 INFO 79532 [egg-security] use xframe middleware
+2026-02-17 01:26:57,881 INFO 79532 [egg-security] use dta middleware
+2026-02-17 01:26:57,881 INFO 79532 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 01:26:57,897 INFO 79532 [egg:core] dump config after load, 4ms
+2026-02-17 01:26:57,905 INFO 79532 [egg-redis] client connect success
+2026-02-17 01:26:57,908 INFO 79532 [egg-watcher:application] watcher start success
+2026-02-17 01:26:57,915 INFO 79532 [egg-redis] instance[0] status OK, client ready
+2026-02-17 01:26:58,089 INFO 79532 [egg:core] dump config after ready, 4ms
+2026-02-17 01:27:02,184 INFO 79593 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 01:27:02,192 INFO 79593 [egg-multipart] stream mode enable
+2026-02-17 01:27:02,315 INFO 79593 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 01:27:02,382 INFO 79593 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 01:27:02,383 INFO 79593 [egg-security] use methodnoallow middleware
+2026-02-17 01:27:02,383 INFO 79593 [egg-security] use noopen middleware
+2026-02-17 01:27:02,383 INFO 79593 [egg-security] use nosniff middleware
+2026-02-17 01:27:02,383 INFO 79593 [egg-security] use xssProtection middleware
+2026-02-17 01:27:02,383 INFO 79593 [egg-security] use xframe middleware
+2026-02-17 01:27:02,383 INFO 79593 [egg-security] use dta middleware
+2026-02-17 01:27:02,383 INFO 79593 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 01:27:02,402 INFO 79593 [egg:core] dump config after load, 4ms
+2026-02-17 01:27:02,408 INFO 79593 [egg-redis] client connect success
+2026-02-17 01:27:02,409 INFO 79593 [egg-redis] instance[0] status OK, client ready
+2026-02-17 01:27:02,414 INFO 79593 [egg-watcher:application] watcher start success
+2026-02-17 01:27:02,599 INFO 79593 [egg:core] dump config after ready, 3ms
+2026-02-17 01:30:27,629 INFO 82105 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 01:30:27,638 INFO 82105 [egg-multipart] stream mode enable
+2026-02-17 01:30:27,861 INFO 82105 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 01:30:28,001 INFO 82105 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 01:30:28,002 INFO 82105 [egg-security] use methodnoallow middleware
+2026-02-17 01:30:28,003 INFO 82105 [egg-security] use noopen middleware
+2026-02-17 01:30:28,003 INFO 82105 [egg-security] use nosniff middleware
+2026-02-17 01:30:28,003 INFO 82105 [egg-security] use xssProtection middleware
+2026-02-17 01:30:28,003 INFO 82105 [egg-security] use xframe middleware
+2026-02-17 01:30:28,003 INFO 82105 [egg-security] use dta middleware
+2026-02-17 01:30:28,003 INFO 82105 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 01:30:28,028 INFO 82105 [egg:core] dump config after load, 4ms
+2026-02-17 01:30:28,033 INFO 82105 [egg-redis] client connect success
+2026-02-17 01:30:28,035 INFO 82105 [egg-watcher:application] watcher start success
+2026-02-17 01:30:28,036 INFO 82105 [egg-redis] instance[0] status OK, client ready
+2026-02-17 01:30:28,192 INFO 82105 [egg:core] dump config after ready, 4ms
+2026-02-17 01:33:41,325 INFO 85834 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 01:33:41,333 INFO 85834 [egg-multipart] stream mode enable
+2026-02-17 01:33:41,475 INFO 85834 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 01:33:41,610 INFO 85834 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 01:33:41,611 INFO 85834 [egg-security] use methodnoallow middleware
+2026-02-17 01:33:41,611 INFO 85834 [egg-security] use noopen middleware
+2026-02-17 01:33:41,612 INFO 85834 [egg-security] use nosniff middleware
+2026-02-17 01:33:41,612 INFO 85834 [egg-security] use xssProtection middleware
+2026-02-17 01:33:41,612 INFO 85834 [egg-security] use xframe middleware
+2026-02-17 01:33:41,613 INFO 85834 [egg-security] use dta middleware
+2026-02-17 01:33:41,613 INFO 85834 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 01:33:41,628 INFO 85834 [egg:core] dump config after load, 3ms
+2026-02-17 01:33:41,634 INFO 85834 [egg-redis] client connect success
+2026-02-17 01:33:41,639 INFO 85834 [egg-redis] instance[0] status OK, client ready
+2026-02-17 01:33:41,640 INFO 85834 [egg-watcher:application] watcher start success
+2026-02-17 01:33:41,804 INFO 85834 [egg:core] dump config after ready, 2ms
+2026-02-17 01:51:17,017 INFO 8963 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 01:51:17,027 INFO 8963 [egg-multipart] stream mode enable
+2026-02-17 01:51:17,385 INFO 8963 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 01:51:17,612 INFO 8963 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 01:51:17,614 INFO 8963 [egg-security] use methodnoallow middleware
+2026-02-17 01:51:17,614 INFO 8963 [egg-security] use noopen middleware
+2026-02-17 01:51:17,615 INFO 8963 [egg-security] use nosniff middleware
+2026-02-17 01:51:17,615 INFO 8963 [egg-security] use xssProtection middleware
+2026-02-17 01:51:17,615 INFO 8963 [egg-security] use xframe middleware
+2026-02-17 01:51:17,616 INFO 8963 [egg-security] use dta middleware
+2026-02-17 01:51:17,616 INFO 8963 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 01:51:17,651 INFO 8963 [egg:core] dump config after load, 5ms
+2026-02-17 01:51:17,658 INFO 8963 [egg-redis] client connect success
+2026-02-17 01:51:17,661 INFO 8963 [egg-watcher:application] watcher start success
+2026-02-17 01:51:17,662 INFO 8963 [egg-redis] instance[0] status OK, client ready
+2026-02-17 01:51:17,957 INFO 8963 [egg:core] dump config after ready, 4ms
+2026-02-17 01:52:03,509 INFO 9984 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 01:52:03,520 INFO 9984 [egg-multipart] stream mode enable
+2026-02-17 01:52:03,743 INFO 9984 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 01:52:03,884 INFO 9984 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 01:52:03,885 INFO 9984 [egg-security] use methodnoallow middleware
+2026-02-17 01:52:03,885 INFO 9984 [egg-security] use noopen middleware
+2026-02-17 01:52:03,885 INFO 9984 [egg-security] use nosniff middleware
+2026-02-17 01:52:03,886 INFO 9984 [egg-security] use xssProtection middleware
+2026-02-17 01:52:03,886 INFO 9984 [egg-security] use xframe middleware
+2026-02-17 01:52:03,886 INFO 9984 [egg-security] use dta middleware
+2026-02-17 01:52:03,886 INFO 9984 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 01:52:03,915 INFO 9984 [egg:core] dump config after load, 3ms
+2026-02-17 01:52:03,921 INFO 9984 [egg-redis] client connect success
+2026-02-17 01:52:03,930 INFO 9984 [egg-redis] instance[0] status OK, client ready
+2026-02-17 01:52:03,930 INFO 9984 [egg-watcher:application] watcher start success
+2026-02-17 01:52:04,124 INFO 9984 [egg:core] dump config after ready, 4ms
+2026-02-17 01:56:32,324 INFO 15617 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 01:56:32,334 INFO 15617 [egg-multipart] stream mode enable
+2026-02-17 01:56:32,559 INFO 15617 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 01:56:32,714 INFO 15617 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 01:56:32,715 INFO 15617 [egg-security] use methodnoallow middleware
+2026-02-17 01:56:32,716 INFO 15617 [egg-security] use noopen middleware
+2026-02-17 01:56:32,716 INFO 15617 [egg-security] use nosniff middleware
+2026-02-17 01:56:32,717 INFO 15617 [egg-security] use xssProtection middleware
+2026-02-17 01:56:32,717 INFO 15617 [egg-security] use xframe middleware
+2026-02-17 01:56:32,718 INFO 15617 [egg-security] use dta middleware
+2026-02-17 01:56:32,718 INFO 15617 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 01:56:32,743 INFO 15617 [egg:core] dump config after load, 3ms
+2026-02-17 01:56:32,749 INFO 15617 [egg-redis] client connect success
+2026-02-17 01:56:32,752 INFO 15617 [egg-watcher:application] watcher start success
+2026-02-17 01:56:32,761 INFO 15617 [egg-redis] instance[0] status OK, client ready
+2026-02-17 01:56:32,946 INFO 15617 [egg:core] dump config after ready, 2ms
+2026-02-17 01:56:41,255 INFO 15898 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 01:56:41,271 INFO 15898 [egg-multipart] stream mode enable
+2026-02-17 01:56:41,523 INFO 15898 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 01:56:41,652 INFO 15898 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 01:56:41,653 INFO 15898 [egg-security] use methodnoallow middleware
+2026-02-17 01:56:41,653 INFO 15898 [egg-security] use noopen middleware
+2026-02-17 01:56:41,653 INFO 15898 [egg-security] use nosniff middleware
+2026-02-17 01:56:41,654 INFO 15898 [egg-security] use xssProtection middleware
+2026-02-17 01:56:41,654 INFO 15898 [egg-security] use xframe middleware
+2026-02-17 01:56:41,654 INFO 15898 [egg-security] use dta middleware
+2026-02-17 01:56:41,654 INFO 15898 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 01:56:41,680 INFO 15898 [egg:core] dump config after load, 6ms
+2026-02-17 01:56:41,686 INFO 15898 [egg-redis] client connect success
+2026-02-17 01:56:41,688 INFO 15898 [egg-watcher:application] watcher start success
+2026-02-17 01:56:41,696 INFO 15898 [egg-redis] instance[0] status OK, client ready
+2026-02-17 01:56:41,862 INFO 15898 [egg:core] dump config after ready, 3ms
+2026-02-17 01:56:50,056 INFO 16211 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 01:56:50,065 INFO 16211 [egg-multipart] stream mode enable
+2026-02-17 01:56:50,270 INFO 16211 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 01:56:50,403 INFO 16211 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 01:56:50,404 INFO 16211 [egg-security] use methodnoallow middleware
+2026-02-17 01:56:50,404 INFO 16211 [egg-security] use noopen middleware
+2026-02-17 01:56:50,405 INFO 16211 [egg-security] use nosniff middleware
+2026-02-17 01:56:50,405 INFO 16211 [egg-security] use xssProtection middleware
+2026-02-17 01:56:50,405 INFO 16211 [egg-security] use xframe middleware
+2026-02-17 01:56:50,405 INFO 16211 [egg-security] use dta middleware
+2026-02-17 01:56:50,405 INFO 16211 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 01:56:50,425 INFO 16211 [egg:core] dump config after load, 6ms
+2026-02-17 01:56:50,431 INFO 16211 [egg-redis] client connect success
+2026-02-17 01:56:50,440 INFO 16211 [egg-watcher:application] watcher start success
+2026-02-17 01:56:50,441 INFO 16211 [egg-redis] instance[0] status OK, client ready
+2026-02-17 01:56:50,661 INFO 16211 [egg:core] dump config after ready, 3ms
+2026-02-17 01:56:58,482 INFO 16401 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 01:56:58,492 INFO 16401 [egg-multipart] stream mode enable
+2026-02-17 01:56:58,690 INFO 16401 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 01:56:58,833 INFO 16401 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 01:56:58,834 INFO 16401 [egg-security] use methodnoallow middleware
+2026-02-17 01:56:58,835 INFO 16401 [egg-security] use noopen middleware
+2026-02-17 01:56:58,835 INFO 16401 [egg-security] use nosniff middleware
+2026-02-17 01:56:58,835 INFO 16401 [egg-security] use xssProtection middleware
+2026-02-17 01:56:58,836 INFO 16401 [egg-security] use xframe middleware
+2026-02-17 01:56:58,836 INFO 16401 [egg-security] use dta middleware
+2026-02-17 01:56:58,836 INFO 16401 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 01:56:58,856 INFO 16401 [egg:core] dump config after load, 6ms
+2026-02-17 01:56:58,862 INFO 16401 [egg-redis] client connect success
+2026-02-17 01:56:58,870 INFO 16401 [egg-redis] instance[0] status OK, client ready
+2026-02-17 01:56:58,870 INFO 16401 [egg-watcher:application] watcher start success
+2026-02-17 01:56:59,050 INFO 16401 [egg:core] dump config after ready, 3ms
+2026-02-17 01:58:41,501 INFO 18165 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 01:58:41,512 INFO 18165 [egg-multipart] stream mode enable
+2026-02-17 01:58:41,778 INFO 18165 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 01:58:41,998 INFO 18165 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 01:58:41,999 INFO 18165 [egg-security] use methodnoallow middleware
+2026-02-17 01:58:42,000 INFO 18165 [egg-security] use noopen middleware
+2026-02-17 01:58:42,000 INFO 18165 [egg-security] use nosniff middleware
+2026-02-17 01:58:42,000 INFO 18165 [egg-security] use xssProtection middleware
+2026-02-17 01:58:42,001 INFO 18165 [egg-security] use xframe middleware
+2026-02-17 01:58:42,001 INFO 18165 [egg-security] use dta middleware
+2026-02-17 01:58:42,001 INFO 18165 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 01:58:42,031 INFO 18165 [egg:core] dump config after load, 5ms
+2026-02-17 01:58:42,038 INFO 18165 [egg-redis] client connect success
+2026-02-17 01:58:42,047 INFO 18165 [egg-redis] instance[0] status OK, client ready
+2026-02-17 01:58:42,050 INFO 18165 [egg-watcher:application] watcher start success
+2026-02-17 01:58:42,228 INFO 18165 [egg:core] dump config after ready, 4ms
+2026-02-17 01:59:37,245 INFO 19096 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 01:59:37,254 INFO 19096 [egg-multipart] stream mode enable
+2026-02-17 01:59:37,441 INFO 19096 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 01:59:37,569 INFO 19096 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 01:59:37,571 INFO 19096 [egg-security] use methodnoallow middleware
+2026-02-17 01:59:37,571 INFO 19096 [egg-security] use noopen middleware
+2026-02-17 01:59:37,571 INFO 19096 [egg-security] use nosniff middleware
+2026-02-17 01:59:37,571 INFO 19096 [egg-security] use xssProtection middleware
+2026-02-17 01:59:37,572 INFO 19096 [egg-security] use xframe middleware
+2026-02-17 01:59:37,572 INFO 19096 [egg-security] use dta middleware
+2026-02-17 01:59:37,572 INFO 19096 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 01:59:37,598 INFO 19096 [egg:core] dump config after load, 3ms
+2026-02-17 01:59:37,604 INFO 19096 [egg-redis] client connect success
+2026-02-17 01:59:37,614 INFO 19096 [egg-redis] instance[0] status OK, client ready
+2026-02-17 01:59:37,614 INFO 19096 [egg-watcher:application] watcher start success
+2026-02-17 01:59:37,781 INFO 19096 [egg:core] dump config after ready, 4ms
+2026-02-17 02:04:52,494 INFO 24828 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 02:04:52,505 INFO 24828 [egg-multipart] stream mode enable
+2026-02-17 02:04:52,736 INFO 24828 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 02:04:52,889 INFO 24828 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 02:04:52,890 INFO 24828 [egg-security] use methodnoallow middleware
+2026-02-17 02:04:52,890 INFO 24828 [egg-security] use noopen middleware
+2026-02-17 02:04:52,891 INFO 24828 [egg-security] use nosniff middleware
+2026-02-17 02:04:52,891 INFO 24828 [egg-security] use xssProtection middleware
+2026-02-17 02:04:52,891 INFO 24828 [egg-security] use xframe middleware
+2026-02-17 02:04:52,892 INFO 24828 [egg-security] use dta middleware
+2026-02-17 02:04:52,892 INFO 24828 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 02:04:52,931 INFO 24828 [egg:core] dump config after load, 3ms
+2026-02-17 02:04:52,936 INFO 24828 [egg-redis] client connect success
+2026-02-17 02:04:52,938 INFO 24828 [egg-redis] instance[0] status OK, client ready
+2026-02-17 02:04:52,939 INFO 24828 [egg-watcher:application] watcher start success
+2026-02-17 02:04:53,159 INFO 24828 [egg:core] dump config after ready, 3ms
+2026-02-17 02:58:38,057 INFO 70009 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 02:58:38,068 INFO 70009 [egg-multipart] stream mode enable
+2026-02-17 02:58:38,356 INFO 70009 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 02:58:38,535 INFO 70009 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 02:58:38,537 INFO 70009 [egg-security] use methodnoallow middleware
+2026-02-17 02:58:38,537 INFO 70009 [egg-security] use noopen middleware
+2026-02-17 02:58:38,538 INFO 70009 [egg-security] use nosniff middleware
+2026-02-17 02:58:38,538 INFO 70009 [egg-security] use xssProtection middleware
+2026-02-17 02:58:38,538 INFO 70009 [egg-security] use xframe middleware
+2026-02-17 02:58:38,539 INFO 70009 [egg-security] use dta middleware
+2026-02-17 02:58:38,539 INFO 70009 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 02:58:38,566 INFO 70009 [egg:core] dump config after load, 5ms
+2026-02-17 02:58:38,575 INFO 70009 [egg-redis] client connect success
+2026-02-17 02:58:38,584 INFO 70009 [egg-redis] instance[0] status OK, client ready
+2026-02-17 02:58:38,585 INFO 70009 [egg-watcher:application] watcher start success
+2026-02-17 02:58:38,998 INFO 70009 [egg:core] dump config after ready, 3ms
+2026-02-17 02:58:43,610 INFO 70210 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 02:58:43,620 INFO 70210 [egg-multipart] stream mode enable
+2026-02-17 02:58:43,834 INFO 70210 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 02:58:43,971 INFO 70210 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 02:58:43,972 INFO 70210 [egg-security] use methodnoallow middleware
+2026-02-17 02:58:43,972 INFO 70210 [egg-security] use noopen middleware
+2026-02-17 02:58:43,973 INFO 70210 [egg-security] use nosniff middleware
+2026-02-17 02:58:43,973 INFO 70210 [egg-security] use xssProtection middleware
+2026-02-17 02:58:43,973 INFO 70210 [egg-security] use xframe middleware
+2026-02-17 02:58:43,974 INFO 70210 [egg-security] use dta middleware
+2026-02-17 02:58:43,974 INFO 70210 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 02:58:44,002 INFO 70210 [egg:core] dump config after load, 3ms
+2026-02-17 02:58:44,008 INFO 70210 [egg-redis] client connect success
+2026-02-17 02:58:44,017 INFO 70210 [egg-watcher:application] watcher start success
+2026-02-17 02:58:44,018 INFO 70210 [egg-redis] instance[0] status OK, client ready
+2026-02-17 02:58:44,202 INFO 70210 [egg:core] dump config after ready, 3ms
+2026-02-17 03:02:30,887 INFO 74972 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 03:02:30,898 INFO 74972 [egg-multipart] stream mode enable
+2026-02-17 03:02:31,114 INFO 74972 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 03:02:31,266 INFO 74972 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 03:02:31,268 INFO 74972 [egg-security] use methodnoallow middleware
+2026-02-17 03:02:31,268 INFO 74972 [egg-security] use noopen middleware
+2026-02-17 03:02:31,268 INFO 74972 [egg-security] use nosniff middleware
+2026-02-17 03:02:31,269 INFO 74972 [egg-security] use xssProtection middleware
+2026-02-17 03:02:31,269 INFO 74972 [egg-security] use xframe middleware
+2026-02-17 03:02:31,269 INFO 74972 [egg-security] use dta middleware
+2026-02-17 03:02:31,269 INFO 74972 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 03:02:31,297 INFO 74972 [egg:core] dump config after load, 4ms
+2026-02-17 03:02:31,303 INFO 74972 [egg-redis] client connect success
+2026-02-17 03:02:31,311 INFO 74972 [egg-redis] instance[0] status OK, client ready
+2026-02-17 03:02:31,311 INFO 74972 [egg-watcher:application] watcher start success
+2026-02-17 03:02:31,482 INFO 74972 [egg:core] dump config after ready, 4ms
+2026-02-17 20:26:48,115 INFO 7273 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 20:26:48,137 INFO 7273 [egg-multipart] stream mode enable
+2026-02-17 20:26:48,302 INFO 7273 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 20:26:48,488 INFO 7273 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 20:26:48,490 INFO 7273 [egg-security] use methodnoallow middleware
+2026-02-17 20:26:48,490 INFO 7273 [egg-security] use noopen middleware
+2026-02-17 20:26:48,490 INFO 7273 [egg-security] use nosniff middleware
+2026-02-17 20:26:48,491 INFO 7273 [egg-security] use xssProtection middleware
+2026-02-17 20:26:48,491 INFO 7273 [egg-security] use xframe middleware
+2026-02-17 20:26:48,491 INFO 7273 [egg-security] use dta middleware
+2026-02-17 20:26:48,491 INFO 7273 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 20:26:48,533 INFO 7273 [egg:core] dump config after load, 8ms
+2026-02-17 20:26:48,545 INFO 7273 [egg-redis] client connect success
+2026-02-17 20:26:48,551 INFO 7273 [egg-watcher:application] watcher start success
+2026-02-17 20:26:48,561 INFO 7273 [egg-redis] instance[0] status OK, client ready
+2026-02-17 20:26:49,113 INFO 7273 [egg:core] dump config after ready, 3ms
+2026-02-17 21:48:46,865 INFO 77820 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 21:48:46,875 INFO 77820 [egg-multipart] stream mode enable
+2026-02-17 21:48:47,158 INFO 77820 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 21:48:47,352 INFO 77820 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 21:48:47,353 INFO 77820 [egg-security] use methodnoallow middleware
+2026-02-17 21:48:47,353 INFO 77820 [egg-security] use noopen middleware
+2026-02-17 21:48:47,353 INFO 77820 [egg-security] use nosniff middleware
+2026-02-17 21:48:47,354 INFO 77820 [egg-security] use xssProtection middleware
+2026-02-17 21:48:47,354 INFO 77820 [egg-security] use xframe middleware
+2026-02-17 21:48:47,354 INFO 77820 [egg-security] use dta middleware
+2026-02-17 21:48:47,354 INFO 77820 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 21:48:47,384 INFO 77820 [egg:core] dump config after load, 4ms
+2026-02-17 21:48:47,390 INFO 77820 [egg-redis] client connect success
+2026-02-17 21:48:47,392 INFO 77820 [egg-watcher:application] watcher start success
+2026-02-17 21:48:47,396 INFO 77820 [egg-redis] instance[0] status OK, client ready
+2026-02-17 21:48:47,577 INFO 77820 [egg:core] dump config after ready, 3ms
+2026-02-17 21:48:57,887 INFO 77927 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 21:48:57,897 INFO 77927 [egg-multipart] stream mode enable
+2026-02-17 21:48:58,110 INFO 77927 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 21:48:58,302 INFO 77927 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 21:48:58,303 INFO 77927 [egg-security] use methodnoallow middleware
+2026-02-17 21:48:58,304 INFO 77927 [egg-security] use noopen middleware
+2026-02-17 21:48:58,304 INFO 77927 [egg-security] use nosniff middleware
+2026-02-17 21:48:58,305 INFO 77927 [egg-security] use xssProtection middleware
+2026-02-17 21:48:58,305 INFO 77927 [egg-security] use xframe middleware
+2026-02-17 21:48:58,306 INFO 77927 [egg-security] use dta middleware
+2026-02-17 21:48:58,306 INFO 77927 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 21:48:58,350 INFO 77927 [egg:core] dump config after load, 4ms
+2026-02-17 21:48:58,357 INFO 77927 [egg-redis] client connect success
+2026-02-17 21:48:58,370 INFO 77927 [egg-redis] instance[0] status OK, client ready
+2026-02-17 21:48:58,371 INFO 77927 [egg-watcher:application] watcher start success
+2026-02-17 21:48:58,592 INFO 77927 [egg:core] dump config after ready, 3ms
+2026-02-17 21:49:03,247 INFO 77991 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 21:49:03,259 INFO 77991 [egg-multipart] stream mode enable
+2026-02-17 21:49:03,527 INFO 77991 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 21:49:03,660 INFO 77991 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 21:49:03,661 INFO 77991 [egg-security] use methodnoallow middleware
+2026-02-17 21:49:03,661 INFO 77991 [egg-security] use noopen middleware
+2026-02-17 21:49:03,662 INFO 77991 [egg-security] use nosniff middleware
+2026-02-17 21:49:03,662 INFO 77991 [egg-security] use xssProtection middleware
+2026-02-17 21:49:03,662 INFO 77991 [egg-security] use xframe middleware
+2026-02-17 21:49:03,662 INFO 77991 [egg-security] use dta middleware
+2026-02-17 21:49:03,662 INFO 77991 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 21:49:03,690 INFO 77991 [egg:core] dump config after load, 5ms
+2026-02-17 21:49:03,696 INFO 77991 [egg-redis] client connect success
+2026-02-17 21:49:03,698 INFO 77991 [egg-redis] instance[0] status OK, client ready
+2026-02-17 21:49:03,705 INFO 77991 [egg-watcher:application] watcher start success
+2026-02-17 21:49:04,057 INFO 77991 [egg:core] dump config after ready, 8ms
+2026-02-17 22:01:32,471 INFO 89534 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:01:32,481 INFO 89534 [egg-multipart] stream mode enable
+2026-02-17 22:01:32,731 INFO 89534 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:01:32,877 INFO 89534 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:01:32,878 INFO 89534 [egg-security] use methodnoallow middleware
+2026-02-17 22:01:32,878 INFO 89534 [egg-security] use noopen middleware
+2026-02-17 22:01:32,878 INFO 89534 [egg-security] use nosniff middleware
+2026-02-17 22:01:32,878 INFO 89534 [egg-security] use xssProtection middleware
+2026-02-17 22:01:32,878 INFO 89534 [egg-security] use xframe middleware
+2026-02-17 22:01:32,879 INFO 89534 [egg-security] use dta middleware
+2026-02-17 22:01:32,879 INFO 89534 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:01:32,899 INFO 89534 [egg:core] dump config after load, 5ms
+2026-02-17 22:01:32,905 INFO 89534 [egg-redis] client connect success
+2026-02-17 22:01:32,913 INFO 89534 [egg-watcher:application] watcher start success
+2026-02-17 22:01:32,914 INFO 89534 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:01:33,101 INFO 89534 [egg:core] dump config after ready, 3ms
+2026-02-17 22:01:46,025 INFO 89673 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:01:46,035 INFO 89673 [egg-multipart] stream mode enable
+2026-02-17 22:01:46,243 INFO 89673 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:01:46,370 INFO 89673 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:01:46,371 INFO 89673 [egg-security] use methodnoallow middleware
+2026-02-17 22:01:46,371 INFO 89673 [egg-security] use noopen middleware
+2026-02-17 22:01:46,371 INFO 89673 [egg-security] use nosniff middleware
+2026-02-17 22:01:46,372 INFO 89673 [egg-security] use xssProtection middleware
+2026-02-17 22:01:46,372 INFO 89673 [egg-security] use xframe middleware
+2026-02-17 22:01:46,372 INFO 89673 [egg-security] use dta middleware
+2026-02-17 22:01:46,372 INFO 89673 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:01:46,397 INFO 89673 [egg:core] dump config after load, 4ms
+2026-02-17 22:01:46,403 INFO 89673 [egg-redis] client connect success
+2026-02-17 22:01:46,405 INFO 89673 [egg-watcher:application] watcher start success
+2026-02-17 22:01:46,412 INFO 89673 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:01:46,592 INFO 89673 [egg:core] dump config after ready, 3ms
+2026-02-17 22:01:54,981 INFO 89752 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:01:54,991 INFO 89752 [egg-multipart] stream mode enable
+2026-02-17 22:01:55,230 INFO 89752 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:01:55,363 INFO 89752 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:01:55,365 INFO 89752 [egg-security] use methodnoallow middleware
+2026-02-17 22:01:55,365 INFO 89752 [egg-security] use noopen middleware
+2026-02-17 22:01:55,365 INFO 89752 [egg-security] use nosniff middleware
+2026-02-17 22:01:55,366 INFO 89752 [egg-security] use xssProtection middleware
+2026-02-17 22:01:55,366 INFO 89752 [egg-security] use xframe middleware
+2026-02-17 22:01:55,366 INFO 89752 [egg-security] use dta middleware
+2026-02-17 22:01:55,366 INFO 89752 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:01:55,391 INFO 89752 [egg:core] dump config after load, 3ms
+2026-02-17 22:01:55,399 INFO 89752 [egg-redis] client connect success
+2026-02-17 22:01:55,408 INFO 89752 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:01:55,409 INFO 89752 [egg-watcher:application] watcher start success
+2026-02-17 22:01:55,573 INFO 89752 [egg:core] dump config after ready, 3ms
+2026-02-17 22:01:56,267 INFO 89780 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:01:56,276 INFO 89780 [egg-multipart] stream mode enable
+2026-02-17 22:01:56,398 INFO 89780 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:01:56,464 INFO 89780 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:01:56,465 INFO 89780 [egg-security] use methodnoallow middleware
+2026-02-17 22:01:56,465 INFO 89780 [egg-security] use noopen middleware
+2026-02-17 22:01:56,465 INFO 89780 [egg-security] use nosniff middleware
+2026-02-17 22:01:56,465 INFO 89780 [egg-security] use xssProtection middleware
+2026-02-17 22:01:56,465 INFO 89780 [egg-security] use xframe middleware
+2026-02-17 22:01:56,465 INFO 89780 [egg-security] use dta middleware
+2026-02-17 22:01:56,465 INFO 89780 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:01:56,486 INFO 89780 [egg:core] dump config after load, 3ms
+2026-02-17 22:01:56,492 INFO 89780 [egg-redis] client connect success
+2026-02-17 22:01:56,498 INFO 89780 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:01:56,499 INFO 89780 [egg-watcher:application] watcher start success
+2026-02-17 22:01:56,698 INFO 89780 [egg:core] dump config after ready, 9ms
+2026-02-17 22:01:57,063 INFO 89789 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:01:57,072 INFO 89789 [egg-multipart] stream mode enable
+2026-02-17 22:01:57,190 INFO 89789 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:01:57,252 INFO 89789 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:01:57,253 INFO 89789 [egg-security] use methodnoallow middleware
+2026-02-17 22:01:57,253 INFO 89789 [egg-security] use noopen middleware
+2026-02-17 22:01:57,254 INFO 89789 [egg-security] use nosniff middleware
+2026-02-17 22:01:57,254 INFO 89789 [egg-security] use xssProtection middleware
+2026-02-17 22:01:57,254 INFO 89789 [egg-security] use xframe middleware
+2026-02-17 22:01:57,254 INFO 89789 [egg-security] use dta middleware
+2026-02-17 22:01:57,254 INFO 89789 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:01:57,270 INFO 89789 [egg:core] dump config after load, 3ms
+2026-02-17 22:01:57,278 INFO 89789 [egg-redis] client connect success
+2026-02-17 22:01:57,284 INFO 89789 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:01:57,285 INFO 89789 [egg-watcher:application] watcher start success
+2026-02-17 22:01:57,451 INFO 89789 [egg:core] dump config after ready, 3ms
+2026-02-17 22:01:59,992 INFO 89823 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:02:00,001 INFO 89823 [egg-multipart] stream mode enable
+2026-02-17 22:02:00,127 INFO 89823 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:02:00,199 INFO 89823 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:02:00,199 INFO 89823 [egg-security] use methodnoallow middleware
+2026-02-17 22:02:00,199 INFO 89823 [egg-security] use noopen middleware
+2026-02-17 22:02:00,200 INFO 89823 [egg-security] use nosniff middleware
+2026-02-17 22:02:00,200 INFO 89823 [egg-security] use xssProtection middleware
+2026-02-17 22:02:00,200 INFO 89823 [egg-security] use xframe middleware
+2026-02-17 22:02:00,200 INFO 89823 [egg-security] use dta middleware
+2026-02-17 22:02:00,200 INFO 89823 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:02:00,216 INFO 89823 [egg:core] dump config after load, 3ms
+2026-02-17 22:02:00,224 INFO 89823 [egg-redis] client connect success
+2026-02-17 22:02:00,230 INFO 89823 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:02:00,231 INFO 89823 [egg-watcher:application] watcher start success
+2026-02-17 22:02:00,401 INFO 89823 [egg:core] dump config after ready, 4ms
+2026-02-17 22:02:01,922 INFO 89874 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:02:01,929 INFO 89874 [egg-multipart] stream mode enable
+2026-02-17 22:02:02,047 INFO 89874 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:02:02,119 INFO 89874 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:02:02,121 INFO 89874 [egg-security] use methodnoallow middleware
+2026-02-17 22:02:02,121 INFO 89874 [egg-security] use noopen middleware
+2026-02-17 22:02:02,122 INFO 89874 [egg-security] use nosniff middleware
+2026-02-17 22:02:02,122 INFO 89874 [egg-security] use xssProtection middleware
+2026-02-17 22:02:02,122 INFO 89874 [egg-security] use xframe middleware
+2026-02-17 22:02:02,122 INFO 89874 [egg-security] use dta middleware
+2026-02-17 22:02:02,122 INFO 89874 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:02:02,142 INFO 89874 [egg:core] dump config after load, 3ms
+2026-02-17 22:02:02,148 INFO 89874 [egg-redis] client connect success
+2026-02-17 22:02:02,154 INFO 89874 [egg-watcher:application] watcher start success
+2026-02-17 22:02:02,155 INFO 89874 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:02:02,317 INFO 89874 [egg:core] dump config after ready, 4ms
+2026-02-17 22:02:04,613 INFO 89912 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:02:04,622 INFO 89912 [egg-multipart] stream mode enable
+2026-02-17 22:02:04,757 INFO 89912 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:02:04,829 INFO 89912 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:02:04,830 INFO 89912 [egg-security] use methodnoallow middleware
+2026-02-17 22:02:04,830 INFO 89912 [egg-security] use noopen middleware
+2026-02-17 22:02:04,830 INFO 89912 [egg-security] use nosniff middleware
+2026-02-17 22:02:04,830 INFO 89912 [egg-security] use xssProtection middleware
+2026-02-17 22:02:04,830 INFO 89912 [egg-security] use xframe middleware
+2026-02-17 22:02:04,831 INFO 89912 [egg-security] use dta middleware
+2026-02-17 22:02:04,831 INFO 89912 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:02:04,851 INFO 89912 [egg:core] dump config after load, 3ms
+2026-02-17 22:02:04,858 INFO 89912 [egg-redis] client connect success
+2026-02-17 22:02:04,864 INFO 89912 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:02:04,865 INFO 89912 [egg-watcher:application] watcher start success
+2026-02-17 22:02:05,039 INFO 89912 [egg:core] dump config after ready, 3ms
+2026-02-17 22:02:06,625 INFO 89987 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:02:06,635 INFO 89987 [egg-multipart] stream mode enable
+2026-02-17 22:02:06,776 INFO 89987 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:02:06,846 INFO 89987 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:02:06,847 INFO 89987 [egg-security] use methodnoallow middleware
+2026-02-17 22:02:06,847 INFO 89987 [egg-security] use noopen middleware
+2026-02-17 22:02:06,847 INFO 89987 [egg-security] use nosniff middleware
+2026-02-17 22:02:06,848 INFO 89987 [egg-security] use xssProtection middleware
+2026-02-17 22:02:06,848 INFO 89987 [egg-security] use xframe middleware
+2026-02-17 22:02:06,848 INFO 89987 [egg-security] use dta middleware
+2026-02-17 22:02:06,848 INFO 89987 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:02:06,867 INFO 89987 [egg:core] dump config after load, 4ms
+2026-02-17 22:02:06,873 INFO 89987 [egg-redis] client connect success
+2026-02-17 22:02:06,879 INFO 89987 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:02:06,880 INFO 89987 [egg-watcher:application] watcher start success
+2026-02-17 22:02:07,064 INFO 89987 [egg:core] dump config after ready, 4ms
+2026-02-17 22:02:08,806 INFO 90007 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:02:08,815 INFO 90007 [egg-multipart] stream mode enable
+2026-02-17 22:02:08,946 INFO 90007 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:02:09,011 INFO 90007 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:02:09,012 INFO 90007 [egg-security] use methodnoallow middleware
+2026-02-17 22:02:09,012 INFO 90007 [egg-security] use noopen middleware
+2026-02-17 22:02:09,012 INFO 90007 [egg-security] use nosniff middleware
+2026-02-17 22:02:09,012 INFO 90007 [egg-security] use xssProtection middleware
+2026-02-17 22:02:09,012 INFO 90007 [egg-security] use xframe middleware
+2026-02-17 22:02:09,013 INFO 90007 [egg-security] use dta middleware
+2026-02-17 22:02:09,013 INFO 90007 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:02:09,029 INFO 90007 [egg:core] dump config after load, 4ms
+2026-02-17 22:02:09,037 INFO 90007 [egg-redis] client connect success
+2026-02-17 22:02:09,043 INFO 90007 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:02:09,044 INFO 90007 [egg-watcher:application] watcher start success
+2026-02-17 22:02:09,212 INFO 90007 [egg:core] dump config after ready, 3ms
+2026-02-17 22:02:09,587 INFO 90041 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:02:09,595 INFO 90041 [egg-multipart] stream mode enable
+2026-02-17 22:02:09,712 INFO 90041 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:02:09,778 INFO 90041 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:02:09,778 INFO 90041 [egg-security] use methodnoallow middleware
+2026-02-17 22:02:09,779 INFO 90041 [egg-security] use noopen middleware
+2026-02-17 22:02:09,779 INFO 90041 [egg-security] use nosniff middleware
+2026-02-17 22:02:09,779 INFO 90041 [egg-security] use xssProtection middleware
+2026-02-17 22:02:09,779 INFO 90041 [egg-security] use xframe middleware
+2026-02-17 22:02:09,779 INFO 90041 [egg-security] use dta middleware
+2026-02-17 22:02:09,779 INFO 90041 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:02:09,797 INFO 90041 [egg:core] dump config after load, 5ms
+2026-02-17 22:02:09,803 INFO 90041 [egg-redis] client connect success
+2026-02-17 22:02:09,808 INFO 90041 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:02:09,809 INFO 90041 [egg-watcher:application] watcher start success
+2026-02-17 22:02:09,959 INFO 90041 [egg:core] dump config after ready, 3ms
+2026-02-17 22:02:17,654 INFO 90139 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:02:17,663 INFO 90139 [egg-multipart] stream mode enable
+2026-02-17 22:02:17,786 INFO 90139 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:02:17,854 INFO 90139 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:02:17,855 INFO 90139 [egg-security] use methodnoallow middleware
+2026-02-17 22:02:17,855 INFO 90139 [egg-security] use noopen middleware
+2026-02-17 22:02:17,855 INFO 90139 [egg-security] use nosniff middleware
+2026-02-17 22:02:17,856 INFO 90139 [egg-security] use xssProtection middleware
+2026-02-17 22:02:17,856 INFO 90139 [egg-security] use xframe middleware
+2026-02-17 22:02:17,856 INFO 90139 [egg-security] use dta middleware
+2026-02-17 22:02:17,856 INFO 90139 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:02:17,872 INFO 90139 [egg:core] dump config after load, 4ms
+2026-02-17 22:02:17,879 INFO 90139 [egg-redis] client connect success
+2026-02-17 22:02:17,885 INFO 90139 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:02:17,886 INFO 90139 [egg-watcher:application] watcher start success
+2026-02-17 22:02:18,059 INFO 90139 [egg:core] dump config after ready, 5ms
+2026-02-17 22:03:06,720 INFO 90566 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:03:06,730 INFO 90566 [egg-multipart] stream mode enable
+2026-02-17 22:03:06,927 INFO 90566 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:03:07,047 INFO 90566 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:03:07,048 INFO 90566 [egg-security] use methodnoallow middleware
+2026-02-17 22:03:07,049 INFO 90566 [egg-security] use noopen middleware
+2026-02-17 22:03:07,049 INFO 90566 [egg-security] use nosniff middleware
+2026-02-17 22:03:07,049 INFO 90566 [egg-security] use xssProtection middleware
+2026-02-17 22:03:07,049 INFO 90566 [egg-security] use xframe middleware
+2026-02-17 22:03:07,049 INFO 90566 [egg-security] use dta middleware
+2026-02-17 22:03:07,049 INFO 90566 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:03:07,073 INFO 90566 [egg:core] dump config after load, 3ms
+2026-02-17 22:03:07,078 INFO 90566 [egg-redis] client connect success
+2026-02-17 22:03:07,086 INFO 90566 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:03:07,087 INFO 90566 [egg-watcher:application] watcher start success
+2026-02-17 22:03:07,238 INFO 90566 [egg:core] dump config after ready, 3ms
+2026-02-17 22:03:11,142 INFO 90634 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:03:11,151 INFO 90634 [egg-multipart] stream mode enable
+2026-02-17 22:03:11,265 INFO 90634 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:03:11,326 INFO 90634 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:03:11,327 INFO 90634 [egg-security] use methodnoallow middleware
+2026-02-17 22:03:11,327 INFO 90634 [egg-security] use noopen middleware
+2026-02-17 22:03:11,327 INFO 90634 [egg-security] use nosniff middleware
+2026-02-17 22:03:11,328 INFO 90634 [egg-security] use xssProtection middleware
+2026-02-17 22:03:11,328 INFO 90634 [egg-security] use xframe middleware
+2026-02-17 22:03:11,328 INFO 90634 [egg-security] use dta middleware
+2026-02-17 22:03:11,328 INFO 90634 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:03:11,343 INFO 90634 [egg:core] dump config after load, 3ms
+2026-02-17 22:03:11,351 INFO 90634 [egg-redis] client connect success
+2026-02-17 22:03:11,356 INFO 90634 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:03:11,356 INFO 90634 [egg-watcher:application] watcher start success
+2026-02-17 22:03:11,504 INFO 90634 [egg:core] dump config after ready, 3ms
+2026-02-17 22:15:46,557 INFO 2434 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:15:46,567 INFO 2434 [egg-multipart] stream mode enable
+2026-02-17 22:15:46,812 INFO 2434 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:15:46,965 INFO 2434 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:15:46,966 INFO 2434 [egg-security] use methodnoallow middleware
+2026-02-17 22:15:46,966 INFO 2434 [egg-security] use noopen middleware
+2026-02-17 22:15:46,967 INFO 2434 [egg-security] use nosniff middleware
+2026-02-17 22:15:46,967 INFO 2434 [egg-security] use xssProtection middleware
+2026-02-17 22:15:46,967 INFO 2434 [egg-security] use xframe middleware
+2026-02-17 22:15:46,967 INFO 2434 [egg-security] use dta middleware
+2026-02-17 22:15:46,967 INFO 2434 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:15:46,995 INFO 2434 [egg:core] dump config after load, 5ms
+2026-02-17 22:15:47,001 INFO 2434 [egg-redis] client connect success
+2026-02-17 22:15:47,009 INFO 2434 [egg-watcher:application] watcher start success
+2026-02-17 22:15:47,010 INFO 2434 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:15:47,209 INFO 2434 [egg:core] dump config after ready, 4ms
+2026-02-17 22:16:43,932 INFO 3305 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:16:43,943 INFO 3305 [egg-multipart] stream mode enable
+2026-02-17 22:16:44,197 INFO 3305 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:16:44,353 INFO 3305 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:16:44,354 INFO 3305 [egg-security] use methodnoallow middleware
+2026-02-17 22:16:44,354 INFO 3305 [egg-security] use noopen middleware
+2026-02-17 22:16:44,355 INFO 3305 [egg-security] use nosniff middleware
+2026-02-17 22:16:44,355 INFO 3305 [egg-security] use xssProtection middleware
+2026-02-17 22:16:44,355 INFO 3305 [egg-security] use xframe middleware
+2026-02-17 22:16:44,355 INFO 3305 [egg-security] use dta middleware
+2026-02-17 22:16:44,355 INFO 3305 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:16:44,382 INFO 3305 [egg:core] dump config after load, 6ms
+2026-02-17 22:16:44,387 INFO 3305 [egg-redis] client connect success
+2026-02-17 22:16:44,396 INFO 3305 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:16:44,396 INFO 3305 [egg-watcher:application] watcher start success
+2026-02-17 22:16:44,589 INFO 3305 [egg:core] dump config after ready, 3ms
+2026-02-17 22:16:50,130 INFO 3379 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:16:50,138 INFO 3379 [egg-multipart] stream mode enable
+2026-02-17 22:16:50,258 INFO 3379 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:16:50,321 INFO 3379 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:16:50,322 INFO 3379 [egg-security] use methodnoallow middleware
+2026-02-17 22:16:50,322 INFO 3379 [egg-security] use noopen middleware
+2026-02-17 22:16:50,322 INFO 3379 [egg-security] use nosniff middleware
+2026-02-17 22:16:50,322 INFO 3379 [egg-security] use xssProtection middleware
+2026-02-17 22:16:50,323 INFO 3379 [egg-security] use xframe middleware
+2026-02-17 22:16:50,323 INFO 3379 [egg-security] use dta middleware
+2026-02-17 22:16:50,323 INFO 3379 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:16:50,340 INFO 3379 [egg:core] dump config after load, 5ms
+2026-02-17 22:16:50,348 INFO 3379 [egg-redis] client connect success
+2026-02-17 22:16:50,350 INFO 3379 [egg-watcher:application] watcher start success
+2026-02-17 22:16:50,351 INFO 3379 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:16:50,513 INFO 3379 [egg:core] dump config after ready, 5ms
+2026-02-17 22:17:33,422 INFO 3744 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:17:33,432 INFO 3744 [egg-multipart] stream mode enable
+2026-02-17 22:17:33,642 INFO 3744 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:17:33,772 INFO 3744 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:17:33,773 INFO 3744 [egg-security] use methodnoallow middleware
+2026-02-17 22:17:33,774 INFO 3744 [egg-security] use noopen middleware
+2026-02-17 22:17:33,774 INFO 3744 [egg-security] use nosniff middleware
+2026-02-17 22:17:33,774 INFO 3744 [egg-security] use xssProtection middleware
+2026-02-17 22:17:33,774 INFO 3744 [egg-security] use xframe middleware
+2026-02-17 22:17:33,775 INFO 3744 [egg-security] use dta middleware
+2026-02-17 22:17:33,775 INFO 3744 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:17:33,800 INFO 3744 [egg:core] dump config after load, 3ms
+2026-02-17 22:17:33,806 INFO 3744 [egg-redis] client connect success
+2026-02-17 22:17:33,814 INFO 3744 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:17:33,815 INFO 3744 [egg-watcher:application] watcher start success
+2026-02-17 22:17:33,978 INFO 3744 [egg:core] dump config after ready, 4ms
+2026-02-17 22:18:03,063 INFO 4041 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:18:03,071 INFO 4041 [egg-multipart] stream mode enable
+2026-02-17 22:18:03,252 INFO 4041 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:18:03,372 INFO 4041 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:18:03,373 INFO 4041 [egg-security] use methodnoallow middleware
+2026-02-17 22:18:03,373 INFO 4041 [egg-security] use noopen middleware
+2026-02-17 22:18:03,374 INFO 4041 [egg-security] use nosniff middleware
+2026-02-17 22:18:03,374 INFO 4041 [egg-security] use xssProtection middleware
+2026-02-17 22:18:03,374 INFO 4041 [egg-security] use xframe middleware
+2026-02-17 22:18:03,374 INFO 4041 [egg-security] use dta middleware
+2026-02-17 22:18:03,374 INFO 4041 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:18:03,398 INFO 4041 [egg:core] dump config after load, 3ms
+2026-02-17 22:18:03,404 INFO 4041 [egg-redis] client connect success
+2026-02-17 22:18:03,412 INFO 4041 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:18:03,413 INFO 4041 [egg-watcher:application] watcher start success
+2026-02-17 22:18:03,591 INFO 4041 [egg:core] dump config after ready, 4ms
+2026-02-17 22:18:13,621 INFO 4175 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:18:13,629 INFO 4175 [egg-multipart] stream mode enable
+2026-02-17 22:18:13,748 INFO 4175 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:18:13,811 INFO 4175 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:18:13,812 INFO 4175 [egg-security] use methodnoallow middleware
+2026-02-17 22:18:13,812 INFO 4175 [egg-security] use noopen middleware
+2026-02-17 22:18:13,813 INFO 4175 [egg-security] use nosniff middleware
+2026-02-17 22:18:13,813 INFO 4175 [egg-security] use xssProtection middleware
+2026-02-17 22:18:13,813 INFO 4175 [egg-security] use xframe middleware
+2026-02-17 22:18:13,813 INFO 4175 [egg-security] use dta middleware
+2026-02-17 22:18:13,813 INFO 4175 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:18:13,829 INFO 4175 [egg:core] dump config after load, 3ms
+2026-02-17 22:18:13,837 INFO 4175 [egg-redis] client connect success
+2026-02-17 22:18:13,842 INFO 4175 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:18:13,843 INFO 4175 [egg-watcher:application] watcher start success
+2026-02-17 22:18:13,985 INFO 4175 [egg:core] dump config after ready, 3ms
+2026-02-17 22:18:19,950 INFO 4271 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:18:19,958 INFO 4271 [egg-multipart] stream mode enable
+2026-02-17 22:18:20,083 INFO 4271 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:18:20,149 INFO 4271 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:18:20,149 INFO 4271 [egg-security] use methodnoallow middleware
+2026-02-17 22:18:20,150 INFO 4271 [egg-security] use noopen middleware
+2026-02-17 22:18:20,150 INFO 4271 [egg-security] use nosniff middleware
+2026-02-17 22:18:20,150 INFO 4271 [egg-security] use xssProtection middleware
+2026-02-17 22:18:20,150 INFO 4271 [egg-security] use xframe middleware
+2026-02-17 22:18:20,150 INFO 4271 [egg-security] use dta middleware
+2026-02-17 22:18:20,150 INFO 4271 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:18:20,168 INFO 4271 [egg:core] dump config after load, 3ms
+2026-02-17 22:18:20,174 INFO 4271 [egg-redis] client connect success
+2026-02-17 22:18:20,176 INFO 4271 [egg-watcher:application] watcher start success
+2026-02-17 22:18:20,182 INFO 4271 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:18:20,344 INFO 4271 [egg:core] dump config after ready, 4ms
+2026-02-17 22:18:50,269 INFO 4593 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:18:50,277 INFO 4593 [egg-multipart] stream mode enable
+2026-02-17 22:18:50,402 INFO 4593 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:18:50,471 INFO 4593 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:18:50,472 INFO 4593 [egg-security] use methodnoallow middleware
+2026-02-17 22:18:50,472 INFO 4593 [egg-security] use noopen middleware
+2026-02-17 22:18:50,472 INFO 4593 [egg-security] use nosniff middleware
+2026-02-17 22:18:50,472 INFO 4593 [egg-security] use xssProtection middleware
+2026-02-17 22:18:50,472 INFO 4593 [egg-security] use xframe middleware
+2026-02-17 22:18:50,472 INFO 4593 [egg-security] use dta middleware
+2026-02-17 22:18:50,472 INFO 4593 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:18:50,492 INFO 4593 [egg:core] dump config after load, 5ms
+2026-02-17 22:18:50,498 INFO 4593 [egg-redis] client connect success
+2026-02-17 22:18:50,500 INFO 4593 [egg-watcher:application] watcher start success
+2026-02-17 22:18:50,502 INFO 4593 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:18:50,662 INFO 4593 [egg:core] dump config after ready, 3ms
+2026-02-17 22:19:40,718 INFO 5055 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:19:40,728 INFO 5055 [egg-multipart] stream mode enable
+2026-02-17 22:19:40,922 INFO 5055 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:19:41,046 INFO 5055 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:19:41,047 INFO 5055 [egg-security] use methodnoallow middleware
+2026-02-17 22:19:41,047 INFO 5055 [egg-security] use noopen middleware
+2026-02-17 22:19:41,047 INFO 5055 [egg-security] use nosniff middleware
+2026-02-17 22:19:41,047 INFO 5055 [egg-security] use xssProtection middleware
+2026-02-17 22:19:41,048 INFO 5055 [egg-security] use xframe middleware
+2026-02-17 22:19:41,048 INFO 5055 [egg-security] use dta middleware
+2026-02-17 22:19:41,048 INFO 5055 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:19:41,071 INFO 5055 [egg:core] dump config after load, 3ms
+2026-02-17 22:19:41,079 INFO 5055 [egg-redis] client connect success
+2026-02-17 22:19:41,087 INFO 5055 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:19:41,087 INFO 5055 [egg-watcher:application] watcher start success
+2026-02-17 22:19:41,242 INFO 5055 [egg:core] dump config after ready, 4ms
+2026-02-17 22:19:50,442 INFO 5290 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 22:19:50,453 INFO 5290 [egg-multipart] stream mode enable
+2026-02-17 22:19:50,655 INFO 5290 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 22:19:50,789 INFO 5290 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 22:19:50,790 INFO 5290 [egg-security] use methodnoallow middleware
+2026-02-17 22:19:50,791 INFO 5290 [egg-security] use noopen middleware
+2026-02-17 22:19:50,791 INFO 5290 [egg-security] use nosniff middleware
+2026-02-17 22:19:50,791 INFO 5290 [egg-security] use xssProtection middleware
+2026-02-17 22:19:50,792 INFO 5290 [egg-security] use xframe middleware
+2026-02-17 22:19:50,792 INFO 5290 [egg-security] use dta middleware
+2026-02-17 22:19:50,792 INFO 5290 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 22:19:50,816 INFO 5290 [egg:core] dump config after load, 3ms
+2026-02-17 22:19:50,822 INFO 5290 [egg-redis] client connect success
+2026-02-17 22:19:50,831 INFO 5290 [egg-redis] instance[0] status OK, client ready
+2026-02-17 22:19:50,832 INFO 5290 [egg-watcher:application] watcher start success
+2026-02-17 22:19:51,043 INFO 5290 [egg:core] dump config after ready, 3ms
+2026-02-17 23:04:08,385 INFO 44534 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 23:04:08,404 INFO 44534 [egg-multipart] stream mode enable
+2026-02-17 23:04:08,690 INFO 44534 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 23:04:08,868 INFO 44534 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 23:04:08,870 INFO 44534 [egg-security] use methodnoallow middleware
+2026-02-17 23:04:08,870 INFO 44534 [egg-security] use noopen middleware
+2026-02-17 23:04:08,871 INFO 44534 [egg-security] use nosniff middleware
+2026-02-17 23:04:08,871 INFO 44534 [egg-security] use xssProtection middleware
+2026-02-17 23:04:08,872 INFO 44534 [egg-security] use xframe middleware
+2026-02-17 23:04:08,872 INFO 44534 [egg-security] use dta middleware
+2026-02-17 23:04:08,872 INFO 44534 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 23:04:08,905 INFO 44534 [egg:core] dump config after load, 6ms
+2026-02-17 23:04:08,911 INFO 44534 [egg-redis] client connect success
+2026-02-17 23:04:08,920 INFO 44534 [egg-redis] instance[0] status OK, client ready
+2026-02-17 23:04:08,920 INFO 44534 [egg-watcher:application] watcher start success
+2026-02-17 23:04:09,092 INFO 44534 [egg:core] dump config after ready, 5ms
+2026-02-17 23:10:00,635 INFO 50315 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-17 23:10:00,644 INFO 50315 [egg-multipart] stream mode enable
+2026-02-17 23:10:00,867 INFO 50315 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-17 23:10:01,016 INFO 50315 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-17 23:10:01,017 INFO 50315 [egg-security] use methodnoallow middleware
+2026-02-17 23:10:01,017 INFO 50315 [egg-security] use noopen middleware
+2026-02-17 23:10:01,018 INFO 50315 [egg-security] use nosniff middleware
+2026-02-17 23:10:01,018 INFO 50315 [egg-security] use xssProtection middleware
+2026-02-17 23:10:01,018 INFO 50315 [egg-security] use xframe middleware
+2026-02-17 23:10:01,018 INFO 50315 [egg-security] use dta middleware
+2026-02-17 23:10:01,018 INFO 50315 [egg-security] compose 6 middlewares into one security middleware
+2026-02-17 23:10:01,045 INFO 50315 [egg:core] dump config after load, 4ms
+2026-02-17 23:10:01,053 INFO 50315 [egg-redis] client connect success
+2026-02-17 23:10:01,061 INFO 50315 [egg-redis] instance[0] status OK, client ready
+2026-02-17 23:10:01,061 INFO 50315 [egg-watcher:application] watcher start success
+2026-02-17 23:10:01,246 INFO 50315 [egg:core] dump config after ready, 3ms
+2026-02-18 21:17:08,844 INFO 6616 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 21:17:08,852 INFO 6616 [egg-multipart] stream mode enable
+2026-02-18 21:17:08,988 INFO 6616 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 21:17:09,152 INFO 6616 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 21:17:09,153 INFO 6616 [egg-security] use methodnoallow middleware
+2026-02-18 21:17:09,153 INFO 6616 [egg-security] use noopen middleware
+2026-02-18 21:17:09,154 INFO 6616 [egg-security] use nosniff middleware
+2026-02-18 21:17:09,154 INFO 6616 [egg-security] use xssProtection middleware
+2026-02-18 21:17:09,154 INFO 6616 [egg-security] use xframe middleware
+2026-02-18 21:17:09,154 INFO 6616 [egg-security] use dta middleware
+2026-02-18 21:17:09,154 INFO 6616 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 21:17:09,179 INFO 6616 [egg:core] dump config after load, 4ms
+2026-02-18 21:17:09,187 INFO 6616 [egg-redis] client connect success
+2026-02-18 21:17:09,192 INFO 6616 [egg-redis] instance[0] status OK, client ready
+2026-02-18 21:17:09,193 INFO 6616 [egg-watcher:application] watcher start success
+2026-02-18 21:17:09,439 INFO 6616 [egg:core] dump config after ready, 3ms
+2026-02-18 21:41:20,249 INFO 19904 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 21:41:20,258 INFO 19904 [egg-multipart] stream mode enable
+2026-02-18 21:41:20,497 INFO 19904 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 21:41:20,648 INFO 19904 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 21:41:20,649 INFO 19904 [egg-security] use methodnoallow middleware
+2026-02-18 21:41:20,650 INFO 19904 [egg-security] use noopen middleware
+2026-02-18 21:41:20,650 INFO 19904 [egg-security] use nosniff middleware
+2026-02-18 21:41:20,650 INFO 19904 [egg-security] use xssProtection middleware
+2026-02-18 21:41:20,650 INFO 19904 [egg-security] use xframe middleware
+2026-02-18 21:41:20,651 INFO 19904 [egg-security] use dta middleware
+2026-02-18 21:41:20,651 INFO 19904 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 21:41:20,681 INFO 19904 [egg:core] dump config after load, 5ms
+2026-02-18 21:41:20,686 INFO 19904 [egg-redis] client connect success
+2026-02-18 21:41:20,688 INFO 19904 [egg-watcher:application] watcher start success
+2026-02-18 21:41:20,697 INFO 19904 [egg-redis] instance[0] status OK, client ready
+2026-02-18 21:41:20,879 INFO 19904 [egg:core] dump config after ready, 4ms
+2026-02-18 21:41:34,533 INFO 20038 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 21:41:34,543 INFO 20038 [egg-multipart] stream mode enable
+2026-02-18 21:41:34,741 INFO 20038 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 21:41:34,870 INFO 20038 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 21:41:34,872 INFO 20038 [egg-security] use methodnoallow middleware
+2026-02-18 21:41:34,872 INFO 20038 [egg-security] use noopen middleware
+2026-02-18 21:41:34,872 INFO 20038 [egg-security] use nosniff middleware
+2026-02-18 21:41:34,872 INFO 20038 [egg-security] use xssProtection middleware
+2026-02-18 21:41:34,873 INFO 20038 [egg-security] use xframe middleware
+2026-02-18 21:41:34,873 INFO 20038 [egg-security] use dta middleware
+2026-02-18 21:41:34,873 INFO 20038 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 21:41:34,897 INFO 20038 [egg:core] dump config after load, 3ms
+2026-02-18 21:41:34,905 INFO 20038 [egg-redis] client connect success
+2026-02-18 21:41:34,913 INFO 20038 [egg-redis] instance[0] status OK, client ready
+2026-02-18 21:41:34,914 INFO 20038 [egg-watcher:application] watcher start success
+2026-02-18 21:41:35,078 INFO 20038 [egg:core] dump config after ready, 4ms
+2026-02-18 21:42:14,084 INFO 20352 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 21:42:14,092 INFO 20352 [egg-multipart] stream mode enable
+2026-02-18 21:42:14,213 INFO 20352 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 21:42:14,281 INFO 20352 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 21:42:14,282 INFO 20352 [egg-security] use methodnoallow middleware
+2026-02-18 21:42:14,282 INFO 20352 [egg-security] use noopen middleware
+2026-02-18 21:42:14,282 INFO 20352 [egg-security] use nosniff middleware
+2026-02-18 21:42:14,283 INFO 20352 [egg-security] use xssProtection middleware
+2026-02-18 21:42:14,283 INFO 20352 [egg-security] use xframe middleware
+2026-02-18 21:42:14,283 INFO 20352 [egg-security] use dta middleware
+2026-02-18 21:42:14,283 INFO 20352 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 21:42:14,301 INFO 20352 [egg:core] dump config after load, 3ms
+2026-02-18 21:42:14,308 INFO 20352 [egg-redis] client connect success
+2026-02-18 21:42:14,309 INFO 20352 [egg-watcher:application] watcher start success
+2026-02-18 21:42:14,316 INFO 20352 [egg-redis] instance[0] status OK, client ready
+2026-02-18 21:42:14,471 INFO 20352 [egg:core] dump config after ready, 3ms
+2026-02-18 21:42:23,331 INFO 20436 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 21:42:23,339 INFO 20436 [egg-multipart] stream mode enable
+2026-02-18 21:42:23,461 INFO 20436 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 21:42:23,528 INFO 20436 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 21:42:23,529 INFO 20436 [egg-security] use methodnoallow middleware
+2026-02-18 21:42:23,529 INFO 20436 [egg-security] use noopen middleware
+2026-02-18 21:42:23,529 INFO 20436 [egg-security] use nosniff middleware
+2026-02-18 21:42:23,529 INFO 20436 [egg-security] use xssProtection middleware
+2026-02-18 21:42:23,529 INFO 20436 [egg-security] use xframe middleware
+2026-02-18 21:42:23,530 INFO 20436 [egg-security] use dta middleware
+2026-02-18 21:42:23,530 INFO 20436 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 21:42:23,546 INFO 20436 [egg:core] dump config after load, 3ms
+2026-02-18 21:42:23,554 INFO 20436 [egg-redis] client connect success
+2026-02-18 21:42:23,560 INFO 20436 [egg-redis] instance[0] status OK, client ready
+2026-02-18 21:42:23,560 INFO 20436 [egg-watcher:application] watcher start success
+2026-02-18 21:42:23,721 INFO 20436 [egg:core] dump config after ready, 3ms
+2026-02-18 21:50:11,509 INFO 25114 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 21:50:11,520 INFO 25114 [egg-multipart] stream mode enable
+2026-02-18 21:50:11,826 INFO 25114 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 21:50:11,996 INFO 25114 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 21:50:11,997 INFO 25114 [egg-security] use methodnoallow middleware
+2026-02-18 21:50:11,998 INFO 25114 [egg-security] use noopen middleware
+2026-02-18 21:50:11,998 INFO 25114 [egg-security] use nosniff middleware
+2026-02-18 21:50:11,998 INFO 25114 [egg-security] use xssProtection middleware
+2026-02-18 21:50:11,999 INFO 25114 [egg-security] use xframe middleware
+2026-02-18 21:50:11,999 INFO 25114 [egg-security] use dta middleware
+2026-02-18 21:50:11,999 INFO 25114 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 21:50:12,024 INFO 25114 [egg:core] dump config after load, 4ms
+2026-02-18 21:50:12,032 INFO 25114 [egg-redis] client connect success
+2026-02-18 21:50:12,041 INFO 25114 [egg-redis] instance[0] status OK, client ready
+2026-02-18 21:50:12,041 INFO 25114 [egg-watcher:application] watcher start success
+2026-02-18 21:50:12,184 INFO 25114 [egg:core] dump config after ready, 2ms
+2026-02-18 21:50:30,548 INFO 25434 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 21:50:30,557 INFO 25434 [egg-multipart] stream mode enable
+2026-02-18 21:50:30,753 INFO 25434 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 21:50:30,885 INFO 25434 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 21:50:30,886 INFO 25434 [egg-security] use methodnoallow middleware
+2026-02-18 21:50:30,886 INFO 25434 [egg-security] use noopen middleware
+2026-02-18 21:50:30,887 INFO 25434 [egg-security] use nosniff middleware
+2026-02-18 21:50:30,887 INFO 25434 [egg-security] use xssProtection middleware
+2026-02-18 21:50:30,887 INFO 25434 [egg-security] use xframe middleware
+2026-02-18 21:50:30,887 INFO 25434 [egg-security] use dta middleware
+2026-02-18 21:50:30,887 INFO 25434 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 21:50:30,916 INFO 25434 [egg:core] dump config after load, 5ms
+2026-02-18 21:50:30,922 INFO 25434 [egg-redis] client connect success
+2026-02-18 21:50:30,930 INFO 25434 [egg-redis] instance[0] status OK, client ready
+2026-02-18 21:50:30,931 INFO 25434 [egg-watcher:application] watcher start success
+2026-02-18 21:50:31,102 INFO 25434 [egg:core] dump config after ready, 2ms
+2026-02-18 21:50:45,782 INFO 25703 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 21:50:45,793 INFO 25703 [egg-multipart] stream mode enable
+2026-02-18 21:50:46,080 INFO 25703 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 21:50:46,223 INFO 25703 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 21:50:46,224 INFO 25703 [egg-security] use methodnoallow middleware
+2026-02-18 21:50:46,224 INFO 25703 [egg-security] use noopen middleware
+2026-02-18 21:50:46,225 INFO 25703 [egg-security] use nosniff middleware
+2026-02-18 21:50:46,225 INFO 25703 [egg-security] use xssProtection middleware
+2026-02-18 21:50:46,225 INFO 25703 [egg-security] use xframe middleware
+2026-02-18 21:50:46,225 INFO 25703 [egg-security] use dta middleware
+2026-02-18 21:50:46,225 INFO 25703 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 21:50:46,255 INFO 25703 [egg:core] dump config after load, 3ms
+2026-02-18 21:50:46,263 INFO 25703 [egg-redis] client connect success
+2026-02-18 21:50:46,274 INFO 25703 [egg-redis] instance[0] status OK, client ready
+2026-02-18 21:50:46,275 INFO 25703 [egg-watcher:application] watcher start success
+2026-02-18 21:50:46,443 INFO 25703 [egg:core] dump config after ready, 3ms
+2026-02-18 21:50:54,132 INFO 26070 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 21:50:54,141 INFO 26070 [egg-multipart] stream mode enable
+2026-02-18 21:50:54,323 INFO 26070 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 21:50:54,434 INFO 26070 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 21:50:54,435 INFO 26070 [egg-security] use methodnoallow middleware
+2026-02-18 21:50:54,435 INFO 26070 [egg-security] use noopen middleware
+2026-02-18 21:50:54,435 INFO 26070 [egg-security] use nosniff middleware
+2026-02-18 21:50:54,435 INFO 26070 [egg-security] use xssProtection middleware
+2026-02-18 21:50:54,436 INFO 26070 [egg-security] use xframe middleware
+2026-02-18 21:50:54,436 INFO 26070 [egg-security] use dta middleware
+2026-02-18 21:50:54,436 INFO 26070 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 21:50:54,452 INFO 26070 [egg:core] dump config after load, 3ms
+2026-02-18 21:50:54,460 INFO 26070 [egg-redis] client connect success
+2026-02-18 21:50:54,467 INFO 26070 [egg-redis] instance[0] status OK, client ready
+2026-02-18 21:50:54,468 INFO 26070 [egg-watcher:application] watcher start success
+2026-02-18 21:50:54,616 INFO 26070 [egg:core] dump config after ready, 3ms
+2026-02-18 21:53:16,070 INFO 27827 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 21:53:16,082 INFO 27827 [egg-multipart] stream mode enable
+2026-02-18 21:53:16,353 INFO 27827 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 21:53:16,508 INFO 27827 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 21:53:16,509 INFO 27827 [egg-security] use methodnoallow middleware
+2026-02-18 21:53:16,510 INFO 27827 [egg-security] use noopen middleware
+2026-02-18 21:53:16,510 INFO 27827 [egg-security] use nosniff middleware
+2026-02-18 21:53:16,510 INFO 27827 [egg-security] use xssProtection middleware
+2026-02-18 21:53:16,510 INFO 27827 [egg-security] use xframe middleware
+2026-02-18 21:53:16,511 INFO 27827 [egg-security] use dta middleware
+2026-02-18 21:53:16,511 INFO 27827 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 21:53:16,543 INFO 27827 [egg:core] dump config after load, 4ms
+2026-02-18 21:53:16,549 INFO 27827 [egg-redis] client connect success
+2026-02-18 21:53:16,557 INFO 27827 [egg-redis] instance[0] status OK, client ready
+2026-02-18 21:53:16,558 INFO 27827 [egg-watcher:application] watcher start success
+2026-02-18 21:53:16,863 INFO 27827 [egg:core] dump config after ready, 5ms
+2026-02-18 22:06:34,730 INFO 38775 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 22:06:34,742 INFO 38775 [egg-multipart] stream mode enable
+2026-02-18 22:06:35,032 INFO 38775 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 22:06:35,208 INFO 38775 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 22:06:35,209 INFO 38775 [egg-security] use methodnoallow middleware
+2026-02-18 22:06:35,209 INFO 38775 [egg-security] use noopen middleware
+2026-02-18 22:06:35,210 INFO 38775 [egg-security] use nosniff middleware
+2026-02-18 22:06:35,210 INFO 38775 [egg-security] use xssProtection middleware
+2026-02-18 22:06:35,210 INFO 38775 [egg-security] use xframe middleware
+2026-02-18 22:06:35,210 INFO 38775 [egg-security] use dta middleware
+2026-02-18 22:06:35,210 INFO 38775 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 22:06:35,240 INFO 38775 [egg:core] dump config after load, 4ms
+2026-02-18 22:06:35,249 INFO 38775 [egg-redis] client connect success
+2026-02-18 22:06:35,251 INFO 38775 [egg-watcher:application] watcher start success
+2026-02-18 22:06:35,254 INFO 38775 [egg-redis] instance[0] status OK, client ready
+2026-02-18 22:06:35,455 INFO 38775 [egg:core] dump config after ready, 3ms
+2026-02-18 22:06:48,644 INFO 38948 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 22:06:48,655 INFO 38948 [egg-multipart] stream mode enable
+2026-02-18 22:06:48,886 INFO 38948 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 22:06:49,059 INFO 38948 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 22:06:49,060 INFO 38948 [egg-security] use methodnoallow middleware
+2026-02-18 22:06:49,061 INFO 38948 [egg-security] use noopen middleware
+2026-02-18 22:06:49,061 INFO 38948 [egg-security] use nosniff middleware
+2026-02-18 22:06:49,062 INFO 38948 [egg-security] use xssProtection middleware
+2026-02-18 22:06:49,063 INFO 38948 [egg-security] use xframe middleware
+2026-02-18 22:06:49,066 INFO 38948 [egg-security] use dta middleware
+2026-02-18 22:06:49,066 INFO 38948 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 22:06:49,112 INFO 38948 [egg:core] dump config after load, 5ms
+2026-02-18 22:06:49,120 INFO 38948 [egg-redis] client connect success
+2026-02-18 22:06:49,129 INFO 38948 [egg-redis] instance[0] status OK, client ready
+2026-02-18 22:06:49,131 INFO 38948 [egg-watcher:application] watcher start success
+2026-02-18 22:06:49,359 INFO 38948 [egg:core] dump config after ready, 5ms
+2026-02-18 22:06:55,495 INFO 39082 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 22:06:55,505 INFO 39082 [egg-multipart] stream mode enable
+2026-02-18 22:06:55,727 INFO 39082 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 22:06:55,862 INFO 39082 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 22:06:55,863 INFO 39082 [egg-security] use methodnoallow middleware
+2026-02-18 22:06:55,863 INFO 39082 [egg-security] use noopen middleware
+2026-02-18 22:06:55,863 INFO 39082 [egg-security] use nosniff middleware
+2026-02-18 22:06:55,863 INFO 39082 [egg-security] use xssProtection middleware
+2026-02-18 22:06:55,863 INFO 39082 [egg-security] use xframe middleware
+2026-02-18 22:06:55,864 INFO 39082 [egg-security] use dta middleware
+2026-02-18 22:06:55,864 INFO 39082 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 22:06:55,885 INFO 39082 [egg:core] dump config after load, 3ms
+2026-02-18 22:06:55,891 INFO 39082 [egg-redis] client connect success
+2026-02-18 22:06:55,893 INFO 39082 [egg-watcher:application] watcher start success
+2026-02-18 22:06:55,897 INFO 39082 [egg-redis] instance[0] status OK, client ready
+2026-02-18 22:06:56,098 INFO 39082 [egg:core] dump config after ready, 4ms
+2026-02-18 22:13:42,542 INFO 41675 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 22:13:42,560 INFO 41675 [egg-multipart] stream mode enable
+2026-02-18 22:13:42,838 INFO 41675 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 22:13:42,998 INFO 41675 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 22:13:43,000 INFO 41675 [egg-security] use methodnoallow middleware
+2026-02-18 22:13:43,000 INFO 41675 [egg-security] use noopen middleware
+2026-02-18 22:13:43,001 INFO 41675 [egg-security] use nosniff middleware
+2026-02-18 22:13:43,004 INFO 41675 [egg-security] use xssProtection middleware
+2026-02-18 22:13:43,004 INFO 41675 [egg-security] use xframe middleware
+2026-02-18 22:13:43,005 INFO 41675 [egg-security] use dta middleware
+2026-02-18 22:13:43,005 INFO 41675 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 22:13:43,033 INFO 41675 [egg:core] dump config after load, 3ms
+2026-02-18 22:13:43,039 INFO 41675 [egg-redis] client connect success
+2026-02-18 22:13:43,042 INFO 41675 [egg-watcher:application] watcher start success
+2026-02-18 22:13:43,051 INFO 41675 [egg-redis] instance[0] status OK, client ready
+2026-02-18 22:13:43,248 INFO 41675 [egg:core] dump config after ready, 3ms
+2026-02-18 22:13:55,385 INFO 41801 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 22:13:55,395 INFO 41801 [egg-multipart] stream mode enable
+2026-02-18 22:13:55,612 INFO 41801 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 22:13:55,754 INFO 41801 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 22:13:55,755 INFO 41801 [egg-security] use methodnoallow middleware
+2026-02-18 22:13:55,756 INFO 41801 [egg-security] use noopen middleware
+2026-02-18 22:13:55,756 INFO 41801 [egg-security] use nosniff middleware
+2026-02-18 22:13:55,756 INFO 41801 [egg-security] use xssProtection middleware
+2026-02-18 22:13:55,757 INFO 41801 [egg-security] use xframe middleware
+2026-02-18 22:13:55,757 INFO 41801 [egg-security] use dta middleware
+2026-02-18 22:13:55,757 INFO 41801 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 22:13:55,785 INFO 41801 [egg:core] dump config after load, 3ms
+2026-02-18 22:13:55,793 INFO 41801 [egg-redis] client connect success
+2026-02-18 22:13:55,795 INFO 41801 [egg-watcher:application] watcher start success
+2026-02-18 22:13:55,803 INFO 41801 [egg-redis] instance[0] status OK, client ready
+2026-02-18 22:13:55,995 INFO 41801 [egg:core] dump config after ready, 4ms
+2026-02-18 22:14:30,130 INFO 42119 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 22:14:30,140 INFO 42119 [egg-multipart] stream mode enable
+2026-02-18 22:14:30,360 INFO 42119 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 22:14:30,513 INFO 42119 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 22:14:30,514 INFO 42119 [egg-security] use methodnoallow middleware
+2026-02-18 22:14:30,515 INFO 42119 [egg-security] use noopen middleware
+2026-02-18 22:14:30,515 INFO 42119 [egg-security] use nosniff middleware
+2026-02-18 22:14:30,515 INFO 42119 [egg-security] use xssProtection middleware
+2026-02-18 22:14:30,515 INFO 42119 [egg-security] use xframe middleware
+2026-02-18 22:14:30,516 INFO 42119 [egg-security] use dta middleware
+2026-02-18 22:14:30,516 INFO 42119 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 22:14:30,544 INFO 42119 [egg:core] dump config after load, 3ms
+2026-02-18 22:14:30,551 INFO 42119 [egg-redis] client connect success
+2026-02-18 22:14:30,560 INFO 42119 [egg-redis] instance[0] status OK, client ready
+2026-02-18 22:14:30,561 INFO 42119 [egg-watcher:application] watcher start success
+2026-02-18 22:14:30,759 INFO 42119 [egg:core] dump config after ready, 6ms
+2026-02-18 22:19:23,047 INFO 45115 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 22:19:23,058 INFO 45115 [egg-multipart] stream mode enable
+2026-02-18 22:19:23,317 INFO 45115 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 22:19:23,479 INFO 45115 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 22:19:23,480 INFO 45115 [egg-security] use methodnoallow middleware
+2026-02-18 22:19:23,481 INFO 45115 [egg-security] use noopen middleware
+2026-02-18 22:19:23,481 INFO 45115 [egg-security] use nosniff middleware
+2026-02-18 22:19:23,481 INFO 45115 [egg-security] use xssProtection middleware
+2026-02-18 22:19:23,482 INFO 45115 [egg-security] use xframe middleware
+2026-02-18 22:19:23,482 INFO 45115 [egg-security] use dta middleware
+2026-02-18 22:19:23,482 INFO 45115 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 22:19:23,510 INFO 45115 [egg:core] dump config after load, 6ms
+2026-02-18 22:19:23,516 INFO 45115 [egg-redis] client connect success
+2026-02-18 22:19:23,518 INFO 45115 [egg-watcher:application] watcher start success
+2026-02-18 22:19:23,519 INFO 45115 [egg-redis] instance[0] status OK, client ready
+2026-02-18 22:19:23,734 INFO 45115 [egg:core] dump config after ready, 4ms
+2026-02-18 22:46:36,092 INFO 65772 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 22:46:36,102 INFO 65772 [egg-multipart] stream mode enable
+2026-02-18 22:46:36,331 INFO 65772 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 22:46:36,468 INFO 65772 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 22:46:36,469 INFO 65772 [egg-security] use methodnoallow middleware
+2026-02-18 22:46:36,469 INFO 65772 [egg-security] use noopen middleware
+2026-02-18 22:46:36,469 INFO 65772 [egg-security] use nosniff middleware
+2026-02-18 22:46:36,470 INFO 65772 [egg-security] use xssProtection middleware
+2026-02-18 22:46:36,470 INFO 65772 [egg-security] use xframe middleware
+2026-02-18 22:46:36,470 INFO 65772 [egg-security] use dta middleware
+2026-02-18 22:46:36,470 INFO 65772 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 22:46:36,501 INFO 65772 [egg:core] dump config after load, 4ms
+2026-02-18 22:46:36,507 INFO 65772 [egg-redis] client connect success
+2026-02-18 22:46:36,515 INFO 65772 [egg-redis] instance[0] status OK, client ready
+2026-02-18 22:46:36,516 INFO 65772 [egg-watcher:application] watcher start success
+2026-02-18 22:46:36,711 INFO 65772 [egg:core] dump config after ready, 3ms
+2026-02-18 22:46:45,209 INFO 65853 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 22:46:45,218 INFO 65853 [egg-multipart] stream mode enable
+2026-02-18 22:46:45,413 INFO 65853 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 22:46:45,542 INFO 65853 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 22:46:45,543 INFO 65853 [egg-security] use methodnoallow middleware
+2026-02-18 22:46:45,544 INFO 65853 [egg-security] use noopen middleware
+2026-02-18 22:46:45,544 INFO 65853 [egg-security] use nosniff middleware
+2026-02-18 22:46:45,544 INFO 65853 [egg-security] use xssProtection middleware
+2026-02-18 22:46:45,545 INFO 65853 [egg-security] use xframe middleware
+2026-02-18 22:46:45,545 INFO 65853 [egg-security] use dta middleware
+2026-02-18 22:46:45,545 INFO 65853 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 22:46:45,572 INFO 65853 [egg:core] dump config after load, 3ms
+2026-02-18 22:46:45,577 INFO 65853 [egg-redis] client connect success
+2026-02-18 22:46:45,579 INFO 65853 [egg-redis] instance[0] status OK, client ready
+2026-02-18 22:46:45,586 INFO 65853 [egg-watcher:application] watcher start success
+2026-02-18 22:46:45,741 INFO 65853 [egg:core] dump config after ready, 3ms
+2026-02-18 22:46:50,114 INFO 65918 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 22:46:50,126 INFO 65918 [egg-multipart] stream mode enable
+2026-02-18 22:46:50,253 INFO 65918 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 22:46:50,319 INFO 65918 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 22:46:50,320 INFO 65918 [egg-security] use methodnoallow middleware
+2026-02-18 22:46:50,321 INFO 65918 [egg-security] use noopen middleware
+2026-02-18 22:46:50,321 INFO 65918 [egg-security] use nosniff middleware
+2026-02-18 22:46:50,321 INFO 65918 [egg-security] use xssProtection middleware
+2026-02-18 22:46:50,321 INFO 65918 [egg-security] use xframe middleware
+2026-02-18 22:46:50,321 INFO 65918 [egg-security] use dta middleware
+2026-02-18 22:46:50,321 INFO 65918 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 22:46:50,339 INFO 65918 [egg:core] dump config after load, 3ms
+2026-02-18 22:46:50,348 INFO 65918 [egg-redis] client connect success
+2026-02-18 22:46:50,355 INFO 65918 [egg-redis] instance[0] status OK, client ready
+2026-02-18 22:46:50,356 INFO 65918 [egg-watcher:application] watcher start success
+2026-02-18 22:46:50,575 INFO 65918 [egg:core] dump config after ready, 4ms
+2026-02-18 22:46:55,017 INFO 66091 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 22:46:55,025 INFO 66091 [egg-multipart] stream mode enable
+2026-02-18 22:46:55,156 INFO 66091 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 22:46:55,226 INFO 66091 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 22:46:55,227 INFO 66091 [egg-security] use methodnoallow middleware
+2026-02-18 22:46:55,227 INFO 66091 [egg-security] use noopen middleware
+2026-02-18 22:46:55,227 INFO 66091 [egg-security] use nosniff middleware
+2026-02-18 22:46:55,227 INFO 66091 [egg-security] use xssProtection middleware
+2026-02-18 22:46:55,227 INFO 66091 [egg-security] use xframe middleware
+2026-02-18 22:46:55,228 INFO 66091 [egg-security] use dta middleware
+2026-02-18 22:46:55,228 INFO 66091 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 22:46:55,250 INFO 66091 [egg:core] dump config after load, 4ms
+2026-02-18 22:46:55,255 INFO 66091 [egg-redis] client connect success
+2026-02-18 22:46:55,261 INFO 66091 [egg-redis] instance[0] status OK, client ready
+2026-02-18 22:46:55,262 INFO 66091 [egg-watcher:application] watcher start success
+2026-02-18 22:46:55,450 INFO 66091 [egg:core] dump config after ready, 3ms
+2026-02-18 22:52:03,212 INFO 69978 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 22:52:03,222 INFO 69978 [egg-multipart] stream mode enable
+2026-02-18 22:52:03,442 INFO 69978 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 22:52:03,576 INFO 69978 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 22:52:03,577 INFO 69978 [egg-security] use methodnoallow middleware
+2026-02-18 22:52:03,577 INFO 69978 [egg-security] use noopen middleware
+2026-02-18 22:52:03,577 INFO 69978 [egg-security] use nosniff middleware
+2026-02-18 22:52:03,577 INFO 69978 [egg-security] use xssProtection middleware
+2026-02-18 22:52:03,578 INFO 69978 [egg-security] use xframe middleware
+2026-02-18 22:52:03,578 INFO 69978 [egg-security] use dta middleware
+2026-02-18 22:52:03,578 INFO 69978 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 22:52:03,603 INFO 69978 [egg:core] dump config after load, 5ms
+2026-02-18 22:52:03,611 INFO 69978 [egg-redis] client connect success
+2026-02-18 22:52:03,619 INFO 69978 [egg-redis] instance[0] status OK, client ready
+2026-02-18 22:52:03,619 INFO 69978 [egg-watcher:application] watcher start success
+2026-02-18 22:52:03,789 INFO 69978 [egg:core] dump config after ready, 5ms
+2026-02-18 22:52:10,443 INFO 70106 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 22:52:10,452 INFO 70106 [egg-multipart] stream mode enable
+2026-02-18 22:52:10,622 INFO 70106 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 22:52:10,747 INFO 70106 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 22:52:10,748 INFO 70106 [egg-security] use methodnoallow middleware
+2026-02-18 22:52:10,748 INFO 70106 [egg-security] use noopen middleware
+2026-02-18 22:52:10,749 INFO 70106 [egg-security] use nosniff middleware
+2026-02-18 22:52:10,749 INFO 70106 [egg-security] use xssProtection middleware
+2026-02-18 22:52:10,749 INFO 70106 [egg-security] use xframe middleware
+2026-02-18 22:52:10,749 INFO 70106 [egg-security] use dta middleware
+2026-02-18 22:52:10,750 INFO 70106 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 22:52:10,775 INFO 70106 [egg:core] dump config after load, 4ms
+2026-02-18 22:52:10,781 INFO 70106 [egg-redis] client connect success
+2026-02-18 22:52:10,788 INFO 70106 [egg-redis] instance[0] status OK, client ready
+2026-02-18 22:52:10,789 INFO 70106 [egg-watcher:application] watcher start success
+2026-02-18 22:52:10,953 INFO 70106 [egg:core] dump config after ready, 5ms
+2026-02-18 22:52:29,672 INFO 70318 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 22:52:29,681 INFO 70318 [egg-multipart] stream mode enable
+2026-02-18 22:52:29,882 INFO 70318 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 22:52:30,009 INFO 70318 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 22:52:30,010 INFO 70318 [egg-security] use methodnoallow middleware
+2026-02-18 22:52:30,010 INFO 70318 [egg-security] use noopen middleware
+2026-02-18 22:52:30,010 INFO 70318 [egg-security] use nosniff middleware
+2026-02-18 22:52:30,011 INFO 70318 [egg-security] use xssProtection middleware
+2026-02-18 22:52:30,011 INFO 70318 [egg-security] use xframe middleware
+2026-02-18 22:52:30,011 INFO 70318 [egg-security] use dta middleware
+2026-02-18 22:52:30,011 INFO 70318 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 22:52:30,036 INFO 70318 [egg:core] dump config after load, 3ms
+2026-02-18 22:52:30,041 INFO 70318 [egg-redis] client connect success
+2026-02-18 22:52:30,043 INFO 70318 [egg-watcher:application] watcher start success
+2026-02-18 22:52:30,051 INFO 70318 [egg-redis] instance[0] status OK, client ready
+2026-02-18 22:52:30,234 INFO 70318 [egg:core] dump config after ready, 3ms
+2026-02-18 22:52:38,363 INFO 70421 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 22:52:38,373 INFO 70421 [egg-multipart] stream mode enable
+2026-02-18 22:52:38,567 INFO 70421 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 22:52:38,697 INFO 70421 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 22:52:38,698 INFO 70421 [egg-security] use methodnoallow middleware
+2026-02-18 22:52:38,698 INFO 70421 [egg-security] use noopen middleware
+2026-02-18 22:52:38,698 INFO 70421 [egg-security] use nosniff middleware
+2026-02-18 22:52:38,699 INFO 70421 [egg-security] use xssProtection middleware
+2026-02-18 22:52:38,699 INFO 70421 [egg-security] use xframe middleware
+2026-02-18 22:52:38,699 INFO 70421 [egg-security] use dta middleware
+2026-02-18 22:52:38,699 INFO 70421 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 22:52:38,723 INFO 70421 [egg:core] dump config after load, 3ms
+2026-02-18 22:52:38,729 INFO 70421 [egg-redis] client connect success
+2026-02-18 22:52:38,731 INFO 70421 [egg-watcher:application] watcher start success
+2026-02-18 22:52:38,744 INFO 70421 [egg-redis] instance[0] status OK, client ready
+2026-02-18 22:52:38,900 INFO 70421 [egg:core] dump config after ready, 4ms
+2026-02-18 22:52:49,338 INFO 70568 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 22:52:49,348 INFO 70568 [egg-multipart] stream mode enable
+2026-02-18 22:52:49,553 INFO 70568 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 22:52:49,685 INFO 70568 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 22:52:49,686 INFO 70568 [egg-security] use methodnoallow middleware
+2026-02-18 22:52:49,686 INFO 70568 [egg-security] use noopen middleware
+2026-02-18 22:52:49,687 INFO 70568 [egg-security] use nosniff middleware
+2026-02-18 22:52:49,687 INFO 70568 [egg-security] use xssProtection middleware
+2026-02-18 22:52:49,687 INFO 70568 [egg-security] use xframe middleware
+2026-02-18 22:52:49,688 INFO 70568 [egg-security] use dta middleware
+2026-02-18 22:52:49,688 INFO 70568 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 22:52:49,719 INFO 70568 [egg:core] dump config after load, 3ms
+2026-02-18 22:52:49,725 INFO 70568 [egg-redis] client connect success
+2026-02-18 22:52:49,733 INFO 70568 [egg-redis] instance[0] status OK, client ready
+2026-02-18 22:52:49,733 INFO 70568 [egg-watcher:application] watcher start success
+2026-02-18 22:52:49,897 INFO 70568 [egg:core] dump config after ready, 4ms
+2026-02-18 22:53:02,584 INFO 70723 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 22:53:02,593 INFO 70723 [egg-multipart] stream mode enable
+2026-02-18 22:53:02,795 INFO 70723 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 22:53:02,936 INFO 70723 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 22:53:02,937 INFO 70723 [egg-security] use methodnoallow middleware
+2026-02-18 22:53:02,937 INFO 70723 [egg-security] use noopen middleware
+2026-02-18 22:53:02,938 INFO 70723 [egg-security] use nosniff middleware
+2026-02-18 22:53:02,938 INFO 70723 [egg-security] use xssProtection middleware
+2026-02-18 22:53:02,938 INFO 70723 [egg-security] use xframe middleware
+2026-02-18 22:53:02,938 INFO 70723 [egg-security] use dta middleware
+2026-02-18 22:53:02,938 INFO 70723 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 22:53:02,965 INFO 70723 [egg:core] dump config after load, 3ms
+2026-02-18 22:53:02,971 INFO 70723 [egg-redis] client connect success
+2026-02-18 22:53:02,973 INFO 70723 [egg-watcher:application] watcher start success
+2026-02-18 22:53:02,976 INFO 70723 [egg-redis] instance[0] status OK, client ready
+2026-02-18 22:53:03,197 INFO 70723 [egg:core] dump config after ready, 3ms
+2026-02-18 22:54:26,424 INFO 71622 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 22:54:26,434 INFO 71622 [egg-multipart] stream mode enable
+2026-02-18 22:54:26,627 INFO 71622 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 22:54:26,752 INFO 71622 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 22:54:26,753 INFO 71622 [egg-security] use methodnoallow middleware
+2026-02-18 22:54:26,753 INFO 71622 [egg-security] use noopen middleware
+2026-02-18 22:54:26,754 INFO 71622 [egg-security] use nosniff middleware
+2026-02-18 22:54:26,754 INFO 71622 [egg-security] use xssProtection middleware
+2026-02-18 22:54:26,754 INFO 71622 [egg-security] use xframe middleware
+2026-02-18 22:54:26,754 INFO 71622 [egg-security] use dta middleware
+2026-02-18 22:54:26,754 INFO 71622 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 22:54:26,780 INFO 71622 [egg:core] dump config after load, 3ms
+2026-02-18 22:54:26,786 INFO 71622 [egg-redis] client connect success
+2026-02-18 22:54:26,795 INFO 71622 [egg-redis] instance[0] status OK, client ready
+2026-02-18 22:54:26,795 INFO 71622 [egg-watcher:application] watcher start success
+2026-02-18 22:54:26,958 INFO 71622 [egg:core] dump config after ready, 4ms
+2026-02-18 23:27:53,390 INFO 94807 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 23:27:53,400 INFO 94807 [egg-multipart] stream mode enable
+2026-02-18 23:27:53,702 INFO 94807 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 23:27:53,861 INFO 94807 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 23:27:53,862 INFO 94807 [egg-security] use methodnoallow middleware
+2026-02-18 23:27:53,862 INFO 94807 [egg-security] use noopen middleware
+2026-02-18 23:27:53,862 INFO 94807 [egg-security] use nosniff middleware
+2026-02-18 23:27:53,863 INFO 94807 [egg-security] use xssProtection middleware
+2026-02-18 23:27:53,863 INFO 94807 [egg-security] use xframe middleware
+2026-02-18 23:27:53,863 INFO 94807 [egg-security] use dta middleware
+2026-02-18 23:27:53,863 INFO 94807 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 23:27:53,895 INFO 94807 [egg:core] dump config after load, 6ms
+2026-02-18 23:27:53,902 INFO 94807 [egg-redis] client connect success
+2026-02-18 23:27:53,904 INFO 94807 [egg-watcher:application] watcher start success
+2026-02-18 23:27:53,912 INFO 94807 [egg-redis] instance[0] status OK, client ready
+2026-02-18 23:27:54,087 INFO 94807 [egg:core] dump config after ready, 4ms
+2026-02-18 23:28:13,137 INFO 94979 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 23:28:13,147 INFO 94979 [egg-multipart] stream mode enable
+2026-02-18 23:28:13,339 INFO 94979 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 23:28:13,464 INFO 94979 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 23:28:13,465 INFO 94979 [egg-security] use methodnoallow middleware
+2026-02-18 23:28:13,466 INFO 94979 [egg-security] use noopen middleware
+2026-02-18 23:28:13,466 INFO 94979 [egg-security] use nosniff middleware
+2026-02-18 23:28:13,466 INFO 94979 [egg-security] use xssProtection middleware
+2026-02-18 23:28:13,466 INFO 94979 [egg-security] use xframe middleware
+2026-02-18 23:28:13,467 INFO 94979 [egg-security] use dta middleware
+2026-02-18 23:28:13,467 INFO 94979 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 23:28:13,493 INFO 94979 [egg:core] dump config after load, 5ms
+2026-02-18 23:28:13,499 INFO 94979 [egg-redis] client connect success
+2026-02-18 23:28:13,501 INFO 94979 [egg-redis] instance[0] status OK, client ready
+2026-02-18 23:28:13,502 INFO 94979 [egg-watcher:application] watcher start success
+2026-02-18 23:28:13,667 INFO 94979 [egg:core] dump config after ready, 3ms
+2026-02-18 23:28:19,557 INFO 95020 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 23:28:19,567 INFO 95020 [egg-multipart] stream mode enable
+2026-02-18 23:28:19,758 INFO 95020 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 23:28:19,880 INFO 95020 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 23:28:19,882 INFO 95020 [egg-security] use methodnoallow middleware
+2026-02-18 23:28:19,882 INFO 95020 [egg-security] use noopen middleware
+2026-02-18 23:28:19,882 INFO 95020 [egg-security] use nosniff middleware
+2026-02-18 23:28:19,882 INFO 95020 [egg-security] use xssProtection middleware
+2026-02-18 23:28:19,883 INFO 95020 [egg-security] use xframe middleware
+2026-02-18 23:28:19,883 INFO 95020 [egg-security] use dta middleware
+2026-02-18 23:28:19,883 INFO 95020 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 23:28:19,906 INFO 95020 [egg:core] dump config after load, 3ms
+2026-02-18 23:28:19,915 INFO 95020 [egg-redis] client connect success
+2026-02-18 23:28:19,917 INFO 95020 [egg-watcher:application] watcher start success
+2026-02-18 23:28:19,921 INFO 95020 [egg-redis] instance[0] status OK, client ready
+2026-02-18 23:28:20,082 INFO 95020 [egg:core] dump config after ready, 3ms
+2026-02-18 23:28:25,083 INFO 95068 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 23:28:25,093 INFO 95068 [egg-multipart] stream mode enable
+2026-02-18 23:28:25,293 INFO 95068 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 23:28:25,421 INFO 95068 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 23:28:25,423 INFO 95068 [egg-security] use methodnoallow middleware
+2026-02-18 23:28:25,423 INFO 95068 [egg-security] use noopen middleware
+2026-02-18 23:28:25,423 INFO 95068 [egg-security] use nosniff middleware
+2026-02-18 23:28:25,424 INFO 95068 [egg-security] use xssProtection middleware
+2026-02-18 23:28:25,424 INFO 95068 [egg-security] use xframe middleware
+2026-02-18 23:28:25,424 INFO 95068 [egg-security] use dta middleware
+2026-02-18 23:28:25,424 INFO 95068 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 23:28:25,456 INFO 95068 [egg:core] dump config after load, 3ms
+2026-02-18 23:28:25,462 INFO 95068 [egg-redis] client connect success
+2026-02-18 23:28:25,464 INFO 95068 [egg-watcher:application] watcher start success
+2026-02-18 23:28:25,473 INFO 95068 [egg-redis] instance[0] status OK, client ready
+2026-02-18 23:28:25,646 INFO 95068 [egg:core] dump config after ready, 3ms
+2026-02-18 23:29:31,839 INFO 95653 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-18 23:29:31,849 INFO 95653 [egg-multipart] stream mode enable
+2026-02-18 23:29:32,041 INFO 95653 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-18 23:29:32,166 INFO 95653 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-18 23:29:32,167 INFO 95653 [egg-security] use methodnoallow middleware
+2026-02-18 23:29:32,167 INFO 95653 [egg-security] use noopen middleware
+2026-02-18 23:29:32,167 INFO 95653 [egg-security] use nosniff middleware
+2026-02-18 23:29:32,167 INFO 95653 [egg-security] use xssProtection middleware
+2026-02-18 23:29:32,168 INFO 95653 [egg-security] use xframe middleware
+2026-02-18 23:29:32,168 INFO 95653 [egg-security] use dta middleware
+2026-02-18 23:29:32,168 INFO 95653 [egg-security] compose 6 middlewares into one security middleware
+2026-02-18 23:29:32,194 INFO 95653 [egg:core] dump config after load, 3ms
+2026-02-18 23:29:32,200 INFO 95653 [egg-redis] client connect success
+2026-02-18 23:29:32,202 INFO 95653 [egg-watcher:application] watcher start success
+2026-02-18 23:29:32,209 INFO 95653 [egg-redis] instance[0] status OK, client ready
+2026-02-18 23:29:32,384 INFO 95653 [egg:core] dump config after ready, 4ms
+2026-02-19 00:00:00,010 INFO 95653 [egg-logrotator] clean all log before 31 days
+2026-02-19 00:00:00,998 INFO 95653 [egg-logrotator] broadcast log-reload
+2026-02-19 00:00:00,998 INFO 95653 [egg-logrotator] rotate files success by DayRotator, files ["/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve/common-error.log -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve/common-error.log.2026-02-18","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve/vue-admin-serve-web.log -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve/vue-admin-serve-web.log.2026-02-18","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve/egg-web.log -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve/egg-web.log.2026-02-18","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve/egg-schedule.log -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve/egg-schedule.log.2026-02-18","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve/egg-agent.log -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve/egg-agent.log.2026-02-18"]

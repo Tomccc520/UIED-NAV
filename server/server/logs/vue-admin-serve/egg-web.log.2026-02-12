@@ -1,0 +1,20 @@
+2026-02-12 00:00:02,848 INFO 73716 [egg-logrotator] app logger reload: got log-reload message
+2026-02-12 12:10:53,399 INFO 21074 [egg:logger] init all loggers with options: {"dir":"/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve","encoding":"utf8","env":"local","level":"INFO","consoleLevel":"INFO","disableConsoleAfterReady":false,"outputJSON":false,"buffer":true,"appLogName":"vue-admin-serve-web.log","coreLogName":"egg-web.log","agentLogName":"egg-agent.log","errorLogName":"common-error.log","coreLogger":{"consoleLevel":"WARN"},"allowDebugAtProd":false,"enablePerformanceTimer":false,"type":"application"}
+2026-02-12 12:10:53,411 INFO 21074 [egg-multipart] stream mode enable
+2026-02-12 12:10:53,580 INFO 21074 [egg-redis] server connecting redis://:***@127.0.0.1:6380/0
+2026-02-12 12:10:53,796 INFO 21074 [egg-static] starting static serve /public -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/app/public
+2026-02-12 12:10:53,799 INFO 21074 [egg-security] use methodnoallow middleware
+2026-02-12 12:10:53,799 INFO 21074 [egg-security] use noopen middleware
+2026-02-12 12:10:53,800 INFO 21074 [egg-security] use nosniff middleware
+2026-02-12 12:10:53,801 INFO 21074 [egg-security] use xssProtection middleware
+2026-02-12 12:10:53,802 INFO 21074 [egg-security] use xframe middleware
+2026-02-12 12:10:53,803 INFO 21074 [egg-security] use dta middleware
+2026-02-12 12:10:53,803 INFO 21074 [egg-security] compose 6 middlewares into one security middleware
+2026-02-12 12:10:53,853 INFO 21074 [egg:core] dump config after load, 6ms
+2026-02-12 12:10:53,862 INFO 21074 [egg-redis] client connect success
+2026-02-12 12:10:53,869 INFO 21074 [egg-redis] instance[0] status OK, client ready
+2026-02-12 12:10:53,869 INFO 21074 [egg-watcher:application] watcher start success
+2026-02-12 12:10:54,140 INFO 21074 [egg:core] dump config after ready, 3ms
+2026-02-13 00:00:00,081 INFO 21074 [egg-logrotator] clean all log before 31 days
+2026-02-13 00:00:01,015 INFO 21074 [egg-logrotator] broadcast log-reload
+2026-02-13 00:00:01,015 INFO 21074 [egg-logrotator] rotate files success by DayRotator, files ["/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve/common-error.log -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve/common-error.log.2026-02-12","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve/vue-admin-serve-web.log -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve/vue-admin-serve-web.log.2026-02-12","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve/egg-web.log -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve/egg-web.log.2026-02-12","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve/egg-schedule.log -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve/egg-schedule.log.2026-02-12","/Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve/egg-agent.log -> /Users/tangxiaoda/Desktop/网站备份/HAO UIED/server/server/logs/vue-admin-serve/egg-agent.log.2026-02-12"]
