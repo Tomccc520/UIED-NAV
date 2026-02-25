@@ -79,7 +79,7 @@
                         <el-option
                             v-for="item in userLevelOptions"
                             :key="item.id"
-                            :label="`${item.name}${item.levelValue !== '' ? ` (Lv${item.levelValue})` : ''}`"
+                            :label="item.name + (item.levelValue !== '' ? ' (Lv' + item.levelValue + ')' : '')"
                             :value="item.levelValue"
                         />
                     </el-select>
