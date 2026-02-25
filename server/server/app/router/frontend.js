@@ -95,6 +95,8 @@ module.exports = app => {
   get('/api/websites/:idOrSlug', controller.uied.frontend.websiteDetail);
   // GET /api/websites/:id/related - 获取相关推荐网站
   get('/api/websites/:id/related', controller.uied.frontend.websiteRelated);
+  // GET /api/websites/:id/health - 网站健康探测（响应时间/状态/SSL）
+  get('/api/websites/:id/health', controller.uied.frontend.websiteHealth);
   // POST /api/websites/:id/click - 记录网站点击
   post('/api/websites/:id/click', controller.uied.frontend.websiteClick);
   // GET /api/websites/:id/comments - 获取网站评论
@@ -131,6 +133,8 @@ module.exports = app => {
   get('/api/websites/:id/tags', controller.uied.frontend.websiteTags);
   // GET /websites/:id/tags - 获取网站标签（兼容旧前端无 /api 前缀）
   getLegacy('/websites/:id/tags', controller.uied.frontend.websiteTags);
+  // GET /websites/:id/health - 网站健康探测（兼容旧前端无 /api 前缀）
+  getLegacy('/websites/:id/health', controller.uied.frontend.websiteHealth);
   
   // ==================== 前端兼容路由（原 Express API 路径）====================
   // 导航菜单

@@ -254,15 +254,51 @@ class FrontendController extends Controller {
   async websiteRelated() {
     const { ctx } = this;
     const { id } = ctx.params;
-    const { limit = 6 } = ctx.query;
+    const { limit = 6, mode, manualIds } = ctx.query;
 
     try {
-      const websites = await ctx.service.uied.frontend.getRelatedWebsites(id, parseInt(limit));
+      /**
+       * 相关推荐支持多种推荐模式，供详情页侧边栏高级配置使用
+       */
+      const websites = await ctx.service.uied.frontend.getRelatedWebsites(id, {
+        limit: parseInt(limit),
+        mode: String(mode || '').trim(),
+        manualIds: String(manualIds || '').trim(),
+      });
       ctx.body = websites;
     } catch (error) {
       ctx.logger.error('获取相关推荐失败:', error);
       ctx.status = 500;
       ctx.body = { error: error.message };
+    }
+  }
+
+  /**
+   * 网站健康探测（本地探测站点响应时间/状态码/SSL）
+   * GET /api/websites/:id/health
+   */
+  async websiteHealth() {
+    const { ctx } = this;
+    const { id } = ctx.params;
+
+    try {
+      const websiteId = this.parsePositiveInt(id, 0);
+      if (!websiteId) {
+        ctx.status = 400;
+        ctx.body = { error: '无效的网站ID' };
+        return;
+      }
+      const timeoutMs = this.parsePositiveInt(ctx.query?.timeout, 6000);
+      const forceRefresh = this.parseBoolean(ctx.query?.refresh, false);
+      const result = await ctx.service.uied.websiteHealthProbe.probeByWebsiteId(websiteId, {
+        timeoutMs,
+        forceRefresh,
+      });
+      ctx.body = result;
+    } catch (error) {
+      ctx.logger.error('网站健康探测失败:', error);
+      ctx.status = Number(error?.status || 500);
+      ctx.body = { error: error.message || '健康探测失败' };
     }
   }
 

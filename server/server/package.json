@@ -52,7 +52,7 @@
     "scripts": {
         "start": "egg-scripts start --daemon --title=egg-server-vue-admin-serve",
         "stop": "egg-scripts stop --title=egg-server-vue-admin-serve",
-        "dev": "egg-bin dev",
+        "dev": "egg-bin dev --port=8002",
         "preflight:commercial": "node ../../scripts/commercial-preflight-check.js",
         "fake": "node ./initTableData.js",
         "debug": "egg-bin debug",

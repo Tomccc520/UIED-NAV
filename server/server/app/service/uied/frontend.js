@@ -583,20 +583,94 @@ class FrontendService extends Service {
   }
 
   /**
-   * 获取相关推荐网站
-   * @param {string} websiteId - 网站ID
-   * @param {number} limit - 返回数量
+   * 获取相关推荐网站（支持同分类/同标签/热门/手动）
+   * @param {string} websiteId 网站ID
+   * @param {number|{limit?: number, mode?: string, manualIds?: string}} options 参数
    */
-  async getRelatedWebsites(websiteId, limit = 6) {
+  async getRelatedWebsites(websiteId, options = 6) {
     const { app } = this;
+    const normalizedOptions = typeof options === 'number'
+      ? { limit: options, mode: 'same_category', manualIds: '' }
+      : {
+        limit: Number.parseInt(String(options?.limit || 6), 10) || 6,
+        mode: String(options?.mode || 'same_category').trim(),
+        manualIds: String(options?.manualIds || '').trim(),
+      };
+    const limit = Math.max(1, Math.min(12, normalizedOptions.limit || 6));
 
     // 获取当前网站的分类
     const [ website ] = await app.model.query(
-      'SELECT category_id FROM uied_website WHERE id = ? AND is_delete = 0',
+      'SELECT id, category_id, tags FROM uied_website WHERE id = ? AND is_delete = 0',
       { replacements: [ websiteId ], type: app.Sequelize.QueryTypes.SELECT }
     );
 
     if (!website) return [];
+
+    /**
+     * 统一格式化结果，供详情页侧边栏展示
+     * @param {Array<object>} rows 原始行数据
+     * @returns {Array<object>} 规范化结果
+     */
+    const formatRows = rows => (Array.isArray(rows) ? rows : []).map(w => ({
+      id: String(w.id),
+      name: w.name,
+      slug: w.slug,
+      description: w.description || '',
+      url: w.url,
+      iconUrl: w.iconUrl || w.icon_url || '',
+    }));
+
+    const mode = [ 'same_category', 'same_tags', 'hot', 'manual' ].includes(normalizedOptions.mode)
+      ? normalizedOptions.mode
+      : 'same_category';
+
+    if (mode === 'manual') {
+      const idList = normalizedOptions.manualIds
+        .split(',')
+        .map(id => id.trim())
+        .filter(Boolean)
+        .filter(id => id !== String(websiteId));
+      if (!idList.length) return [];
+      const manualList = await this.getWebsitesByIds(idList);
+      return (Array.isArray(manualList) ? manualList : []).slice(0, limit);
+    }
+
+    if (mode === 'hot') {
+      const rows = await app.model.query(
+        `SELECT id, name, slug, description, url, icon_url as iconUrl
+         FROM uied_website
+         WHERE id != ? AND is_delete = 0
+         ORDER BY is_hot DESC, is_featured DESC, click_count DESC, sort ASC
+         LIMIT ?`,
+        { replacements: [ websiteId, limit ], type: app.Sequelize.QueryTypes.SELECT }
+      );
+      return formatRows(rows);
+    }
+
+    if (mode === 'same_tags') {
+      const tags = this.safeJsonParse(website.tags, [])
+        .map(tag => String(tag || '').trim())
+        .filter(Boolean)
+        .slice(0, 5);
+      if (!tags.length) {
+        return await this.getRelatedWebsites(websiteId, { limit, mode: 'same_category' });
+      }
+      const likeClauses = tags.map(() => 'tags LIKE ?').join(' OR ');
+      const likeValues = tags.map(tag => `%${tag}%`);
+      const rows = await app.model.query(
+        `SELECT id, name, slug, description, url, icon_url as iconUrl
+         FROM uied_website
+         WHERE id != ? AND is_delete = 0
+           AND (${likeClauses})
+         ORDER BY is_hot DESC, is_featured DESC, click_count DESC, sort ASC
+         LIMIT ?`,
+        {
+          replacements: [ websiteId, ...likeValues, limit ],
+          type: app.Sequelize.QueryTypes.SELECT,
+        }
+      );
+      return formatRows(rows);
+    }
 
     // 获取同分类的其他网站
     const related = await app.model.query(
@@ -607,15 +681,7 @@ class FrontendService extends Service {
        LIMIT ?`,
       { replacements: [ website.category_id, websiteId, limit ], type: app.Sequelize.QueryTypes.SELECT }
     );
-
-    return related.map(w => ({
-      id: String(w.id),
-      name: w.name,
-      slug: w.slug,
-      description: w.description || '',
-      url: w.url,
-      iconUrl: w.iconUrl,
-    }));
+    return formatRows(related);
   }
 
   /**

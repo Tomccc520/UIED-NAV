@@ -215,7 +215,7 @@
                                     </span>
                                 </div>
                                 <div class="ai-editor-layout__mode-actions">
-                                    <el-button link type="primary" @click="router.push('/uied/aiConfig')">
+                                    <el-button link type="primary" @click="goToAiConfigPage">
                                         AI配置
                                     </el-button>
                                 </div>
@@ -302,7 +302,10 @@
                                                 {{ item.role === 'user' ? '我' : 'AI' }}
                                             </div>
                                             <div class="ai-chat__message-content">
-                                                <span>{{ item.content }}</span>
+                                                <div
+                                                    class="ai-chat__message-markdown"
+                                                    v-html="renderChatMessageContent(item)"
+                                                />
                                                 <span v-if="item.streaming" class="ai-chat__cursor"
                                                     >|</span
                                                 >
@@ -347,6 +350,13 @@
                                         <el-tag v-if="aiGenerating" size="small" type="warning"
                                             >生成中</el-tag
                                         >
+                                    </div>
+                                    <div v-if="hasDraft" class="ai-chat__draft-preview">
+                                        <div class="ai-chat__draft-preview-title">Markdown 预览</div>
+                                        <div
+                                            class="ai-chat__draft-preview-body"
+                                            v-html="renderAiMarkdown(aiDraftText)"
+                                        />
                                     </div>
                                     <el-space wrap>
                                         <el-button
@@ -473,6 +483,8 @@ import {
     uiedAiChat,
     uiedSeoScraperFetch
 } from '@/api/uied'
+import configs from '@/config'
+import { getToken } from '@/utils/auth'
 import feedback from '@/utils/feedback'
 import type { FormInstance, FormRules } from 'element-plus'
 import { QuestionFilled, FolderOpened } from '@element-plus/icons-vue'
@@ -488,6 +500,11 @@ interface ChatMessage {
     streaming?: boolean
 }
 
+interface ChatStreamContextItem {
+    role: 'user' | 'assistant'
+    content: string
+}
+
 const route = useRoute()
 const router = useRouter()
 
@@ -501,6 +518,19 @@ const isFirefoxBrowser =
 const detailEditorCompatMode = ref(false)
 const editFormRef = ref<FormInstance>()
 const isEdit = computed(() => !!route.query.id)
+
+/**
+ * 打开 AI 配置页（兼容旧路径与新版分组路径）
+ */
+const goToAiConfigPage = () => {
+    const targetPath = '/system-setting/base-config/aiConfig'
+    const resolved = router.resolve(targetPath)
+    if (resolved?.matched?.length) {
+        router.push(targetPath)
+        return
+    }
+    router.push('/uied/aiConfig')
+}
 
 /**
  * 仅在详情页签激活后初始化富文本编辑器，避免隐藏容器下编辑器无法输入
@@ -774,18 +804,118 @@ const resolveAiAssistantErrorMessage = (error: any) => {
     return rawMessage || 'AI 处理失败，请稍后重试'
 }
 
-// 纯文本转 HTML
-const plainTextToHtml = (text: string) => {
-    if (!text.trim()) return ''
-    const escape = (s: string) =>
-        s.replace(
-            /[&<>"']/g,
-            (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] || c)
+/**
+ * 转义 HTML，避免 AI 文本直接注入 DOM
+ */
+const escapeHtmlText = (text: string) =>
+    String(text || '').replace(
+        /[&<>"']/g,
+        (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] || c)
+    )
+
+/**
+ * 渲染 Markdown 行内语法（加粗、斜体、行内代码、链接）
+ */
+const renderInlineMarkdown = (text: string) => {
+    let html = escapeHtmlText(text || '')
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>')
+    html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    html = html.replace(/__([^_]+)__/g, '<strong>$1</strong>')
+    html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    html = html.replace(/_([^_]+)_/g, '<em>$1</em>')
+    html = html.replace(
+        /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+        '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
+    )
+    return html
+}
+
+/**
+ * 将 Markdown 文本转换为安全 HTML（轻量实现，覆盖 AI 助手常见输出）
+ */
+const renderAiMarkdown = (text: string) => {
+    const source = String(text || '').replace(/\r\n/g, '\n').trim()
+    if (!source) return ''
+
+    const codeBlocks: string[] = []
+    let normalized = source.replace(/```([\w-]*)\n?([\s\S]*?)```/g, (_, lang = '', code = '') => {
+        const idx = codeBlocks.length
+        const safeLang = escapeHtmlText(String(lang || '').trim())
+        const safeCode = escapeHtmlText(String(code || '').replace(/\n$/, ''))
+        codeBlocks.push(
+            `<pre class="ai-md-pre"><code class="ai-md-code" data-lang="${safeLang}">${safeCode}</code></pre>`
         )
-    return text
-        .split(/\n{2,}/)
-        .map((b) => `<p>${escape(b).replace(/\n/g, '<br/>')}</p>`)
-        .join('')
+        return `__AI_CODE_BLOCK_${idx}__`
+    })
+
+    const lines = normalized.split('\n')
+    const blocks: string[] = []
+    let i = 0
+    while (i < lines.length) {
+        const rawLine = lines[i]
+        const line = rawLine.trim()
+        if (!line) {
+            i += 1
+            continue
+        }
+
+        const headingMatch = line.match(/^(#{1,6})\s+(.*)$/)
+        if (headingMatch) {
+            const level = Math.min(6, headingMatch[1].length)
+            blocks.push(`<h${level}>${renderInlineMarkdown(headingMatch[2])}</h${level}>`)
+            i += 1
+            continue
+        }
+
+        if (/^>\s?/.test(line)) {
+            const quoteLines: string[] = []
+            while (i < lines.length && /^>\s?/.test(lines[i].trim())) {
+                quoteLines.push(lines[i].trim().replace(/^>\s?/, ''))
+                i += 1
+            }
+            blocks.push(`<blockquote>${quoteLines.map(item => renderInlineMarkdown(item)).join('<br/>')}</blockquote>`)
+            continue
+        }
+
+        if (/^[-*]\s+/.test(line)) {
+            const items: string[] = []
+            while (i < lines.length && /^[-*]\s+/.test(lines[i].trim())) {
+                items.push(lines[i].trim().replace(/^[-*]\s+/, ''))
+                i += 1
+            }
+            blocks.push(`<ul>${items.map(item => `<li>${renderInlineMarkdown(item)}</li>`).join('')}</ul>`)
+            continue
+        }
+
+        if (/^\d+\.\s+/.test(line)) {
+            const items: string[] = []
+            while (i < lines.length && /^\d+\.\s+/.test(lines[i].trim())) {
+                items.push(lines[i].trim().replace(/^\d+\.\s+/, ''))
+                i += 1
+            }
+            blocks.push(`<ol>${items.map(item => `<li>${renderInlineMarkdown(item)}</li>`).join('')}</ol>`)
+            continue
+        }
+
+        const paragraphLines: string[] = []
+        while (i < lines.length && lines[i].trim()) {
+            paragraphLines.push(lines[i])
+            i += 1
+        }
+        blocks.push(`<p>${paragraphLines.map(item => renderInlineMarkdown(item)).join('<br/>')}</p>`)
+    }
+
+    let html = blocks.join('')
+    html = html.replace(/__AI_CODE_BLOCK_(\d+)__/g, (_, idx) => codeBlocks[Number(idx)] || '')
+    return html
+}
+
+/**
+ * 将 AI 草稿（Markdown/纯文本）转换为编辑器 HTML
+ */
+const markdownTextToHtml = (text: string) => {
+    const rendered = renderAiMarkdown(text)
+    return rendered || `<p>${escapeHtmlText(text || '').replace(/\n/g, '<br/>')}</p>`
 }
 
 // 富文本转纯文本
@@ -796,13 +926,22 @@ const toPlainText = (html: string) =>
         .replace(/\s+/g, ' ')
         .trim()
 
-// 清理 Markdown 围栏
+// 规范化 AI 草稿文本（保留 Markdown 语法）
 const normalizeDraft = (text: string) =>
     (text || '')
         .replace(/\r\n/g, '\n')
-        .replace(/```[\w-]*\n?/g, '')
-        .replace(/```/g, '')
         .trim()
+
+/**
+ * 渲染聊天消息内容（AI 消息支持 Markdown，用户消息按纯文本）
+ */
+const renderChatMessageContent = (item: ChatMessage) => {
+    const content = String(item?.content || '')
+    if (item.role === 'assistant') {
+        return renderAiMarkdown(content)
+    }
+    return escapeHtmlText(content).replace(/\n/g, '<br/>')
+}
 
 // 构建 AI 提示
 const buildPrompt = (mode: AiGenerateMode, userPrompt = '') => {
@@ -820,15 +959,156 @@ const buildPrompt = (mode: AiGenerateMode, userPrompt = '') => {
     let prompt = `网站名称：${websiteName}\n网站地址：${websiteUrl}\n`
     if (websiteDesc) prompt += `网站描述：${websiteDesc}\n`
     if (currentText && mode !== 'replace') prompt += `\n当前正文内容：\n${currentText}\n`
-    prompt += `\n${modeInstructions[mode]}\n请只输出纯文本，不要 Markdown 代码块。`
+    prompt += `\n${modeInstructions[mode]}\n请使用 Markdown 输出内容（可使用标题、列表、加粗），不要输出解释性前缀。`
     if (userPrompt) prompt += `\n用户额外要求：${userPrompt}`
     return prompt
 }
 
-// 请求 AI
-const requestAiDraft = async (mode: AiGenerateMode, userPrompt = '') => {
+/**
+ * 收集最近对话上下文，传给 AI 对话接口提升连续性
+ */
+const buildAiChatContext = (): ChatStreamContextItem[] =>
+    chatMessages.value
+        .filter((item) => item.role === 'user' || item.role === 'assistant')
+        .map((item) => ({
+            role: item.role,
+            content: String(item.content || '').trim()
+        }))
+        .filter((item) => item.content)
+        .slice(-6)
+
+/**
+ * 通过 SSE 接口获取 AI 回复（优先使用真实流式输出）
+ */
+const requestAiDraftBySse = async (mode: AiGenerateMode, userPrompt = '') => {
     const message = buildPrompt(mode, userPrompt)
-    const res = await uiedAiChat({ message, context: '网站详情内容编辑' })
+    const token = getToken()
+    const baseUrl = String(configs.baseUrl || '').replace(/\/$/, '')
+    const streamUrl = `${baseUrl}/api/ai/chat/completions/editor`
+
+    const headers: Record<string, string> = {
+        'Content-Type': 'application/json'
+    }
+    if (token) headers.token = String(token)
+
+    const response = await fetch(streamUrl, {
+        method: 'POST',
+        headers,
+        credentials: 'include',
+        body: JSON.stringify({
+            message,
+            context: buildAiChatContext()
+        })
+    })
+
+    if (!response.ok || !response.body) {
+        const text = await response.text().catch(() => '')
+        throw new Error(text || `AI 流式请求失败（HTTP ${response.status}）`)
+    }
+
+    stopStream()
+    const assistantMsg = appendChatMessage('assistant', '', true)
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder('utf-8')
+    let buffer = ''
+    let mergedText = ''
+    let hasChunk = false
+
+    try {
+        while (true) {
+            const { done, value } = await reader.read()
+            buffer += decoder.decode(value || new Uint8Array(), { stream: !done })
+
+            let splitIndex = buffer.indexOf('\n\n')
+            while (splitIndex !== -1) {
+                const packet = buffer.slice(0, splitIndex)
+                buffer = buffer.slice(splitIndex + 2)
+
+                const dataLine = packet
+                    .split('\n')
+                    .map((line) => line.trim())
+                    .filter((line) => line.startsWith('data:'))
+                    .map((line) => line.replace(/^data:\s?/, ''))
+                    .join('')
+
+                if (dataLine) {
+                    if (dataLine === '[DONE]') {
+                        assistantMsg.streaming = false
+                        const draft = normalizeDraft(mergedText)
+                        if (draft) {
+                            aiDraftText.value = draft
+                            lastGenerateMode.value = mode
+                            assistantMsg.content = draft
+                        }
+                        return draft
+                    }
+                    try {
+                        const payload = JSON.parse(dataLine)
+                        const delta = String(
+                            payload?.choices?.[0]?.delta?.content ||
+                                payload?.content ||
+                                payload?.reply ||
+                                ''
+                        )
+                        if (delta) {
+                            hasChunk = true
+                            mergedText += delta
+                            assistantMsg.content = normalizeDraft(mergedText)
+                            aiDraftText.value = normalizeDraft(mergedText)
+                            lastGenerateMode.value = mode
+                            scrollChatToBottom()
+                        }
+                    } catch (parseError) {
+                        console.warn('[uied.website.ai] SSE 片段解析失败', dataLine, parseError)
+                    }
+                }
+                splitIndex = buffer.indexOf('\n\n')
+            }
+
+            if (done) break
+        }
+    } catch (error) {
+        assistantMsg.streaming = false
+        if (hasChunk) {
+            const draft = normalizeDraft(mergedText)
+            if (draft) {
+                aiDraftText.value = draft
+                lastGenerateMode.value = mode
+                assistantMsg.content = draft
+                return draft
+            }
+        }
+        throw error
+    } finally {
+        assistantMsg.streaming = false
+        reader.releaseLock?.()
+    }
+
+    const draft = normalizeDraft(mergedText)
+    if (!draft) {
+        throw new Error('AI 未返回可用结果，请检查流式接口配置')
+    }
+    aiDraftText.value = draft
+    lastGenerateMode.value = mode
+    assistantMsg.content = draft
+    return draft
+}
+
+/**
+ * 请求 AI（优先 SSE 流式，失败后回退普通对话接口）
+ */
+const requestAiDraft = async (mode: AiGenerateMode, userPrompt = '') => {
+    try {
+        return await requestAiDraftBySse(mode, userPrompt)
+    } catch (sseError) {
+        console.warn('[uied.website.ai] SSE 失败，回退普通接口', sseError)
+    }
+
+    const message = buildPrompt(mode, userPrompt)
+    const res = await uiedAiChat({
+        message,
+        context: buildAiChatContext()
+    })
     const reply =
         res?.reply ||
         res?.content ||
@@ -911,7 +1191,7 @@ const applyAiDraft = (mode: 'replace' | 'append') => {
         feedback.msgWarning('没有可用的 AI 草稿')
         return
     }
-    const html = plainTextToHtml(draft)
+    const html = markdownTextToHtml(draft)
     if (mode === 'append' && editData.detailContent.trim()) {
         editData.detailContent = `${editData.detailContent}<p><br/></p>${html}`
     } else {
@@ -1220,12 +1500,78 @@ onBeforeUnmount(() => {
     margin-bottom: 2px;
 }
 .ai-chat__message-content {
-    white-space: pre-wrap;
-    word-break: break-word;
     font-size: 13px;
     line-height: 1.65;
     padding: 10px 12px;
     border-radius: 10px;
+}
+.ai-chat__message-markdown {
+    word-break: break-word;
+}
+.ai-chat__message-markdown :deep(p) {
+    margin: 0 0 8px;
+}
+.ai-chat__message-markdown :deep(p:last-child) {
+    margin-bottom: 0;
+}
+.ai-chat__message-markdown :deep(h1),
+.ai-chat__message-markdown :deep(h2),
+.ai-chat__message-markdown :deep(h3),
+.ai-chat__message-markdown :deep(h4) {
+    margin: 6px 0 8px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+.ai-chat__message-markdown :deep(h1) {
+    font-size: 16px;
+}
+.ai-chat__message-markdown :deep(h2) {
+    font-size: 15px;
+}
+.ai-chat__message-markdown :deep(h3),
+.ai-chat__message-markdown :deep(h4) {
+    font-size: 14px;
+}
+.ai-chat__message-markdown :deep(ul),
+.ai-chat__message-markdown :deep(ol) {
+    margin: 6px 0 8px 18px;
+    padding: 0;
+}
+.ai-chat__message-markdown :deep(li) {
+    margin: 2px 0;
+}
+.ai-chat__message-markdown :deep(blockquote) {
+    margin: 6px 0;
+    padding: 6px 10px;
+    border-left: 3px solid #d0d7de;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 6px;
+}
+.ai-chat__message-markdown :deep(code) {
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: rgba(15, 23, 42, 0.08);
+    font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;
+    font-size: 12px;
+}
+.ai-chat__message-markdown :deep(.ai-md-pre) {
+    margin: 8px 0;
+    padding: 10px;
+    border-radius: 8px;
+    background: #0f172a;
+    color: #e2e8f0;
+    overflow-x: auto;
+}
+.ai-chat__message-markdown :deep(.ai-md-pre code) {
+    padding: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 12px;
+    line-height: 1.55;
+}
+.ai-chat__message-markdown :deep(a) {
+    color: #2563eb;
+    text-decoration: underline;
 }
 .ai-chat__message--user .ai-chat__message-content {
     background: #e9f3ff;
@@ -1259,6 +1605,27 @@ onBeforeUnmount(() => {
 .ai-chat__apply-bar {
     border-top: 1px dashed var(--el-border-color-light);
     padding-top: 10px;
+}
+.ai-chat__draft-preview {
+    margin-bottom: 10px;
+    border: 1px solid var(--el-border-color-light);
+    border-radius: 10px;
+    background: #fafafa;
+    overflow: hidden;
+}
+.ai-chat__draft-preview-title {
+    padding: 8px 10px;
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+    border-bottom: 1px solid var(--el-border-color-lighter);
+    background: #fff;
+}
+.ai-chat__draft-preview-body {
+    max-height: 160px;
+    overflow-y: auto;
+    padding: 10px;
+    font-size: 12px;
+    line-height: 1.65;
 }
 
 @media (max-width: 1280px) {

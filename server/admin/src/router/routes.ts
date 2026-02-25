@@ -65,6 +65,22 @@ export const constantRoutes: Array<RouteRecordRaw> = [
         ]
     },
     {
+        path: '/uied/aiConfig',
+        component: LAYOUT,
+        children: [
+            {
+                path: '',
+                name: Symbol(),
+                component: () => import('@/views/uied/aiConfig/index.vue'),
+                meta: {
+                    title: 'AI配置',
+                    hidden: true,
+                    activeMenu: '/system-setting/base-config/aiConfig'
+                }
+            }
+        ]
+    },
+    {
         path: '/article-manage/article',
         component: LAYOUT,
         children: [
