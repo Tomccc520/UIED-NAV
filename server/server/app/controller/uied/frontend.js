@@ -998,9 +998,13 @@ class FrontendController extends Controller {
         children: (menu.children || []).map(transformMenu),
       });
 
-      const dailyHotConfig = await this.getDailyHotDisplayConfig().catch(() => null);
-      const result = this.applyBuiltinNavMenuRefs(menus.map(transformMenu), { dailyHotConfig });
-      ctx.body = this.appendDailyHotNavMenuItem(result, dailyHotConfig);
+      const [ dailyHotConfig, rankBoardConfig ] = await Promise.all([
+        this.getDailyHotDisplayConfig().catch(() => null),
+        this.getRankBoardDisplayConfig().catch(() => null),
+      ]);
+      const result = this.applyBuiltinNavMenuRefs(menus.map(transformMenu), { dailyHotConfig, rankBoardConfig });
+      const withDailyHot = this.appendDailyHotNavMenuItem(result, dailyHotConfig);
+      ctx.body = this.appendRankBoardNavMenuItem(withDailyHot, rankBoardConfig);
     } catch (error) {
       ctx.logger.error('获取导航菜单失败:', error);
       ctx.status = 500;
@@ -1067,9 +1071,13 @@ class FrontendController extends Controller {
         })),
       }));
 
-      const dailyHotConfig = await this.getDailyHotDisplayConfig().catch(() => null);
-      const resolved = this.applyBuiltinFooterLinks(result, { dailyHotConfig });
-      ctx.body = this.appendDailyHotFooterLink(resolved, dailyHotConfig);
+      const [ dailyHotConfig, rankBoardConfig ] = await Promise.all([
+        this.getDailyHotDisplayConfig().catch(() => null),
+        this.getRankBoardDisplayConfig().catch(() => null),
+      ]);
+      const resolved = this.applyBuiltinFooterLinks(result, { dailyHotConfig, rankBoardConfig });
+      const withDailyHot = this.appendDailyHotFooterLink(resolved, dailyHotConfig);
+      ctx.body = this.appendRankBoardFooterLink(withDailyHot, rankBoardConfig);
     } catch (error) {
       ctx.logger.error('获取页脚设置失败:', error);
       ctx.status = 500;
@@ -2306,6 +2314,29 @@ class FrontendController extends Controller {
   }
 
   /**
+   * 获取榜单系统显示配置（供导航菜单/页脚自动注入使用）
+   */
+  async getRankBoardDisplayConfig() {
+    const { ctx } = this;
+    const config = await ctx.service.uied.rankBoard.getPublicConfig();
+    const placements = Array.isArray(config?.displayPlacements)
+      ? config.displayPlacements.map(item => String(item || '').trim()).filter(Boolean)
+      : [];
+    return {
+      enabled: config?.enabled !== false,
+      displayPlacements: Array.from(new Set(placements)),
+      displayLabel: String(config?.displayLabel || '榜单系统').trim() || '榜单系统',
+      displayPath: this.normalizePath(config?.displayPath || '/p/rankings'),
+      displaySort: this.parsePositiveInt(config?.displaySort, 88),
+      displayDesktop: config?.displayDesktop !== false,
+      displayMobile: config?.displayMobile !== false,
+      displayOpenInNewTab: config?.displayOpenInNewTab === true,
+      defaultMetric: String(config?.defaultMetric || 'visit').trim().toLowerCase(),
+      defaultPeriod: String(config?.defaultPeriod || 'day').trim().toLowerCase(),
+    };
+  }
+
+  /**
    * 规范化路径（确保前导斜杠）
    */
   normalizePath(path) {
@@ -2316,11 +2347,12 @@ class FrontendController extends Controller {
   }
 
   /**
-   * 按内置入口配置解析导航菜单项（当前先支持 daily_hot）
+   * 按内置入口配置解析导航菜单项（当前支持 daily_hot / rankings）
    */
   applyBuiltinNavMenuRefs(rows = [], context = {}) {
     const list = Array.isArray(rows) ? rows : [];
     const dailyHotConfig = context?.dailyHotConfig || null;
+    const rankBoardConfig = context?.rankBoardConfig || null;
 
     return list.map(item => {
       const next = {
@@ -2333,17 +2365,23 @@ class FrontendController extends Controller {
         if (!String(next.text || '').trim()) {
           next.text = dailyHotConfig.displayLabel || '每日热榜';
         }
+      } else if (builtinKey === 'rankings' && rankBoardConfig) {
+        next.link = rankBoardConfig.displayPath || next.link || '/p/rankings';
+        if (!String(next.text || '').trim()) {
+          next.text = rankBoardConfig.displayLabel || '榜单系统';
+        }
       }
       return next;
     });
   }
 
   /**
-   * 按内置入口配置解析页脚链接（当前先支持 daily_hot）
+   * 按内置入口配置解析页脚链接（当前支持 daily_hot / rankings）
    */
   applyBuiltinFooterLinks(groups = [], context = {}) {
     const list = Array.isArray(groups) ? groups : [];
     const dailyHotConfig = context?.dailyHotConfig || null;
+    const rankBoardConfig = context?.rankBoardConfig || null;
 
     return list.map(group => ({
       ...group,
@@ -2355,6 +2393,11 @@ class FrontendController extends Controller {
           if (!String(next.text || '').trim()) {
             next.text = dailyHotConfig.displayLabel || '每日热榜';
           }
+        } else if (builtinKey === 'rankings' && rankBoardConfig) {
+          next.url = rankBoardConfig.displayPath || next.url || '/p/rankings';
+          if (!String(next.text || '').trim()) {
+            next.text = rankBoardConfig.displayLabel || '榜单系统';
+          }
         }
         return next;
       }),
@@ -2364,12 +2407,13 @@ class FrontendController extends Controller {
   /**
    * 判断导航菜单是否已存在同目标链接（避免重复注入）
    */
-  hasNavMenuLink(rows = [], targetPath = '') {
+  hasNavMenuLink(rows = [], targetPath = '', builtinKeys = []) {
     const list = Array.isArray(rows) ? rows : [];
     const normalizedTarget = this.normalizePath(targetPath);
+    const builtinKeySet = new Set((Array.isArray(builtinKeys) ? builtinKeys : []).map(item => String(item || '').trim().toLowerCase()));
     const walk = items => items.some(item => {
       const builtinKey = String(item?.builtinKey || '').trim().toLowerCase();
-      if (builtinKey === 'daily_hot') return true;
+      if (builtinKey && builtinKeySet.has(builtinKey)) return true;
       const currentLink = item?.link ? this.normalizePath(item.link) : '';
       if (currentLink && currentLink === normalizedTarget) return true;
       return Array.isArray(item?.children) && walk(item.children);
@@ -2384,7 +2428,7 @@ class FrontendController extends Controller {
     const list = Array.isArray(rows) ? rows.slice() : [];
     if (!config || config.enabled === false) return list;
     if (!Array.isArray(config.displayPlacements) || !config.displayPlacements.includes('home_menu')) return list;
-    if (!config.displayPath || this.hasNavMenuLink(list, config.displayPath)) return list;
+    if (!config.displayPath || this.hasNavMenuLink(list, config.displayPath, [ 'daily_hot' ])) return list;
 
     list.push({
       id: 'builtin:daily-hot',
@@ -2410,12 +2454,13 @@ class FrontendController extends Controller {
   /**
    * 判断页脚链接是否已存在同目标链接（避免重复注入）
    */
-  hasFooterLink(groups = [], targetPath = '') {
+  hasFooterLink(groups = [], targetPath = '', builtinKeys = []) {
     const normalizedTarget = this.normalizePath(targetPath);
+    const builtinKeySet = new Set((Array.isArray(builtinKeys) ? builtinKeys : []).map(item => String(item || '').trim().toLowerCase()));
     return (Array.isArray(groups) ? groups : []).some(group =>
       Array.isArray(group?.links) && group.links.some(link => {
         const builtinKey = String(link?.builtinKey || '').trim().toLowerCase();
-        if (builtinKey === 'daily_hot') return true;
+        if (builtinKey && builtinKeySet.has(builtinKey)) return true;
         const currentLink = link?.url ? this.normalizePath(link.url) : '';
         return currentLink && currentLink === normalizedTarget;
       })
@@ -2433,7 +2478,7 @@ class FrontendController extends Controller {
 
     if (!config || config.enabled === false) return list;
     if (!Array.isArray(config.displayPlacements) || !config.displayPlacements.includes('footer_link')) return list;
-    if (!config.displayPath || this.hasFooterLink(list, config.displayPath)) return list;
+    if (!config.displayPath || this.hasFooterLink(list, config.displayPath, [ 'daily_hot' ])) return list;
 
     const targetGroup = list.find(group => group?.visible !== false)
       || null;
@@ -2467,6 +2512,82 @@ class FrontendController extends Controller {
         links: [ builtinLink ],
         builtin: true,
         builtinKey: 'daily_hot',
+      },
+    ];
+  }
+
+  /**
+   * 按榜单系统配置自动注入导航菜单入口（首页菜单）
+   */
+  appendRankBoardNavMenuItem(rows = [], config = null) {
+    const list = Array.isArray(rows) ? rows.slice() : [];
+    if (!config || config.enabled === false) return list;
+    if (!Array.isArray(config.displayPlacements) || !config.displayPlacements.includes('home_menu')) return list;
+    if (!config.displayPath || this.hasNavMenuLink(list, config.displayPath, [ 'rankings' ])) return list;
+
+    list.push({
+      id: 'builtin:rankings',
+      text: config.displayLabel || '榜单系统',
+      link: config.displayPath || '/p/rankings',
+      external: config.displayOpenInNewTab === true,
+      label: '内置',
+      labelType: 'info',
+      icon: 'DataAnalysis',
+      parentId: null,
+      order: Number(config.displaySort || 88),
+      visible: true,
+      children: [],
+      builtin: true,
+      builtinKey: 'rankings',
+      displayDesktop: config.displayDesktop !== false,
+      displayMobile: config.displayMobile !== false,
+    });
+
+    return list.sort((a, b) => Number(a?.order || 0) - Number(b?.order || 0));
+  }
+
+  /**
+   * 按榜单系统配置自动注入页脚链接（页脚显示）
+   */
+  appendRankBoardFooterLink(groups = [], config = null) {
+    const list = Array.isArray(groups) ? groups.map(group => ({
+      ...group,
+      links: Array.isArray(group?.links) ? group.links.slice() : [],
+    })) : [];
+    if (!config || config.enabled === false) return list;
+    if (!Array.isArray(config.displayPlacements) || !config.displayPlacements.includes('footer_link')) return list;
+    if (!config.displayPath || this.hasFooterLink(list, config.displayPath, [ 'rankings' ])) return list;
+
+    const builtinLink = {
+      id: 'builtin:rankings-footer',
+      text: config.displayLabel || '榜单系统',
+      url: config.displayPath || '/p/rankings',
+      external: config.displayOpenInNewTab === true,
+      order: Number(config.displaySort || 88),
+      visible: true,
+      builtin: true,
+      builtinKey: 'rankings',
+      displayDesktop: config.displayDesktop !== false,
+      displayMobile: config.displayMobile !== false,
+    };
+
+    const targetGroup = list.find(group => group?.visible !== false) || null;
+    if (targetGroup) {
+      targetGroup.links.push(builtinLink);
+      targetGroup.links.sort((a, b) => Number(a?.order || 0) - Number(b?.order || 0));
+      return list;
+    }
+
+    return [
+      ...list,
+      {
+        id: 'builtin:rankings-group',
+        title: '榜单专区',
+        order: 998,
+        visible: true,
+        links: [ builtinLink ],
+        builtin: true,
+        builtinKey: 'rankings',
       },
     ];
   }
