@@ -203,6 +203,9 @@ const rsa = {
     'user:author:public:detail', // 作者公开主页
     'user:article:collect:list', // 用户收藏文章列表
     'user:article:like:list', // 用户点赞文章列表
+    'user:website:favorite:list', // 用户收藏网址列表
+    'user:website:like:list', // 用户点赞网址列表
+    'user:website:comment:list', // 用户网址评论列表
     'article:cate:all', // 文章分类全部
     'article:tag:all', // 文章标签全部
     'article:topic:all', // 文章专题全部

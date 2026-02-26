@@ -156,8 +156,10 @@ module.exports = app => {
   router.all('/api/user/author/options', controller.user.authorOptions);
   router.all('/api/user/article/collect/list', controller.user.articleCollectList);
   router.all('/api/user/article/like/list', controller.user.articleLikeList);
+  router.all('/api/user/article/comment/list', controller.user.articleCommentList);
   router.all('/api/user/website/favorite/list', controller.user.websiteFavoriteList);
   router.all('/api/user/website/like/list', controller.user.websiteLikeList);
+  router.all('/api/user/website/comment/list', controller.user.websiteCommentList);
   router.all('/api/article/cate/list', controller.article.cateList);
   router.all('/api/article/cate/all', controller.article.cateAll);
   router.all('/api/article/cate/add', controller.article.cateAdd);

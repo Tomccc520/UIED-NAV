@@ -1852,7 +1852,7 @@ class UserService extends Service {
    */
   async articleCollectList(userId, params = {}) {
     const { ctx } = this;
-    const pageNo = Number(params.pageNo || 1);
+    const pageNo = Number(params.pageNo || params.page || 1);
     const pageSize = Number(params.pageSize || 10);
     const limit = Math.max(1, Math.min(50, pageSize));
     const offset = limit * (Math.max(1, pageNo) - 1);
@@ -1929,7 +1929,7 @@ class UserService extends Service {
    */
   async getUserWebsiteInteractionList(userId, params = {}, tableName, timeField = 'createTime') {
     const { ctx, app } = this;
-    const pageNo = Number(params.pageNo || 1);
+    const pageNo = Number(params.pageNo || params.page || 1);
     const pageSize = Number(params.pageSize || 10);
     const limit = Math.max(1, Math.min(50, pageSize));
     const offset = limit * (Math.max(1, pageNo) - 1);
@@ -2044,7 +2044,7 @@ class UserService extends Service {
    */
   async articleLikeList(userId, params = {}) {
     const { ctx } = this;
-    const pageNo = Number(params.pageNo || 1);
+    const pageNo = Number(params.pageNo || params.page || 1);
     const pageSize = Number(params.pageSize || 10);
     const limit = Math.max(1, Math.min(50, pageSize));
     const offset = limit * (Math.max(1, pageNo) - 1);
@@ -2118,6 +2118,154 @@ class UserService extends Service {
       total: count,
       lists,
     };
+  }
+
+  /**
+   * 用户中心评论列表通用查询
+   * @param {number} userId 用户ID
+   * @param {object} params 分页与筛选参数
+   * @param {'article'|'website'} type 评论类型
+   * @returns {Promise<{pageNo:number,pageSize:number,total:number,lists:Array}>} 评论分页列表
+   */
+  async getUserCommentList(userId, params = {}, type = 'website') {
+    const { ctx, app } = this;
+    const pageNo = Number(params.pageNo || params.page || 1);
+    const pageSize = Number(params.pageSize || 10);
+    const limit = Math.max(1, Math.min(50, pageSize));
+    const offset = limit * (Math.max(1, pageNo) - 1);
+    const keyword = String(params.keyword || '').trim();
+    const status = String(params.status || '').trim();
+
+    const isArticle = type === 'article';
+    const tableName = isArticle ? 'uied_article_comment' : 'uied_website_comment';
+    const targetTable = isArticle ? 'uied_article' : 'uied_website';
+    const targetIdField = isArticle ? 'article_id' : 'website_id';
+    const targetTitleField = isArticle ? 'title' : 'name';
+    const targetContentField = isArticle ? 'summary' : 'description';
+
+    const replacements = [ Number(userId) ];
+    let whereSql = 'c.is_delete = 0 AND c.user_id = ?';
+    if (status) {
+      whereSql += ' AND c.status = ?';
+      replacements.push(status);
+    }
+    if (keyword) {
+      whereSql += ` AND (
+        c.content LIKE ?
+        OR t.${targetTitleField} LIKE ?
+      )`;
+      replacements.push(`%${keyword}%`, `%${keyword}%`);
+    }
+
+    try {
+      const [ countRow ] = await app.model.query(
+        `
+        SELECT COUNT(1) AS total
+        FROM ${tableName} c
+        LEFT JOIN ${targetTable} t ON t.id = c.${targetIdField}
+        WHERE ${whereSql}
+        `,
+        {
+          replacements,
+          type: app.Sequelize.QueryTypes.SELECT,
+        }
+      );
+
+      const rows = await app.model.query(
+        `
+        SELECT
+          c.id,
+          c.${targetIdField} AS target_id,
+          c.parent_id,
+          c.content,
+          c.status,
+          c.like_count,
+          c.create_time,
+          c.update_time,
+          t.id AS target_row_id,
+          t.${targetTitleField} AS target_title,
+          t.slug AS target_slug,
+          ${isArticle ? 'NULL' : 't.url'} AS target_url,
+          ${isArticle ? 'NULL' : 't.icon_url'} AS target_icon_url,
+          t.${targetContentField} AS target_description
+        FROM ${tableName} c
+        LEFT JOIN ${targetTable} t ON t.id = c.${targetIdField}
+        WHERE ${whereSql}
+        ORDER BY c.id DESC
+        LIMIT ? OFFSET ?
+        `,
+        {
+          replacements: [ ...replacements, limit, offset ],
+          type: app.Sequelize.QueryTypes.SELECT,
+        }
+      );
+
+      const lists = (rows || []).map(item => {
+        const targetId = Number(item.target_id || item.target_row_id || 0);
+        return {
+          id: Number(item.id || 0),
+          targetId,
+          parentId: Number(item.parent_id || 0),
+          content: String(item.content || ''),
+          status: String(item.status || ''),
+          likeCount: Number(item.like_count || 0),
+          createTime: moment(Number(item.create_time || 0) * 1000).format('YYYY-MM-DD HH:mm:ss'),
+          updateTime: moment(Number(item.update_time || 0) * 1000).format('YYYY-MM-DD HH:mm:ss'),
+          target: {
+            id: targetId,
+            title: String(item.target_title || ''),
+            slug: String(item.target_slug || ''),
+            description: String(item.target_description || ''),
+            url: String(item.target_url || ''),
+            iconUrl: item.target_icon_url ? urlUtil.toAbsoluteUrl(item.target_icon_url) : '',
+          },
+        };
+      });
+
+      return {
+        pageNo: Math.max(1, pageNo),
+        pageSize: limit,
+        total: Number(countRow?.total || 0),
+        lists,
+      };
+    } catch (error) {
+      const message = String(error?.message || '');
+      const isCompatibleError = message.includes('doesn\'t exist')
+        || message.includes('Unknown column')
+        || message.includes('Table')
+        || message.includes('ER_NO_SUCH_TABLE')
+        || message.includes('ER_BAD_FIELD_ERROR');
+      if (!isCompatibleError) {
+        throw error;
+      }
+      ctx.logger.warn(`[user.getUserCommentList] ${type} 评论表结构兼容降级: ${message}`);
+      return {
+        pageNo: Math.max(1, pageNo),
+        pageSize: limit,
+        total: 0,
+        lists: [],
+      };
+    }
+  }
+
+  /**
+   * 用户中心文章评论列表
+   * @param {number} userId 用户ID
+   * @param {object} params 查询参数
+   * @returns {Promise<object>} 文章评论分页列表
+   */
+  async articleCommentList(userId, params = {}) {
+    return await this.getUserCommentList(userId, params, 'article');
+  }
+
+  /**
+   * 用户中心网址评论列表
+   * @param {number} userId 用户ID
+   * @param {object} params 查询参数
+   * @returns {Promise<object>} 网址评论分页列表
+   */
+  async websiteCommentList(userId, params = {}) {
+    return await this.getUserCommentList(userId, params, 'website');
   }
 
   /**

@@ -437,7 +437,7 @@ class UserController extends BaseController {
     const { ctx } = this;
     try {
       const userId = await ctx.service.user.getUserId();
-      const params = ctx.request.query || {};
+      const params = Object.keys(ctx.request.body || {}).length ? (ctx.request.body || {}) : (ctx.request.query || {});
       const data = await ctx.service.user.orderList(userId, params);
       this.result({ data });
     } catch (e) {
@@ -452,7 +452,7 @@ class UserController extends BaseController {
     const { ctx } = this;
     try {
       const userId = await ctx.service.user.getUserId();
-      const params = ctx.request.query || {};
+      const params = Object.keys(ctx.request.body || {}).length ? (ctx.request.body || {}) : (ctx.request.query || {});
       const data = await ctx.service.user.licenseList(userId, params);
       this.result({ data });
     } catch (e) {
@@ -479,7 +479,7 @@ class UserController extends BaseController {
     const { ctx } = this;
     try {
       const userId = await ctx.service.user.getUserId();
-      const params = ctx.request.query || {};
+      const params = Object.keys(ctx.request.body || {}).length ? (ctx.request.body || {}) : (ctx.request.query || {});
       const data = await ctx.service.user.messageList(userId, params);
       this.result({ data });
     } catch (e) {
@@ -515,7 +515,7 @@ class UserController extends BaseController {
     const { ctx } = this;
     try {
       const userId = await ctx.service.user.getUserId();
-      const params = ctx.request.query || {};
+      const params = Object.keys(ctx.request.body || {}).length ? (ctx.request.body || {}) : (ctx.request.query || {});
       const data = await ctx.service.user.collectList(userId, params);
       this.result({ data });
     } catch (e) {
@@ -542,7 +542,7 @@ class UserController extends BaseController {
     const { ctx } = this;
     try {
       const userId = await ctx.service.user.getUserId();
-      const params = ctx.request.query || {};
+      const params = Object.keys(ctx.request.body || {}).length ? (ctx.request.body || {}) : (ctx.request.query || {});
       const data = await ctx.service.user.articleCollectList(userId, params);
       this.result({ data });
     } catch (e) {
@@ -557,7 +557,7 @@ class UserController extends BaseController {
     const { ctx } = this;
     try {
       const userId = await ctx.service.user.getUserId();
-      const params = ctx.request.query || {};
+      const params = Object.keys(ctx.request.body || {}).length ? (ctx.request.body || {}) : (ctx.request.query || {});
       const data = await ctx.service.user.articleLikeList(userId, params);
       this.result({ data });
     } catch (e) {
@@ -589,6 +589,36 @@ class UserController extends BaseController {
       const userId = await ctx.service.user.getUserId();
       const params = Object.keys(ctx.request.body || {}).length ? (ctx.request.body || {}) : (ctx.request.query || {});
       const data = await ctx.service.user.websiteLikeList(userId, params);
+      this.result({ data });
+    } catch (e) {
+      this.result({ data: '', message: e.message, code: 1001 });
+    }
+  }
+
+  /**
+   * 用户中心文章评论列表
+   */
+  async articleCommentList() {
+    const { ctx } = this;
+    try {
+      const userId = await ctx.service.user.getUserId();
+      const params = Object.keys(ctx.request.body || {}).length ? (ctx.request.body || {}) : (ctx.request.query || {});
+      const data = await ctx.service.user.articleCommentList(userId, params);
+      this.result({ data });
+    } catch (e) {
+      this.result({ data: '', message: e.message, code: 1001 });
+    }
+  }
+
+  /**
+   * 用户中心网址评论列表
+   */
+  async websiteCommentList() {
+    const { ctx } = this;
+    try {
+      const userId = await ctx.service.user.getUserId();
+      const params = Object.keys(ctx.request.body || {}).length ? (ctx.request.body || {}) : (ctx.request.query || {});
+      const data = await ctx.service.user.websiteCommentList(userId, params);
       this.result({ data });
     } catch (e) {
       this.result({ data: '', message: e.message, code: 1001 });
@@ -635,7 +665,7 @@ class UserController extends BaseController {
     const { ctx } = this;
     try {
       const userId = await ctx.service.user.getUserId();
-      const params = ctx.request.query || {};
+      const params = Object.keys(ctx.request.body || {}).length ? (ctx.request.body || {}) : (ctx.request.query || {});
       const data = await ctx.service.user.loginLog(userId, params);
       this.result({ data });
     } catch (e) {

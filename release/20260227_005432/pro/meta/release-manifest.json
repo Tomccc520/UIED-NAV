@@ -1,0 +1,24 @@
+{
+  "edition": "pro",
+  "generatedAt": "2026-02-26T16:54:33Z",
+  "releasePreset": "first-pro",
+  "strategy": "single-mainline-license-feature",
+  "licenseBindingTemplate": {
+    "customerName": "",
+    "companyName": "",
+    "contactEmail": "",
+    "domainLimit": 1,
+    "domainWhitelist": [],
+    "expiresAt": 0
+  },
+  "requiredApis": [
+    "/api/uied/license/info",
+    "/api/uied/license/sign",
+    "/api/uied/license/verify",
+    "/api/uied/feature/list",
+    "/api/uied/commercial/mode/get",
+    "/api/uied/commercial/overview",
+    "/api/uied/delivery/package/export"
+  ],
+  "notes": "请在发包前执行 scripts/commercial-preflight-check.js，并保证 FAIL=0。"
+}

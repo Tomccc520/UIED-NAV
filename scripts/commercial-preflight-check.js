@@ -14,6 +14,9 @@ const { execFileSync } = require('child_process');
 
 const ROOT_DIR = path.resolve(__dirname, '..');
 const DEFAULT_BASE_URL = process.env.PREFLIGHT_BASE_URL || 'http://127.0.0.1:8002';
+const DEFAULT_FRONTEND_BASE_URL = process.env.PREFLIGHT_FRONTEND_BASE_URL || '';
+const DEFAULT_SMOKE_USER = process.env.PREFLIGHT_SMOKE_USER || '';
+const DEFAULT_SMOKE_PASS = process.env.PREFLIGHT_SMOKE_PASS || '';
 const REPORT_DIR = path.join(ROOT_DIR, 'docs', 'API', 'reports');
 const REPORT_FILE = path.join(REPORT_DIR, 'commercial_preflight_latest.json');
 const ROUTER_FILES = [
@@ -369,6 +372,9 @@ async function main() {
   const args = parseArgs(process.argv.slice(2));
   const reporter = createReporter();
   const baseUrl = String(args['base-url'] || DEFAULT_BASE_URL).replace(/\/+$/, '');
+  const frontendBaseUrl = String(args['frontend-base-url'] || DEFAULT_FRONTEND_BASE_URL || '').replace(/\/+$/, '');
+  const smokeUser = String(args['smoke-user'] || DEFAULT_SMOKE_USER || '').trim();
+  const smokePass = String(args['smoke-pass'] || DEFAULT_SMOKE_PASS || '').trim();
 
   let mysql = null;
   try {
@@ -396,6 +402,8 @@ async function main() {
     '/api/articles/meta/tags',
     '/api/site-info',
     '/api/settings/nav-menus',
+    '/api/daily-hot/config',
+    '/api/rankings',
   ];
   for (const endpoint of apiEndpoints) {
     const url = `${baseUrl}${endpoint}`;
@@ -416,6 +424,87 @@ async function main() {
       reporter.add('pass', '接口', endpoint, `HTTP ${res.status}`);
     } catch (error) {
       reporter.add('fail', '接口', endpoint, `请求失败: ${String(error.message || error)}`, '确认后端 8002 服务可访问。');
+    }
+  }
+
+  // 1.1) 用户中心鉴权链路检查（登录 -> 受保护接口）
+  if (!smokeUser || !smokePass) {
+    reporter.add(
+      'warn',
+      '接口',
+      '用户中心登录态链路',
+      '未提供 --smoke-user/--smoke-pass，跳过受保护接口检查',
+      '建议在发布前传入测试账号，验证 profile/订单/消息/收藏/评论等接口。'
+    );
+  } else {
+    let authHeaders = null;
+    try {
+      const loginRes = await postJson(`${baseUrl}/api/user/login`, {
+        account: smokeUser,
+        password: smokePass,
+      });
+      if (!loginRes.ok || !loginRes.json || !isApiSuccess(loginRes.json)) {
+        reporter.add(
+          'fail',
+          '接口',
+          '/api/user/login',
+          `登录失败: HTTP ${loginRes.status}, body=${String(loginRes.text || '').slice(0, 180)}`,
+          '确认测试账号可用，或先执行 /api/user/seed/testUsers。'
+        );
+      } else {
+        const loginData = extractData(loginRes.json) || {};
+        const token = String(loginData.token || '').trim();
+        if (!token) {
+          reporter.add('fail', '接口', '/api/user/login', '登录成功但未返回 token', '检查 user.login 返回结构。');
+        } else {
+          authHeaders = {
+            token,
+            Authorization: `Bearer ${token}`,
+          };
+          reporter.add('pass', '接口', '/api/user/login', `测试账号登录成功（${smokeUser}）`);
+        }
+      }
+    } catch (error) {
+      reporter.add('fail', '接口', '/api/user/login', `请求失败: ${String(error.message || error)}`, '检查后端服务与账号配置。');
+    }
+
+    if (authHeaders) {
+      const protectedChecks = [
+        { method: 'GET', path: '/api/user/profile' },
+        { method: 'POST', path: '/api/user/index/stats', body: {} },
+        { method: 'POST', path: '/api/user/message/list', body: { pageNo: 1, pageSize: 1 } },
+        { method: 'POST', path: '/api/user/order/list', body: { pageNo: 1, pageSize: 1 } },
+        { method: 'POST', path: '/api/user/license/list', body: { pageNo: 1, pageSize: 1 } },
+        { method: 'POST', path: '/api/user/article/collect/list', body: { pageNo: 1, pageSize: 1 } },
+        { method: 'POST', path: '/api/user/article/like/list', body: { pageNo: 1, pageSize: 1 } },
+        { method: 'POST', path: '/api/user/website/favorite/list', body: { pageNo: 1, pageSize: 1 } },
+        { method: 'POST', path: '/api/user/website/like/list', body: { pageNo: 1, pageSize: 1 } },
+        { method: 'POST', path: '/api/user/article/comment/list', body: { pageNo: 1, pageSize: 1 } },
+        { method: 'POST', path: '/api/user/website/comment/list', body: { pageNo: 1, pageSize: 1 } },
+      ];
+      for (const check of protectedChecks) {
+        try {
+          const res = await requestJson(`${baseUrl}${check.path}`, {
+            method: check.method,
+            headers: {
+              ...authHeaders,
+              'content-type': 'application/json',
+            },
+            body: check.method === 'POST' ? check.body : undefined,
+          });
+          if (!res.ok) {
+            reporter.add('fail', '接口', check.path, `HTTP ${res.status}`, '检查 token 鉴权、路由与权限拦截。');
+            continue;
+          }
+          if (res.json && !isApiSuccess(res.json)) {
+            reporter.add('fail', '接口', check.path, `业务响应异常: ${String(res.text || '').slice(0, 180)}`, '检查 controller/service 返回结构。');
+            continue;
+          }
+          reporter.add('pass', '接口', check.path, `HTTP ${res.status}`);
+        } catch (error) {
+          reporter.add('fail', '接口', check.path, `请求失败: ${String(error.message || error)}`, '检查后端日志与数据库状态。');
+        }
+      }
     }
   }
 
@@ -754,6 +843,31 @@ async function main() {
       }
     } catch (error) {
       reporter.add('fail', '数据', '基础数据检查', String(error.message || error), '检查 la_user/uied_article 表是否存在。');
+    }
+  }
+
+  // 6) 前端页面冒烟检查（可选）
+  if (!frontendBaseUrl) {
+    reporter.add(
+      'warn',
+      '前端',
+      '页面冒烟',
+      '未提供 --frontend-base-url，跳过前端页面可达性检查',
+      '建议发布前增加 --frontend-base-url http://127.0.0.1:3003 执行冒烟。'
+    );
+  } else {
+    const frontendPages = [ '/', '/articles', '/p/daily-hot', '/rankings', '/changelog' ];
+    for (const pagePath of frontendPages) {
+      try {
+        const res = await getJson(`${frontendBaseUrl}${pagePath}`, {}, 10000);
+        if (!res.ok) {
+          reporter.add('fail', '前端', pagePath, `HTTP ${res.status}`, '检查前端服务是否运行、路由重写是否正确。');
+          continue;
+        }
+        reporter.add('pass', '前端', pagePath, `HTTP ${res.status}`);
+      } catch (error) {
+        reporter.add('fail', '前端', pagePath, `请求失败: ${String(error.message || error)}`, '确认前端服务启动，并检查反向代理配置。');
+      }
     }
   }
 
