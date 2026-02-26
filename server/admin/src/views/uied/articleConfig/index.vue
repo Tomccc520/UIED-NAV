@@ -40,6 +40,29 @@
                 <el-form-item label="列表页封面图">
                     <el-input v-model="articleConfig.listPageCoverImage" placeholder="https://..." />
                 </el-form-item>
+                <el-divider content-position="left">详情页布局</el-divider>
+                <el-form-item label="详情页宽度模式">
+                    <el-select v-model="articleConfig.detailLayoutWidthMode" style="width: 260px">
+                        <el-option label="标准（居中阅读）" value="contained" />
+                        <el-option label="宽版（信息更密）" value="wide" />
+                        <el-option label="全宽（屏幕自适应）" value="fluid" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="正文最大宽度">
+                    <el-input-number
+                        v-model="articleConfig.detailContentMaxWidth"
+                        :min="680"
+                        :max="1600"
+                        :step="20"
+                    />
+                    <span class="ml-2 text-xs text-[#909399]">px</span>
+                </el-form-item>
+                <el-form-item label="标题区对齐">
+                    <el-radio-group v-model="articleConfig.detailHeaderAlign">
+                        <el-radio-button label="center">居中</el-radio-button>
+                        <el-radio-button label="left">左对齐</el-radio-button>
+                    </el-radio-group>
+                </el-form-item>
                 <el-form-item label="评论启用">
                     <el-switch v-model="articleConfig.commentsEnabled" />
                 </el-form-item>
@@ -104,6 +127,9 @@ const articleConfig = reactive({
     listPageTitle: '设计专栏',
     listPageDescription: '汇聚优质设计文章，分享前沿设计趋势、实战技巧与行业洞察',
     listPageCoverImage: '',
+    detailLayoutWidthMode: 'contained',
+    detailContentMaxWidth: 880,
+    detailHeaderAlign: 'center',
     commentsEnabled: true,
     topicsEnabled: true
 })

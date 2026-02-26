@@ -1837,7 +1837,7 @@ class FrontendController extends Controller {
   async articleComments() {
     const { ctx } = this;
     const { id } = ctx.params;
-    const { page = 1, pageSize = 10 } = ctx.query;
+    const { page = 1, pageSize = 10, sort = 'latest' } = ctx.query;
 
     try {
       const articleId = this.parsePositiveInt(id, 0);
@@ -1853,7 +1853,8 @@ class FrontendController extends Controller {
         page: pageNo,
         pageSize: limit,
         type: 'article',
-        status: 'approved'
+        status: 'approved',
+        sort: String(sort || 'latest').trim().toLowerCase() === 'hot' ? 'hot' : 'latest',
       });
       const total = this.parsePositiveInt(result?.count, 0);
       ctx.body = {

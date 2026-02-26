@@ -14,11 +14,73 @@ const Service = require('egg').Service;
 
 class CommentService extends Service {
   /**
+   * 格式化评论时间文本（YYYY-MM-DD HH:mm:ss）
+   */
+  formatCommentTimeString(timestamp) {
+    const seconds = Number(timestamp || 0);
+    if (!Number.isFinite(seconds) || seconds <= 0) return '';
+    const date = new Date(seconds * 1000);
+    const pad = value => String(value).padStart(2, '0');
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+    const hour = pad(date.getHours());
+    const minute = pad(date.getMinutes());
+    const second = pad(date.getSeconds());
+    return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+  }
+
+  /**
+   * 检查评论表字段是否存在（用于兼容不同客户库结构）
+   */
+  async hasCommentColumn(tableName, columnName) {
+    const { app } = this;
+    const cacheKey = `${String(tableName || '')}.${String(columnName || '')}`.toLowerCase();
+    if (!app.__uiedCommentColumnCache) {
+      app.__uiedCommentColumnCache = new Map();
+    }
+    if (app.__uiedCommentColumnCache.has(cacheKey)) {
+      return app.__uiedCommentColumnCache.get(cacheKey) === true;
+    }
+    const [ row ] = await app.model.query(
+      `
+      SELECT COUNT(1) AS cnt
+      FROM INFORMATION_SCHEMA.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = ?
+        AND COLUMN_NAME = ?
+      `,
+      {
+        replacements: [ String(tableName || ''), String(columnName || '') ],
+        type: app.Sequelize.QueryTypes.SELECT,
+      }
+    );
+    const exists = Number(row?.cnt || 0) > 0;
+    app.__uiedCommentColumnCache.set(cacheKey, exists);
+    return exists;
+  }
+
+  /**
+   * 构建评论排序 SQL，热度优先时自动回退到时间排序
+   */
+  async buildCommentOrderClause(tableName, sort = 'latest') {
+    const normalizedSort = String(sort || '').trim().toLowerCase();
+    if (normalizedSort !== 'hot') {
+      return 'c.create_time DESC, c.id DESC';
+    }
+    const hasLikeCountColumn = await this.hasCommentColumn(tableName, 'like_count');
+    if (hasLikeCountColumn) {
+      return 'c.like_count DESC, c.create_time DESC, c.id DESC';
+    }
+    return 'c.create_time DESC, c.id DESC';
+  }
+
+  /**
    * 获取评论列表（管理后台 & 前端）
    */
   async list(params = {}) {
     const { app } = this;
-    const { page = 1, pageSize = 15, type = 'website', status, keyword, articleId, websiteId } = params;
+    const { page = 1, pageSize = 15, type = 'website', status, keyword, articleId, websiteId, sort = 'latest' } = params;
     const offset = (page - 1) * pageSize;
 
     const tableName = type === 'article' ? 'uied_article_comment' : 'uied_website_comment';
@@ -56,13 +118,15 @@ class CommentService extends Service {
       { replacements, type: app.Sequelize.QueryTypes.SELECT }
     );
 
+    const orderClause = await this.buildCommentOrderClause(tableName, sort);
+
     // 查询列表（关联目标表获取标题）
     const lists = await app.model.query(
       `SELECT c.*, t.${titleField} as target_title
        FROM ${tableName} c
        LEFT JOIN ${targetTable} t ON c.${targetIdField} = t.id
        WHERE ${conditions}
-       ORDER BY c.create_time DESC
+       ORDER BY ${orderClause}
        LIMIT ? OFFSET ?`,
       {
         replacements: [ ...replacements, parseInt(pageSize), offset ],
@@ -97,7 +161,7 @@ class CommentService extends Service {
     const targetId = articleId || websiteId;
     
     // 插入评论
-    const [ result ] = await app.model.query(
+    const insertResult = await app.model.query(
       `INSERT INTO ${tableName} 
        (${targetIdField}, parent_id, content, user_id, nickname, email, status, create_time, update_time)
        VALUES (?, ?, ?, ?, ?, ?, 'approved', ?, ?)`,
@@ -112,16 +176,33 @@ class CommentService extends Service {
           now,
           now
         ],
-        type: app.Sequelize.QueryTypes.INSERT
+        type: app.Sequelize.QueryTypes.INSERT,
       }
     );
-    
-    return {
-      id: result,
-      content,
-      createTime: now,
-      status: 'approved'
-    };
+
+    const insertPayload = Array.isArray(insertResult) ? insertResult[0] : insertResult;
+    const insertId = Number(
+      typeof insertPayload === 'object' && insertPayload !== null
+        ? (insertPayload.insertId || insertPayload.id || 0)
+        : insertPayload
+    ) || 0;
+    const [ detail ] = await app.model.query(
+      `SELECT * FROM ${tableName} WHERE id = ? LIMIT 1`,
+      {
+        replacements: [ insertId ],
+        type: app.Sequelize.QueryTypes.SELECT,
+      }
+    );
+    if (!detail) {
+      return {
+        id: insertId,
+        content,
+        parentId: Number(parentId || 0),
+        createTime: this.formatCommentTimeString(now),
+        status: 'approved',
+      };
+    }
+    return this.formatComment(detail, type);
   }
 
   /**
@@ -329,19 +410,32 @@ class CommentService extends Service {
    */
   formatComment(comment, type) {
     const targetIdField = type === 'article' ? 'article_id' : 'website_id';
+    const createTimestamp = Number(comment.create_time || 0);
+    const updateTimestamp = Number(comment.update_time || 0);
+    const createTime = this.formatCommentTimeString(createTimestamp);
+    const updateTime = this.formatCommentTimeString(updateTimestamp);
     return {
       id: comment.id,
       targetId: comment[targetIdField],
       targetTitle: comment.target_title || '',
       userId: comment.user_id,
+      articleId: type === 'article' ? Number(comment[targetIdField] || 0) : 0,
+      websiteId: type === 'website' ? Number(comment[targetIdField] || 0) : 0,
+      parentId: Number(comment.parent_id || 0),
+      isTop: Number(comment.is_top || 0),
       nickname: comment.nickname,
       email: comment.email,
       content: comment.content,
       status: comment.status,
       ip: comment.ip,
       userAgent: comment.user_agent,
-      createdAt: comment.create_time ? comment.create_time * 1000 : null,
-      updatedAt: comment.update_time ? comment.update_time * 1000 : null,
+      avatar: comment.avatar || '',
+      likeCount: Number(comment.like_count || 0),
+      isLike: Number(comment.is_like || 0),
+      createTime,
+      updateTime,
+      createdAt: createTimestamp ? createTimestamp * 1000 : null,
+      updatedAt: updateTimestamp ? updateTimestamp * 1000 : null,
     };
   }
 

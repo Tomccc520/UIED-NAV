@@ -79,6 +79,16 @@ class WebsitePreviewSnapshotService extends Service {
   }
 
   /**
+   * 构建 thum.io 兜底截图地址（用于 mShots 失败时的二级兜底）
+   * @param {string} rawUrl 原始网址
+   * @returns {string} thum.io 截图 URL
+   */
+  buildThumIoUrl(rawUrl) {
+    const normalized = this.normalizeUrl(rawUrl);
+    return `https://image.thum.io/get/width/1280/noanimate/${normalized}`;
+  }
+
+  /**
    * 确保截图缓存目录存在
    */
   async ensureSnapshotDir() {
@@ -198,6 +208,7 @@ class WebsitePreviewSnapshotService extends Service {
         ok: false,
         source: 'mshots_fallback',
         url: this.buildMshotsUrl(website.url),
+        fallbackUrls: [ this.buildThumIoUrl(website.url) ],
         localGenerated: false,
         fallback: true,
         reason: captureResult.reason || 'Playwright 截图不可用',
@@ -220,6 +231,7 @@ class WebsitePreviewSnapshotService extends Service {
       ok: false,
       source: 'mshots_fallback',
       url: this.buildMshotsUrl(website.url),
+      fallbackUrls: [ this.buildThumIoUrl(website.url) ],
       localGenerated: false,
       fallback: true,
       reason: 'Playwright 自动截图已关闭，使用 mShots 兜底',

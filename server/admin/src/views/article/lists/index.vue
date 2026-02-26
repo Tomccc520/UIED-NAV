@@ -288,6 +288,7 @@ interface ArticleListItem {
     id: number
     image?: string
     title?: string
+    slug?: string
     category?: string
     author?: string
     visit?: number
@@ -326,9 +327,19 @@ const normalizeFrontendRoutePath = (rawPath: string, fallbackPath = '/articles')
     return normalized ? `/${normalized}` : '/'
 }
 const frontendArticleDetailPath = normalizeFrontendRoutePath(
-    import.meta.env.VITE_FRONTEND_ARTICLE_DETAIL_PATH || '/articles',
-    '/articles'
+    import.meta.env.VITE_FRONTEND_ARTICLE_DETAIL_PATH || '/article',
+    '/article'
 )
+
+/**
+ * 统一获取前台文章详情路径，优先兼容固定链接「/article/:slug」
+ */
+const resolveFrontendArticleDetailPath = () => {
+    if (frontendArticleDetailPath === '/articles') {
+        return '/article'
+    }
+    return frontendArticleDetailPath
+}
 
 const { pager, getLists, resetPage, resetParams } = usePaging({
     fetchFun: articleLists,
@@ -475,9 +486,10 @@ const handleAuditPass = async (row: ArticleListItem) => {
  * 在前台新窗口查看文章
  */
 const handleView = (row: ArticleListItem) => {
-    const articleSlug = String((row as any)?.slug || row.id || '').trim()
+    const articleSlug = String(row?.slug || row?.id || '').trim()
+    const articlePath = resolveFrontendArticleDetailPath()
     window.open(
-        `${frontendUrl}${frontendArticleDetailPath}/${encodeURIComponent(articleSlug)}`,
+        `${frontendUrl}${articlePath}/${encodeURIComponent(articleSlug)}`,
         '_blank'
     )
 }

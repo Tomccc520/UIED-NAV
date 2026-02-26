@@ -192,10 +192,19 @@ class SettingService extends Service {
       listPageTitle: '设计专栏',
       listPageDescription: '汇聚优质设计文章，分享前沿设计趋势、实战技巧与行业洞察',
       listPageCoverImage: '',
+      detailLayoutWidthMode: 'contained',
+      detailContentMaxWidth: 880,
+      detailHeaderAlign: 'center',
       commentsEnabled: true,
       topicsEnabled: true,
     };
     const merged = { ...defaults, ...(config || {}) };
+    const detailLayoutWidthMode = [ 'contained', 'wide', 'fluid' ].includes(String(merged.detailLayoutWidthMode || '').trim())
+      ? String(merged.detailLayoutWidthMode || '').trim()
+      : defaults.detailLayoutWidthMode;
+    const detailHeaderAlign = [ 'left', 'center' ].includes(String(merged.detailHeaderAlign || '').trim())
+      ? String(merged.detailHeaderAlign || '').trim()
+      : defaults.detailHeaderAlign;
     return {
       ...merged,
       enabled: merged.enabled !== false,
@@ -203,6 +212,11 @@ class SettingService extends Service {
       homeSectionLimit: Number.isFinite(Number(merged.homeSectionLimit))
         ? Math.max(1, Math.min(50, Number(merged.homeSectionLimit)))
         : defaults.homeSectionLimit,
+      detailLayoutWidthMode,
+      detailContentMaxWidth: Number.isFinite(Number(merged.detailContentMaxWidth))
+        ? Math.max(680, Math.min(1600, Number(merged.detailContentMaxWidth)))
+        : defaults.detailContentMaxWidth,
+      detailHeaderAlign,
       commentsEnabled: merged.commentsEnabled !== false,
       topicsEnabled: merged.topicsEnabled !== false,
     };
@@ -613,6 +627,9 @@ class SettingService extends Service {
       listPageTitle: '设计专栏',
       listPageDescription: '汇聚优质设计文章，分享前沿设计趋势、实战技巧与行业洞察',
       listPageCoverImage: '',
+      detailLayoutWidthMode: 'contained',
+      detailContentMaxWidth: 880,
+      detailHeaderAlign: 'center',
       commentsEnabled: true,
       topicsEnabled: true,
     };

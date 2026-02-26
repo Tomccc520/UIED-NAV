@@ -721,24 +721,87 @@ class UserService extends Service {
   }
 
   /**
+   * 获取前台用户 token 有效期（秒）
+   */
+  getUserTokenTtlSeconds() {
+    const appConfig = this.getAppConfig();
+    const fromConfig = Number(appConfig.userTokenTtlSeconds || appConfig.userTokenTtl || 0);
+    if (Number.isFinite(fromConfig) && fromConfig > 300) {
+      return Math.floor(fromConfig);
+    }
+    // 默认 7 天
+    return 7 * 24 * 60 * 60;
+  }
+
+  /**
+   * 计算 token 续签阈值（秒）
+   */
+  getUserTokenRefreshThresholdSeconds(ttlSeconds) {
+    const ttl = Number(ttlSeconds || 0);
+    if (!Number.isFinite(ttl) || ttl <= 0) return 1800;
+    return Math.max(1800, Math.floor(ttl / 3));
+  }
+
+  /**
+   * 缓存前台用户 token 映射并写入 TTL
+   */
+  async cacheUserTokenSession(token, user) {
+    const { ctx } = this;
+    if (!token || !user || !user.id) return;
+    const appConfig = this.getAppConfig();
+    const userTokenKey = appConfig.userTokenKey || extendConfig.userTokenKey;
+    const userTokenSet = appConfig.userTokenSet || extendConfig.userTokenSet;
+    const userInfoKey = appConfig.userInfoKey || extendConfig.userInfoKey;
+    const tokenTtlSeconds = this.getUserTokenTtlSeconds();
+    const key = userTokenKey + token;
+    const setKey = userTokenSet + user.id;
+    await ctx.service.redis.set(key, user.id, tokenTtlSeconds);
+    if (ctx.app.redis) {
+      await ctx.app.redis.sadd(setKey, token);
+      await ctx.app.redis.expire(setKey, tokenTtlSeconds);
+    }
+    const safeUser = this.buildSafeUserInfo(user);
+    await ctx.service.redis.set(userInfoKey + user.id, JSON.stringify(safeUser));
+  }
+
+  /**
+   * Redis 丢失时尝试通过 token 解密恢复用户会话
+   */
+  async tryRestoreUserSessionByToken(token) {
+    const { ctx } = this;
+    if (!token) return 0;
+    let decoded = {};
+    try {
+      const decodedRaw = ctx.getDecodeToken(token);
+      decoded = safeJsonParse(decodedRaw, {});
+    } catch (error) {
+      return 0;
+    }
+    const sn = Number(decoded?.username || 0);
+    const password = String(decoded?.password || '').trim();
+    if (!sn || !password) return 0;
+    const user = await ctx.model.User.findOne({
+      where: {
+        sn,
+        password,
+        isDelete: 0,
+      },
+    });
+    if (!user || Number(user.isDisable || 0) === 1) return 0;
+    await this.cacheUserTokenSession(token, user);
+    return Number(user.id || 0);
+  }
+
+  /**
    * 生成用户令牌
    */
   async createUserToken(user) {
     const { ctx } = this;
-    const appConfig = this.getAppConfig();
     const token = ctx.setToken({
       username: user.sn,
       password: user.password,
     });
-    const userTokenKey = appConfig.userTokenKey || extendConfig.userTokenKey;
-    const userTokenSet = appConfig.userTokenSet || extendConfig.userTokenSet;
-    const userInfoKey = appConfig.userInfoKey || extendConfig.userInfoKey;
-    const key = userTokenKey + token;
-    const setKey = userTokenSet + user.id;
-    await ctx.service.redis.set(key, user.id);
-    await ctx.service.redis.sadd(setKey, token);
-    const safeUser = this.buildSafeUserInfo(user);
-    await ctx.service.redis.set(userInfoKey + user.id, JSON.stringify(safeUser));
+    await this.cacheUserTokenSession(token, user);
     return token;
   }
 
@@ -753,9 +816,22 @@ class UserService extends Service {
       throw new Error('未登录');
     }
     const userTokenKey = appConfig.userTokenKey || extendConfig.userTokenKey;
-    const uid = await ctx.service.redis.get(userTokenKey + token);
+    const tokenKey = userTokenKey + token;
+    let uid = await ctx.service.redis.get(tokenKey);
+    if (!uid) {
+      const restoredUid = await this.tryRestoreUserSessionByToken(token);
+      if (restoredUid > 0) {
+        uid = String(restoredUid);
+      }
+    }
     if (!uid) {
       throw new Error('登录已失效');
+    }
+    const tokenTtlSeconds = this.getUserTokenTtlSeconds();
+    const refreshThreshold = this.getUserTokenRefreshThresholdSeconds(tokenTtlSeconds);
+    const remainTtl = Number(await ctx.service.redis.ttl(tokenKey) || -1);
+    if (remainTtl > 0 && remainTtl < refreshThreshold) {
+      await ctx.service.redis.expire(tokenKey, tokenTtlSeconds);
     }
     return parseInt(uid, 10);
   }
