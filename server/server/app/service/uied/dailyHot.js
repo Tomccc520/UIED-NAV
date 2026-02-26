@@ -159,7 +159,7 @@ class DailyHotService extends Service {
     const apiBaseUrl = String(source.apiBaseUrl || defaults.apiBaseUrl).trim() || defaults.apiBaseUrl;
     const timeoutMs = this.parsePositiveInt(source.timeoutMs, defaults.timeoutMs, 1000, 30000);
     const cacheTtlSeconds = this.parsePositiveInt(source.cacheTtlSeconds, defaults.cacheTtlSeconds, 30, 86400);
-    const defaultPlatforms = this.toStringList(source.defaultPlatforms);
+    const defaultPlatforms = Array.from(new Set(this.toStringList(source.defaultPlatforms)));
     const maxPlatforms = this.parsePositiveInt(source.maxPlatforms, defaults.maxPlatforms, 1, 50);
     const defaultLimit = this.parsePositiveInt(source.defaultLimit, defaults.defaultLimit, 1, 30);
     const displayPlacements = this.normalizeDisplayPlacements(source.displayPlacements);
@@ -171,7 +171,9 @@ class DailyHotService extends Service {
       apiBaseUrl: apiBaseUrl.endsWith('/') ? apiBaseUrl : `${apiBaseUrl}/`,
       timeoutMs,
       cacheTtlSeconds,
-      defaultPlatforms: defaultPlatforms.length > 0 ? defaultPlatforms : defaults.defaultPlatforms,
+      defaultPlatforms: defaultPlatforms.length > 0
+        ? defaultPlatforms
+        : Array.from(new Set(defaults.defaultPlatforms)),
       defaultLimit,
       maxPlatforms,
       displayPlacements: displayPlacements.length > 0 ? displayPlacements : defaults.displayPlacements,
@@ -586,6 +588,9 @@ class DailyHotService extends Service {
     try {
       const payload = await this.requestProvider({}, { config });
       remotePlatforms = this.normalizePlatformsResponse(payload);
+      if (!Array.isArray(remotePlatforms) || remotePlatforms.length === 0) {
+        remotePlatforms = this.toStringList(config.defaultPlatforms);
+      }
     } catch (error) {
       this.ctx.logger.warn('[dailyHot] 获取远程平台列表失败，降级默认配置:', error.message);
       remotePlatforms = this.toStringList(config.defaultPlatforms);

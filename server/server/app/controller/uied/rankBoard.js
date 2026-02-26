@@ -19,10 +19,14 @@ class RankBoardController extends baseController {
     const { ctx } = this;
     const includeDisabled = String(ctx.query?.includeDisabled || '1').trim() === '1';
     try {
-      const list = await ctx.service.uied.rankBoard.getConfigList({ includeDisabled });
+      const [ list, moduleConfig ] = await Promise.all([
+        ctx.service.uied.rankBoard.getConfigList({ includeDisabled }),
+        ctx.service.uied.rankBoard.getPublicConfig(),
+      ]);
       this.result({
         data: {
           list,
+          moduleConfig,
           total: Array.isArray(list) ? list.length : 0,
         },
       });
@@ -38,15 +42,28 @@ class RankBoardController extends baseController {
   async configSave() {
     const { ctx } = this;
     const list = Array.isArray(ctx.request.body?.list) ? ctx.request.body.list : [];
-    if (list.length === 0) {
+    const moduleConfig = ctx.request.body?.moduleConfig || null;
+    if (list.length === 0 && !moduleConfig) {
       this.result({ code: 400, message: '请提供配置列表' });
       return;
     }
     try {
-      const rows = await ctx.service.uied.rankBoard.saveConfigList(list);
+      const tasks = [];
+      if (list.length > 0) {
+        tasks.push(ctx.service.uied.rankBoard.saveConfigList(list));
+      } else {
+        tasks.push(ctx.service.uied.rankBoard.getConfigList({ includeDisabled: true }));
+      }
+      if (moduleConfig) {
+        tasks.push(ctx.service.uied.rankBoard.savePublicConfig(moduleConfig));
+      } else {
+        tasks.push(ctx.service.uied.rankBoard.getPublicConfig());
+      }
+      const [ rows, savedModuleConfig ] = await Promise.all(tasks);
       this.result({
         data: {
           list: rows,
+          moduleConfig: savedModuleConfig,
           total: Array.isArray(rows) ? rows.length : 0,
         },
         message: '保存成功',
@@ -108,14 +125,16 @@ class RankBoardController extends baseController {
   async schema() {
     const { ctx } = this;
     try {
-      const [ draft, configs ] = await Promise.all([
+      const [ draft, configs, moduleConfig ] = await Promise.all([
         ctx.service.uied.rankBoard.getFieldDraft(),
         ctx.service.uied.rankBoard.getConfigList({ includeDisabled: true }),
+        ctx.service.uied.rankBoard.getPublicConfig(),
       ]);
       this.result({
         data: {
           draft,
           configs,
+          moduleConfig,
         },
       });
     } catch (error) {

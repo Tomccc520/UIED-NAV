@@ -136,6 +136,27 @@
                             <span class="form-tip">勾选后会自动注入对应前台位置（导航/页脚/悬浮入口等）。</span>
                         </el-form-item>
                     </el-col>
+                    <el-col :span="24">
+                        <el-form-item label="运营快捷预设">
+                            <div class="quick-preset-wrap">
+                                <el-button size="small" @click="handleApplyOpsPreset('nav_footer')">
+                                    导航 + 页脚（常用）
+                                </el-button>
+                                <el-button size="small" @click="handleApplyOpsPreset('quick_only')">
+                                    仅导航快捷入口
+                                </el-button>
+                                <el-button size="small" @click="handleApplyOpsPreset('floating_focus')">
+                                    悬浮入口优先
+                                </el-button>
+                                <el-button size="small" @click="handleApplyOpsPreset('all')">
+                                    全部入口都显示
+                                </el-button>
+                                <div class="form-tip">
+                                    预设只会修改显示位置、入口名称与默认平台，不会改高级设置。
+                                </div>
+                            </div>
+                        </el-form-item>
+                    </el-col>
                     <el-col :span="8">
                         <el-form-item label="入口名称">
                             <el-input v-model="globalForm.displayLabel" placeholder="每日热榜" />
@@ -164,6 +185,17 @@
                     <el-col :span="8">
                         <el-form-item label="新窗口打开">
                             <el-switch v-model="globalForm.displayOpenInNewTab" />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                        <el-form-item label="前台效果预览">
+                            <div class="ops-preview-line">
+                                <span class="ops-preview-line__label">{{ globalForm.displayLabel || '每日热榜' }}</span>
+                                <code>{{ normalizedDisplayPath }}</code>
+                                <span>位置 {{ (globalForm.displayPlacements || []).length }} 个</span>
+                                <span>默认平台 {{ (globalForm.defaultPlatforms || []).length }} 个</span>
+                                <span>每平台 {{ globalForm.defaultLimit }} 条</span>
+                            </div>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -386,6 +418,11 @@ const enabledPlatformQuickOptions = computed(() => {
  * 草案 JSON 文本
  */
 const schemaText = computed(() => JSON.stringify(schemaData.value || {}, null, 2))
+const normalizedDisplayPath = computed(() => {
+    const path = String(globalForm.displayPath || '').trim()
+    if (!path) return '/p/daily-hot'
+    return path.startsWith('/') ? path : `/${path}`
+})
 
 /**
  * 加载全局配置
@@ -518,6 +555,28 @@ const handleClearDefaultPlatforms = () => {
 }
 
 /**
+ * 运营快捷预设（降低运营配置门槛）
+ */
+const handleApplyOpsPreset = (preset: 'nav_footer' | 'quick_only' | 'floating_focus' | 'all') => {
+    if (preset === 'nav_footer') {
+        globalForm.displayPlacements = [ 'home_menu', 'footer_link' ]
+        if (!String(globalForm.displayLabel || '').trim()) globalForm.displayLabel = '每日热榜'
+        return
+    }
+    if (preset === 'quick_only') {
+        globalForm.displayPlacements = [ 'nav_quick_entry' ]
+        if (!String(globalForm.displayLabel || '').trim()) globalForm.displayLabel = '今日热榜'
+        return
+    }
+    if (preset === 'floating_focus') {
+        globalForm.displayPlacements = [ 'fixed_link', 'nav_quick_entry' ]
+        if (!String(globalForm.displayLabel || '').trim()) globalForm.displayLabel = '热点速览'
+        return
+    }
+    globalForm.displayPlacements = displayPlacementOptions.map((item) => item.value)
+}
+
+/**
  * 删除平台行
  */
 const handleDeletePlatformRow = async (row: PlatformRow, index: number) => {
@@ -625,5 +684,43 @@ onMounted(() => {
     color: #909399;
     font-size: 12px;
     line-height: 1.6;
+}
+
+.quick-preset-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.quick-preset-wrap .form-tip {
+    margin-left: 4px;
+}
+
+.ops-preview-line {
+    min-height: 38px;
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid #ebeef5;
+    background: #f8fafc;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: #606266;
+}
+
+.ops-preview-line__label {
+    font-weight: 600;
+    color: #303133;
+}
+
+.ops-preview-line code {
+    background: rgba(0, 0, 0, 0.04);
+    padding: 2px 6px;
+    border-radius: 6px;
+    color: #334155;
 }
 </style>

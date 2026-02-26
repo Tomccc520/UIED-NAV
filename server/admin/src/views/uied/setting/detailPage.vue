@@ -26,6 +26,7 @@
             </el-tabs>
 
             <el-form :model="config" label-width="160px" style="max-width: 700px">
+                <div v-show="activeSectionTab === 'layout'" class="setting-section-panel">
                 <!-- 布局与样式（售卖版） -->
                 <div id="detail-page-config-section-layout">
                     <el-divider content-position="left">布局与样式（售卖版）</el-divider>
@@ -81,8 +82,10 @@
                     />
                     <span class="form-tip">站点数据面板标题文案，可按客户行业改成更贴近的名称。</span>
                 </el-form-item>
+                </div>
 
                 <!-- 详情侧边栏（兼容前端旧接口） -->
+                <div v-show="activeSectionTab === 'sidebarOps'" class="setting-section-panel">
                 <div id="detail-page-config-section-sidebar-ops">
                     <el-divider content-position="left">详情侧边栏（兼容前端旧接口）</el-divider>
                 </div>
@@ -266,8 +269,10 @@
                         placeholder="例如：detail_bottom"
                     />
                 </el-form-item>
+                </div>
 
                 <!-- SEO 模块 -->
+                <div v-show="activeSectionTab === 'seo'" class="setting-section-panel">
                 <div id="detail-page-config-section-seo">
                     <el-divider content-position="left">详情页 SEO 模块（FAQ / 长尾词 / Schema）</el-divider>
                 </div>
@@ -331,8 +336,10 @@
                     <el-switch v-model="config.seoSchemaEnabled" />
                     <span class="form-tip">开启后前端注入 JSON-LD（WebPage/Breadcrumb/FAQPage）。</span>
                 </el-form-item>
+                </div>
 
                 <!-- 区块显示控制 -->
+                <div v-show="activeSectionTab === 'blocks'" class="setting-section-panel">
                 <div id="detail-page-config-section-blocks">
                     <el-divider content-position="left">区块显示控制</el-divider>
                 </div>
@@ -466,8 +473,10 @@
                         >开启后，详情页将展示该网站关联的标签，方便用户了解网站特征</span
                     >
                 </el-form-item>
+                </div>
 
                 <!-- 直达按钮 -->
+                <div v-show="activeSectionTab === 'footer'" class="setting-section-panel">
                 <div id="detail-page-config-section-footer">
                     <el-divider content-position="left">直达按钮</el-divider>
                 </div>
@@ -591,6 +600,7 @@
                     />
                     <span class="form-tip">访问按钮上显示的文字，默认为「访问网站」</span>
                 </el-form-item>
+                </div>
 
                 <!-- 保存按钮 -->
                 <el-form-item>
@@ -702,16 +712,13 @@ const detailPageSectionAnchorMap: Record<string, string> = {
 }
 
 /**
- * 点击顶部标签后滚动到对应配置区块，减少长页面滚动成本
+ * 顶部标签切换（当前版本采用分组显示，不再仅依赖锚点滚动）
  */
 const handleSectionTabClick = async (pane: any) => {
     const tabName = String(pane?.props?.name || pane?.paneName || activeSectionTab.value || '')
-    const anchorId = detailPageSectionAnchorMap[tabName]
-    if (!anchorId) return
+    if (!detailPageSectionAnchorMap[tabName]) return
+    activeSectionTab.value = tabName
     await nextTick()
-    const target = document.getElementById(anchorId)
-    if (!target) return
-    target.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
 // 加载配置
@@ -759,6 +766,9 @@ onMounted(() => {
     padding-left: 2px;
     line-height: 1.6;
 }
+.setting-section-panel {
+    animation: fadeInSection 0.18s ease;
+}
 
 /* 设置页面头部样式 */
 .setting-header {
@@ -794,6 +804,17 @@ onMounted(() => {
 
 .setting-nav-tabs :deep(.el-tabs__nav-wrap)::after {
     background-color: #ebeef5;
+}
+
+@keyframes fadeInSection {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* 优化：问号提示图标样式 */

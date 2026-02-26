@@ -25,6 +25,35 @@ class BannerService extends Service {
     return map[position] || position || '';
   }
 
+  /**
+   * 获取广告位置别名集合（兼容后台配置值与前端请求值不一致）
+   * @param {string} position 前端传入的位置标识
+   * @returns {string[]} 可匹配的位置列表
+   */
+  getPositionAliases(position) {
+    const normalized = String(position || '').trim();
+    if (!normalized) return [];
+
+    const aliasGroups = {
+      top: [ 'top', 'home', 'global_strip' ],
+      home: [ 'home', 'top', 'global_strip' ],
+      global_strip: [ 'global_strip', 'home', 'top' ],
+      bottom: [ 'bottom', 'footer' ],
+      footer: [ 'footer', 'bottom' ],
+      sidebar: [ 'sidebar', 'website_detail_sidebar', 'detail_sidebar' ],
+      website_detail_sidebar: [ 'website_detail_sidebar', 'sidebar', 'detail_sidebar' ],
+      detail_sidebar: [ 'detail_sidebar', 'website_detail_sidebar', 'sidebar' ],
+      popup: [ 'popup', 'detail' ],
+      detail: [ 'detail', 'popup' ],
+      detail_top: [ 'detail_top' ],
+      detail_inline: [ 'detail_inline' ],
+      detail_bottom: [ 'detail_bottom' ],
+    };
+
+    const aliases = aliasGroups[normalized] || [ normalized ];
+    return Array.from(new Set(aliases.filter(Boolean)));
+  }
+
   async list(params = {}) {
     const { app } = this;
     const page = parseInt(params.pageNo) || 1;
@@ -131,8 +160,14 @@ class BannerService extends Service {
     replacements.push(now, now);
 
     if (position) {
-      whereSql += ' AND position = ?';
-      replacements.push(position);
+      const positionAliases = this.getPositionAliases(position);
+      if (positionAliases.length > 1) {
+        whereSql += ` AND position IN (${positionAliases.map(() => '?').join(',')})`;
+        replacements.push(...positionAliases);
+      } else {
+        whereSql += ' AND position = ?';
+        replacements.push(positionAliases[0] || position);
+      }
     }
 
     // page_slug 为空表示全局；支持 all 作为通配值

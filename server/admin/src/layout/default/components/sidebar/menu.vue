@@ -4,14 +4,6 @@
         :class="themeClass"
         :style="isCollapsed ? '' : `--aside-width: ${width}px`"
     >
-        <div v-if="!isCollapsed" class="menu-search-bar">
-            <el-input
-                v-model.trim="menuKeyword"
-                clearable
-                size="small"
-                placeholder="搜索功能菜单..."
-            />
-        </div>
         <el-scrollbar>
             <div v-if="menuKeyword && displayRoutes.length === 0" class="menu-search-empty">
                 未找到匹配功能，请换个关键词试试
@@ -33,6 +25,14 @@
                 />
             </el-menu>
         </el-scrollbar>
+        <div v-if="!isCollapsed" class="menu-search-bar menu-search-bar--bottom">
+            <el-input
+                v-model.trim="menuKeyword"
+                clearable
+                size="small"
+                placeholder="搜索功能菜单..."
+            />
+        </div>
     </div>
 </template>
 
@@ -124,6 +124,12 @@ const displayRoutes = computed<RouteRecordRaw[]>(() => {
         :deep(.el-input__wrapper) {
             border-radius: 10px;
         }
+        &.menu-search-bar--bottom {
+            border-bottom: 0;
+            border-top: 1px solid rgba(0, 0, 0, 0.04);
+            margin-top: auto;
+            padding: 8px 10px 10px;
+        }
     }
     .menu-search-empty {
         margin: 10px 10px 0;
@@ -138,6 +144,9 @@ const displayRoutes = computed<RouteRecordRaw[]>(() => {
         .menu-search-bar {
             border-bottom-color: rgba(255, 255, 255, 0.08);
             background: rgba(17, 24, 39, 0.75);
+            &.menu-search-bar--bottom {
+                border-top-color: rgba(255, 255, 255, 0.08);
+            }
         }
         .menu-search-empty {
             color: #cbd5e1;

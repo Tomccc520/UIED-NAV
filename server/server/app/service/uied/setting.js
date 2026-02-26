@@ -547,7 +547,7 @@ class SettingService extends Service {
       spacingDensity: 'compact',
       labelVisualStyle: 'soft',
       dataPanelEnabled: true,
-      dataPanelTitle: '站点数据',
+      dataPanelTitle: '站点访问数据',
       heroAccentGlassEnabled: true,
       enabled: true,
       showRelated: true,
