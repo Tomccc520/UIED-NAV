@@ -89,6 +89,11 @@ export function uiedWebsiteSearch(params?: any) {
     return request.get({ url: '/uied/website/search', params })
 }
 
+// 刷新/获取网站预览截图（前台公开接口，后台编辑页复用）
+export function uiedWebsitePreviewSnapshot(websiteId: number | string, params?: any) {
+    return request.get({ url: `/websites/${websiteId}/preview-snapshot`, params })
+}
+
 // ==================== 页面管理 ====================
 
 // 页面列表（分页）

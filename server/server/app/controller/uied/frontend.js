@@ -303,6 +303,36 @@ class FrontendController extends Controller {
   }
 
   /**
+   * 获取网站预览截图（优先本地上传/截图，其次 Playwright 缓存，最后 mShots 兜底）
+   * GET /api/websites/:id/preview-snapshot
+   */
+  async websitePreviewSnapshot() {
+    const { ctx } = this;
+    const { id } = ctx.params;
+
+    try {
+      const websiteId = this.parsePositiveInt(id, 0);
+      if (!websiteId) {
+        ctx.status = 400;
+        ctx.body = { error: '无效的网站ID' };
+        return;
+      }
+
+      const timeoutMs = this.parsePositiveInt(ctx.query?.timeout, 12000);
+      const forceRefresh = this.parseBoolean(ctx.query?.refresh, false);
+      const result = await ctx.service.uied.websitePreviewSnapshot.getPreviewSnapshotByWebsiteId(websiteId, {
+        timeoutMs,
+        forceRefresh,
+      });
+      ctx.body = result;
+    } catch (error) {
+      ctx.logger.error('获取网站预览截图失败:', error);
+      ctx.status = Number(error?.status || 500);
+      ctx.body = { error: error.message || '获取网站预览截图失败' };
+    }
+  }
+
+  /**
    * 记录网站点击
    * POST /api/websites/:id/click
    */
@@ -490,6 +520,60 @@ class FrontendController extends Controller {
       ctx.logger.error('取消收藏失败:', error);
       ctx.status = 500;
       ctx.body = { error: error.message || '取消收藏失败' };
+    }
+  }
+
+  /**
+   * 添加网站点赞（匿名/登录均可）
+   * POST /api/websites/:id/like
+   */
+  async websiteLikeAdd() {
+    const { ctx } = this;
+    const { id } = ctx.params;
+    const websiteId = this.parsePositiveInt(id, 0);
+    if (!websiteId) {
+      ctx.status = 400;
+      ctx.body = { error: '网站ID无效' };
+      return;
+    }
+    try {
+      const result = await ctx.service.uied.websiteInteraction.addLike(websiteId);
+      ctx.body = {
+        isLiked: true,
+        likeCount: Number(result.likeCount || 0),
+        message: '点赞成功',
+      };
+    } catch (error) {
+      ctx.logger.error('网站点赞失败:', error);
+      ctx.status = 500;
+      ctx.body = { error: error.message || '点赞失败' };
+    }
+  }
+
+  /**
+   * 取消网站点赞（匿名/登录均可）
+   * DELETE /api/websites/:id/like
+   */
+  async websiteLikeDel() {
+    const { ctx } = this;
+    const { id } = ctx.params;
+    const websiteId = this.parsePositiveInt(id, 0);
+    if (!websiteId) {
+      ctx.status = 400;
+      ctx.body = { error: '网站ID无效' };
+      return;
+    }
+    try {
+      const result = await ctx.service.uied.websiteInteraction.removeLike(websiteId);
+      ctx.body = {
+        isLiked: false,
+        likeCount: Number(result.likeCount || 0),
+        message: '已取消点赞',
+      };
+    } catch (error) {
+      ctx.logger.error('取消网站点赞失败:', error);
+      ctx.status = 500;
+      ctx.body = { error: error.message || '取消点赞失败' };
     }
   }
 
@@ -1094,6 +1178,9 @@ class FrontendController extends Controller {
       const config = await ctx.service.uied.dailyHot.getConfig();
       ctx.body = {
         enabled: config?.enabled !== false,
+        defaultPlatforms: Array.isArray(config?.defaultPlatforms) ? config.defaultPlatforms.map(item => String(item || '').trim()).filter(Boolean) : [],
+        defaultLimit: Number(config?.defaultLimit || 10),
+        maxPlatforms: Number(config?.maxPlatforms || 12),
         displayPlacements: Array.isArray(config?.displayPlacements) ? config.displayPlacements : [],
         displayLabel: String(config?.displayLabel || '每日热榜'),
         displayPath: String(config?.displayPath || '/p/daily-hot'),

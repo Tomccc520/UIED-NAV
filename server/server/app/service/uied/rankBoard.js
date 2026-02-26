@@ -89,6 +89,15 @@ class RankBoardService extends Service {
         sort: 40,
         isEnabled: true,
       },
+      {
+        boardKey: 'weekly_likes',
+        boardName: '本周高赞',
+        description: '按近7天点赞数排序（互动热度）',
+        algorithm: 'weekly_like_desc',
+        limitCount: 20,
+        sort: 50,
+        isEnabled: true,
+      },
     ];
   }
 
@@ -409,6 +418,40 @@ class RankBoardService extends Service {
   }
 
   /**
+   * 查询“本周高赞”（近7天点赞数）
+   */
+  async queryWeeklyLikes(limit = 20) {
+    const { app } = this;
+    const safeLimit = this.parsePositiveInt(limit, 20, 1, 100);
+    const rows = await app.model.query(
+      `SELECT w.id, w.name, w.slug, w.url, w.icon_url AS iconUrl, w.description,
+              w.click_count AS clickCount, w.create_time AS createTime,
+              c.name AS category,
+              COUNT(l.id) AS likeCount,
+              COUNT(l.id) AS score
+       FROM uied_website w
+       LEFT JOIN uied_category c ON c.id = w.category_id
+       LEFT JOIN uied_website_like l
+         ON l.website_id = w.id
+        AND l.is_delete = 0
+        AND l.create_time >= UNIX_TIMESTAMP() - (7 * 24 * 3600)
+       WHERE w.is_delete = 0
+       GROUP BY w.id, w.name, w.slug, w.url, w.icon_url, w.description, w.click_count, w.create_time, c.name
+       ORDER BY likeCount DESC, w.is_pinned DESC, w.click_count DESC, w.update_time DESC, w.id DESC
+       LIMIT ?`,
+      {
+        replacements: [ safeLimit ],
+        type: app.Sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    return (Array.isArray(rows) ? rows : []).map(row => this.buildWebsiteCard({
+      ...row,
+      score: Number(row.likeCount || 0),
+    }));
+  }
+
+  /**
    * 按榜单键查询榜单数据
    */
   async queryBoardItems(boardKey, limit = 20) {
@@ -417,6 +460,7 @@ class RankBoardService extends Service {
     if (key === 'seven_day_rising') return this.querySevenDayRising(limit);
     if (key === 'new_sites') return this.queryNewSites(limit);
     if (key === 'editor_pick') return this.queryEditorPick(limit);
+    if (key === 'weekly_likes') return this.queryWeeklyLikes(limit);
     return [];
   }
 

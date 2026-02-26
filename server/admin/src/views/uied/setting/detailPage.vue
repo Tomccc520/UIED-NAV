@@ -17,9 +17,19 @@
                 </p>
             </div>
 
+            <el-tabs v-model="activeSectionTab" class="setting-nav-tabs" @tab-click="handleSectionTabClick">
+                <el-tab-pane label="布局样式" name="layout" />
+                <el-tab-pane label="侧栏与运营位" name="sidebarOps" />
+                <el-tab-pane label="SEO模块" name="seo" />
+                <el-tab-pane label="区块显示" name="blocks" />
+                <el-tab-pane label="底部与举报" name="footer" />
+            </el-tabs>
+
             <el-form :model="config" label-width="160px" style="max-width: 700px">
                 <!-- 布局与样式（售卖版） -->
-                <el-divider content-position="left">布局与样式（售卖版）</el-divider>
+                <div id="detail-page-config-section-layout">
+                    <el-divider content-position="left">布局与样式（售卖版）</el-divider>
+                </div>
                 <p class="section-desc">
                     支持多套详情页视觉风格切换，便于交付不同客户时快速做出差异化效果。
                 </p>
@@ -73,7 +83,9 @@
                 </el-form-item>
 
                 <!-- 详情侧边栏（兼容前端旧接口） -->
-                <el-divider content-position="left">详情侧边栏（兼容前端旧接口）</el-divider>
+                <div id="detail-page-config-section-sidebar-ops">
+                    <el-divider content-position="left">详情侧边栏（兼容前端旧接口）</el-divider>
+                </div>
                 <p class="section-desc">
                     这里配置的字段会同时供详情页侧边栏读取（兼容旧接口 <code>/api/public/detail-sidebar-config</code>）。
                 </p>
@@ -256,7 +268,9 @@
                 </el-form-item>
 
                 <!-- SEO 模块 -->
-                <el-divider content-position="left">详情页 SEO 模块（FAQ / 长尾词 / Schema）</el-divider>
+                <div id="detail-page-config-section-seo">
+                    <el-divider content-position="left">详情页 SEO 模块（FAQ / 长尾词 / Schema）</el-divider>
+                </div>
                 <p class="section-desc">
                     用于增强详情页搜索流量能力。FAQ 与长尾词可用于生成页面内容，Schema 用于结构化数据。
                 </p>
@@ -319,7 +333,9 @@
                 </el-form-item>
 
                 <!-- 区块显示控制 -->
-                <el-divider content-position="left">区块显示控制</el-divider>
+                <div id="detail-page-config-section-blocks">
+                    <el-divider content-position="left">区块显示控制</el-divider>
+                </div>
                 <p class="section-desc">
                     控制详情页中各个功能区块是否显示。关闭后对应区块将在前端隐藏，不影响已有数据。
                 </p>
@@ -376,6 +392,43 @@
                     </span>
                 </el-form-item>
 
+                <el-divider content-position="left">自动预览截图（Playwright）</el-divider>
+                <p class="section-desc">
+                    当网站未上传缩略图与截图时，后端可自动生成预览图并缓存；失败时可选择回退到 mShots。
+                </p>
+
+                <el-form-item label="启用自动截图">
+                    <el-switch v-model="config.previewSnapshotEnabled" />
+                    <span class="form-tip">关闭后不再尝试本地 Playwright 截图（仍可使用上传图片）。</span>
+                </el-form-item>
+
+                <el-form-item label="截图超时(ms)">
+                    <el-input-number
+                        v-model="config.previewSnapshotTimeoutMs"
+                        :min="3000"
+                        :max="30000"
+                        :step="1000"
+                        :disabled="!config.previewSnapshotEnabled"
+                    />
+                    <span class="form-tip">单次截图等待时间，建议 8000-15000ms。</span>
+                </el-form-item>
+
+                <el-form-item label="截图缓存TTL(秒)">
+                    <el-input-number
+                        v-model="config.previewSnapshotCacheTtlSeconds"
+                        :min="60"
+                        :max="604800"
+                        :step="60"
+                        :disabled="!config.previewSnapshotEnabled"
+                    />
+                    <span class="form-tip">超过缓存时间会重新截图；网站编辑页支持手动刷新缓存。</span>
+                </el-form-item>
+
+                <el-form-item label="失败回退 mShots">
+                    <el-switch v-model="config.previewSnapshotAllowFallbackMshots" />
+                    <span class="form-tip">开启后本地截图失败会回退到 mShots 免费截图兜底。</span>
+                </el-form-item>
+
                 <el-form-item label="评分功能">
                     <el-switch v-model="config.ratingsEnabled" />
                     <span class="form-tip"
@@ -415,7 +468,9 @@
                 </el-form-item>
 
                 <!-- 直达按钮 -->
-                <el-divider content-position="left">直达按钮</el-divider>
+                <div id="detail-page-config-section-footer">
+                    <el-divider content-position="left">直达按钮</el-divider>
+                </div>
                 <p class="section-desc">
                     控制详情页头部区域的「直达网站」箭头按钮。点击后将在新窗口打开目标网站。
                 </p>
@@ -558,7 +613,7 @@
  * @license MIT
  * @version 1.1.0
  */
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, nextTick } from 'vue'
 import { uiedSettingGet, uiedSettingSave } from '@/api/uied'
 import feedback from '@/utils/feedback'
 
@@ -605,6 +660,10 @@ const defaultConfig = {
     thumbnailLayoutStyle: 'device',
     thumbnailSplitSideCount: 2,
     thumbnailCarouselThumbCount: 6,
+    previewSnapshotEnabled: true,
+    previewSnapshotTimeoutMs: 12000,
+    previewSnapshotCacheTtlSeconds: 21600,
+    previewSnapshotAllowFallbackMshots: true,
     ratingsEnabled: true,
     commentsEnabled: true,
     sharingEnabled: true,
@@ -632,6 +691,28 @@ const defaultConfig = {
 
 const saving = ref(false)
 const config = reactive({ ...defaultConfig })
+const activeSectionTab = ref('layout')
+
+const detailPageSectionAnchorMap: Record<string, string> = {
+    layout: 'detail-page-config-section-layout',
+    sidebarOps: 'detail-page-config-section-sidebar-ops',
+    seo: 'detail-page-config-section-seo',
+    blocks: 'detail-page-config-section-blocks',
+    footer: 'detail-page-config-section-footer'
+}
+
+/**
+ * 点击顶部标签后滚动到对应配置区块，减少长页面滚动成本
+ */
+const handleSectionTabClick = async (pane: any) => {
+    const tabName = String(pane?.props?.name || pane?.paneName || activeSectionTab.value || '')
+    const anchorId = detailPageSectionAnchorMap[tabName]
+    if (!anchorId) return
+    await nextTick()
+    const target = document.getElementById(anchorId)
+    if (!target) return
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
 
 // 加载配置
 const loadConfig = async () => {
@@ -696,6 +777,23 @@ onMounted(() => {
     color: #606266;
     margin: 0;
     line-height: 1.6;
+}
+
+.setting-nav-tabs {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: #fff;
+    margin-bottom: 16px;
+    padding-top: 4px;
+}
+
+.setting-nav-tabs :deep(.el-tabs__header) {
+    margin-bottom: 10px;
+}
+
+.setting-nav-tabs :deep(.el-tabs__nav-wrap)::after {
+    background-color: #ebeef5;
 }
 
 /* 优化：问号提示图标样式 */

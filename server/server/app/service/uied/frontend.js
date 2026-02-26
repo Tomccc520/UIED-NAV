@@ -552,6 +552,48 @@ class FrontendService extends Service {
       );
     }
 
+    /**
+     * 汇总互动数据（评分/收藏/点赞）
+     * 说明：失败时不阻断详情页主流程，前端使用默认值兜底。
+     */
+    let interactionSummary = {
+      userRating: 0,
+      averageRating: 0,
+      totalRatings: 0,
+      favorited: false,
+      totalFavorites: 0,
+      isLiked: false,
+      likeCount: 0,
+    };
+    try {
+      interactionSummary = {
+        ...interactionSummary,
+        ...(await this.ctx.service.uied.websiteInteraction.getWebsiteInteractionSummary(website.id)),
+      };
+    } catch (error) {
+      this.ctx.logger.warn('[frontend] 获取网站互动汇总失败，使用默认值:', error.message);
+    }
+
+    /**
+     * 统计网站评论数（已审核）
+     * 说明：与互动汇总分开处理，避免评论表异常影响详情页主流程。
+     */
+    let commentsCount = 0;
+    try {
+      const [ commentCountRow ] = await app.model.query(
+        `SELECT COUNT(1) AS total
+         FROM uied_website_comment
+         WHERE website_id = ? AND is_delete = 0 AND status = 'approved'`,
+        {
+          replacements: [ website.id ],
+          type: app.Sequelize.QueryTypes.SELECT,
+        }
+      );
+      commentsCount = Number(commentCountRow?.total || 0);
+    } catch (error) {
+      this.ctx.logger.warn('[frontend] 统计网站评论数失败，使用默认值:', error.message);
+    }
+
     return {
       id: String(website.id),
       name: website.name,
@@ -577,6 +619,14 @@ class FrontendService extends Service {
       screenshots: website.screenshots ? this.safeJsonParse(website.screenshots, []) : [],
       thumbnail: website.thumbnail,
       visitBtnText: website.visit_btn_text,
+      averageRating: Number(interactionSummary.averageRating || 0),
+      totalRatings: Number(interactionSummary.totalRatings || 0),
+      userRating: Number(interactionSummary.userRating || 0),
+      isFavorited: interactionSummary.favorited === true,
+      totalFavorites: Number(interactionSummary.totalFavorites || 0),
+      isLiked: interactionSummary.isLiked === true,
+      likeCount: Number(interactionSummary.likeCount || 0),
+      commentsCount,
       createdAt: website.create_time ? new Date(website.create_time * 1000).toISOString() : null,
       updatedAt: website.update_time ? new Date(website.update_time * 1000).toISOString() : null,
     };

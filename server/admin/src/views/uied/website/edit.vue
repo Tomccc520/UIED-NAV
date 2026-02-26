@@ -167,7 +167,7 @@
                                                 @click="handleCaptureThumbnail"
                                                 :loading="capturingThumbnail"
                                             >
-                                                截图获取
+                                                {{ isEdit ? '截图获取（刷新缓存）' : '截图获取' }}
                                             </el-button>
                                         </div>
                                         <div class="detail-thumbnail-preview mt-2">
@@ -657,6 +657,19 @@ const handleThumbnailSelect = (urls: string | string[]) => {
     if (url) editData.thumbnail = url
 }
 const capturingThumbnail = ref(false)
+
+/**
+ * 解析当前编辑网站 ID（仅编辑态可用）
+ */
+const getEditingWebsiteId = () => {
+    const rawId = route.query.id
+    const parsed = Number.parseInt(String(Array.isArray(rawId) ? rawId[0] : rawId || ''), 10)
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : 0
+}
+
+/**
+ * 后台手动刷新预览截图（编辑态优先走后端 Playwright 缓存刷新，新增态回退 thum.io）
+ */
 const handleCaptureThumbnail = async () => {
     if (!editData.url) {
         feedback.msgWarning('请先填写网站URL')
@@ -664,6 +677,34 @@ const handleCaptureThumbnail = async () => {
     }
     capturingThumbnail.value = true
     try {
+        const websiteId = getEditingWebsiteId()
+        if (websiteId > 0) {
+            const response = await fetch(
+                `/api/websites/${websiteId}/preview-snapshot?refresh=1`,
+                {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: { Accept: 'application/json' }
+                }
+            )
+            if (response.ok) {
+                const payload = await response.json()
+                const previewUrl = String(payload?.url || '').trim()
+                if (previewUrl) {
+                    editData.thumbnail = previewUrl
+                    if (payload?.source === 'playwright_cache') {
+                        feedback.msgSuccess('本地截图缓存已刷新')
+                    } else if (payload?.source === 'mshots_fallback') {
+                        feedback.msgWarning('本地截图失败，已回退到 mShots 截图')
+                    } else {
+                        feedback.msgSuccess('缩略图已更新')
+                    }
+                    return
+                }
+            }
+            feedback.msgWarning('本地截图未生成，已改用 API 截图兜底')
+        }
+
         editData.thumbnail = `https://image.thum.io/get/width/1280/crop/800/${editData.url}`
         feedback.msgSuccess('缩略图URL已生成')
     } finally {

@@ -97,6 +97,8 @@ module.exports = app => {
   get('/api/websites/:id/related', controller.uied.frontend.websiteRelated);
   // GET /api/websites/:id/health - 网站健康探测（响应时间/状态/SSL）
   get('/api/websites/:id/health', controller.uied.frontend.websiteHealth);
+  // GET /api/websites/:id/preview-snapshot - 网站预览截图（本地上传优先，支持 Playwright 缓存）
+  get('/api/websites/:id/preview-snapshot', controller.uied.frontend.websitePreviewSnapshot);
   // POST /api/websites/:id/click - 记录网站点击
   post('/api/websites/:id/click', controller.uied.frontend.websiteClick);
   // GET /api/websites/:id/comments - 获取网站评论
@@ -109,6 +111,10 @@ module.exports = app => {
   post('/api/websites/:id/favorite', controller.uied.frontend.websiteFavoriteAdd);
   // DELETE /api/websites/:id/favorite - 取消收藏（兼容旧前端）
   del('/api/websites/:id/favorite', controller.uied.frontend.websiteFavoriteDel);
+  // POST /api/websites/:id/like - 添加点赞（匿名/登录均可）
+  post('/api/websites/:id/like', controller.uied.frontend.websiteLikeAdd);
+  // DELETE /api/websites/:id/like - 取消点赞（匿名/登录均可）
+  del('/api/websites/:id/like', controller.uied.frontend.websiteLikeDel);
   
   // ==================== 公开设置 ====================
   // GET /api/settings/public - 获取公开设置
@@ -135,6 +141,12 @@ module.exports = app => {
   getLegacy('/websites/:id/tags', controller.uied.frontend.websiteTags);
   // GET /websites/:id/health - 网站健康探测（兼容旧前端无 /api 前缀）
   getLegacy('/websites/:id/health', controller.uied.frontend.websiteHealth);
+  // GET /websites/:id/preview-snapshot - 网站预览截图（兼容旧前端无 /api 前缀）
+  getLegacy('/websites/:id/preview-snapshot', controller.uied.frontend.websitePreviewSnapshot);
+  // POST /websites/:id/like - 网站点赞（兼容旧前端无 /api 前缀）
+  postLegacy('/websites/:id/like', controller.uied.frontend.websiteLikeAdd);
+  // DELETE /websites/:id/like - 取消网站点赞（兼容旧前端无 /api 前缀）
+  delLegacy('/websites/:id/like', controller.uied.frontend.websiteLikeDel);
   
   // ==================== 前端兼容路由（原 Express API 路径）====================
   // 导航菜单

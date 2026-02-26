@@ -7,6 +7,22 @@
 <template>
     <div class="uied-dailyhot-page">
         <el-card class="!border-none mb-4" shadow="never">
+            <div class="ops-page-header">
+                <div>
+                    <div class="ops-page-title">每日热榜配置中心</div>
+                    <div class="ops-page-desc">
+                        面向运营使用：先配置入口展示与默认平台，再维护平台列表；高级参数放在开发调试区。
+                    </div>
+                </div>
+            </div>
+            <el-tabs v-model="activePageTab" class="ops-page-tabs">
+                <el-tab-pane label="运营配置" name="ops" />
+                <el-tab-pane label="平台管理" name="platforms" />
+                <el-tab-pane label="开发调试" name="dev" />
+            </el-tabs>
+        </el-card>
+
+        <el-card v-show="activePageTab === 'ops'" class="!border-none mb-4" shadow="never">
             <template #header>
                 <div class="flex items-center justify-between">
                     <span class="font-medium">每日热榜全局配置</span>
@@ -32,42 +48,92 @@
                             <el-input-number v-model="globalForm.maxPlatforms" :min="1" :max="50" class="!w-full" />
                         </el-form-item>
                     </el-col>
-                    <el-col :span="12">
-                        <el-form-item label="接口地址">
-                            <el-input v-model="globalForm.apiBaseUrl" placeholder="https://api.pearktrue.cn/api/dailyhot/" />
-                        </el-form-item>
-                    </el-col>
-                    <el-col :span="6">
-                        <el-form-item label="请求超时(ms)">
-                            <el-input-number v-model="globalForm.timeoutMs" :min="1000" :max="30000" class="!w-full" />
-                        </el-form-item>
-                    </el-col>
-                    <el-col :span="6">
-                        <el-form-item label="全局缓存秒数">
-                            <el-input-number v-model="globalForm.cacheTtlSeconds" :min="30" :max="86400" class="!w-full" />
-                        </el-form-item>
-                    </el-col>
                     <el-col :span="24">
-                        <el-form-item label="默认平台（每行一个）">
-                            <el-input
-                                v-model="defaultPlatformsText"
-                                type="textarea"
-                                :rows="4"
-                                placeholder="哔哩哔哩\n知乎\n微博"
-                            />
+                        <el-form-item label="高级设置（可选）">
+                            <div class="w-full">
+                                <div class="flex items-center gap-3">
+                                    <el-switch v-model="showAdvancedConfig" />
+                                    <span class="text-xs text-tx-secondary">
+                                        仅开发/运维场景需要修改：接口地址、超时、缓存秒数
+                                    </span>
+                                </div>
+                            </div>
+                        </el-form-item>
+                    </el-col>
+                    <template v-if="showAdvancedConfig">
+                        <el-col :span="12">
+                            <el-form-item label="接口地址">
+                                <el-input v-model="globalForm.apiBaseUrl" placeholder="https://api.pearktrue.cn/api/dailyhot/" />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="6">
+                            <el-form-item label="请求超时(ms)">
+                                <el-input-number v-model="globalForm.timeoutMs" :min="1000" :max="30000" class="!w-full" />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="6">
+                            <el-form-item label="全局缓存秒数">
+                                <el-input-number v-model="globalForm.cacheTtlSeconds" :min="30" :max="86400" class="!w-full" />
+                            </el-form-item>
+                        </el-col>
+                    </template>
+                    <el-col :span="24">
+                        <el-form-item label="默认展示平台">
+                            <div class="w-full flex flex-col gap-3">
+                                <el-select
+                                    v-model="globalForm.defaultPlatforms"
+                                    multiple
+                                    filterable
+                                    allow-create
+                                    default-first-option
+                                    collapse-tags
+                                    collapse-tags-tooltip
+                                    style="width: 100%"
+                                    placeholder="请选择或输入平台名称"
+                                >
+                                    <el-option
+                                        v-for="item in platformSelectOptions"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value"
+                                    />
+                                </el-select>
+                                <div class="flex flex-wrap gap-2 items-center">
+                                    <span class="text-xs text-tx-secondary">快捷选择：</span>
+                                    <el-button size="small" @click="handleUseEnabledPlatformsAsDefault">
+                                        使用已启用平台
+                                    </el-button>
+                                    <el-button size="small" @click="handleClearDefaultPlatforms">
+                                        清空选择
+                                    </el-button>
+                                </div>
+                                <el-checkbox-group v-model="globalForm.defaultPlatforms" class="platform-quick-checklist">
+                                    <el-checkbox
+                                        v-for="item in enabledPlatformQuickOptions"
+                                        :key="item.value"
+                                        :label="item.value"
+                                    >
+                                        {{ item.label }}
+                                    </el-checkbox>
+                                </el-checkbox-group>
+                                <span class="form-tip">前端会按这里的顺序展示平台区块（支持勾选或多选，不需要手工换行输入）。</span>
+                            </div>
                         </el-form-item>
                     </el-col>
                     <el-col :span="24">
                         <el-form-item label="前台显示位置">
-                            <el-checkbox-group v-model="globalForm.displayPlacements">
-                                <el-checkbox
-                                    v-for="item in displayPlacementOptions"
-                                    :key="item.value"
-                                    :label="item.value"
-                                >
-                                    {{ item.label }}
-                                </el-checkbox>
-                            </el-checkbox-group>
+                            <div class="placement-button-group">
+                                <el-checkbox-group v-model="globalForm.displayPlacements">
+                                    <el-checkbox-button
+                                        v-for="item in displayPlacementOptions"
+                                        :key="item.value"
+                                        :label="item.value"
+                                    >
+                                        {{ item.label }}
+                                    </el-checkbox-button>
+                                </el-checkbox-group>
+                            </div>
+                            <span class="form-tip">勾选后会自动注入对应前台位置（导航/页脚/悬浮入口等）。</span>
                         </el-form-item>
                     </el-col>
                     <el-col :span="8">
@@ -104,7 +170,7 @@
             </el-form>
         </el-card>
 
-        <el-card class="!border-none mb-4" shadow="never">
+        <el-card v-show="activePageTab === 'platforms'" class="!border-none mb-4" shadow="never">
             <template #header>
                 <div class="flex items-center justify-between">
                     <span class="font-medium">平台持久化配置</span>
@@ -175,13 +241,19 @@
             </el-table>
         </el-card>
 
-        <el-card class="!border-none" shadow="never">
+        <el-card v-show="activePageTab === 'dev'" class="!border-none" shadow="never">
             <template #header>
                 <div class="flex items-center justify-between">
-                    <span class="font-medium">后台页面字段草案</span>
+                    <span class="font-medium">开发调试（字段草案）</span>
                     <el-button @click="loadSchema">刷新草案</el-button>
                 </div>
             </template>
+            <el-alert
+                title="该区域主要用于开发联调查看字段结构，运营日常使用可忽略。"
+                type="warning"
+                :closable="false"
+                class="mb-4"
+            />
             <pre class="schema-view">{{ schemaText }}</pre>
         </el-card>
     </div>
@@ -238,6 +310,8 @@ const globalSaving = ref(false)
 const platformLoading = ref(false)
 const platformSaving = ref(false)
 const schemaLoading = ref(false)
+const showAdvancedConfig = ref(false)
+const activePageTab = ref<'ops' | 'platforms' | 'dev'>('ops')
 const schemaData = ref<Record<string, any>>({})
 const platformRows = ref<PlatformRow[]>([])
 const displayPlacementOptions = [
@@ -274,20 +348,38 @@ const toInt = (value: any, fallback: number, min: number, max: number) => {
 }
 
 /**
- * 默认平台文本和数组双向映射
+ * 平台下拉选项（优先读取平台配置表中的展示名与标题）
  */
-const defaultPlatformsText = computed({
-    get() {
-        return Array.isArray(globalForm.defaultPlatforms)
-            ? globalForm.defaultPlatforms.join('\n')
-            : ''
-    },
-    set(value: string) {
-        globalForm.defaultPlatforms = String(value || '')
-            .split(/[\n,，|]+/)
-            .map((item) => item.trim())
-            .filter(Boolean)
-    }
+const platformSelectOptions = computed(() => {
+    const quick = platformRows.value.map((row) => ({
+        value: String(row.platformTitle || '').trim(),
+        label: String(row.displayName || row.platformTitle || '').trim()
+    })).filter((item) => item.value)
+
+    const selectedOnly = (Array.isArray(globalForm.defaultPlatforms) ? globalForm.defaultPlatforms : [])
+        .map((item) => String(item || '').trim())
+        .filter(Boolean)
+        .map((value) => ({ value, label: value }))
+
+    const map = new Map<string, { value: string; label: string }>()
+    ;[ ...quick, ...selectedOnly ].forEach((item) => {
+        if (!map.has(item.value)) map.set(item.value, item)
+    })
+    return Array.from(map.values())
+})
+
+/**
+ * 已启用平台快捷勾选项（给运营人员直接勾选）
+ */
+const enabledPlatformQuickOptions = computed(() => {
+    return platformRows.value
+        .filter((row) => row.isEnabled !== false)
+        .sort((a, b) => (a.sort || 0) - (b.sort || 0))
+        .map((row) => ({
+            value: String(row.platformTitle || '').trim(),
+            label: String(row.displayName || row.platformTitle || '').trim()
+        }))
+        .filter((item) => item.value)
 })
 
 /**
@@ -412,6 +504,20 @@ const handleAddPlatformRow = () => {
 }
 
 /**
+ * 使用已启用平台作为默认展示平台（按平台排序写入）
+ */
+const handleUseEnabledPlatformsAsDefault = () => {
+    globalForm.defaultPlatforms = enabledPlatformQuickOptions.value.map((item) => item.value)
+}
+
+/**
+ * 清空默认展示平台选择
+ */
+const handleClearDefaultPlatforms = () => {
+    globalForm.defaultPlatforms = []
+}
+
+/**
  * 删除平台行
  */
 const handleDeletePlatformRow = async (row: PlatformRow, index: number) => {
@@ -468,6 +574,30 @@ onMounted(() => {
     flex-direction: column;
 }
 
+.ops-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.ops-page-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #303133;
+}
+
+.ops-page-desc {
+    margin-top: 6px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #909399;
+}
+
+.ops-page-tabs {
+    margin-top: 12px;
+}
+
 .schema-view {
     margin: 0;
     padding: 12px;
@@ -475,6 +605,24 @@ onMounted(() => {
     border-radius: 8px;
     max-height: 420px;
     overflow: auto;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.platform-quick-checklist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+}
+
+.placement-button-group :deep(.el-checkbox-button__inner) {
+    border-radius: 8px !important;
+}
+
+.form-tip {
+    display: inline-block;
+    margin-top: 6px;
+    color: #909399;
     font-size: 12px;
     line-height: 1.6;
 }

@@ -1,6 +1,6 @@
 /**
  * @file service/uied/websiteInteraction.js
- * @description 网站评分/收藏交互服务
+ * @description 网站评分/收藏/点赞交互服务
  * @author UIED技术团队
  * @copyright Tomda (https://www.tomda.top)
  * @copyright UIED技术团队 (https://fsuied.com)
@@ -56,6 +56,25 @@ class WebsiteInteractionService extends Service {
         KEY \`idx_website_delete\` (\`website_id\`,\`is_delete\`),
         KEY \`idx_user_delete\` (\`user_id\`,\`is_delete\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='网站收藏表'`,
+      { type: app.Sequelize.QueryTypes.RAW }
+    );
+
+    await app.model.query(
+      `CREATE TABLE IF NOT EXISTS \`uied_website_like\` (
+        \`id\` int unsigned NOT NULL AUTO_INCREMENT,
+        \`website_id\` int unsigned NOT NULL DEFAULT 0,
+        \`actor_key\` varchar(140) NOT NULL DEFAULT '',
+        \`user_id\` int unsigned NOT NULL DEFAULT 0,
+        \`ip_hash\` varchar(64) NOT NULL DEFAULT '',
+        \`is_delete\` tinyint unsigned NOT NULL DEFAULT 0,
+        \`create_time\` int unsigned NOT NULL DEFAULT 0,
+        \`update_time\` int unsigned NOT NULL DEFAULT 0,
+        \`delete_time\` int unsigned NOT NULL DEFAULT 0,
+        PRIMARY KEY (\`id\`),
+        UNIQUE KEY \`uk_website_actor\` (\`website_id\`,\`actor_key\`),
+        KEY \`idx_website_delete\` (\`website_id\`,\`is_delete\`),
+        KEY \`idx_user_delete\` (\`user_id\`,\`is_delete\`)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='网站点赞表'`,
       { type: app.Sequelize.QueryTypes.RAW }
     );
     app[cacheKey] = true;
@@ -171,6 +190,88 @@ class WebsiteInteractionService extends Service {
   }
 
   /**
+   * 对外暴露：点赞网站并返回汇总数据
+   */
+  async addLike(websiteId) {
+    await this.ensureTables();
+    await this.ensureWebsiteExists(websiteId);
+    const actor = await this.resolveActor();
+    const now = Math.floor(Date.now() / 1000);
+    const { app } = this;
+
+    await app.model.query(
+      `INSERT INTO uied_website_like
+       (website_id, actor_key, user_id, ip_hash, is_delete, create_time, update_time, delete_time)
+       VALUES (?, ?, ?, ?, 0, ?, ?, 0)
+       ON DUPLICATE KEY UPDATE
+         user_id = VALUES(user_id),
+         ip_hash = VALUES(ip_hash),
+         is_delete = 0,
+         delete_time = 0,
+         update_time = VALUES(update_time)`,
+      {
+        replacements: [ websiteId, actor.actorKey, actor.userId, actor.ipHash, now, now ],
+        type: app.Sequelize.QueryTypes.INSERT,
+      }
+    );
+
+    const summary = await this.getLikeSummary(websiteId, actor.actorKey);
+    return {
+      ...summary,
+      actorType: actor.userId > 0 ? 'user' : 'anonymous',
+    };
+  }
+
+  /**
+   * 对外暴露：取消点赞并返回汇总数据
+   */
+  async removeLike(websiteId) {
+    await this.ensureTables();
+    await this.ensureWebsiteExists(websiteId);
+    const actor = await this.resolveActor();
+    const now = Math.floor(Date.now() / 1000);
+    const { app } = this;
+
+    await app.model.query(
+      `UPDATE uied_website_like
+       SET is_delete = 1, delete_time = ?, update_time = ?
+       WHERE website_id = ? AND actor_key = ? AND is_delete = 0`,
+      {
+        replacements: [ now, now, websiteId, actor.actorKey ],
+        type: app.Sequelize.QueryTypes.UPDATE,
+      }
+    );
+
+    const summary = await this.getLikeSummary(websiteId, actor.actorKey);
+    return {
+      ...summary,
+      actorType: actor.userId > 0 ? 'user' : 'anonymous',
+    };
+  }
+
+  /**
+   * 对外暴露：切换点赞状态（便于前端一键点赞/取消）
+   */
+  async toggleLike(websiteId) {
+    await this.ensureTables();
+    await this.ensureWebsiteExists(websiteId);
+    const actor = await this.resolveActor();
+    const current = await this.getLikeSummary(websiteId, actor.actorKey);
+    if (current.isLiked) {
+      const removed = await this.removeLike(websiteId);
+      return {
+        ...removed,
+        isLiked: false,
+      };
+    }
+    const added = await this.addLike(websiteId);
+    return {
+      ...added,
+      isLiked: true,
+    };
+  }
+
+  /**
    * 校验网站是否存在
    */
   async ensureWebsiteExists(websiteId) {
@@ -259,6 +360,62 @@ class WebsiteInteractionService extends Service {
     return {
       favorited,
       totalFavorites: Number(aggregate?.totalFavorites || 0),
+    };
+  }
+
+  /**
+   * 读取点赞统计与当前操作者点赞状态
+   */
+  async getLikeSummary(websiteId, actorKey = '') {
+    const { app } = this;
+    const [ aggregate ] = await app.model.query(
+      `SELECT COUNT(1) AS likeCount
+       FROM uied_website_like
+       WHERE website_id = ? AND is_delete = 0`,
+      {
+        replacements: [ websiteId ],
+        type: app.Sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    let isLiked = false;
+    if (actorKey) {
+      const [ self ] = await app.model.query(
+        `SELECT id
+         FROM uied_website_like
+         WHERE website_id = ? AND actor_key = ? AND is_delete = 0
+         LIMIT 1`,
+        {
+          replacements: [ websiteId, actorKey ],
+          type: app.Sequelize.QueryTypes.SELECT,
+        }
+      );
+      isLiked = Boolean(self?.id);
+    }
+
+    return {
+      isLiked,
+      likeCount: Number(aggregate?.likeCount || 0),
+    };
+  }
+
+  /**
+   * 获取网站互动汇总（详情页接口用）
+   * 统一返回评分/收藏/点赞与当前操作者状态，减少前端额外请求
+   */
+  async getWebsiteInteractionSummary(websiteId) {
+    await this.ensureTables();
+    const actor = await this.resolveActor();
+    const [ rating, favorite, like ] = await Promise.all([
+      this.getRatingSummary(websiteId, actor.actorKey),
+      this.getFavoriteSummary(websiteId, actor.actorKey),
+      this.getLikeSummary(websiteId, actor.actorKey),
+    ]);
+    return {
+      ...rating,
+      ...favorite,
+      ...like,
+      actorType: actor.userId > 0 ? 'user' : 'anonymous',
     };
   }
 
