@@ -565,6 +565,36 @@ class UserController extends BaseController {
     }
   }
 
+  /**
+   * 用户中心收藏网址列表
+   */
+  async websiteFavoriteList() {
+    const { ctx } = this;
+    try {
+      const userId = await ctx.service.user.getUserId();
+      const params = Object.keys(ctx.request.body || {}).length ? (ctx.request.body || {}) : (ctx.request.query || {});
+      const data = await ctx.service.user.websiteFavoriteList(userId, params);
+      this.result({ data });
+    } catch (e) {
+      this.result({ data: '', message: e.message, code: 1001 });
+    }
+  }
+
+  /**
+   * 用户中心点赞网址列表
+   */
+  async websiteLikeList() {
+    const { ctx } = this;
+    try {
+      const userId = await ctx.service.user.getUserId();
+      const params = Object.keys(ctx.request.body || {}).length ? (ctx.request.body || {}) : (ctx.request.query || {});
+      const data = await ctx.service.user.websiteLikeList(userId, params);
+      this.result({ data });
+    } catch (e) {
+      this.result({ data: '', message: e.message, code: 1001 });
+    }
+  }
+
   async addressList() {
     const { ctx } = this;
     try {

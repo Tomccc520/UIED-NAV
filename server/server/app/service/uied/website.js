@@ -131,6 +131,13 @@ class WebsiteService extends Service {
 
     if (!website) return null;
 
+    let trafficMetrics = null;
+    try {
+      trafficMetrics = await this.ctx.service.uied.websiteTrafficMetric.getByWebsiteId(website.id);
+    } catch (error) {
+      this.ctx.logger.warn('[uied.website.detail] 获取网站访问数据失败，忽略:', error.message);
+    }
+
     // 转换字段名和类型
     return {
       id: website.id,
@@ -156,6 +163,7 @@ class WebsiteService extends Service {
       screenshots: website.screenshots ? JSON.parse(website.screenshots) : [],
       thumbnail: website.thumbnail,
       visitBtnText: website.visit_btn_text,
+      trafficMetrics,
       status: website.status,
       createdAt: website.create_time,
       updatedAt: website.update_time,
@@ -215,6 +223,15 @@ class WebsiteService extends Service {
         type: app.Sequelize.QueryTypes.INSERT,
       }
     );
+
+    const websiteId = Number(result || 0);
+    if (websiteId > 0 && data.trafficMetrics !== undefined) {
+      try {
+        await this.ctx.service.uied.websiteTrafficMetric.saveByWebsiteId(websiteId, data.trafficMetrics || {});
+      } catch (error) {
+        this.ctx.logger.warn('[uied.website.add] 保存网站访问数据失败，忽略:', error.message);
+      }
+    }
 
     return { id: result, ...data };
   }
@@ -284,6 +301,14 @@ class WebsiteService extends Service {
       `UPDATE uied_website SET ${updates.join(', ')} WHERE id = ?`,
       { replacements: values, type: app.Sequelize.QueryTypes.UPDATE }
     );
+
+    if (data.trafficMetrics !== undefined) {
+      try {
+        await this.ctx.service.uied.websiteTrafficMetric.saveByWebsiteId(data.id, data.trafficMetrics || {});
+      } catch (error) {
+        this.ctx.logger.warn('[uied.website.edit] 保存网站访问数据失败，忽略:', error.message);
+      }
+    }
 
     return data;
   }

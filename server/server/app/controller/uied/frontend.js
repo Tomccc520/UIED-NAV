@@ -274,6 +274,32 @@ class FrontendController extends Controller {
   }
 
   /**
+   * 网站对比 AI 分析（前台公开接口）
+   * POST /api/compare/websites/ai-analysis
+   */
+  async websiteCompareAiAnalysis() {
+    const { ctx } = this;
+    const body = ctx.request.body || {};
+    const leftIdOrSlug = String(body.leftIdOrSlug || body.left || ctx.query?.leftIdOrSlug || ctx.query?.left || '').trim();
+    const rightIdOrSlug = String(body.rightIdOrSlug || body.right || ctx.query?.rightIdOrSlug || ctx.query?.right || '').trim();
+
+    if (!leftIdOrSlug || !rightIdOrSlug) {
+      ctx.status = 400;
+      ctx.body = { error: '请提供左右对比网站参数' };
+      return;
+    }
+
+    try {
+      const result = await ctx.service.uied.frontend.getWebsiteCompareAiAnalysis(leftIdOrSlug, rightIdOrSlug);
+      ctx.body = result;
+    } catch (error) {
+      ctx.logger.error('生成网站对比 AI 分析失败:', error);
+      ctx.status = Number(error?.status || 500);
+      ctx.body = { error: error.message || '生成网站对比 AI 分析失败' };
+    }
+  }
+
+  /**
    * 网站健康探测（本地探测站点响应时间/状态码/SSL）
    * GET /api/websites/:id/health
    */

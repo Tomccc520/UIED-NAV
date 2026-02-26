@@ -594,6 +594,17 @@ class FrontendService extends Service {
       this.ctx.logger.warn('[frontend] 统计网站评论数失败，使用默认值:', error.message);
     }
 
+    /**
+     * 读取网站访问数据（高级版）
+     * 说明：手动录入数据为可选项，失败不影响详情页主流程。
+     */
+    let trafficMetrics = null;
+    try {
+      trafficMetrics = await this.ctx.service.uied.websiteTrafficMetric.getByWebsiteId(website.id);
+    } catch (error) {
+      this.ctx.logger.warn('[frontend] 获取网站访问数据失败，使用默认值:', error.message);
+    }
+
     return {
       id: String(website.id),
       name: website.name,
@@ -627,6 +638,7 @@ class FrontendService extends Service {
       isLiked: interactionSummary.isLiked === true,
       likeCount: Number(interactionSummary.likeCount || 0),
       commentsCount,
+      trafficMetrics,
       createdAt: website.create_time ? new Date(website.create_time * 1000).toISOString() : null,
       updatedAt: website.update_time ? new Date(website.update_time * 1000).toISOString() : null,
     };
@@ -732,6 +744,80 @@ class FrontendService extends Service {
       { replacements: [ website.category_id, websiteId, limit ], type: app.Sequelize.QueryTypes.SELECT }
     );
     return formatRows(related);
+  }
+
+  /**
+   * 生成网站对比 AI 分析文案（复用后台 AI 配置服务）
+   * @param {string} leftIdOrSlug 左侧网站ID或slug
+   * @param {string} rightIdOrSlug 右侧网站ID或slug
+   * @returns {Promise<object>} AI 分析结果
+   */
+  async getWebsiteCompareAiAnalysis(leftIdOrSlug, rightIdOrSlug) {
+    const left = String(leftIdOrSlug || '').trim();
+    const right = String(rightIdOrSlug || '').trim();
+    if (!left || !right) {
+      throw new Error('缺少对比网站参数');
+    }
+    if (left === right) {
+      throw new Error('请选择两个不同的网站进行对比');
+    }
+
+    const [ leftWebsite, rightWebsite ] = await Promise.all([
+      this.getWebsiteDetail(left),
+      this.getWebsiteDetail(right),
+    ]);
+    if (!leftWebsite || !rightWebsite) {
+      throw new Error('对比网站不存在或已下线');
+    }
+
+    const leftTags = Array.isArray(leftWebsite.tags) ? leftWebsite.tags.slice(0, 10) : [];
+    const rightTags = Array.isArray(rightWebsite.tags) ? rightWebsite.tags.slice(0, 10) : [];
+    const leftTraffic = leftWebsite.trafficMetrics || {};
+    const rightTraffic = rightWebsite.trafficMetrics || {};
+
+    const prompt = [
+      `请为以下两个网站输出一份中文对比分析，使用 Markdown 格式。`,
+      `要求：`,
+      `1. 输出结构固定为：概览结论、核心差异、适用人群、选择建议、风险提示`,
+      `2. 不要编造无法确认的数据；没有数据就明确写“未录入/未知”`,
+      `3. 语气专业、简洁，适合直接展示在导航站详情对比页`,
+      `4. 每个小节用二级标题（##）`,
+      ``,
+      `左侧网站：`,
+      `- 名称：${leftWebsite.name}`,
+      `- 分类：${leftWebsite.category?.name || '未分类'}`,
+      `- 描述：${leftWebsite.description || '无'}`,
+      `- 标签：${leftTags.join('、') || '无'}`,
+      `- 点赞：${Number(leftWebsite.likeCount || 0)}`,
+      `- 收藏：${Number(leftWebsite.totalFavorites || 0)}`,
+      `- 评论：${Number(leftWebsite.commentsCount || 0)}`,
+      `- 月访问量：${Number(leftTraffic.monthlyVisits || 0) || '未录入'}`,
+      `- 平均访问时长(秒)：${Number(leftTraffic.avgVisitDurationSeconds || 0) || '未录入'}`,
+      `- 每次访问页数：${Number(leftTraffic.pagesPerVisit || 0) || '未录入'}`,
+      `- 跳出率：${Number(leftTraffic.bounceRate || 0) ? `${Number(leftTraffic.bounceRate || 0)}%` : '未录入'}`,
+      ``,
+      `右侧网站：`,
+      `- 名称：${rightWebsite.name}`,
+      `- 分类：${rightWebsite.category?.name || '未分类'}`,
+      `- 描述：${rightWebsite.description || '无'}`,
+      `- 标签：${rightTags.join('、') || '无'}`,
+      `- 点赞：${Number(rightWebsite.likeCount || 0)}`,
+      `- 收藏：${Number(rightWebsite.totalFavorites || 0)}`,
+      `- 评论：${Number(rightWebsite.commentsCount || 0)}`,
+      `- 月访问量：${Number(rightTraffic.monthlyVisits || 0) || '未录入'}`,
+      `- 平均访问时长(秒)：${Number(rightTraffic.avgVisitDurationSeconds || 0) || '未录入'}`,
+      `- 每次访问页数：${Number(rightTraffic.pagesPerVisit || 0) || '未录入'}`,
+      `- 跳出率：${Number(rightTraffic.bounceRate || 0) ? `${Number(rightTraffic.bounceRate || 0)}%` : '未录入'}`,
+    ].join('\n');
+
+    const result = await this.ctx.service.uied.aiConfig.chat(prompt, []);
+    return {
+      left: { id: String(leftWebsite.id), name: leftWebsite.name, slug: leftWebsite.slug || '' },
+      right: { id: String(rightWebsite.id), name: rightWebsite.name, slug: rightWebsite.slug || '' },
+      markdown: String(result?.reply || '').trim(),
+      reasoningContent: String(result?.reasoningContent || '').trim(),
+      usage: result?.usage || null,
+    };
   }
 
   /**

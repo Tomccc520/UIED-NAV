@@ -10,6 +10,41 @@
 <template>
     <div class="banner-lists">
         <el-card class="!border-none" shadow="never">
+            <el-alert
+                title="前端显示位置说明：广告管理用于图片/HTML广告位（如首页横条、侧栏）；详情页顶部/正文中/底部推荐位请使用【商业位体系】配置。"
+                type="info"
+                :closable="false"
+                class="mb-4"
+            />
+            <el-card shadow="never" class="mb-4 banner-ops-helper">
+                <template #header>
+                    <div class="flex items-center justify-between">
+                        <span class="font-medium">前端位置说明与快捷预览</span>
+                        <div class="text-xs text-gray-400">配置位置 + 页面标识后可直接预览验证</div>
+                    </div>
+                </template>
+                <div class="banner-ops-helper__grid">
+                    <div class="banner-ops-helper__card">
+                        <div class="banner-ops-helper__title">常用位置说明</div>
+                        <div class="banner-ops-helper__row"><code>global_strip / top / home</code><span>首页顶部横条广告</span></div>
+                        <div class="banner-ops-helper__row"><code>sidebar / website_detail_sidebar</code><span>侧栏广告（首页/详情页按 pageSlug 区分）</span></div>
+                        <div class="banner-ops-helper__row"><code>footer / bottom</code><span>底部广告</span></div>
+                        <div class="banner-ops-helper__row"><code>detail / popup</code><span>详情页旧兼容位置</span></div>
+                    </div>
+                    <div class="banner-ops-helper__card">
+                        <div class="banner-ops-helper__title">快捷预览入口</div>
+                        <div class="flex flex-wrap gap-2">
+                            <el-button size="small" @click="openPreviewPage('/')">前端首页</el-button>
+                            <el-button size="small" @click="openPreviewPage('/p/daily-hot')">每日热榜</el-button>
+                            <el-button size="small" @click="openPreviewPage('/p/rankings')">榜单系统</el-button>
+                            <el-button size="small" @click="openPreviewPage('/website/1')">网址详情（示例）</el-button>
+                        </div>
+                        <div class="banner-ops-helper__tip">
+                            提示：请同时检查 <code>位置(position)</code>、<code>页面标识(pageSlug)</code>、<code>状态</code> 和 <code>时间窗</code>。
+                        </div>
+                    </div>
+                </div>
+            </el-card>
             <div class="mb-4 flex justify-between">
                 <el-button type="primary" @click="handleAdd">
                     <template #icon><icon name="el-icon-Plus" /></template>
@@ -230,5 +265,75 @@ const handleDelete = async (id: number) => {
     getLists()
 }
 
+/**
+ * 打开前端预览页面，帮助运营快速验证广告位是否显示
+ */
+const openPreviewPage = (path: string) => {
+    const normalized = String(path || '').startsWith('/') ? path : `/${path}`
+    window.open(`http://localhost:3003${normalized}`, '_blank')
+}
+
 getLists()
 </script>
+
+<style scoped>
+.banner-ops-helper :deep(.el-card__body) {
+    padding-top: 12px;
+}
+
+.banner-ops-helper__grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 12px;
+}
+
+.banner-ops-helper__card {
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: var(--el-fill-color-extra-light);
+}
+
+.banner-ops-helper__title {
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.banner-ops-helper__row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 8px;
+    align-items: start;
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+    padding: 4px 0;
+}
+
+.banner-ops-helper__row code {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 0 8px;
+    border-radius: 999px;
+    border: 1px solid var(--el-border-color-lighter);
+    background: #fff;
+    color: var(--el-color-primary);
+}
+
+.banner-ops-helper__tip {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+    line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+    .banner-ops-helper__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .banner-ops-helper__row {
+        grid-template-columns: 1fr;
+    }
+}
+</style>

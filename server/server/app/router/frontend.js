@@ -173,6 +173,10 @@ module.exports = app => {
   postFeature('/api/ai-config/generate-website-info', 'ai_assistant', controller.uied.aiConfig.generateWebsiteInfo);
   // POST /api/ai-config/chat - AI 聊天
   postFeature('/api/ai-config/chat', 'ai_assistant', controller.uied.aiConfig.chat);
+  // POST /api/compare/websites/ai-analysis - 网站对比 AI 分析
+  postFeature('/api/compare/websites/ai-analysis', 'ai_assistant', controller.uied.frontend.websiteCompareAiAnalysis);
+  // POST /compare/websites/ai-analysis - 网站对比 AI 分析（兼容旧前端无 /api 前缀）
+  postLegacyFeature('/compare/websites/ai-analysis', 'ai_assistant', controller.uied.frontend.websiteCompareAiAnalysis);
   // POST /api/ai-config/smart-search - AI 智能搜索（兼容旧前端）
   postFeature('/api/ai-config/smart-search', 'ai_assistant', controller.uied.frontend.aiSearch);
   // POST /api/ai-search - AI 智能搜索（统一前端入口）

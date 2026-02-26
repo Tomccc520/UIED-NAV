@@ -1844,6 +1844,126 @@ class UserService extends Service {
   }
 
   /**
+   * 用户中心网站收藏/点赞列表通用查询
+   * @param {number} userId 用户ID
+   * @param {Object} params 查询参数
+   * @param {string} tableName 表名（uied_website_favorite / uied_website_like）
+   * @param {string} timeField 返回时间字段名
+   * @returns {Promise<object>} 分页列表
+   */
+  async getUserWebsiteInteractionList(userId, params = {}, tableName, timeField = 'createTime') {
+    const { ctx, app } = this;
+    const pageNo = Number(params.pageNo || 1);
+    const pageSize = Number(params.pageSize || 10);
+    const limit = Math.max(1, Math.min(50, pageSize));
+    const offset = limit * (Math.max(1, pageNo) - 1);
+
+    await ctx.service.uied.websiteInteraction.ensureTables();
+
+    const safeTable = [ 'uied_website_favorite', 'uied_website_like' ].includes(String(tableName))
+      ? String(tableName)
+      : 'uied_website_favorite';
+
+    const [ countRow ] = await app.model.query(
+      `SELECT COUNT(1) AS total
+       FROM ${safeTable} ui
+       INNER JOIN uied_website w ON w.id = ui.website_id AND w.is_delete = 0
+       WHERE ui.user_id = ? AND ui.is_delete = 0`,
+      {
+        replacements: [ Number(userId) ],
+        type: app.Sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    const rows = await app.model.query(
+      `SELECT ui.id as relation_id, ui.website_id, ui.create_time as relation_create_time,
+              w.id, w.name, w.slug, w.description, w.url, w.icon_url, w.thumbnail, w.click_count,
+              w.create_time, w.update_time, w.tags,
+              c.name as category_name
+       FROM ${safeTable} ui
+       INNER JOIN uied_website w ON w.id = ui.website_id AND w.is_delete = 0
+       LEFT JOIN uied_category c ON c.id = w.category_id
+       WHERE ui.user_id = ? AND ui.is_delete = 0
+       ORDER BY ui.id DESC
+       LIMIT ? OFFSET ?`,
+      {
+        replacements: [ Number(userId), limit, offset ],
+        type: app.Sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    const websiteIds = Array.from(new Set((rows || []).map(item => Number(item.website_id || item.id || 0)).filter(Boolean)));
+    let interactionMap = new Map();
+    if (websiteIds.length > 0) {
+      try {
+        const summaries = await Promise.all(
+          websiteIds.map(async websiteId => {
+            const summary = await ctx.service.uied.websiteInteraction.getWebsiteInteractionSummary(websiteId);
+            return [ websiteId, summary ];
+          })
+        );
+        interactionMap = new Map(summaries);
+      } catch (error) {
+        ctx.logger.warn('[user.getUserWebsiteInteractionList] 读取网站互动汇总失败，降级基础字段:', error.message);
+      }
+    }
+
+    const lists = (rows || []).map(item => {
+      const websiteId = Number(item.website_id || item.id || 0);
+      const summary = interactionMap.get(websiteId) || {};
+      const tags = safeJsonParse(item.tags, []);
+      const normalizedTags = Array.isArray(tags) ? tags.filter(Boolean) : [];
+      return {
+        id: websiteId,
+        websiteId,
+        relationId: Number(item.relation_id || 0),
+        name: String(item.name || ''),
+        slug: String(item.slug || ''),
+        description: String(item.description || ''),
+        url: String(item.url || ''),
+        iconUrl: item.icon_url ? urlUtil.toAbsoluteUrl(item.icon_url) : '',
+        thumbnail: item.thumbnail ? urlUtil.toAbsoluteUrl(item.thumbnail) : '',
+        clickCount: Number(item.click_count || 0),
+        categoryName: String(item.category_name || ''),
+        tags: normalizedTags,
+        favoriteCount: Number(summary.totalFavorites || 0),
+        likeCount: Number(summary.likeCount || 0),
+        commentCount: Number(summary.commentsCount || 0),
+        [timeField]: moment(Number(item.relation_create_time || 0) * 1000).format('YYYY-MM-DD HH:mm:ss'),
+        createTime: moment(Number(item.create_time || 0) * 1000).format('YYYY-MM-DD HH:mm:ss'),
+        updateTime: moment(Number(item.update_time || 0) * 1000).format('YYYY-MM-DD HH:mm:ss'),
+      };
+    });
+
+    return {
+      pageNo: Math.max(1, pageNo),
+      pageSize: limit,
+      total: Number(countRow?.total || 0),
+      lists,
+    };
+  }
+
+  /**
+   * 用户中心收藏网址列表
+   * @param {number} userId 用户ID
+   * @param {object} params 查询参数
+   * @returns {Promise<object>} 收藏网址分页列表
+   */
+  async websiteFavoriteList(userId, params = {}) {
+    return await this.getUserWebsiteInteractionList(userId, params, 'uied_website_favorite', 'favoriteTime');
+  }
+
+  /**
+   * 用户中心点赞网址列表
+   * @param {number} userId 用户ID
+   * @param {object} params 查询参数
+   * @returns {Promise<object>} 点赞网址分页列表
+   */
+  async websiteLikeList(userId, params = {}) {
+    return await this.getUserWebsiteInteractionList(userId, params, 'uied_website_like', 'likeTime');
+  }
+
+  /**
    * 用户中心点赞文章列表
    */
   async articleLikeList(userId, params = {}) {

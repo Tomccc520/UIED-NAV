@@ -197,6 +197,125 @@
                         </section>
                     </div>
 
+                    <el-divider content-position="left">访问数据（高级版）</el-divider>
+                    <el-card class="!border-none mb-4" shadow="never">
+                        <template #header>
+                            <div class="flex items-center justify-between">
+                                <span class="font-medium">站点访问数据（手动录入）</span>
+                                <span class="text-xs text-tx-secondary">
+                                    适合售卖版展示 Similarweb 风格数据，不依赖第三方付费 API
+                                </span>
+                            </div>
+                        </template>
+                        <el-form :model="editData.trafficMetrics" label-width="130px">
+                            <el-row :gutter="16">
+                                <el-col :span="8">
+                                    <el-form-item label="月访问量">
+                                        <el-input-number
+                                            v-model="editData.trafficMetrics.monthlyVisits"
+                                            :min="0"
+                                            :max="999999999999"
+                                            class="!w-full"
+                                        />
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="8">
+                                    <el-form-item label="平均访问时长(秒)">
+                                        <el-input-number
+                                            v-model="editData.trafficMetrics.avgVisitDurationSeconds"
+                                            :min="0"
+                                            :max="86400"
+                                            class="!w-full"
+                                        />
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="8">
+                                    <el-form-item label="每次访问页数">
+                                        <el-input-number
+                                            v-model="editData.trafficMetrics.pagesPerVisit"
+                                            :min="0"
+                                            :max="999"
+                                            :precision="2"
+                                            class="!w-full"
+                                        />
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="8">
+                                    <el-form-item label="跳出率(%)">
+                                        <el-input-number
+                                            v-model="editData.trafficMetrics.bounceRate"
+                                            :min="0"
+                                            :max="100"
+                                            :precision="2"
+                                            class="!w-full"
+                                        />
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="8">
+                                    <el-form-item label="数据来源">
+                                        <el-select v-model="editData.trafficMetrics.dataSource" class="!w-full">
+                                            <el-option label="手动录入" value="manual" />
+                                            <el-option label="第三方估算" value="api" />
+                                            <el-option label="运营标注" value="ops" />
+                                        </el-select>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="8">
+                                    <el-form-item label="备注">
+                                        <el-input
+                                            v-model="editData.trafficMetrics.remark"
+                                            maxlength="100"
+                                            show-word-limit
+                                            placeholder="如：2026年2月估算数据"
+                                        />
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+
+                            <el-divider content-position="left">来源渠道占比（%）</el-divider>
+                            <el-row :gutter="16">
+                                <el-col :span="8">
+                                    <el-form-item label="直接访问">
+                                        <el-input-number v-model="editData.trafficMetrics.sourceBreakdown.direct" :min="0" :max="100" :precision="2" class="!w-full" />
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="8">
+                                    <el-form-item label="自然搜索">
+                                        <el-input-number v-model="editData.trafficMetrics.sourceBreakdown.organicSearch" :min="0" :max="100" :precision="2" class="!w-full" />
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="8">
+                                    <el-form-item label="邮件">
+                                        <el-input-number v-model="editData.trafficMetrics.sourceBreakdown.email" :min="0" :max="100" :precision="2" class="!w-full" />
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="8">
+                                    <el-form-item label="外链引荐">
+                                        <el-input-number v-model="editData.trafficMetrics.sourceBreakdown.referral" :min="0" :max="100" :precision="2" class="!w-full" />
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="8">
+                                    <el-form-item label="社交媒体">
+                                        <el-input-number v-model="editData.trafficMetrics.sourceBreakdown.social" :min="0" :max="100" :precision="2" class="!w-full" />
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="8">
+                                    <el-form-item label="展示广告">
+                                        <el-input-number v-model="editData.trafficMetrics.sourceBreakdown.displayAds" :min="0" :max="100" :precision="2" class="!w-full" />
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="8">
+                                    <el-form-item label="其他">
+                                        <el-input-number v-model="editData.trafficMetrics.sourceBreakdown.others" :min="0" :max="100" :precision="2" class="!w-full" />
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                            <div class="text-xs text-tx-secondary">
+                                建议总和接近 100%。未填写时前端将继续显示基础站点数据。
+                            </div>
+                        </el-form>
+                    </el-card>
+
                     <el-divider content-position="left">详情内容（AI 辅助编辑）</el-divider>
                     <!-- AI 编辑器布局：左编辑器 + 右AI助手 -->
                     <div class="ai-editor-layout">
@@ -578,6 +697,27 @@ const getCategoryList = async () => {
 // 截图列表
 const screenshotList = ref<string[]>([])
 
+/**
+ * 创建默认访问数据（高级版）表单对象
+ */
+const createDefaultTrafficMetrics = () => ({
+    monthlyVisits: 0,
+    avgVisitDurationSeconds: 0,
+    pagesPerVisit: 0,
+    bounceRate: 0,
+    dataSource: 'manual',
+    remark: '',
+    sourceBreakdown: {
+        direct: 0,
+        organicSearch: 0,
+        email: 0,
+        referral: 0,
+        social: 0,
+        displayAds: 0,
+        others: 0
+    }
+})
+
 // 表单数据
 const editData = reactive({
     id: 0,
@@ -596,7 +736,8 @@ const editData = reactive({
     thumbnail: '',
     seoTitle: '',
     seoDescription: '',
-    seoKeywords: ''
+    seoKeywords: '',
+    trafficMetrics: createDefaultTrafficMetrics()
 })
 
 const editRules: FormRules = {
@@ -637,6 +778,21 @@ const loadDetail = async (id: string | number) => {
         editData.seoTitle = data.seoTitle || data.seo_title || ''
         editData.seoDescription = data.seoDescription || data.seo_description || ''
         editData.seoKeywords = data.seoKeywords || data.seo_keywords || ''
+        const trafficMetrics = (data.trafficMetrics || data.traffic_metrics || {}) as any
+        Object.assign(editData.trafficMetrics, createDefaultTrafficMetrics(), {
+            monthlyVisits: Number(trafficMetrics.monthlyVisits || trafficMetrics.monthly_visits || 0),
+            avgVisitDurationSeconds: Number(
+                trafficMetrics.avgVisitDurationSeconds || trafficMetrics.avg_visit_duration_seconds || 0
+            ),
+            pagesPerVisit: Number(trafficMetrics.pagesPerVisit || trafficMetrics.pages_per_visit || 0),
+            bounceRate: Number(trafficMetrics.bounceRate || trafficMetrics.bounce_rate || 0),
+            dataSource: trafficMetrics.dataSource || trafficMetrics.data_source || 'manual',
+            remark: trafficMetrics.remark || '',
+            sourceBreakdown: {
+                ...createDefaultTrafficMetrics().sourceBreakdown,
+                ...(trafficMetrics.sourceBreakdown || trafficMetrics.trafficSources || {})
+            }
+        })
         const screenshots = data.screenshots || []
         screenshotList.value = Array.isArray(screenshots) ? [...screenshots] : []
     } catch (error) {
@@ -1263,7 +1419,24 @@ const handleSubmit = async () => {
             ...editData,
             screenshots,
             thumbnail: editData.thumbnail || null,
-            order: editData.sortOrder
+            order: editData.sortOrder,
+            trafficMetrics: {
+                monthlyVisits: Number(editData.trafficMetrics.monthlyVisits || 0),
+                avgVisitDurationSeconds: Number(editData.trafficMetrics.avgVisitDurationSeconds || 0),
+                pagesPerVisit: Number(editData.trafficMetrics.pagesPerVisit || 0),
+                bounceRate: Number(editData.trafficMetrics.bounceRate || 0),
+                dataSource: editData.trafficMetrics.dataSource || 'manual',
+                remark: editData.trafficMetrics.remark || '',
+                sourceBreakdown: {
+                    direct: Number(editData.trafficMetrics.sourceBreakdown.direct || 0),
+                    organicSearch: Number(editData.trafficMetrics.sourceBreakdown.organicSearch || 0),
+                    email: Number(editData.trafficMetrics.sourceBreakdown.email || 0),
+                    referral: Number(editData.trafficMetrics.sourceBreakdown.referral || 0),
+                    social: Number(editData.trafficMetrics.sourceBreakdown.social || 0),
+                    displayAds: Number(editData.trafficMetrics.sourceBreakdown.displayAds || 0),
+                    others: Number(editData.trafficMetrics.sourceBreakdown.others || 0)
+                }
+            }
         }
         if (editData.id) {
             await uiedWebsiteEdit(submitData)
