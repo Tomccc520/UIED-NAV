@@ -11,6 +11,9 @@ DATE_TAG="$(date +%Y%m%d_%H%M%S)"
 DEFAULT_OUTPUT_DIR="$ROOT_DIR/release/$DATE_TAG"
 DEFAULT_EDITIONS="free,pro,enterprise"
 BASE_URL="${PREFLIGHT_BASE_URL:-http://127.0.0.1:8002}"
+FRONTEND_BASE_URL="${PREFLIGHT_FRONTEND_BASE_URL:-}"
+SMOKE_USER="${PREFLIGHT_SMOKE_USER:-}"
+SMOKE_PASS="${PREFLIGHT_SMOKE_PASS:-}"
 RUN_PREFLIGHT=1
 ALLOW_PREFLIGHT_FAIL=0
 OUTPUT_DIR="$DEFAULT_OUTPUT_DIR"
@@ -79,6 +82,10 @@ print_help() {
                                    使用预设版本方案（未显式指定 --editions 时生效）
   --output /abs/path               指定输出目录，默认: $DEFAULT_OUTPUT_DIR
   --base-url http://127.0.0.1:8002 健康检查 API 地址
+  --frontend-base-url http://127.0.0.1:3003
+                                   健康检查前端地址（可选）
+  --smoke-user <username>          健康检查登录账号（可选）
+  --smoke-pass <password>          健康检查登录密码（可选）
   --skip-preflight                 跳过发布前健康检查
   --allow-preflight-fail           健康检查失败时仍继续打包
   --auto-sign-license              调用后台接口自动签发 license/customer-license.json
@@ -120,6 +127,18 @@ parse_args() {
         ;;
       --base-url)
         BASE_URL="${2:-$BASE_URL}"
+        shift 2
+        ;;
+      --frontend-base-url)
+        FRONTEND_BASE_URL="${2:-$FRONTEND_BASE_URL}"
+        shift 2
+        ;;
+      --smoke-user)
+        SMOKE_USER="${2:-$SMOKE_USER}"
+        shift 2
+        ;;
+      --smoke-pass)
+        SMOKE_PASS="${2:-$SMOKE_PASS}"
         shift 2
         ;;
       --skip-preflight)
@@ -342,8 +361,24 @@ run_preflight_check() {
     return 0
   fi
   log_info "执行商业版发布前健康检查..."
+  # 组装健康检查命令（按需附加用户链路与前端冒烟参数）
+  local preflight_cmd=(
+    node
+    "$ROOT_DIR/scripts/commercial-preflight-check.js"
+    --base-url
+    "$BASE_URL"
+  )
+  if [[ -n "$FRONTEND_BASE_URL" ]]; then
+    preflight_cmd+=(--frontend-base-url "$FRONTEND_BASE_URL")
+  fi
+  if [[ -n "$SMOKE_USER" ]]; then
+    preflight_cmd+=(--smoke-user "$SMOKE_USER")
+  fi
+  if [[ -n "$SMOKE_PASS" ]]; then
+    preflight_cmd+=(--smoke-pass "$SMOKE_PASS")
+  fi
   set +e
-  node "$ROOT_DIR/scripts/commercial-preflight-check.js" --base-url "$BASE_URL"
+  "${preflight_cmd[@]}"
   local code=$?
   set -e
   if [[ $code -ne 0 ]]; then
@@ -726,6 +761,8 @@ main() {
   log_info "版本列表: ${editions[*]}"
   [[ -n "$RELEASE_PRESET" ]] && log_info "版本预设: $RELEASE_PRESET"
   log_info "健康检查地址: $BASE_URL"
+  [[ -n "$FRONTEND_BASE_URL" ]] && log_info "前端检查地址: $FRONTEND_BASE_URL"
+  [[ -n "$SMOKE_USER" ]] && log_info "健康检查账号: $SMOKE_USER"
   [[ "$AUTO_SIGN_LICENSE" -eq 1 ]] && log_info "自动签发许可证: 开启 (${BASE_URL%/}${LICENSE_SIGN_API_PATH})"
 
   run_preflight_check

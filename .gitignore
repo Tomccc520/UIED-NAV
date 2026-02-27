@@ -23,6 +23,7 @@ npm-debug.log*
 # 构建产物
 dist/
 build/
+release/
 
 # 上传文件
 backend/uploads/*

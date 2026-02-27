@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-26T16:54:32.987Z",
+  "generatedAt": "2026-02-26T16:59:37.091Z",
   "rows": [
     {
       "status": "pass",
@@ -72,11 +72,88 @@
       "suggestion": ""
     },
     {
-      "status": "warn",
+      "status": "pass",
       "category": "接口",
-      "item": "用户中心登录态链路",
-      "detail": "未提供 --smoke-user/--smoke-pass，跳过受保护接口检查",
-      "suggestion": "建议在发布前传入测试账号，验证 profile/订单/消息/收藏/评论等接口。"
+      "item": "/api/user/login",
+      "detail": "测试账号登录成功（uied_test_buyer）",
+      "suggestion": ""
+    },
+    {
+      "status": "pass",
+      "category": "接口",
+      "item": "/api/user/profile",
+      "detail": "HTTP 200",
+      "suggestion": ""
+    },
+    {
+      "status": "pass",
+      "category": "接口",
+      "item": "/api/user/index/stats",
+      "detail": "HTTP 200",
+      "suggestion": ""
+    },
+    {
+      "status": "pass",
+      "category": "接口",
+      "item": "/api/user/message/list",
+      "detail": "HTTP 200",
+      "suggestion": ""
+    },
+    {
+      "status": "pass",
+      "category": "接口",
+      "item": "/api/user/order/list",
+      "detail": "HTTP 200",
+      "suggestion": ""
+    },
+    {
+      "status": "pass",
+      "category": "接口",
+      "item": "/api/user/license/list",
+      "detail": "HTTP 200",
+      "suggestion": ""
+    },
+    {
+      "status": "pass",
+      "category": "接口",
+      "item": "/api/user/article/collect/list",
+      "detail": "HTTP 200",
+      "suggestion": ""
+    },
+    {
+      "status": "pass",
+      "category": "接口",
+      "item": "/api/user/article/like/list",
+      "detail": "HTTP 200",
+      "suggestion": ""
+    },
+    {
+      "status": "pass",
+      "category": "接口",
+      "item": "/api/user/website/favorite/list",
+      "detail": "HTTP 200",
+      "suggestion": ""
+    },
+    {
+      "status": "pass",
+      "category": "接口",
+      "item": "/api/user/website/like/list",
+      "detail": "HTTP 200",
+      "suggestion": ""
+    },
+    {
+      "status": "pass",
+      "category": "接口",
+      "item": "/api/user/article/comment/list",
+      "detail": "HTTP 200",
+      "suggestion": ""
+    },
+    {
+      "status": "pass",
+      "category": "接口",
+      "item": "/api/user/website/comment/list",
+      "detail": "HTTP 200",
+      "suggestion": ""
     },
     {
       "status": "pass",
@@ -205,11 +282,39 @@
       "suggestion": ""
     },
     {
-      "status": "warn",
+      "status": "pass",
       "category": "前端",
-      "item": "页面冒烟",
-      "detail": "未提供 --frontend-base-url，跳过前端页面可达性检查",
-      "suggestion": "建议发布前增加 --frontend-base-url http://127.0.0.1:3003 执行冒烟。"
+      "item": "/",
+      "detail": "HTTP 200",
+      "suggestion": ""
+    },
+    {
+      "status": "pass",
+      "category": "前端",
+      "item": "/articles",
+      "detail": "HTTP 200",
+      "suggestion": ""
+    },
+    {
+      "status": "pass",
+      "category": "前端",
+      "item": "/p/daily-hot",
+      "detail": "HTTP 200",
+      "suggestion": ""
+    },
+    {
+      "status": "pass",
+      "category": "前端",
+      "item": "/rankings",
+      "detail": "HTTP 200",
+      "suggestion": ""
+    },
+    {
+      "status": "pass",
+      "category": "前端",
+      "item": "/changelog",
+      "detail": "HTTP 200",
+      "suggestion": ""
     }
   ]
 }
