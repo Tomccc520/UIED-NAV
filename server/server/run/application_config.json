@@ -307,6 +307,7 @@
         "node-rsa": "^1.1.1",
         "nodemailer": "^6.7.5",
         "os": "^0.1.2",
+        "playwright": "^1.58.2",
         "streamsearch": "^1.1.0",
         "ua-parser-js": "^1.0.35",
         "util": "^0.12.5"
@@ -328,7 +329,7 @@
       "scripts": {
         "start": "egg-scripts start --daemon --title=egg-server-vue-admin-serve",
         "stop": "egg-scripts stop --title=egg-server-vue-admin-serve",
-        "dev": "egg-bin dev",
+        "dev": "egg-bin dev --port=8002",
         "preflight:commercial": "node ../../scripts/commercial-preflight-check.js",
         "fake": "node ./initTableData.js",
         "debug": "egg-bin debug",
@@ -718,6 +719,7 @@
         "node-rsa": "^1.1.1",
         "nodemailer": "^6.7.5",
         "os": "^0.1.2",
+        "playwright": "^1.58.2",
         "streamsearch": "^1.1.0",
         "ua-parser-js": "^1.0.35",
         "util": "^0.12.5"
@@ -739,7 +741,7 @@
       "scripts": {
         "start": "egg-scripts start --daemon --title=egg-server-vue-admin-serve",
         "stop": "egg-scripts stop --title=egg-server-vue-admin-serve",
-        "dev": "egg-bin dev",
+        "dev": "egg-bin dev --port=8002",
         "preflight:commercial": "node ../../scripts/commercial-preflight-check.js",
         "fake": "node ./initTableData.js",
         "debug": "egg-bin debug",

@@ -5652,6 +5652,194 @@
       "UNSUBSCRIBE"
     ],
     "paramNames": [],
+    "path": "/api/user/article/comment/list",
+    "regexp": "/^\\/api\\/user\\/article\\/comment\\/list(?:\\/(?=$))?$/",
+    "stack": [
+      "wrappedController"
+    ]
+  },
+  {
+    "name": null,
+    "methods": [
+      "HEAD",
+      "ACL",
+      "BIND",
+      "CHECKOUT",
+      "CONNECT",
+      "COPY",
+      "DELETE",
+      "GET",
+      "HEAD",
+      "LINK",
+      "LOCK",
+      "M-SEARCH",
+      "MERGE",
+      "MKACTIVITY",
+      "MKCALENDAR",
+      "MKCOL",
+      "MOVE",
+      "NOTIFY",
+      "OPTIONS",
+      "PATCH",
+      "POST",
+      "PROPFIND",
+      "PROPPATCH",
+      "PURGE",
+      "PUT",
+      "QUERY",
+      "REBIND",
+      "REPORT",
+      "SEARCH",
+      "SOURCE",
+      "SUBSCRIBE",
+      "TRACE",
+      "UNBIND",
+      "UNLINK",
+      "UNLOCK",
+      "UNSUBSCRIBE"
+    ],
+    "paramNames": [],
+    "path": "/api/user/website/favorite/list",
+    "regexp": "/^\\/api\\/user\\/website\\/favorite\\/list(?:\\/(?=$))?$/",
+    "stack": [
+      "wrappedController"
+    ]
+  },
+  {
+    "name": null,
+    "methods": [
+      "HEAD",
+      "ACL",
+      "BIND",
+      "CHECKOUT",
+      "CONNECT",
+      "COPY",
+      "DELETE",
+      "GET",
+      "HEAD",
+      "LINK",
+      "LOCK",
+      "M-SEARCH",
+      "MERGE",
+      "MKACTIVITY",
+      "MKCALENDAR",
+      "MKCOL",
+      "MOVE",
+      "NOTIFY",
+      "OPTIONS",
+      "PATCH",
+      "POST",
+      "PROPFIND",
+      "PROPPATCH",
+      "PURGE",
+      "PUT",
+      "QUERY",
+      "REBIND",
+      "REPORT",
+      "SEARCH",
+      "SOURCE",
+      "SUBSCRIBE",
+      "TRACE",
+      "UNBIND",
+      "UNLINK",
+      "UNLOCK",
+      "UNSUBSCRIBE"
+    ],
+    "paramNames": [],
+    "path": "/api/user/website/like/list",
+    "regexp": "/^\\/api\\/user\\/website\\/like\\/list(?:\\/(?=$))?$/",
+    "stack": [
+      "wrappedController"
+    ]
+  },
+  {
+    "name": null,
+    "methods": [
+      "HEAD",
+      "ACL",
+      "BIND",
+      "CHECKOUT",
+      "CONNECT",
+      "COPY",
+      "DELETE",
+      "GET",
+      "HEAD",
+      "LINK",
+      "LOCK",
+      "M-SEARCH",
+      "MERGE",
+      "MKACTIVITY",
+      "MKCALENDAR",
+      "MKCOL",
+      "MOVE",
+      "NOTIFY",
+      "OPTIONS",
+      "PATCH",
+      "POST",
+      "PROPFIND",
+      "PROPPATCH",
+      "PURGE",
+      "PUT",
+      "QUERY",
+      "REBIND",
+      "REPORT",
+      "SEARCH",
+      "SOURCE",
+      "SUBSCRIBE",
+      "TRACE",
+      "UNBIND",
+      "UNLINK",
+      "UNLOCK",
+      "UNSUBSCRIBE"
+    ],
+    "paramNames": [],
+    "path": "/api/user/website/comment/list",
+    "regexp": "/^\\/api\\/user\\/website\\/comment\\/list(?:\\/(?=$))?$/",
+    "stack": [
+      "wrappedController"
+    ]
+  },
+  {
+    "name": null,
+    "methods": [
+      "HEAD",
+      "ACL",
+      "BIND",
+      "CHECKOUT",
+      "CONNECT",
+      "COPY",
+      "DELETE",
+      "GET",
+      "HEAD",
+      "LINK",
+      "LOCK",
+      "M-SEARCH",
+      "MERGE",
+      "MKACTIVITY",
+      "MKCALENDAR",
+      "MKCOL",
+      "MOVE",
+      "NOTIFY",
+      "OPTIONS",
+      "PATCH",
+      "POST",
+      "PROPFIND",
+      "PROPPATCH",
+      "PURGE",
+      "PUT",
+      "QUERY",
+      "REBIND",
+      "REPORT",
+      "SEARCH",
+      "SOURCE",
+      "SUBSCRIBE",
+      "TRACE",
+      "UNBIND",
+      "UNLINK",
+      "UNLOCK",
+      "UNSUBSCRIBE"
+    ],
+    "paramNames": [],
     "path": "/api/article/cate/list",
     "regexp": "/^\\/api\\/article\\/cate\\/list(?:\\/(?=$))?$/",
     "stack": [
@@ -20573,6 +20761,56 @@
   {
     "name": null,
     "methods": [
+      "HEAD",
+      "GET"
+    ],
+    "paramNames": [
+      {
+        "name": "id",
+        "prefix": "/",
+        "delimiter": "/",
+        "optional": false,
+        "repeat": false,
+        "partial": false,
+        "asterisk": false,
+        "pattern": "[^\\/]+?"
+      }
+    ],
+    "path": "/api/websites/:id/health",
+    "regexp": "/^\\/api\\/websites\\/((?:[^\\/]+?))\\/health(?:\\/(?=$))?$/",
+    "stack": [
+      "frontendResponseNormalizer",
+      "wrappedController"
+    ]
+  },
+  {
+    "name": null,
+    "methods": [
+      "HEAD",
+      "GET"
+    ],
+    "paramNames": [
+      {
+        "name": "id",
+        "prefix": "/",
+        "delimiter": "/",
+        "optional": false,
+        "repeat": false,
+        "partial": false,
+        "asterisk": false,
+        "pattern": "[^\\/]+?"
+      }
+    ],
+    "path": "/api/websites/:id/preview-snapshot",
+    "regexp": "/^\\/api\\/websites\\/((?:[^\\/]+?))\\/preview-snapshot(?:\\/(?=$))?$/",
+    "stack": [
+      "frontendResponseNormalizer",
+      "wrappedController"
+    ]
+  },
+  {
+    "name": null,
+    "methods": [
       "POST"
     ],
     "paramNames": [
@@ -20711,6 +20949,54 @@
     ],
     "path": "/api/websites/:id/favorite",
     "regexp": "/^\\/api\\/websites\\/((?:[^\\/]+?))\\/favorite(?:\\/(?=$))?$/",
+    "stack": [
+      "frontendResponseNormalizer",
+      "wrappedController"
+    ]
+  },
+  {
+    "name": null,
+    "methods": [
+      "POST"
+    ],
+    "paramNames": [
+      {
+        "name": "id",
+        "prefix": "/",
+        "delimiter": "/",
+        "optional": false,
+        "repeat": false,
+        "partial": false,
+        "asterisk": false,
+        "pattern": "[^\\/]+?"
+      }
+    ],
+    "path": "/api/websites/:id/like",
+    "regexp": "/^\\/api\\/websites\\/((?:[^\\/]+?))\\/like(?:\\/(?=$))?$/",
+    "stack": [
+      "frontendResponseNormalizer",
+      "wrappedController"
+    ]
+  },
+  {
+    "name": null,
+    "methods": [
+      "DELETE"
+    ],
+    "paramNames": [
+      {
+        "name": "id",
+        "prefix": "/",
+        "delimiter": "/",
+        "optional": false,
+        "repeat": false,
+        "partial": false,
+        "asterisk": false,
+        "pattern": "[^\\/]+?"
+      }
+    ],
+    "path": "/api/websites/:id/like",
+    "regexp": "/^\\/api\\/websites\\/((?:[^\\/]+?))\\/like(?:\\/(?=$))?$/",
     "stack": [
       "frontendResponseNormalizer",
       "wrappedController"
@@ -20911,6 +21197,108 @@
       "HEAD",
       "GET"
     ],
+    "paramNames": [
+      {
+        "name": "id",
+        "prefix": "/",
+        "delimiter": "/",
+        "optional": false,
+        "repeat": false,
+        "partial": false,
+        "asterisk": false,
+        "pattern": "[^\\/]+?"
+      }
+    ],
+    "path": "/websites/:id/health",
+    "regexp": "/^\\/websites\\/((?:[^\\/]+?))\\/health(?:\\/(?=$))?$/",
+    "stack": [
+      "commercialLegacyRouteGuard",
+      "frontendResponseNormalizer",
+      "wrappedController"
+    ]
+  },
+  {
+    "name": null,
+    "methods": [
+      "HEAD",
+      "GET"
+    ],
+    "paramNames": [
+      {
+        "name": "id",
+        "prefix": "/",
+        "delimiter": "/",
+        "optional": false,
+        "repeat": false,
+        "partial": false,
+        "asterisk": false,
+        "pattern": "[^\\/]+?"
+      }
+    ],
+    "path": "/websites/:id/preview-snapshot",
+    "regexp": "/^\\/websites\\/((?:[^\\/]+?))\\/preview-snapshot(?:\\/(?=$))?$/",
+    "stack": [
+      "commercialLegacyRouteGuard",
+      "frontendResponseNormalizer",
+      "wrappedController"
+    ]
+  },
+  {
+    "name": null,
+    "methods": [
+      "POST"
+    ],
+    "paramNames": [
+      {
+        "name": "id",
+        "prefix": "/",
+        "delimiter": "/",
+        "optional": false,
+        "repeat": false,
+        "partial": false,
+        "asterisk": false,
+        "pattern": "[^\\/]+?"
+      }
+    ],
+    "path": "/websites/:id/like",
+    "regexp": "/^\\/websites\\/((?:[^\\/]+?))\\/like(?:\\/(?=$))?$/",
+    "stack": [
+      "commercialLegacyRouteGuard",
+      "frontendResponseNormalizer",
+      "wrappedController"
+    ]
+  },
+  {
+    "name": null,
+    "methods": [
+      "DELETE"
+    ],
+    "paramNames": [
+      {
+        "name": "id",
+        "prefix": "/",
+        "delimiter": "/",
+        "optional": false,
+        "repeat": false,
+        "partial": false,
+        "asterisk": false,
+        "pattern": "[^\\/]+?"
+      }
+    ],
+    "path": "/websites/:id/like",
+    "regexp": "/^\\/websites\\/((?:[^\\/]+?))\\/like(?:\\/(?=$))?$/",
+    "stack": [
+      "commercialLegacyRouteGuard",
+      "frontendResponseNormalizer",
+      "wrappedController"
+    ]
+  },
+  {
+    "name": null,
+    "methods": [
+      "HEAD",
+      "GET"
+    ],
     "paramNames": [],
     "path": "/api/settings/nav-menus",
     "regexp": "/^\\/api\\/settings\\/nav-menus(?:\\/(?=$))?$/",
@@ -21049,6 +21437,35 @@
     "path": "/api/ai-config/chat",
     "regexp": "/^\\/api\\/ai-config\\/chat(?:\\/(?=$))?$/",
     "stack": [
+      "commercialFeatureGuard",
+      "frontendResponseNormalizer",
+      "wrappedController"
+    ]
+  },
+  {
+    "name": null,
+    "methods": [
+      "POST"
+    ],
+    "paramNames": [],
+    "path": "/api/compare/websites/ai-analysis",
+    "regexp": "/^\\/api\\/compare\\/websites\\/ai-analysis(?:\\/(?=$))?$/",
+    "stack": [
+      "commercialFeatureGuard",
+      "frontendResponseNormalizer",
+      "wrappedController"
+    ]
+  },
+  {
+    "name": null,
+    "methods": [
+      "POST"
+    ],
+    "paramNames": [],
+    "path": "/compare/websites/ai-analysis",
+    "regexp": "/^\\/compare\\/websites\\/ai-analysis(?:\\/(?=$))?$/",
+    "stack": [
+      "commercialLegacyRouteGuard",
       "commercialFeatureGuard",
       "frontendResponseNormalizer",
       "wrappedController"
