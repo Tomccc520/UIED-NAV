@@ -23,6 +23,7 @@ npm-debug.log*
 # 构建产物
 dist/
 build/
+release/
 
 # 上传文件
 backend/uploads/*
@@ -40,10 +41,17 @@ admin/.git/
 # 测试覆盖率
 coverage/
 
-# Kiro 配置和文档（不上传到开源仓库）
+# Kiro 配置和文档（仅放行 API 对接文档）
 .kiro/
-docs/
+**/docs/
+!/docs/
+/docs/*
+!/docs/API/
+!/docs/API/**
 
 # 开发工具脚本
 add_copyright.py
-0
+
+# 模块安装临时目录
+server/.module_backup/
+server/.module_report/

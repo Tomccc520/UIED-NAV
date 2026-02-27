@@ -1,0 +1,55 @@
+# UIED 导航系统 - MySQL + Redis 配置
+# 用于 likeadmin 迁移后的数据库服务
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: uied_mysql
+    restart: unless-stopped
+    ports:
+      - "3308:3306"  # 使用 3308 避免与其他 MySQL 实例冲突
+    environment:
+      MYSQL_ROOT_PASSWORD: root123456
+      MYSQL_DATABASE: uied_nav
+      MYSQL_USER: uied
+      MYSQL_PASSWORD: uied123456
+      TZ: Asia/Shanghai
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    command: 
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --max_connections=1000
+      - --innodb_buffer_pool_size=256M
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot123456"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: uied_redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"  # 使用 6380 避免与其他 Redis 实例冲突
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data:
+    name: uied_mysql_data
+  redis_data:
+    name: uied_redis_data
+
+networks:
+  default:
+    name: uied_network

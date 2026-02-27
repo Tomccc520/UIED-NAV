@@ -1,0 +1,225 @@
+'use strict';
+
+module.exports = app => {
+  const { router, controller } = app;
+  /**
+   * 按功能键创建商业版能力守卫中间件
+   */
+  const featureGuard = featureKey => app.middleware.commercialFeatureGuard({ featureKey });
+  /**
+   * 注册带能力校验的全方法路由
+   */
+  const allFeature = (path, featureKey, action) => router.all(path, featureGuard(featureKey), action);
+  router.all('/api/system/login', controller.system.login);
+  router.all('/api/system/logout', controller.system.logout);
+  router.all('/api/system/menu/route', controller.system.menusRoute);
+  router.all('/api/common/index/console', controller.system.console);
+  router.all('/api/common/index/config', controller.system.configInfo);
+
+  // 部门管理
+  router.all('/api/system/dept/list', controller.system.dept.deptList);
+  router.all('/api/system/dept/add', controller.system.dept.deptAdd);
+  router.all('/api/system/dept/detail', controller.system.dept.deptDetail);
+  router.all('/api/system/dept/edit', controller.system.dept.deptEdit);
+  router.all('/api/system/dept/del', controller.system.dept.deptDel);
+  router.all('/api/system/dept/all', controller.system.dept.deptAll);
+
+  // 岗位管理
+  router.all('/api/system/post/list', controller.system.post.postList);
+  router.all('/api/system/post/add', controller.system.post.postAdd);
+  router.all('/api/system/post/detail', controller.system.post.postDetail);
+  router.all('/api/system/post/edit', controller.system.post.postEdit);
+  router.all('/api/system/post/del', controller.system.post.postDel);
+  router.all('/api/system/post/all', controller.system.post.postAll);
+
+  // 管理员
+  router.all('/api/system/admin/list', controller.system.admin.adminList);
+  router.all('/api/system/admin/self', controller.system.admin.self);
+  router.all('/api/system/admin/add', controller.system.admin.add);
+  router.all('/api/system/admin/detail', controller.system.admin.detail);
+  router.all('/api/system/admin/edit', controller.system.admin.edit);
+  router.all('/api/system/admin/upInfo', controller.system.admin.update);
+  router.all('/api/system/admin/del', controller.system.admin.del);
+  router.all('/api/system/admin/disable', controller.system.admin.disable);
+
+  // 角色管理
+  router.all('/api/system/role/all', controller.system.role.roleAll);
+  router.all('/api/system/role/list', controller.system.role.roleList);
+  router.all('/api/system/role/detail', controller.system.role.detail);
+  router.all('/api/system/role/add', controller.system.role.add);
+  router.all('/api/system/role/edit', controller.system.role.edit);
+  router.all('/api/system/role/del', controller.system.role.del);
+
+  // 菜单管理
+  router.all('/api/system/menu/list', controller.system.menu.menuList);
+  router.all('/api/system/menu/detail', controller.system.menu.menuDetail);
+  router.all('/api/system/menu/add', controller.system.menu.menuAdd);
+  router.all('/api/system/menu/edit', controller.system.menu.menuEdit);
+  router.all('/api/system/menu/del', controller.system.menu.menuDel);
+
+  // 素材管理
+  router.all('/api/common/album/cateList', controller.common.album.cateList);
+  router.all('/api/common/album/cateAdd', controller.common.album.cateAdd);
+  router.all('/api/common/album/cateRename', controller.common.album.cateRename);
+  router.all('/api/common/album/cateDel', controller.common.album.cateDel);
+  router.all('/api/common/album/albumList', controller.common.album.albumList);
+  router.all('/api/common/album/albumRename', controller.common.album.albumRename);
+  router.all('/api/common/album/albumDel', controller.common.album.albumDel);
+  router.all('/api/common/album/albumAdd', controller.common.album.albumAdd);
+  router.all('/api/common/album/albumMove', controller.common.album.albumMove);
+
+  // 上传
+  router.all('/api/common/upload/image', controller.common.album.uploadImage);
+  // 远程图片转存（用于编辑器粘贴公众号等外链图片时落到素材库）
+  router.all('/api/common/upload/image/transfer', controller.common.album.transferImage);
+  // 正文图片一键转存（服务端抽取图片并替换正文）
+  router.all('/api/common/upload/image/transfer-content', controller.common.album.transferEditorContentImages);
+  router.all('/api/common/upload/video', controller.common.album.uploadVideo);
+
+  // 网站信息
+  router.all('/api/setting/website/detail', controller.setting.website.details);
+  router.all('/api/setting/website/save', controller.setting.website.save);
+  router.all('/api/setting/copyright/detail', controller.setting.copyright.details);
+  router.all('/api/setting/copyright/save', controller.setting.copyright.save);
+  router.all('/api/setting/protocol/detail', controller.setting.protocol.details);
+  router.all('/api/setting/protocol/save', controller.setting.protocol.save);
+  router.all('/api/setting/storage/list', controller.setting.storage.list);
+  router.all('/api/setting/storage/detail', controller.setting.storage.detail);
+  router.all('/api/setting/storage/edit', controller.setting.storage.edit);
+  router.all('/api/setting/storage/change', controller.setting.storage.change);
+  router.all('/api/monitor/server', controller.monitor.monitor.server);
+  router.all('/api/monitor/cache', controller.monitor.monitor.cache);
+
+  // 日志管理
+  router.all('/api/system/log/operate', controller.system.log.operate);
+
+  // 字典管理
+  router.all('/api/setting/dict/type/list', controller.setting.dict.list);
+  router.all('/api/setting/dict/type/all', controller.setting.dict.all);
+  router.all('/api/setting/dict/type/add', controller.setting.dict.add);
+  router.all('/api/setting/dict/type/detail', controller.setting.dict.detail);
+  router.all('/api/setting/dict/type/edit', controller.setting.dict.edit);
+  router.all('/api/setting/dict/type/del', controller.setting.dict.del);
+  router.all('/api/setting/dict/data/list', controller.setting.dict.dataList);
+  router.all('/api/setting/dict/data/all', controller.setting.dict.dataAll);
+  router.all('/api/setting/dict/data/detail', controller.setting.dict.dataDetail);
+  router.all('/api/setting/dict/data/add', controller.setting.dict.dataAdd);
+  router.all('/api/setting/dict/data/edit', controller.setting.dict.dataEdit);
+  router.all('/api/setting/dict/data/del', controller.setting.dict.dataDel);
+
+  // 生成代码
+  router.all('/api/gen/list', controller.gen.gen.list);
+  router.all('/api/gen/db', controller.gen.gen.dbTables);
+  router.all('/api/gen/importTable', controller.gen.gen.importTable);
+  router.all('/api/gen/delTable', controller.gen.gen.delTable);
+  router.all('/api/gen/syncTable', controller.gen.gen.syncTable);
+  router.all('/api/gen/previewCode', controller.gen.gen.previewCode);
+  router.all('/api/gen/downloadCode', controller.gen.gen.downloadCode);
+  allFeature('/api/user/list', 'user_center', controller.user.list);
+  allFeature('/api/user/detail', 'user_center', controller.user.detail);
+  allFeature('/api/user/edit', 'user_center', controller.user.edit);
+  allFeature('/api/user/stats', 'user_center', controller.user.stats);
+  allFeature('/api/user/wallet/adjust', 'user_center', controller.user.walletAdjust);
+  allFeature('/api/user/group/list', 'user_center', controller.user.groupList);
+  allFeature('/api/user/group/add', 'user_center', controller.user.groupAdd);
+  allFeature('/api/user/group/edit', 'user_center', controller.user.groupEdit);
+  allFeature('/api/user/group/del', 'user_center', controller.user.groupDel);
+  allFeature('/api/user/tag/list', 'user_center', controller.user.tagList);
+  allFeature('/api/user/tag/add', 'user_center', controller.user.tagAdd);
+  allFeature('/api/user/tag/edit', 'user_center', controller.user.tagEdit);
+  allFeature('/api/user/tag/del', 'user_center', controller.user.tagDel);
+  allFeature('/api/user/tag/bind', 'user_center', controller.user.tagBind);
+  allFeature('/api/user/level/list', 'user_center', controller.user.levelList);
+  allFeature('/api/user/level/add', 'user_center', controller.user.levelAdd);
+  allFeature('/api/user/level/edit', 'user_center', controller.user.levelEdit);
+  allFeature('/api/user/level/del', 'user_center', controller.user.levelDel);
+  allFeature('/api/user/seed/testUsers', 'user_center', controller.user.seedTestUsers);
+  // 前台用户中心（登录/资料）
+  router.all('/api/user/register', controller.user.register);
+  router.all('/api/user/login', controller.user.login);
+  router.all('/api/user/logout', controller.user.logout);
+  router.all('/api/user/profile', controller.user.profile);
+  router.all('/api/user/profile/update', controller.user.updateProfile);
+  // 前台作者中心
+  router.all('/api/user/author/center/detail', controller.user.authorCenterDetail);
+  router.all('/api/user/author/center/save', controller.user.authorCenterSave);
+  router.all('/api/user/author/public/detail', controller.user.authorPublicDetail);
+  // 前台用户中心（概览）
+  router.all('/api/user/index/stats', controller.user.indexStats);
+  router.all('/api/user/order/list', controller.user.orderList);
+  router.all('/api/user/license/list', controller.user.licenseList);
+  router.all('/api/user/password/change', controller.user.changePassword);
+  router.all('/api/user/message/list', controller.user.messageList);
+  router.all('/api/user/message/read', controller.user.messageRead);
+  router.all('/api/user/message/delete', controller.user.messageDelete);
+  router.all('/api/user/login/log', controller.user.loginLog);
+  router.all('/api/user/author/options', controller.user.authorOptions);
+  router.all('/api/user/article/collect/list', controller.user.articleCollectList);
+  router.all('/api/user/article/like/list', controller.user.articleLikeList);
+  router.all('/api/user/article/comment/list', controller.user.articleCommentList);
+  router.all('/api/user/website/favorite/list', controller.user.websiteFavoriteList);
+  router.all('/api/user/website/like/list', controller.user.websiteLikeList);
+  router.all('/api/user/website/comment/list', controller.user.websiteCommentList);
+  router.all('/api/article/cate/list', controller.article.cateList);
+  router.all('/api/article/cate/all', controller.article.cateAll);
+  router.all('/api/article/cate/add', controller.article.cateAdd);
+  router.all('/api/article/cate/edit', controller.article.cateEdit);
+  router.all('/api/article/cate/del', controller.article.cateDel);
+  router.all('/api/article/cate/detail', controller.article.cateDetail);
+  router.all('/api/article/cate/change', controller.article.cateChange);
+  router.all('/api/article/tag/list', controller.article.tagList);
+  router.all('/api/article/tag/all', controller.article.tagAll);
+  router.all('/api/article/tag/add', controller.article.tagAdd);
+  router.all('/api/article/tag/edit', controller.article.tagEdit);
+  router.all('/api/article/tag/del', controller.article.tagDel);
+  router.all('/api/article/tag/detail', controller.article.tagDetail);
+  router.all('/api/article/tag/change', controller.article.tagChange);
+  router.all('/api/article/tag/batch/change', controller.article.tagBatchChange);
+  router.all('/api/article/tag/batch/del', controller.article.tagBatchDel);
+  router.all('/api/article/tag/merge', controller.article.tagMerge);
+  router.all('/api/article/topic/list', controller.article.topicList);
+  router.all('/api/article/topic/all', controller.article.topicAll);
+  router.all('/api/article/topic/add', controller.article.topicAdd);
+  router.all('/api/article/topic/edit', controller.article.topicEdit);
+  router.all('/api/article/topic/del', controller.article.topicDel);
+  router.all('/api/article/topic/detail', controller.article.topicDetail);
+  router.all('/api/article/topic/change', controller.article.topicChange);
+  router.all('/api/article/list', controller.article.list);
+  router.all('/api/article/all', controller.article.all);
+  router.all('/api/article/add', controller.article.add);
+  router.all('/api/article/seed/testData', controller.article.seedTestData);
+  router.all('/api/article/front/add', controller.article.frontAdd);
+  router.all('/api/article/front/list', controller.article.frontList);
+  router.all('/api/article/front/detail', controller.article.frontDetail);
+  router.all('/api/article/front/edit', controller.article.frontEdit);
+  router.all('/api/article/front/audit', controller.article.frontAudit);
+  router.all('/api/article/front/audit/message/list', controller.article.frontAuditMessageList);
+  router.all('/api/article/edit', controller.article.edit);
+  router.all('/api/article/del', controller.article.del);
+  router.all('/api/article/detail', controller.article.detail);
+  router.all('/api/article/change', controller.article.change);
+  router.all('/api/article/visit/incr', controller.article.visitIncr);
+  router.all('/api/article/collect/list', controller.article.collectList);
+  router.all('/api/article/collect/toggle', controller.article.collectToggle);
+  router.all('/api/article/like/toggle', controller.article.likeToggle);
+  router.all('/api/article/stats', controller.article.stats);
+  router.all('/api/article/comment/list', controller.article.commentList);
+  router.all('/api/article/comment/add', controller.article.commentAdd);
+  router.all('/api/article/comment/like/toggle', controller.article.commentLikeToggle);
+  router.all('/api/article/comment/report/add', controller.article.commentReportAdd);
+  router.all('/api/article/comment/top/toggle', controller.article.commentTopToggle);
+  router.all('/api/article/comment/manage/list', controller.article.commentManageList);
+  router.all('/api/article/comment/manage/replies', controller.article.commentManageReplies);
+  router.all('/api/article/comment/manage/change', controller.article.commentManageChange);
+  router.all('/api/article/comment/manage/del', controller.article.commentManageDel);
+  router.all('/api/article/comment/manage/batch/change', controller.article.commentManageBatchChange);
+  router.all('/api/article/comment/manage/batch/del', controller.article.commentManageBatchDel);
+  router.all('/api/article/comment/manage/sensitive/detail', controller.article.commentManageSensitiveDetail);
+  router.all('/api/article/comment/manage/sensitive/save', controller.article.commentManageSensitiveSave);
+  router.all('/api/article/comment/manage/report/list', controller.article.commentManageReportList);
+  router.all('/api/article/comment/manage/report/handle', controller.article.commentManageReportHandle);
+  router.all('/api/article/comment/manage/mute/list', controller.article.commentManageMuteList);
+  router.all('/api/article/comment/manage/mute/add', controller.article.commentManageMuteAdd);
+  router.all('/api/article/comment/manage/mute/del', controller.article.commentManageMuteDel);
+  router.all('/api/article/import/wechat', controller.article.importWechat);
+};

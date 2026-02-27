@@ -1,0 +1,11 @@
+{
+    "extends": "eslint-config-egg",
+    "parser": "babel-eslint",
+    "parserOptions": {
+        "ecmaVersion": 2020
+    },
+    "rules": {
+        "jsdoc/require-param": "off",
+        "jsdoc/require-param-description": "off"
+    }
+}

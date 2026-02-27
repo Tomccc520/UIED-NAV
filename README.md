@@ -17,9 +17,9 @@ UIED 导航系统是一个现代化的设计资源导航网站系统，采用前
 ### ✨ 核心特性
 
 - 🎨 **现代化设计**：简洁美观的用户界面
-- 🚀 **高性能**：React 19 + Express，快速响应
+- 🚀 **高性能**：React 19 + Egg.js，快速响应
 - 📱 **响应式**：完美支持移动端和桌面端
-- 🔧 **易于部署**：5 分钟快速部署
+- 🔧 **易于部署**：Docker 一键部署
 - 🎯 **功能完整**：网站管理、分类管理、SEO 优化等
 - 🔒 **安全可靠**：JWT 认证，数据加密
 
@@ -50,6 +50,8 @@ UIED 导航系统是一个现代化的设计资源导航网站系统，采用前
 - ✅ 系统设置
 - ✅ 网站监控
 - ✅ 数据导出
+- ✅ 文章管理
+- ✅ 评论管理
 
 ---
 
@@ -57,8 +59,9 @@ UIED 导航系统是一个现代化的设计资源导航网站系统，采用前
 
 ### 环境要求
 
-- Node.js >= 18.0.0
-- npm >= 9.0.0
+- Node.js >= 16.0.0
+- npm >= 8.0.0
+- Docker (用于 MySQL)
 
 ### 安装步骤
 
@@ -69,85 +72,75 @@ git clone https://github.com/Tomccc520/UIED-NAV.git
 cd UIED-NAV
 ```
 
-#### 2. 安装依赖
+#### 2. 启动 MySQL 数据库
+
+```bash
+docker-compose -f docker/docker-compose.mysql.yml up -d
+```
+
+#### 3. 安装依赖
 
 ```bash
 # 安装后端依赖
-cd backend
-npm install
-
-# 安装前端依赖
-cd ../frontend
+cd server/server
 npm install
 
 # 安装管理后台依赖
 cd ../admin
 npm install
+
+# 安装前端依赖
+cd ../../frontend
+npm install
 ```
 
-#### 3. 配置环境变量
+#### 4. 配置环境变量
 
 ```bash
-# 后端配置
-cd backend
-cp .env.production.example .env
-# 编辑 .env 文件，配置数据库等信息
-
 # 前端配置
-cd ../frontend
-cp .env.example .env
-# 编辑 .env 文件，配置 API 地址
-
-# 管理后台配置
-cd ../admin
-cp .env.example .env
-# 编辑 .env 文件，配置 API 地址
-```
-
-#### 4. 初始化数据库
-
-```bash
-cd backend
-
-# 生成 Prisma Client
-npx prisma generate
-
-# 运行数据库迁移（创建表结构）
-npx prisma migrate deploy
-
-# 填充初始数据（包含管理员账号）
-node src/utils/seedAdmin.js
-node src/utils/seedSettings.js
-node src/utils/seedFaviconApis.js
-```
-
-#### 5. 启动服务
-
-```bash
-# 启动后端（端口 3001）
-cd backend
-npm run dev
-
-# 启动前端（端口 3000）
 cd frontend
-npm start
-
-# 启动管理后台（端口 5173）
-cd admin
-npm run dev
+cp .env.example .env
+# 编辑 .env 文件，确保 API 地址正确
+# REACT_APP_API_URL=http://localhost:8002/api
 ```
 
-#### 6. 访问系统
+#### 5. 导入初始数据
+
+```bash
+# 导入 likeadmin 基础表
+docker exec -i uied_mysql mysql -u uied -puied123456 uied_nav < server/sql/install.sql
+
+# 导入 UIED 业务表
+docker exec -i uied_mysql mysql -u uied -puied123456 uied_nav < server/sql/uied_tables.sql
+```
+
+#### 6. 启动服务
+
+```bash
+# 启动后端（端口 8002）
+cd server/server
+npm run dev
+
+# 启动管理后台（端口 5174）
+cd ../admin
+npm run dev
+
+# 启动前端（端口 3003）
+cd ../../frontend
+npm start
+```
+
+#### 7. 访问系统
 
 | 服务 | 地址 | 说明 |
 |------|------|------|
-| 前端 | http://localhost:3000 | 用户访问的网站 |
-| 后端 | http://localhost:3001/api | RESTful API |
-| 管理后台 | http://localhost:5173 | 内容管理系统 |
+| 前端 | http://localhost:3003 | 用户访问的网站 |
+| 后端 | http://localhost:8002/api | RESTful API |
+| 管理后台 | http://localhost:5174 | 内容管理系统 |
 
 **默认管理员账号：**
-- 用户名: `UIED`
-- 密码: `UIED123456`
+- 用户名: `admin`
+- 密码: `123456`
 
 ---
 
@@ -155,31 +148,41 @@ npm run dev
 
 ```
 uied-nav/
-├── frontend/          # 前端用户界面
+├── docs/              # 📚 项目文档
+│   ├── 项目结构说明.md
+│   ├── 详情页跳转问题修复记录.md
+│   ├── 修复说明.md
+│   ├── 代码重构总结.md
+│   ├── 开发指南.md
+│   ├── 数据库说明.md
+│   └── ...
+├── scripts/           # 🔧 工具脚本
+│   ├── restart-frontend.sh      # 重启前端服务
+│   ├── diagnose.sh              # 诊断端口和 API 连接
+│   └── test_setting_api.sh     # 测试设置 API
+├── server/            # likeadmin 后端和管理后台
+│   ├── server/        # Egg.js API 服务 (端口 8002)
+│   │   ├── app/
+│   │   │   ├── controller/uied/  # UIED 业务控制器
+│   │   │   ├── service/uied/     # UIED 业务服务
+│   │   │   └── model/uied/       # UIED 数据模型
+│   │   └── config/
+│   └── admin/         # Vue 3 管理后台 (端口 5174)
+│       └── src/views/uied/       # UIED 管理页面
+├── frontend/          # React 用户前端 (端口 3003)
 │   ├── src/
 │   │   ├── components/    # 可复用组件
 │   │   ├── pages/         # 页面组件
 │   │   ├── hooks/         # 自定义 hooks
 │   │   ├── services/      # API 调用服务
 │   │   └── utils/         # 工具函数
-│   ├── public/
-│   └── package.json
-├── backend/           # 后端 API 服务
-│   ├── src/
-│   │   ├── routes/        # API 路由
-│   │   ├── services/      # 业务逻辑
-│   │   ├── middleware/    # 中间件
-│   │   └── utils/         # 工具函数
-│   ├── prisma/            # 数据库 schema
-│   └── package.json
-├── admin/             # 管理后台
-│   ├── src/
-│   │   ├── pages/         # 管理页面
-│   │   ├── components/    # 管理组件
-│   │   └── services/      # API 服务
-│   └── package.json
-├── docs/              # 文档
+│   │       └── urlUtils.ts  # ⭐ 统一 URL 处理工具
+│   └── public/
 ├── docker/            # Docker 配置
+│   └── docker-compose.mysql.yml
+├── data/              # 数据备份
+│   └── mysql_backup_*.sql
+├── start.sh           # 🚀 一键启动脚本
 └── README.md
 ```
 
@@ -187,37 +190,68 @@ uied-nav/
 
 ## 🛠️ 技术栈
 
-### Frontend（前端）
+### Frontend（前端用户界面）
 - React 19
 - TypeScript
 - React Router v7
+- Zustand + React Query
 - 原生 CSS
 
-### Backend（后端）
-- Express.js
-- Prisma ORM
-- SQLite
-- JWT
-- Vitest
+### Backend（后端 API）
+- Egg.js (likeadmin)
+- Sequelize ORM
+- MySQL 8.0
+- JWT 认证
 
 ### Admin（管理后台）
-- React 19
-- TypeScript
-- Ant Design 6
+- Vue 3 + TypeScript
+- Element Plus
 - Vite
+
+### Database（数据库）
+- MySQL 8.0
+- Docker 容器化
 
 ---
 
 ## 📚 文档
 
+### 开发文档
+- 📖 [项目结构说明](docs/项目结构说明.md) - 目录结构、重要文件、开发规范
 - 📖 [开发指南](docs/开发指南.md) - 项目结构、API说明、学习要点
 - 🗄️ [数据库说明](docs/数据库说明.md) - 数据表结构、备份方案
 - 🔐 [登录系统说明](docs/登录系统说明.md) - 认证流程、安全措施
-- 🚀 [宝塔部署指南](docs/宝塔部署指南.md) - 生产环境部署步骤
+
+### 部署文档
+- 🚀 [宝塔部署指南](docs/宝塔部署教程.md) - 生产环境部署步骤
+- 🐳 [Docker部署指南](docs/Docker部署教程.md) - Docker 部署步骤
+
+### 测试文档
 - 🧪 [测试指南](docs/测试指南.md) - 功能测试、API测试
+
+### 问题修复记录
+- 🔧 [详情页跳转问题修复记录](docs/详情页跳转问题修复记录.md) - 详情页功能修复过程
+- 🔧 [修复说明](docs/修复说明.md) - CORS 错误和端口配置修复
+- 🔧 [代码重构总结](docs/代码重构总结.md) - 代码架构优化说明
+
+### 其他文档
 - 📊 [项目总结](docs/项目总结.md) - 功能清单、技术栈
 - 💼 [商业化规划](docs/商业化规划.md) - 开源+商业化策略
-- 🎯 [功能定位](docs/功能定位调整-简化版.md) - 产品定位和功能规划
+
+## 🔧 工具脚本
+
+项目提供了一些实用脚本，位于 `scripts/` 目录：
+
+```bash
+# 重启前端服务
+./scripts/restart-frontend.sh
+
+# 诊断端口和 API 连接问题
+./scripts/diagnose.sh
+
+# 测试设置 API
+./scripts/test_setting_api.sh
+```
 
 ---
 
