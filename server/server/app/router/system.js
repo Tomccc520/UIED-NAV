@@ -140,6 +140,7 @@ module.exports = app => {
   router.all('/api/user/logout', controller.user.logout);
   router.all('/api/user/profile', controller.user.profile);
   router.all('/api/user/profile/update', controller.user.updateProfile);
+  router.all('/api/user/avatar/upload', controller.user.uploadAvatar);
   // 前台作者中心
   router.all('/api/user/author/center/detail', controller.user.authorCenterDetail);
   router.all('/api/user/author/center/save', controller.user.authorCenterSave);

@@ -1,193 +1,102 @@
 {
-  "generatedAt": "2026-02-26T16:59:37.091Z",
+  "generatedAt": "2026-02-27T15:11:41.454Z",
   "rows": [
     {
-      "status": "pass",
+      "status": "fail",
       "category": "环境",
       "item": "MySQL 容器探测",
-      "detail": "使用容器: uied_mysql，数据库: uied_nav",
-      "suggestion": ""
+      "detail": "Command failed: docker ps --format {{.Names}}\npermission denied while trying to connect to the Docker daemon socket at unix:///Users/tangxiaoda/.docker/run/docker.sock: Get \"http://%2FUsers%2Ftangxiaoda%2F.docker%2Frun%2Fdocker.sock/v1.47/containers/json\": dial unix /Users/tangxiaoda/.docker/run/docker.sock: connect: operation not permitted\n",
+      "suggestion": "确认 Docker 已启动，或通过 --mysql-container 指定容器名。"
     },
     {
-      "status": "pass",
+      "status": "fail",
       "category": "接口",
       "item": "/api/settings/public",
-      "detail": "HTTP 200",
-      "suggestion": ""
+      "detail": "请求失败: fetch failed",
+      "suggestion": "确认后端 8002 服务可访问。"
     },
     {
-      "status": "pass",
+      "status": "fail",
       "category": "接口",
       "item": "/api/settings/frontend-config",
-      "detail": "HTTP 200",
-      "suggestion": ""
+      "detail": "请求失败: fetch failed",
+      "suggestion": "确认后端 8002 服务可访问。"
     },
     {
-      "status": "pass",
+      "status": "fail",
       "category": "接口",
       "item": "/api/articles?limit=1",
-      "detail": "HTTP 200",
-      "suggestion": ""
+      "detail": "请求失败: fetch failed",
+      "suggestion": "确认后端 8002 服务可访问。"
     },
     {
-      "status": "pass",
+      "status": "fail",
       "category": "接口",
       "item": "/api/articles/meta/categories",
-      "detail": "HTTP 200",
-      "suggestion": ""
+      "detail": "请求失败: fetch failed",
+      "suggestion": "确认后端 8002 服务可访问。"
     },
     {
-      "status": "pass",
+      "status": "fail",
       "category": "接口",
       "item": "/api/articles/meta/tags",
-      "detail": "HTTP 200",
-      "suggestion": ""
+      "detail": "请求失败: fetch failed",
+      "suggestion": "确认后端 8002 服务可访问。"
     },
     {
-      "status": "pass",
+      "status": "fail",
       "category": "接口",
       "item": "/api/site-info",
-      "detail": "HTTP 200",
-      "suggestion": ""
+      "detail": "请求失败: fetch failed",
+      "suggestion": "确认后端 8002 服务可访问。"
     },
     {
-      "status": "pass",
+      "status": "fail",
       "category": "接口",
       "item": "/api/settings/nav-menus",
-      "detail": "HTTP 200",
-      "suggestion": ""
+      "detail": "请求失败: fetch failed",
+      "suggestion": "确认后端 8002 服务可访问。"
     },
     {
-      "status": "pass",
+      "status": "fail",
       "category": "接口",
       "item": "/api/daily-hot/config",
-      "detail": "HTTP 200",
-      "suggestion": ""
+      "detail": "请求失败: fetch failed",
+      "suggestion": "确认后端 8002 服务可访问。"
     },
     {
-      "status": "pass",
+      "status": "fail",
       "category": "接口",
       "item": "/api/rankings",
-      "detail": "HTTP 200",
-      "suggestion": ""
+      "detail": "请求失败: fetch failed",
+      "suggestion": "确认后端 8002 服务可访问。"
     },
     {
-      "status": "pass",
+      "status": "fail",
       "category": "接口",
       "item": "/api/user/login",
-      "detail": "测试账号登录成功（uied_test_buyer）",
-      "suggestion": ""
+      "detail": "请求失败: fetch failed",
+      "suggestion": "检查后端服务与账号配置。"
     },
     {
-      "status": "pass",
-      "category": "接口",
-      "item": "/api/user/profile",
-      "detail": "HTTP 200",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "接口",
-      "item": "/api/user/index/stats",
-      "detail": "HTTP 200",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "接口",
-      "item": "/api/user/message/list",
-      "detail": "HTTP 200",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "接口",
-      "item": "/api/user/order/list",
-      "detail": "HTTP 200",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "接口",
-      "item": "/api/user/license/list",
-      "detail": "HTTP 200",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "接口",
-      "item": "/api/user/article/collect/list",
-      "detail": "HTTP 200",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "接口",
-      "item": "/api/user/article/like/list",
-      "detail": "HTTP 200",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "接口",
-      "item": "/api/user/website/favorite/list",
-      "detail": "HTTP 200",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "接口",
-      "item": "/api/user/website/like/list",
-      "detail": "HTTP 200",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "接口",
-      "item": "/api/user/article/comment/list",
-      "detail": "HTTP 200",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "接口",
-      "item": "/api/user/website/comment/list",
-      "detail": "HTTP 200",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
+      "status": "fail",
       "category": "接口",
       "item": "/api/wordpress/tags",
-      "detail": "HTTP 200（feature=wordpress_channel）",
-      "suggestion": ""
+      "detail": "请求失败: fetch failed",
+      "suggestion": "确认后端服务和路由可访问。"
     },
     {
-      "status": "pass",
+      "status": "fail",
       "category": "接口",
       "item": "/api/wordpress/widgets/active",
-      "detail": "HTTP 200（feature=wordpress_channel）",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "接口",
-      "item": "/api/websites/:id/rate",
-      "detail": "网站ID=1 评分成功",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "接口",
-      "item": "/api/websites/:id/favorite",
-      "detail": "网站ID=1 收藏成功",
-      "suggestion": ""
+      "detail": "请求失败: fetch failed",
+      "suggestion": "确认后端服务和路由可访问。"
     },
     {
       "status": "pass",
       "category": "路由",
       "item": "method+path 重复定义",
-      "detail": "未发现重复定义（扫描 531 条路由）",
+      "detail": "未发现重复定义（扫描 532 条路由）",
       "suggestion": ""
     },
     {
@@ -206,115 +115,17 @@
     },
     {
       "status": "pass",
-      "category": "菜单",
-      "item": "关键权限点",
-      "detail": "关键菜单权限点完整",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "菜单",
-      "item": "user:detail 路由",
-      "detail": "挂载关系与隐藏路由配置正确",
-      "suggestion": ""
-    },
-    {
-      "status": "warn",
-      "category": "菜单",
-      "item": "重复权限点",
-      "detail": "发现 1 组重复 perms：uied:setting:get\t2",
-      "suggestion": "检查 la_system_auth_menu，避免路由命中歧义。"
-    },
-    {
-      "status": "pass",
       "category": "资源",
       "item": "默认头像文件",
       "detail": "backend_avatar.png 存在",
       "suggestion": ""
     },
     {
-      "status": "pass",
-      "category": "资源",
-      "item": "历史默认头像路径",
-      "detail": "未发现 default_avatar.png 残留引用",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "配置",
-      "item": "关键配置项",
-      "detail": "关键配置项已落库",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "配置",
-      "item": "配置 JSON 格式",
-      "detail": "关键配置 JSON 可解析",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "配置",
-      "item": "弹窗配置回读",
-      "detail": "DB 与 API 返回一致",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "数据",
-      "item": "商业版新增表",
-      "detail": "已检测到 4 张新增表",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "数据",
-      "item": "站点用户数据",
-      "detail": "当前用户数: 5",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "数据",
-      "item": "文章数据",
-      "detail": "已发布文章数: 6",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
+      "status": "warn",
       "category": "前端",
-      "item": "/",
-      "detail": "HTTP 200",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "前端",
-      "item": "/articles",
-      "detail": "HTTP 200",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "前端",
-      "item": "/p/daily-hot",
-      "detail": "HTTP 200",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "前端",
-      "item": "/rankings",
-      "detail": "HTTP 200",
-      "suggestion": ""
-    },
-    {
-      "status": "pass",
-      "category": "前端",
-      "item": "/changelog",
-      "detail": "HTTP 200",
-      "suggestion": ""
+      "item": "页面冒烟",
+      "detail": "未提供 --frontend-base-url，跳过前端页面可达性检查",
+      "suggestion": "建议发布前增加 --frontend-base-url http://127.0.0.1:3003 执行冒烟。"
     }
   ]
 }

@@ -88,6 +88,10 @@ class UserController extends BaseController {
     const { ctx } = this;
     try {
       const userId = await ctx.service.user.getUserId();
+      /**
+       * 个人中心资料读取前，先对演示账号做一次懒初始化，避免前端模块空数据。
+       */
+      await ctx.service.user.ensurePersonalCenterDemoData(userId);
       const data = await ctx.service.user.getSafeUserInfoById(userId, true);
       this.result({ data });
     } catch (e) {
@@ -115,6 +119,21 @@ class UserController extends BaseController {
       const userId = await ctx.service.user.getUserId();
       const user = await ctx.service.user.updateProfile(userId, body);
       this.result({ data: user });
+    } catch (e) {
+      this.result({ data: '', message: e.message, code: 1001 });
+    }
+  }
+
+  /**
+   * 前台用户头像上传并保存
+   */
+  async uploadAvatar() {
+    const { ctx } = this;
+    try {
+      const userId = await ctx.service.user.getUserId();
+      const stream = await ctx.getFileStream();
+      const data = await ctx.service.user.uploadAvatar(userId, stream);
+      this.result({ data, message: '上传成功' });
     } catch (e) {
       this.result({ data: '', message: e.message, code: 1001 });
     }

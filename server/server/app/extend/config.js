@@ -228,6 +228,7 @@ const rsa = {
   userTokenPassUri: [
     'common:album:albumList', // 素材列表（前台富文本选择素材）
     'common:album:cateList', // 素材分类（前台富文本选择素材）
+    'user:avatar:upload', // 前台用户头像上传
     'ai:chat:completions:editor', // AI 编辑器生成
   ],
 

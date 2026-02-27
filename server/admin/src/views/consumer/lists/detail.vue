@@ -7,7 +7,13 @@
             <el-form ref="formRef" class="ls-form" :model="formData" label-width="120px">
                 <div class="bg-page py-5 pl-20 mb-10">
                     <div class="mb-3 text-tx-regular">用户头像</div>
-                    <el-avatar :src="formData.avatar" :size="58" />
+                    <div class="flex items-center gap-4">
+                        <el-avatar :src="formData.avatar" :size="58" />
+                        <material-picker v-model="avatarEditValue" :limit="1" />
+                        <el-button type="primary" v-perms="['user:edit']" @click="handleAvatarSave">
+                            保存头像
+                        </el-button>
+                    </div>
                 </div>
                 <el-form-item label="用户编号："> {{ formData.sn }} </el-form-item>
                 <el-form-item label="用户昵称：">
@@ -124,6 +130,7 @@ const formData = reactive({
     userTypeName: '',
     username: ''
 })
+const avatarEditValue = ref('')
 
 const formRef = shallowRef<FormInstance>()
 
@@ -138,6 +145,7 @@ const getDetails = async () => {
         //@ts-ignore
         formData[key] = data[key]
     })
+    avatarEditValue.value = String(data?.avatar || '')
 }
 
 /**
@@ -151,6 +159,19 @@ const handleEdit = async (value: string, field: string) => {
         value
     })
     feedback.msgSuccess('编辑成功')
+    getDetails()
+}
+
+/**
+ * 保存用户头像
+ */
+const handleAvatarSave = async () => {
+    await userEdit({
+        id: route.query.id,
+        field: 'avatar',
+        value: avatarEditValue.value || ''
+    })
+    feedback.msgSuccess('头像更新成功')
     getDetails()
 }
 

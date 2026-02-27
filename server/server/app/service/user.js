@@ -156,6 +156,72 @@ class UserService extends Service {
   }
 
   /**
+   * 读取指定数据表字段集合（兼容不同客户库结构）
+   * @param {string} tableName 数据表名
+   * @returns {Promise<Set<string>>} 字段集合
+   */
+  async getTableColumns(tableName = '') {
+    const normalizedTableName = String(tableName || '').trim();
+    if (!normalizedTableName) {
+      return new Set();
+    }
+    if (!(this._tableColumnCache instanceof Map)) {
+      this._tableColumnCache = new Map();
+    }
+    if (this._tableColumnCache.has(normalizedTableName)) {
+      return this._tableColumnCache.get(normalizedTableName);
+    }
+    const { ctx } = this;
+    try {
+      const rows = await ctx.model.query(
+        `
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = ?
+        `,
+        {
+          replacements: [ normalizedTableName ],
+          type: ctx.app.Sequelize.QueryTypes.SELECT,
+        }
+      );
+      const columns = new Set(
+        (Array.isArray(rows) ? rows : []).map(item => String(item?.COLUMN_NAME || ''))
+      );
+      this._tableColumnCache.set(normalizedTableName, columns);
+      return columns;
+    } catch (error) {
+      ctx.logger.warn(`[user] 获取表 ${normalizedTableName} 字段集合失败: ${error.message || error}`);
+      const fallback = new Set();
+      this._tableColumnCache.set(normalizedTableName, fallback);
+      return fallback;
+    }
+  }
+
+  /**
+   * 判断指定数据表是否包含目标字段（支持候选字段名）
+   * @param {string} tableName 数据表名
+   * @param {string|string[]} candidates 候选字段名
+   * @returns {Promise<boolean>} 是否存在
+   */
+  async hasTableColumn(tableName = '', candidates = []) {
+    const columns = await this.getTableColumns(tableName);
+    const list = Array.isArray(candidates) ? candidates : [ candidates ];
+    return list.some(item => columns.has(String(item || '').trim()));
+  }
+
+  /**
+   * 判断是否为个人中心演示数据自动补齐账号
+   * @param {string} username 用户名
+   * @returns {boolean} 是否命中演示账号
+   */
+  isPersonalCenterSeedUser(username = '') {
+    const normalized = String(username || '').trim().toLowerCase();
+    if (!normalized) return false;
+    return normalized === 'tomda' || normalized.startsWith('uied_test_');
+  }
+
+  /**
    * 获取用户扩展业务字段可用状态
    */
   async getUserBusinessColumns() {
@@ -1124,6 +1190,10 @@ class UserService extends Service {
     });
     await this.recordLoginLog(user.id, 1);
     const token = await this.createUserToken(user);
+    /**
+     * 测试账号登录时自动补齐个人中心演示数据，避免联调空数据误判为接口异常。
+     */
+    await this.ensurePersonalCenterDemoData(user.id, user.nickname || user.username || '');
     const userInfo = await this.getSafeUserInfoById(user.id, true);
     return { user: userInfo, userInfo, token };
   }
@@ -1171,6 +1241,44 @@ class UserService extends Service {
     });
     await this.syncUserCache(userId);
     return await this.getSafeUserInfoById(userId, true);
+  }
+
+  /**
+   * 上传并保存用户头像（前台用户中心）
+   */
+  async uploadAvatar(userId, stream) {
+    const { ctx } = this;
+    const uid = Number(userId || 0);
+    if (!uid) {
+      throw new Error('用户不存在');
+    }
+    if (!stream) {
+      throw new Error('未检测到上传文件');
+    }
+    const mimeType = String(stream.mimeType || '').toLowerCase();
+    if (!mimeType.startsWith('image/')) {
+      throw new Error('仅支持上传图片文件');
+    }
+
+    const uploadRes = await ctx.service.album.uploadFile(0, stream, 10);
+    const relativeAvatar = urlUtil.toRelativeUrl(uploadRes?.path || uploadRes?.uri || '');
+    if (!relativeAvatar) {
+      throw new Error('头像上传失败');
+    }
+
+    const now = Math.floor(Date.now() / 1000);
+    await ctx.model.User.update({
+      avatar: relativeAvatar,
+      updateTime: now,
+    }, {
+      where: { id: uid, isDelete: 0 },
+    });
+    await this.syncUserCache(uid);
+    const user = await this.getSafeUserInfoById(uid, true);
+    return {
+      avatar: user.avatar,
+      user,
+    };
   }
 
   /**
@@ -1222,6 +1330,8 @@ class UserService extends Service {
         total: 0,
         pageNo: Number(params.pageNo || 1),
         pageSize: Number(params.pageSize || 10),
+        moduleEnabled: false,
+        moduleMessage: '当前环境未启用订单系统',
       };
     }
     const pageNo = Number(params.pageNo || 1);
@@ -1705,6 +1815,8 @@ class UserService extends Service {
       pageSize,
       total: count,
       lists,
+      moduleEnabled: true,
+      moduleMessage: '',
     };
   }
 
@@ -2121,6 +2233,110 @@ class UserService extends Service {
   }
 
   /**
+   * 确保 UIED 评论表兼容字段存在（兼容历史库无 parent_id/like_count）
+   * @returns {Promise<void>}
+   */
+  async ensureUiedCommentTableCompatibility() {
+    const { app } = this;
+    if (app.__uiedCommentTableCompatibilityReady) {
+      return;
+    }
+    const tableCreateSqlMap = {
+      uied_article_comment: `
+        CREATE TABLE IF NOT EXISTS \`uied_article_comment\` (
+          \`id\` int unsigned NOT NULL AUTO_INCREMENT,
+          \`article_id\` int unsigned NOT NULL COMMENT '文章ID',
+          \`parent_id\` int unsigned NOT NULL DEFAULT 0 COMMENT '父评论ID',
+          \`user_id\` int unsigned DEFAULT NULL COMMENT '用户ID（可选）',
+          \`nickname\` varchar(100) DEFAULT '' COMMENT '昵称',
+          \`email\` varchar(255) DEFAULT '' COMMENT '邮箱',
+          \`content\` text NOT NULL COMMENT '评论内容',
+          \`status\` varchar(20) DEFAULT 'pending' COMMENT '状态',
+          \`like_count\` int unsigned NOT NULL DEFAULT 0 COMMENT '点赞数',
+          \`ip\` varchar(50) DEFAULT '' COMMENT 'IP地址',
+          \`user_agent\` varchar(500) DEFAULT '' COMMENT '浏览器信息',
+          \`is_delete\` tinyint unsigned DEFAULT '0' COMMENT '是否删除',
+          \`create_time\` int unsigned DEFAULT '0' COMMENT '创建时间',
+          \`update_time\` int unsigned DEFAULT '0' COMMENT '更新时间',
+          \`delete_time\` int unsigned DEFAULT '0' COMMENT '删除时间',
+          PRIMARY KEY (\`id\`),
+          KEY \`idx_article_id\` (\`article_id\`),
+          KEY \`idx_status\` (\`status\`),
+          KEY \`idx_create_time\` (\`create_time\`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文章评论表'
+      `,
+      uied_website_comment: `
+        CREATE TABLE IF NOT EXISTS \`uied_website_comment\` (
+          \`id\` int unsigned NOT NULL AUTO_INCREMENT,
+          \`website_id\` int unsigned NOT NULL COMMENT '网站ID',
+          \`parent_id\` int unsigned NOT NULL DEFAULT 0 COMMENT '父评论ID',
+          \`user_id\` int unsigned DEFAULT NULL COMMENT '用户ID（可选）',
+          \`nickname\` varchar(100) DEFAULT '' COMMENT '昵称',
+          \`email\` varchar(255) DEFAULT '' COMMENT '邮箱',
+          \`content\` text NOT NULL COMMENT '评论内容',
+          \`status\` varchar(20) DEFAULT 'pending' COMMENT '状态',
+          \`like_count\` int unsigned NOT NULL DEFAULT 0 COMMENT '点赞数',
+          \`ip\` varchar(50) DEFAULT '' COMMENT 'IP地址',
+          \`user_agent\` varchar(500) DEFAULT '' COMMENT '浏览器信息',
+          \`is_delete\` tinyint unsigned DEFAULT '0' COMMENT '是否删除',
+          \`create_time\` int unsigned DEFAULT '0' COMMENT '创建时间',
+          \`update_time\` int unsigned DEFAULT '0' COMMENT '更新时间',
+          \`delete_time\` int unsigned DEFAULT '0' COMMENT '删除时间',
+          PRIMARY KEY (\`id\`),
+          KEY \`idx_website_id\` (\`website_id\`),
+          KEY \`idx_status\` (\`status\`),
+          KEY \`idx_create_time\` (\`create_time\`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='网站评论表'
+      `,
+    };
+
+    for (const [ tableName, createSql ] of Object.entries(tableCreateSqlMap)) {
+      await this.ctx.model.query(createSql, { type: this.ctx.app.Sequelize.QueryTypes.RAW });
+      await this.ensureTableColumn(
+        tableName,
+        'parent_id',
+        `ALTER TABLE \`${tableName}\` ADD COLUMN \`parent_id\` int unsigned NOT NULL DEFAULT 0 COMMENT '父评论ID' AFTER \`${tableName === 'uied_article_comment' ? 'article_id' : 'website_id'}\`;`
+      );
+      await this.ensureTableColumn(
+        tableName,
+        'like_count',
+        `ALTER TABLE \`${tableName}\` ADD COLUMN \`like_count\` int unsigned NOT NULL DEFAULT 0 COMMENT '点赞数' AFTER \`status\`;`
+      );
+    }
+    app.__uiedCommentTableCompatibilityReady = true;
+  }
+
+  /**
+   * 仅对演示账号自动补齐个人中心演示数据
+   * @param {number} userId 用户ID
+   * @param {string} nickname 兜底昵称
+   * @returns {Promise<void>}
+   */
+  async ensurePersonalCenterDemoData(userId, nickname = '') {
+    const { ctx } = this;
+    const uid = Number(userId || 0);
+    if (!uid) {
+      return;
+    }
+    const user = await ctx.model.User.findOne({
+      where: { id: uid, isDelete: 0 },
+      attributes: [ 'id', 'username', 'nickname' ],
+    });
+    if (!user || !this.isPersonalCenterSeedUser(user.username)) {
+      return;
+    }
+
+    const cacheKey = `uied:personal:center:seeded:${uid}`;
+    const seeded = await ctx.service.redis.get(cacheKey);
+    if (seeded) {
+      return;
+    }
+
+    await this.seedPersonalCenterDemoDataForUser(uid, nickname || user.nickname || user.username || `用户${uid}`);
+    await ctx.service.redis.set(cacheKey, true, 60 * 30);
+  }
+
+  /**
    * 用户中心评论列表通用查询
    * @param {number} userId 用户ID
    * @param {object} params 分页与筛选参数
@@ -2142,6 +2358,11 @@ class UserService extends Service {
     const targetIdField = isArticle ? 'article_id' : 'website_id';
     const targetTitleField = isArticle ? 'title' : 'name';
     const targetContentField = isArticle ? 'summary' : 'description';
+    await this.ensureUiedCommentTableCompatibility();
+    const hasParentId = await this.hasTableColumn(tableName, 'parent_id');
+    const hasLikeCount = await this.hasTableColumn(tableName, 'like_count');
+    const parentIdSelect = hasParentId ? 'c.parent_id' : '0 AS parent_id';
+    const likeCountSelect = hasLikeCount ? 'c.like_count' : '0 AS like_count';
 
     const replacements = [ Number(userId) ];
     let whereSql = 'c.is_delete = 0 AND c.user_id = ?';
@@ -2176,10 +2397,10 @@ class UserService extends Service {
         SELECT
           c.id,
           c.${targetIdField} AS target_id,
-          c.parent_id,
+          ${parentIdSelect},
           c.content,
           c.status,
-          c.like_count,
+          ${likeCountSelect},
           c.create_time,
           c.update_time,
           t.id AS target_row_id,
@@ -3357,6 +3578,243 @@ class UserService extends Service {
   }
 
   /**
+   * 获取演示网站 ID 列表
+   */
+  async getDemoWebsiteIds(limit = 2) {
+    const { ctx, app } = this;
+    try {
+      const rows = await app.model.query(
+        `
+        SELECT id
+        FROM uied_website
+        WHERE is_delete = 0
+        ORDER BY is_featured DESC, is_hot DESC, id DESC
+        LIMIT ?
+        `,
+        {
+          replacements: [ Math.max(1, Number(limit || 2)) ],
+          type: app.Sequelize.QueryTypes.SELECT,
+        }
+      );
+      return (rows || []).map(item => Number(item.id || 0)).filter(Boolean);
+    } catch (error) {
+      ctx.logger.warn(`[user.getDemoWebsiteIds] 获取演示网站失败: ${error.message || error}`);
+      return [];
+    }
+  }
+
+  /**
+   * 获取演示文章 ID 列表（la_article）
+   */
+  async getDemoLegacyArticleIds(limit = 2) {
+    const { ctx } = this;
+    try {
+      const rows = await ctx.model.Article.findAll({
+        where: { is_delete: 0, is_show: 1 },
+        attributes: [ 'id' ],
+        order: [[ 'id', 'DESC' ]],
+        limit: Math.max(1, Number(limit || 2)),
+      });
+      return (rows || []).map(item => Number(item.id || 0)).filter(Boolean);
+    } catch (error) {
+      ctx.logger.warn(`[user.getDemoLegacyArticleIds] 获取演示文章失败: ${error.message || error}`);
+      return [];
+    }
+  }
+
+  /**
+   * 获取演示文章 ID 列表（uied_article）
+   */
+  async getDemoUiedArticleIds(limit = 2) {
+    const { ctx, app } = this;
+    try {
+      const rows = await app.model.query(
+        `
+        SELECT id
+        FROM uied_article
+        WHERE is_delete = 0
+          AND status = 'published'
+        ORDER BY id DESC
+        LIMIT ?
+        `,
+        {
+          replacements: [ Math.max(1, Number(limit || 2)) ],
+          type: app.Sequelize.QueryTypes.SELECT,
+        }
+      );
+      return (rows || []).map(item => Number(item.id || 0)).filter(Boolean);
+    } catch (error) {
+      ctx.logger.warn(`[user.getDemoUiedArticleIds] 获取演示文章失败: ${error.message || error}`);
+      return [];
+    }
+  }
+
+  /**
+   * 为指定用户补齐个人中心演示数据（幂等）
+   */
+  async seedPersonalCenterDemoDataForUser(userId, nickname = '') {
+    const { ctx, app } = this;
+    const uid = Number(userId || 0);
+    if (!uid) return;
+    const now = Math.floor(Date.now() / 1000);
+    const actorKey = `u:${uid}`;
+    const user = await ctx.model.User.findOne({
+      where: { id: uid, isDelete: 0 },
+      attributes: [ 'id', 'nickname', 'username' ],
+    });
+    if (!user) return;
+
+    /**
+     * 预先保证网站互动表与评论表存在，避免新库初始化时写入失败。
+     */
+    await ctx.service.uied.websiteInteraction.ensureTables();
+    await this.ensureUiedCommentTableCompatibility();
+
+    const displayName = String(nickname || user.nickname || user.username || `用户${uid}`).slice(0, 100);
+    const websiteIds = await this.getDemoWebsiteIds(2);
+    const legacyArticleIds = await this.getDemoLegacyArticleIds(2);
+    const uiedArticleIds = await this.getDemoUiedArticleIds(2);
+
+    for (const websiteId of websiteIds) {
+      try {
+        await app.model.query(
+          `
+          INSERT INTO uied_website_favorite
+          (website_id, actor_key, user_id, ip_hash, is_delete, create_time, update_time, delete_time)
+          SELECT ?, ?, ?, '', 0, ?, ?, 0
+          FROM DUAL
+          WHERE NOT EXISTS (
+            SELECT 1 FROM uied_website_favorite
+            WHERE website_id = ? AND user_id = ? AND is_delete = 0
+          )
+          `,
+          {
+            replacements: [ websiteId, actorKey, uid, now, now, websiteId, uid ],
+            type: app.Sequelize.QueryTypes.INSERT,
+          }
+        );
+      } catch (error) {
+        ctx.logger.warn(`[user.seedPersonalCenterDemoDataForUser] 收藏演示数据写入失败 websiteId=${websiteId}: ${error.message || error}`);
+      }
+      try {
+        await app.model.query(
+          `
+          INSERT INTO uied_website_like
+          (website_id, actor_key, user_id, ip_hash, is_delete, create_time, update_time, delete_time)
+          SELECT ?, ?, ?, '', 0, ?, ?, 0
+          FROM DUAL
+          WHERE NOT EXISTS (
+            SELECT 1 FROM uied_website_like
+            WHERE website_id = ? AND user_id = ? AND is_delete = 0
+          )
+          `,
+          {
+            replacements: [ websiteId, actorKey, uid, now, now, websiteId, uid ],
+            type: app.Sequelize.QueryTypes.INSERT,
+          }
+        );
+      } catch (error) {
+        ctx.logger.warn(`[user.seedPersonalCenterDemoDataForUser] 点赞演示数据写入失败 websiteId=${websiteId}: ${error.message || error}`);
+      }
+      try {
+        await app.model.query(
+          `
+          INSERT INTO uied_website_comment
+          (website_id, user_id, nickname, email, content, status, ip, user_agent, is_delete, create_time, update_time, delete_time)
+          SELECT ?, ?, ?, '', '这是演示评论：这个网站收录质量不错，推荐持续关注。', 'approved', '', 'seed-script', 0, ?, ?, 0
+          FROM DUAL
+          WHERE NOT EXISTS (
+            SELECT 1 FROM uied_website_comment
+            WHERE website_id = ? AND user_id = ? AND is_delete = 0
+          )
+          `,
+          {
+            replacements: [ websiteId, uid, displayName, now, now, websiteId, uid ],
+            type: app.Sequelize.QueryTypes.INSERT,
+          }
+        );
+      } catch (error) {
+        ctx.logger.warn(`[user.seedPersonalCenterDemoDataForUser] 网站评论演示数据写入失败 websiteId=${websiteId}: ${error.message || error}`);
+      }
+    }
+
+    for (const articleId of legacyArticleIds) {
+      const collectExists = await ctx.model.ArticleCollect.findOne({
+        where: { user_id: uid, article_id: articleId, is_delete: 0 },
+        attributes: [ 'id' ],
+      });
+      if (!collectExists) {
+        await ctx.model.ArticleCollect.create({
+          user_id: uid,
+          article_id: articleId,
+          is_delete: 0,
+          create_time: now,
+          update_time: now,
+          delete_time: 0,
+        });
+      }
+
+      const likeExists = await ctx.model.ArticleLike.findOne({
+        where: { user_id: uid, article_id: articleId, is_delete: 0 },
+        attributes: [ 'id' ],
+      });
+      if (!likeExists) {
+        await ctx.model.ArticleLike.create({
+          user_id: uid,
+          article_id: articleId,
+          is_delete: 0,
+          create_time: now,
+          update_time: now,
+          delete_time: 0,
+        });
+      }
+    }
+
+    for (const articleId of uiedArticleIds) {
+      try {
+        await app.model.query(
+          `
+          INSERT INTO uied_article_comment
+          (article_id, user_id, nickname, email, content, status, ip, user_agent, is_delete, create_time, update_time, delete_time)
+          SELECT ?, ?, ?, '', '这是演示评论：文章内容结构清晰，实用性很高。', 'approved', '', 'seed-script', 0, ?, ?, 0
+          FROM DUAL
+          WHERE NOT EXISTS (
+            SELECT 1 FROM uied_article_comment
+            WHERE article_id = ? AND user_id = ? AND is_delete = 0
+          )
+          `,
+          {
+            replacements: [ articleId, uid, displayName, now, now, articleId, uid ],
+            type: app.Sequelize.QueryTypes.INSERT,
+          }
+        );
+      } catch (error) {
+        ctx.logger.warn(`[user.seedPersonalCenterDemoDataForUser] 文章评论演示数据写入失败 articleId=${articleId}: ${error.message || error}`);
+      }
+    }
+
+    const messageExists = await ctx.model.UserMessage.findOne({
+      where: {
+        userId: uid,
+        type: 'system_notice',
+      },
+      attributes: [ 'id' ],
+    });
+    if (!messageExists) {
+      await ctx.model.UserMessage.create({
+        userId: uid,
+        type: 'system_notice',
+        title: '欢迎使用个人中心',
+        content: '演示数据已初始化，你现在可以查看收藏、点赞、评论等模块。',
+        extra: '',
+        isRead: 0,
+        readTime: 0,
+        createTime: now,
+      });
+    }
+  }
+
+  /**
    * 管理端初始化测试用户（幂等）
    */
   async seedTestUsers() {
@@ -3500,6 +3958,7 @@ class UserService extends Service {
         }
       }
 
+      await this.seedPersonalCenterDemoDataForUser(userId, item.nickname);
       resultRows.push({
         id: userId,
         username: item.username,
@@ -3509,6 +3968,14 @@ class UserService extends Service {
         userTypeName: this.getUserTypeLabel(item.userType),
         action,
       });
+    }
+
+    const tomdaUser = await ctx.model.User.findOne({
+      where: { username: 'tomda', isDelete: 0 },
+      attributes: [ 'id', 'nickname' ],
+    });
+    if (tomdaUser && Number(tomdaUser.id || 0) > 0) {
+      await this.seedPersonalCenterDemoDataForUser(Number(tomdaUser.id), String(tomdaUser.nickname || 'tomda'));
     }
 
     return {
@@ -3854,7 +4321,7 @@ class UserService extends Service {
   async edit(id, field, value) {
     const { ctx } = this;
     const userColumns = await this.getUserBusinessColumns();
-    const allowFields = [ 'username', 'realName', 'sex', 'mobile', 'nickname', 'isDisable', 'userType' ];
+    const allowFields = [ 'username', 'realName', 'sex', 'mobile', 'nickname', 'isDisable', 'userType', 'avatar' ];
     if (userColumns.email) allowFields.push('email');
     if (userColumns.vipLevel) allowFields.push('vipLevel');
     if (userColumns.remark) allowFields.push('remark');
@@ -3868,10 +4335,12 @@ class UserService extends Service {
       return;
     }
     const updateTime = Math.floor(Date.now() / 1000);
-    const updateData = {
-      [field]: value,
-      updateTime,
-    };
+    const updateData = { updateTime };
+    if (field === 'avatar') {
+      updateData.avatar = value ? urlUtil.toRelativeUrl(String(value).trim()) : '';
+    } else {
+      updateData[field] = value;
+    }
     if (field === 'vipLevel' && Number(value) === 0 && userColumns.vipExpireTime) {
       updateData.vipExpireTime = 0;
     }
