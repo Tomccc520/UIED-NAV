@@ -445,6 +445,20 @@ class WebsiteInteractionService extends Service {
     const queryUserId = Number.parseInt(String(ctx.query?.userId || ''), 10);
     if (Number.isInteger(queryUserId) && queryUserId > 0) return queryUserId;
 
+    /**
+     * 优先复用用户中心统一登录态解析，保证前台互动与个人中心读取同一套 token 逻辑。
+     */
+    if (ctx.service.user && typeof ctx.service.user.getUserId === 'function') {
+      try {
+        const resolvedUserId = await ctx.service.user.getUserId();
+        if (Number.isInteger(Number(resolvedUserId)) && Number(resolvedUserId) > 0) {
+          return Number(resolvedUserId);
+        }
+      } catch (error) {
+        // 未登录或 token 无效时降级为匿名，不中断互动功能
+      }
+    }
+
     const token = this.extractUserTokenFromRequest();
     if (!token) return 0;
 

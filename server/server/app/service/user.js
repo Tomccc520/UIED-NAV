@@ -2069,15 +2069,39 @@ class UserService extends Service {
     const safeTable = [ 'uied_website_favorite', 'uied_website_like' ].includes(String(tableName))
       ? String(tableName)
       : 'uied_website_favorite';
-    const actorKey = `u:${uid}`;
+    /**
+     * 兼容历史匿名行为：同一用户当前 IP 下的匿名互动可在登录后合并展示。
+     */
+    const actorKeys = [`u:${uid}`];
+    try {
+      const ip = ctx.service.uied?.websiteInteraction?.getClientIp
+        ? ctx.service.uied.websiteInteraction.getClientIp()
+        : String(ctx.ip || ctx.request.ip || '').trim();
+      if (ip && ctx.service.uied?.websiteInteraction?.hashIp) {
+        const ipHash = ctx.service.uied.websiteInteraction.hashIp(ip);
+        if (ipHash) {
+          actorKeys.push(`ip:${ipHash}`);
+        }
+      }
+    } catch (error) {
+      // IP 合并失败不影响主流程
+    }
+    const uniqueActorKeys = Array.from(new Set(actorKeys.filter(Boolean)));
+    const actorKeyPlaceholders = uniqueActorKeys.map(() => '?').join(', ');
+    const actorWhereSql = uniqueActorKeys.length > 0
+      ? `(ui.user_id = ? OR ui.actor_key IN (${actorKeyPlaceholders}))`
+      : 'ui.user_id = ?';
+    const actorWhereReplacements = uniqueActorKeys.length > 0
+      ? [uid, ...uniqueActorKeys]
+      : [uid];
 
     const [ countRow ] = await app.model.query(
       `SELECT COUNT(1) AS total
        FROM ${safeTable} ui
        INNER JOIN uied_website w ON w.id = ui.website_id AND w.is_delete = 0
-       WHERE (ui.user_id = ? OR ui.actor_key = ?) AND ui.is_delete = 0`,
+       WHERE ${actorWhereSql} AND ui.is_delete = 0`,
       {
-        replacements: [ uid, actorKey ],
+        replacements: actorWhereReplacements,
         type: app.Sequelize.QueryTypes.SELECT,
       }
     );
@@ -2090,11 +2114,11 @@ class UserService extends Service {
        FROM ${safeTable} ui
        INNER JOIN uied_website w ON w.id = ui.website_id AND w.is_delete = 0
        LEFT JOIN uied_category c ON c.id = w.category_id
-       WHERE (ui.user_id = ? OR ui.actor_key = ?) AND ui.is_delete = 0
+       WHERE ${actorWhereSql} AND ui.is_delete = 0
        ORDER BY ui.id DESC
        LIMIT ? OFFSET ?`,
       {
-        replacements: [ uid, actorKey, limit, offset ],
+        replacements: [ ...actorWhereReplacements, limit, offset ],
         type: app.Sequelize.QueryTypes.SELECT,
       }
     );
