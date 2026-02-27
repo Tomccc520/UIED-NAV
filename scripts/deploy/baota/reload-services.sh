@@ -8,6 +8,8 @@ set -euo pipefail
 
 SITE_ROOT="${1:-/www/wwwroot/hao.uied.cn}"
 BACKEND_DIR="$SITE_ROOT/backend"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ECO_FILE="$SCRIPT_DIR/ecosystem.uied-api.config.cjs"
 
 check_command() {
   # 函数说明：检查命令是否存在，避免执行中断
@@ -24,7 +26,7 @@ reload_backend() {
   if pm2 describe uied-api >/dev/null 2>&1; then
     pm2 reload uied-api --update-env
   else
-    pm2 start scripts/deploy/baota/ecosystem.uied-api.config.cjs
+    pm2 start "$ECO_FILE"
   fi
   pm2 save
 }
@@ -47,4 +49,3 @@ main() {
 }
 
 main "$@"
-
