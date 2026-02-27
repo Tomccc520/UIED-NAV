@@ -32,7 +32,7 @@ module.exports = options => {
     }
 
     // Token是否为空
-    const token = ctx.request.header.token;
+    const token = extractRequestToken(ctx);
     if (!token) {
       ctx.response.status = 403;
       ctx.body = { code: 332, data: '', message: 'token参数为空' };
@@ -131,12 +131,29 @@ module.exports = options => {
    */
   async function allowUserTokenPass(ctx, auths) {
     if (!matchWhitelist(auths, userTokenPassUri || [])) return false;
-    const token = String(ctx.request.header.token || '').trim();
+    const token = extractRequestToken(ctx);
     if (!token) return false;
     const appConfig = ctx.app.config || {};
     const userTokenRedisKey = String(appConfig.userTokenKey || userTokenKey || '').trim() || 'user:token:';
     const exists = await ctx.service.redis.exists(userTokenRedisKey + token);
     return Number(exists || 0) > 0;
+  }
+
+  /**
+   * 提取请求 token（兼容 token 头与 Authorization Bearer）
+   */
+  function extractRequestToken(ctx) {
+    const tokenHeader = String(ctx.request.header.token || '').trim();
+    if (tokenHeader) return tokenHeader;
+    const authHeader = String(
+      ctx.request.header.authorization || ctx.request.header.Authorization || ''
+    ).trim();
+    if (!authHeader) return '';
+    const bearerMatch = authHeader.match(/^Bearer\s+(.+)$/i);
+    if (bearerMatch && bearerMatch[1]) {
+      return String(bearerMatch[1]).trim();
+    }
+    return authHeader;
   }
 
   function replaceAll(str, find, replace) {

@@ -148,12 +148,18 @@ module.exports = app => {
   // 前台用户中心（概览）
   router.all('/api/user/index/stats', controller.user.indexStats);
   router.all('/api/user/order/list', controller.user.orderList);
+  router.all('/api/user/order/detail/:id', controller.user.orderDetail);
   router.all('/api/user/license/list', controller.user.licenseList);
   router.all('/api/user/password/change', controller.user.changePassword);
+  router.all('/api/user/account/send-code', controller.user.sendCode);
+  router.all('/api/user/account/bind', controller.user.bindAccount);
+  router.all('/api/user/account/unbind', controller.user.unbindAccount);
   router.all('/api/user/message/list', controller.user.messageList);
   router.all('/api/user/message/read', controller.user.messageRead);
   router.all('/api/user/message/delete', controller.user.messageDelete);
   router.all('/api/user/login/log', controller.user.loginLog);
+  router.all('/api/user/invoice/list', controller.user.invoiceList);
+  router.all('/api/user/invoice/apply', controller.user.invoiceApply);
   router.all('/api/user/author/options', controller.user.authorOptions);
   router.all('/api/user/article/collect/list', controller.user.articleCollectList);
   router.all('/api/user/article/like/list', controller.user.articleLikeList);

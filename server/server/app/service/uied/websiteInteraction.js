@@ -445,7 +445,7 @@ class WebsiteInteractionService extends Service {
     const queryUserId = Number.parseInt(String(ctx.query?.userId || ''), 10);
     if (Number.isInteger(queryUserId) && queryUserId > 0) return queryUserId;
 
-    const token = String(ctx.request.header.token || '').trim();
+    const token = this.extractUserTokenFromRequest();
     if (!token) return 0;
 
     const appConfig = ctx.app.config || {};
@@ -457,9 +457,40 @@ class WebsiteInteractionService extends Service {
       ctx.logger.warn('[websiteInteraction] 读取用户 token 失败，降级匿名:', error.message);
       return 0;
     }
+    /**
+     * 兼容 Redis 丢失场景：若用户服务提供 token 恢复能力，尝试恢复会话。
+     */
+    if (!userIdRaw && ctx.service.user && typeof ctx.service.user.tryRestoreUserSessionByToken === 'function') {
+      try {
+        const restoredUid = await ctx.service.user.tryRestoreUserSessionByToken(token);
+        if (Number(restoredUid || 0) > 0) {
+          userIdRaw = String(restoredUid);
+        }
+      } catch (error) {
+        ctx.logger.warn('[websiteInteraction] 恢复用户会话失败，降级匿名:', error.message);
+      }
+    }
     const tokenUserId = Number.parseInt(String(userIdRaw || ''), 10);
     if (!Number.isInteger(tokenUserId) || tokenUserId <= 0) return 0;
     return tokenUserId;
+  }
+
+  /**
+   * 提取前台用户 token（兼容 token 头与 Authorization Bearer）
+   */
+  extractUserTokenFromRequest() {
+    const { ctx } = this;
+    const tokenHeader = String(ctx.request.header.token || '').trim();
+    if (tokenHeader) return tokenHeader;
+    const authHeader = String(
+      ctx.request.header.authorization || ctx.request.header.Authorization || ''
+    ).trim();
+    if (!authHeader) return '';
+    const bearerMatch = authHeader.match(/^Bearer\s+(.+)$/i);
+    if (bearerMatch && bearerMatch[1]) {
+      return String(bearerMatch[1]).trim();
+    }
+    return authHeader;
   }
 
   /**

@@ -1219,7 +1219,8 @@ class UserService extends Service {
    */
   async updateProfile(userId, params) {
     const { ctx } = this;
-    const { nickname, avatar } = params;
+    const userColumns = await this.getUserBusinessColumns();
+    const { nickname, avatar, email } = params;
     const updateData = {};
     if (nickname !== undefined) {
       const nextNickname = String(nickname || '').trim();
@@ -1231,6 +1232,16 @@ class UserService extends Service {
     if (avatar !== undefined) {
       const nextAvatar = String(avatar || '').trim();
       updateData.avatar = nextAvatar ? urlUtil.toRelativeUrl(nextAvatar) : '';
+    }
+    if (email !== undefined && userColumns.email) {
+      const nextEmail = String(email || '').trim();
+      if (nextEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nextEmail)) {
+        throw new Error('邮箱格式不正确');
+      }
+      updateData.email = nextEmail;
+    }
+    if (Object.keys(updateData).length === 0) {
+      return await this.getSafeUserInfoById(userId, true);
     }
     const updateTime = Math.floor(Date.now() / 1000);
     await ctx.model.User.update({
@@ -1260,8 +1271,14 @@ class UserService extends Service {
       throw new Error('仅支持上传图片文件');
     }
 
-    const uploadRes = await ctx.service.album.uploadFile(0, stream, 10);
-    const relativeAvatar = urlUtil.toRelativeUrl(uploadRes?.path || uploadRes?.uri || '');
+    /**
+     * 前台用户头像上传不依赖后台素材库入库（la_album），避免 aid 场景导致上传失败。
+     * 仅保存文件并更新用户头像字段。
+     */
+    const uploadRes = await ctx.service.album.handleUploadFile(stream, 10);
+    const rawUri = String(uploadRes?.url || uploadRes?.path || '').trim();
+    const absoluteUri = /^https?:\/\//i.test(rawUri) ? rawUri : urlUtil.toAbsoluteUrl(rawUri);
+    const relativeAvatar = urlUtil.toRelativeUrl(absoluteUri);
     if (!relativeAvatar) {
       throw new Error('头像上传失败');
     }
@@ -2041,6 +2058,7 @@ class UserService extends Service {
    */
   async getUserWebsiteInteractionList(userId, params = {}, tableName, timeField = 'createTime') {
     const { ctx, app } = this;
+    const uid = Number(userId || 0);
     const pageNo = Number(params.pageNo || params.page || 1);
     const pageSize = Number(params.pageSize || 10);
     const limit = Math.max(1, Math.min(50, pageSize));
@@ -2051,14 +2069,15 @@ class UserService extends Service {
     const safeTable = [ 'uied_website_favorite', 'uied_website_like' ].includes(String(tableName))
       ? String(tableName)
       : 'uied_website_favorite';
+    const actorKey = `u:${uid}`;
 
     const [ countRow ] = await app.model.query(
       `SELECT COUNT(1) AS total
        FROM ${safeTable} ui
        INNER JOIN uied_website w ON w.id = ui.website_id AND w.is_delete = 0
-       WHERE ui.user_id = ? AND ui.is_delete = 0`,
+       WHERE (ui.user_id = ? OR ui.actor_key = ?) AND ui.is_delete = 0`,
       {
-        replacements: [ Number(userId) ],
+        replacements: [ uid, actorKey ],
         type: app.Sequelize.QueryTypes.SELECT,
       }
     );
@@ -2071,11 +2090,11 @@ class UserService extends Service {
        FROM ${safeTable} ui
        INNER JOIN uied_website w ON w.id = ui.website_id AND w.is_delete = 0
        LEFT JOIN uied_category c ON c.id = w.category_id
-       WHERE ui.user_id = ? AND ui.is_delete = 0
+       WHERE (ui.user_id = ? OR ui.actor_key = ?) AND ui.is_delete = 0
        ORDER BY ui.id DESC
        LIMIT ? OFFSET ?`,
       {
-        replacements: [ Number(userId), limit, offset ],
+        replacements: [ uid, actorKey, limit, offset ],
         type: app.Sequelize.QueryTypes.SELECT,
       }
     );
