@@ -84,6 +84,34 @@ class UserController extends BaseController {
     }
   }
 
+  /**
+   * 登录二次验证：重新发送验证码
+   */
+  async loginTwoFactorSend() {
+    const { ctx } = this;
+    try {
+      const body = ctx.request.body || {};
+      const data = await ctx.service.user.sendLoginTwoFactorCode(body);
+      this.result({ data, message: '发送成功' });
+    } catch (e) {
+      this.result({ data: '', message: e.message, code: 1001 });
+    }
+  }
+
+  /**
+   * 登录二次验证：提交验证码并完成登录
+   */
+  async loginTwoFactorVerify() {
+    const { ctx } = this;
+    try {
+      const body = ctx.request.body || {};
+      const data = await ctx.service.user.verifyLoginTwoFactor(body);
+      this.result({ data, message: '登录成功' });
+    } catch (e) {
+      this.result({ data: '', message: e.message, code: 1001 });
+    }
+  }
+
   async profile() {
     const { ctx } = this;
     try {
@@ -284,10 +312,7 @@ class UserController extends BaseController {
     try {
       const userId = await ctx.service.user.getUserId();
       const body = ctx.request.body || {};
-      const data = await ctx.service.license.bindDomain(body.licenseId, body.domain, userId, {
-        mobile: body.mobile,
-        qq: body.qq,
-      });
+      const data = await ctx.service.user.bindLicenseDomain(userId, body);
       this.result({ data, message: '已提交审核' });
     } catch (e) {
       this.result({ data: '', message: e.message, code: 1001 });
@@ -299,8 +324,7 @@ class UserController extends BaseController {
     try {
       const userId = await ctx.service.user.getUserId();
       const body = ctx.request.body || {};
-      const { licenseId, domain, mobile, qq } = body;
-      await ctx.service.license.submitInfo(licenseId, { domain, mobile, qq }, userId);
+      await ctx.service.user.changeLicenseDomain(userId, body);
       this.result({ data: null, message: '提交成功，请等待审核' });
     } catch (e) {
       this.result({ data: '', message: e.message, code: 1001 });
@@ -644,6 +668,96 @@ class UserController extends BaseController {
     }
   }
 
+  /**
+   * 用户中心删除文章评论
+   */
+  async articleCommentDelete() {
+    const { ctx } = this;
+    try {
+      const userId = await ctx.service.user.getUserId();
+      const body = ctx.request.body || {};
+      await ctx.service.user.articleCommentDelete(userId, body);
+      this.result({ data: null, message: '删除成功' });
+    } catch (e) {
+      this.result({ data: '', message: e.message, code: 1001 });
+    }
+  }
+
+  /**
+   * 用户中心编辑文章评论
+   */
+  async articleCommentUpdate() {
+    const { ctx } = this;
+    try {
+      const userId = await ctx.service.user.getUserId();
+      const body = ctx.request.body || {};
+      const data = await ctx.service.user.articleCommentUpdate(userId, body);
+      this.result({ data, message: '更新成功' });
+    } catch (e) {
+      this.result({ data: '', message: e.message, code: 1001 });
+    }
+  }
+
+  /**
+   * 用户中心回复文章评论（楼中楼）
+   */
+  async articleCommentReply() {
+    const { ctx } = this;
+    try {
+      const userId = await ctx.service.user.getUserId();
+      const body = ctx.request.body || {};
+      const data = await ctx.service.user.articleCommentReply(userId, body);
+      this.result({ data, message: '回复成功' });
+    } catch (e) {
+      this.result({ data: '', message: e.message, code: 1001 });
+    }
+  }
+
+  /**
+   * 用户中心删除网址评论
+   */
+  async websiteCommentDelete() {
+    const { ctx } = this;
+    try {
+      const userId = await ctx.service.user.getUserId();
+      const body = ctx.request.body || {};
+      await ctx.service.user.websiteCommentDelete(userId, body);
+      this.result({ data: null, message: '删除成功' });
+    } catch (e) {
+      this.result({ data: '', message: e.message, code: 1001 });
+    }
+  }
+
+  /**
+   * 用户中心编辑网址评论
+   */
+  async websiteCommentUpdate() {
+    const { ctx } = this;
+    try {
+      const userId = await ctx.service.user.getUserId();
+      const body = ctx.request.body || {};
+      const data = await ctx.service.user.websiteCommentUpdate(userId, body);
+      this.result({ data, message: '更新成功' });
+    } catch (e) {
+      this.result({ data: '', message: e.message, code: 1001 });
+    }
+  }
+
+  /**
+   * 用户中心回复网址评论（楼中楼）
+   */
+  async websiteCommentReply() {
+    const { ctx } = this;
+    try {
+      const userId = await ctx.service.user.getUserId();
+      const body = ctx.request.body || {};
+      const data = await ctx.service.user.websiteCommentReply(userId, body);
+      this.result({ data, message: '回复成功' });
+    } catch (e) {
+      this.result({ data: '', message: e.message, code: 1001 });
+    }
+  }
+
   async addressList() {
     const { ctx } = this;
     try {
@@ -687,6 +801,94 @@ class UserController extends BaseController {
       const params = Object.keys(ctx.request.body || {}).length ? (ctx.request.body || {}) : (ctx.request.query || {});
       const data = await ctx.service.user.loginLog(userId, params);
       this.result({ data });
+    } catch (e) {
+      this.result({ data: '', message: e.message, code: 1001 });
+    }
+  }
+
+  /**
+   * 获取当前账号 2FA 状态
+   */
+  async twoFactorStatus() {
+    const { ctx } = this;
+    try {
+      const userId = await ctx.service.user.getUserId();
+      const data = await ctx.service.user.twoFactorStatus(userId);
+      this.result({ data });
+    } catch (e) {
+      this.result({ data: '', message: e.message, code: 1001 });
+    }
+  }
+
+  /**
+   * 发送 2FA 配置验证码（启用/关闭）
+   */
+  async twoFactorSendCode() {
+    const { ctx } = this;
+    try {
+      const userId = await ctx.service.user.getUserId();
+      const body = ctx.request.body || {};
+      const data = await ctx.service.user.sendTwoFactorSecurityCode(userId, body);
+      this.result({ data, message: '发送成功' });
+    } catch (e) {
+      this.result({ data: '', message: e.message, code: 1001 });
+    }
+  }
+
+  /**
+   * 启用 2FA
+   */
+  async twoFactorEnable() {
+    const { ctx } = this;
+    try {
+      const userId = await ctx.service.user.getUserId();
+      const body = ctx.request.body || {};
+      const data = await ctx.service.user.enableTwoFactor(userId, body);
+      this.result({ data, message: '2FA 已开启' });
+    } catch (e) {
+      this.result({ data: '', message: e.message, code: 1001 });
+    }
+  }
+
+  /**
+   * 关闭 2FA
+   */
+  async twoFactorDisable() {
+    const { ctx } = this;
+    try {
+      const userId = await ctx.service.user.getUserId();
+      const body = ctx.request.body || {};
+      const data = await ctx.service.user.disableTwoFactor(userId, body);
+      this.result({ data, message: '2FA 已关闭' });
+    } catch (e) {
+      this.result({ data: '', message: e.message, code: 1001 });
+    }
+  }
+
+  /**
+   * 获取活跃登录设备列表（会话）
+   */
+  async sessionList() {
+    const { ctx } = this;
+    try {
+      const userId = await ctx.service.user.getUserId();
+      const data = await ctx.service.user.sessionList(userId);
+      this.result({ data });
+    } catch (e) {
+      this.result({ data: '', message: e.message, code: 1001 });
+    }
+  }
+
+  /**
+   * 下线指定登录设备
+   */
+  async sessionKick() {
+    const { ctx } = this;
+    try {
+      const userId = await ctx.service.user.getUserId();
+      const body = ctx.request.body || {};
+      await ctx.service.user.sessionKick(userId, body);
+      this.result({ data: null, message: '设备已下线' });
     } catch (e) {
       this.result({ data: '', message: e.message, code: 1001 });
     }
@@ -749,7 +951,7 @@ class UserController extends BaseController {
     const { ctx } = this;
     try {
       const userId = await ctx.service.user.getUserId();
-      const params = ctx.request.query || {};
+      const params = Object.keys(ctx.request.body || {}).length ? (ctx.request.body || {}) : (ctx.request.query || {});
       const data = await ctx.service.user.invoiceList(userId, params);
       this.result({ data });
     } catch (e) {

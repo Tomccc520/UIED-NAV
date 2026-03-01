@@ -137,6 +137,8 @@ module.exports = app => {
   // 前台用户中心（登录/资料）
   router.all('/api/user/register', controller.user.register);
   router.all('/api/user/login', controller.user.login);
+  router.all('/api/user/login/2fa/send', controller.user.loginTwoFactorSend);
+  router.all('/api/user/login/2fa/verify', controller.user.loginTwoFactorVerify);
   router.all('/api/user/logout', controller.user.logout);
   router.all('/api/user/profile', controller.user.profile);
   router.all('/api/user/profile/update', controller.user.updateProfile);
@@ -150,6 +152,8 @@ module.exports = app => {
   router.all('/api/user/order/list', controller.user.orderList);
   router.all('/api/user/order/detail/:id', controller.user.orderDetail);
   router.all('/api/user/license/list', controller.user.licenseList);
+  router.all('/api/user/license/bind', controller.user.bindLicense);
+  router.all('/api/user/license/change-domain', controller.user.changeLicenseDomain);
   router.all('/api/user/password/change', controller.user.changePassword);
   router.all('/api/user/account/send-code', controller.user.sendCode);
   router.all('/api/user/account/bind', controller.user.bindAccount);
@@ -158,15 +162,27 @@ module.exports = app => {
   router.all('/api/user/message/read', controller.user.messageRead);
   router.all('/api/user/message/delete', controller.user.messageDelete);
   router.all('/api/user/login/log', controller.user.loginLog);
+  router.all('/api/user/security/2fa/status', controller.user.twoFactorStatus);
+  router.all('/api/user/security/2fa/send-code', controller.user.twoFactorSendCode);
+  router.all('/api/user/security/2fa/enable', controller.user.twoFactorEnable);
+  router.all('/api/user/security/2fa/disable', controller.user.twoFactorDisable);
+  router.all('/api/user/session/list', controller.user.sessionList);
+  router.all('/api/user/session/kick', controller.user.sessionKick);
   router.all('/api/user/invoice/list', controller.user.invoiceList);
   router.all('/api/user/invoice/apply', controller.user.invoiceApply);
   router.all('/api/user/author/options', controller.user.authorOptions);
   router.all('/api/user/article/collect/list', controller.user.articleCollectList);
   router.all('/api/user/article/like/list', controller.user.articleLikeList);
   router.all('/api/user/article/comment/list', controller.user.articleCommentList);
+  router.all('/api/user/article/comment/delete', controller.user.articleCommentDelete);
+  router.all('/api/user/article/comment/update', controller.user.articleCommentUpdate);
+  router.all('/api/user/article/comment/reply', controller.user.articleCommentReply);
   router.all('/api/user/website/favorite/list', controller.user.websiteFavoriteList);
   router.all('/api/user/website/like/list', controller.user.websiteLikeList);
   router.all('/api/user/website/comment/list', controller.user.websiteCommentList);
+  router.all('/api/user/website/comment/delete', controller.user.websiteCommentDelete);
+  router.all('/api/user/website/comment/update', controller.user.websiteCommentUpdate);
+  router.all('/api/user/website/comment/reply', controller.user.websiteCommentReply);
   router.all('/api/article/cate/list', controller.article.cateList);
   router.all('/api/article/cate/all', controller.article.cateAll);
   router.all('/api/article/cate/add', controller.article.cateAdd);

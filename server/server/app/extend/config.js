@@ -187,17 +187,27 @@ const rsa = {
     // 前台用户中心（账号与个人中心）
     'user:register',
     'user:login',
+    'user:login:2fa:send',
+    'user:login:2fa:verify',
     'user:logout',
     'user:profile',
     'user:profile:update',
     'user:index:stats',
     'user:order:list',
     'user:license:list',
+    'user:license:bind',
+    'user:license:change:domain',
     'user:password:change',
     'user:message:list',
     'user:message:read',
     'user:message:delete',
     'user:login:log',
+    'user:security:2fa:status',
+    'user:security:2fa:send-code',
+    'user:security:2fa:enable',
+    'user:security:2fa:disable',
+    'user:session:list',
+    'user:session:kick',
     'user:author:center:detail', // 作者中心详情（前台登录）
     'user:author:center:save', // 作者中心保存（前台登录）
     'user:author:public:detail', // 作者公开主页
@@ -229,6 +239,8 @@ const rsa = {
     'common:album:albumList', // 素材列表（前台富文本选择素材）
     'common:album:cateList', // 素材分类（前台富文本选择素材）
     'user:avatar:upload', // 前台用户头像上传
+    'user:license:bind', // 前台用户授权绑定
+    'user:license:change:domain', // 前台用户修改授权域名
     'ai:chat:completions:editor', // AI 编辑器生成
   ],
 

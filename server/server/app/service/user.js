@@ -211,6 +211,19 @@ class UserService extends Service {
   }
 
   /**
+   * 返回数据表中第一个存在的字段名
+   * @param {string} tableName 数据表名
+   * @param {string|string[]} candidates 候选字段名
+   * @returns {Promise<string>} 已存在字段名
+   */
+  async resolveExistingColumn(tableName = '', candidates = []) {
+    const columns = await this.getTableColumns(tableName);
+    const list = Array.isArray(candidates) ? candidates : [ candidates ];
+    const match = list.find(item => columns.has(String(item || '').trim()));
+    return String(match || '').trim();
+  }
+
+  /**
    * 判断是否为个人中心演示数据自动补齐账号
    * @param {string} username 用户名
    * @returns {boolean} 是否命中演示账号
@@ -809,9 +822,101 @@ class UserService extends Service {
   }
 
   /**
+   * 构建用户登录会话缓存键
+   * @param {string} token 用户登录令牌
+   * @return {string} Redis 会话键
+   */
+  getUserSessionRedisKey(token = '') {
+    return `user:session:${String(token || '').trim()}`;
+  }
+
+  /**
+   * 生成当前请求对应的设备名称
+   * @param {object} uaInfo UA 解析结果
+   * @return {string} 设备名称
+   */
+  resolveLoginDeviceName(uaInfo = {}) {
+    const browserName = String(uaInfo?.browser?.name || '').trim();
+    const browserVersion = String(uaInfo?.browser?.version || '').trim();
+    const osName = String(uaInfo?.os?.name || '').trim();
+    const osVersion = String(uaInfo?.os?.version || '').trim();
+    const browserText = browserName ? `${browserName}${browserVersion ? ` ${browserVersion}` : ''}` : '未知浏览器';
+    const osText = osName ? `${osName}${osVersion ? ` ${osVersion}` : ''}` : '未知系统';
+    return `${browserText} · ${osText}`;
+  }
+
+  /**
+   * 构建并缓存用户会话数据
+   * @param {object} user 用户信息
+   * @param {string} token 登录令牌
+   * @param {object} options 额外配置
+   * @return {object} 会话对象
+   */
+  buildUserSessionPayload(user, token, options = {}) {
+    const { ctx } = this;
+    const now = Math.floor(Date.now() / 1000);
+    const uaInfo = parser(ctx.request.header['user-agent'] || '');
+    return {
+      sessionId: String(options.sessionId || ctx.randomString()),
+      token: String(token || ''),
+      userId: Number(user?.id || 0),
+      ip: String(ctx.request.ip || ''),
+      userAgent: String(ctx.request.header['user-agent'] || ''),
+      os: uaInfo?.os || {},
+      browser: uaInfo?.browser || {},
+      device: this.resolveLoginDeviceName(uaInfo),
+      loginType: String(options.loginType || 'password'),
+      twoFactorVerified: Number(options.twoFactorVerified === false ? 0 : 1),
+      createTime: now,
+      lastActiveTime: now,
+    };
+  }
+
+  /**
+   * 读取当前 token 对应的会话对象
+   * @param {string} token 登录令牌
+   * @return {Promise<object|null>} 会话对象
+   */
+  async getUserSessionByToken(token = '') {
+    const { ctx } = this;
+    const key = this.getUserSessionRedisKey(token);
+    const session = await ctx.service.redis.get(key);
+    if (!session || typeof session !== 'object') {
+      return null;
+    }
+    return session;
+  }
+
+  /**
+   * 更新会话最近活跃时间
+   * @param {string} token 登录令牌
+   * @param {number} ttlSeconds 会话 TTL
+   */
+  async refreshUserSessionActiveTime(token, ttlSeconds) {
+    const { ctx } = this;
+    const session = await this.getUserSessionByToken(token);
+    if (!session) {
+      return;
+    }
+    const now = Math.floor(Date.now() / 1000);
+    session.lastActiveTime = now;
+    await ctx.service.redis.set(this.getUserSessionRedisKey(token), session, ttlSeconds);
+  }
+
+  /**
+   * 删除 token 对应登录会话
+   * @param {string} token 登录令牌
+   */
+  async removeUserSessionByToken(token = '') {
+    const { ctx } = this;
+    if (!token) return;
+    await ctx.service.redis.del(this.getUserSessionRedisKey(token));
+  }
+
+  /**
    * 缓存前台用户 token 映射并写入 TTL
    */
-  async cacheUserTokenSession(token, user) {
+  async cacheUserTokenSession(token, user, options = {}) {
     const { ctx } = this;
     if (!token || !user || !user.id) return;
     const appConfig = this.getAppConfig();
@@ -826,6 +931,8 @@ class UserService extends Service {
       await ctx.app.redis.sadd(setKey, token);
       await ctx.app.redis.expire(setKey, tokenTtlSeconds);
     }
+    const sessionPayload = this.buildUserSessionPayload(user, token, options);
+    await ctx.service.redis.set(this.getUserSessionRedisKey(token), sessionPayload, tokenTtlSeconds);
     const safeUser = this.buildSafeUserInfo(user);
     await ctx.service.redis.set(userInfoKey + user.id, JSON.stringify(safeUser));
   }
@@ -854,6 +961,14 @@ class UserService extends Service {
       },
     });
     if (!user || Number(user.isDisable || 0) === 1) return 0;
+    /**
+     * 安全策略：当账号已启用 2FA 时，不允许仅凭解密 token 在 Redis 丢失后自动恢复会话。
+     * 需要重新走登录 + 2FA 验证链路。
+     */
+    const securityRow = await this.getUserSecurityRow(Number(user.id || 0)).catch(() => null);
+    if (Number(securityRow?.two_fa_enabled || 0) === 1) {
+      return 0;
+    }
     await this.cacheUserTokenSession(token, user);
     return Number(user.id || 0);
   }
@@ -861,13 +976,13 @@ class UserService extends Service {
   /**
    * 生成用户令牌
    */
-  async createUserToken(user) {
+  async createUserToken(user, options = {}) {
     const { ctx } = this;
     const token = ctx.setToken({
       username: user.sn,
       password: user.password,
     });
-    await this.cacheUserTokenSession(token, user);
+    await this.cacheUserTokenSession(token, user, options);
     return token;
   }
 
@@ -893,12 +1008,17 @@ class UserService extends Service {
     if (!uid) {
       throw new Error('登录已失效');
     }
+    const session = await this.getUserSessionByToken(token);
+    if (session && Number(session.userId || 0) === Number(uid || 0) && Number(session.twoFactorVerified || 0) !== 1) {
+      throw new Error('当前登录需要完成二次验证');
+    }
     const tokenTtlSeconds = this.getUserTokenTtlSeconds();
     const refreshThreshold = this.getUserTokenRefreshThresholdSeconds(tokenTtlSeconds);
     const remainTtl = Number(await ctx.service.redis.ttl(tokenKey) || -1);
     if (remainTtl > 0 && remainTtl < refreshThreshold) {
       await ctx.service.redis.expire(tokenKey, tokenTtlSeconds);
     }
+    await this.refreshUserSessionActiveTime(token, tokenTtlSeconds);
     return parseInt(uid, 10);
   }
 
@@ -918,6 +1038,7 @@ class UserService extends Service {
     const tokenKey = userTokenKey + token;
     const uid = await ctx.service.redis.get(tokenKey);
     await ctx.service.redis.del(tokenKey);
+    await this.removeUserSessionByToken(token);
     const userId = Number(uid || 0);
     if (!userId) {
       return true;
@@ -1180,6 +1301,16 @@ class UserService extends Service {
     if (user.password !== md5(password)) {
       throw new Error('密码错误');
     }
+    const challenge = await this.createLoginTwoFactorChallenge(user);
+    if (challenge) {
+      return {
+        need2fa: true,
+        challengeToken: challenge.challengeToken,
+        method: challenge.method,
+        maskedAccount: challenge.maskedAccount,
+        expireSeconds: challenge.expireSeconds,
+      };
+    }
     const now = Math.floor(Date.now() / 1000);
     await ctx.model.User.update({
       lastLoginIp: ctx.request.ip,
@@ -1189,7 +1320,10 @@ class UserService extends Service {
       where: { id: user.id },
     });
     await this.recordLoginLog(user.id, 1);
-    const token = await this.createUserToken(user);
+    const token = await this.createUserToken(user, {
+      loginType: 'password',
+      twoFactorVerified: true,
+    });
     /**
      * 测试账号登录时自动补齐个人中心演示数据，避免联调空数据误判为接口异常。
      */
@@ -1201,6 +1335,10 @@ class UserService extends Service {
   async recordLoginLog(userId, status = 1) {
     const { ctx } = this;
     try {
+      await this.ensureUserLoginLogTable();
+      if (!this.hasModel('UserLoginLog')) {
+        return;
+      }
       const ua = parser(ctx.request.header['user-agent'] || '');
       await ctx.model.UserLoginLog.create({
         userId,
@@ -1447,6 +1585,33 @@ class UserService extends Service {
     data.amount = Number(order.price || 0).toFixed(2);
     data.originalAmount = Number(order.originPrice || 0).toFixed(2);
     data.couponAmount = Number(order.couponAmount || 0).toFixed(2);
+    /**
+     * 兼容订单详情页展示“授权码/下载记录”：缺失时返回空数组，避免前端兜底报错。
+     */
+    data.licenseList = [];
+    data.downloadRecords = [];
+    if (this.hasModel('License')) {
+      const licenseRows = await ctx.model.License.findAll({
+        where: { userId, orderId: Number(orderId || 0), isDelete: 0 },
+        order: [[ 'id', 'DESC' ]],
+      }).catch(() => []);
+      data.licenseList = (Array.isArray(licenseRows) ? licenseRows : []).map(item => ({
+        id: Number(item.id || 0),
+        key: String(item.licenseKey || ''),
+        domain: String(item.domain || ''),
+        mobile: String(item.mobile || ''),
+        qq: String(item.qq || ''),
+        status: Number(item.status || 0),
+        auditStatus: Number(item.auditStatus || 0),
+        expireTime: Number(item.expireTime || 0),
+        bindCount: Number(item.bindCount || 0),
+        bindLimit: Number(item.bindLimit || 1),
+      }));
+    }
+    const snapshot = safeJsonParse(order.snapshot, {});
+    if (Array.isArray(snapshot?.downloadRecords)) {
+      data.downloadRecords = snapshot.downloadRecords;
+    }
     return data;
   }
 
@@ -1532,6 +1697,7 @@ class UserService extends Service {
       return {
         id: license.id,
         productId: Number(license.productId || 0),
+        orderId: Number(license.orderId || 0),
         productName: productMap.get(license.productId)?.name || '',
         domain,
         key: license.licenseKey,
@@ -1555,6 +1721,183 @@ class UserService extends Service {
       pageNo,
       pageSize,
     };
+  }
+
+  /**
+   * 获取授权表名
+   * @returns {string} 授权表名
+   */
+  getLicenseTableName() {
+    const prefix = String(extendConfig.dbTablePrefix || 'la_').trim() || 'la_';
+    return `${prefix}license`;
+  }
+
+  /**
+   * 归一化授权绑定域名（兼容粘贴完整 URL）
+   * @param {string} input 原始输入
+   * @returns {string} 处理后的域名
+   */
+  normalizeLicenseDomain(input = '') {
+    const raw = String(input || '').trim().toLowerCase();
+    if (!raw) return '';
+    let value = raw.replace(/^https?:\/\//, '');
+    value = value.replace(/\/.*$/, '').replace(/:\d+$/, '');
+    value = value.replace(/\.$/, '');
+    return value;
+  }
+
+  /**
+   * 校验授权绑定域名格式
+   * @param {string} domain 域名
+   * @returns {boolean} 是否合法
+   */
+  isValidLicenseDomain(domain = '') {
+    const value = this.normalizeLicenseDomain(domain);
+    if (!value) return false;
+    if (value === 'localhost') return true;
+    if (/^\d{1,3}(\.\d{1,3}){3}$/.test(value)) return true;
+    return /^([a-z0-9-]+\.)+[a-z]{2,}$/.test(value);
+  }
+
+  /**
+   * 获取当前用户拥有的授权记录（原始 SQL，兼容未生成 model 的裁剪版）
+   * @param {number} userId 用户ID
+   * @param {number|string} licenseId 授权ID
+   * @returns {Promise<object|null>} 授权记录
+   */
+  async getUserOwnedLicenseRow(userId, licenseId) {
+    const { ctx } = this;
+    const tableName = this.getLicenseTableName();
+    const [ row ] = await ctx.model.query(
+      `
+      SELECT *
+      FROM ${tableName}
+      WHERE id = ?
+        AND user_id = ?
+        AND is_delete = 0
+      LIMIT 1
+      `,
+      {
+        replacements: [ Number(licenseId || 0), Number(userId || 0) ],
+        type: ctx.app.Sequelize.QueryTypes.SELECT,
+      }
+    );
+    return row || null;
+  }
+
+  /**
+   * 提交授权域名绑定/变更（最小可用版）
+   * @param {number} userId 用户ID
+   * @param {object} params 请求参数
+   * @param {'bind'|'change'} mode 操作模式
+   * @returns {Promise<object>} 返回最新状态
+   */
+  async saveLicenseDomainRequest(userId, params = {}, mode = 'bind') {
+    const { ctx } = this;
+    const licenseId = Number(params.licenseId || params.id || 0);
+    const domain = this.normalizeLicenseDomain(params.domain || '');
+    const mobile = String(params.mobile || '').trim();
+    const qq = String(params.qq || '').trim();
+    const tableName = this.getLicenseTableName();
+
+    if (!licenseId) {
+      throw new Error('授权ID不能为空');
+    }
+    if (!this.isValidLicenseDomain(domain)) {
+      throw new Error('域名格式不正确');
+    }
+
+    const columns = await this.getTableColumns(tableName);
+    if (!columns.size) {
+      throw new Error('当前系统未启用授权码绑定');
+    }
+
+    const row = await this.getUserOwnedLicenseRow(userId, licenseId);
+    if (!row) {
+      throw new Error('授权记录不存在');
+    }
+
+    const now = Math.floor(Date.now() / 1000);
+    const sets = [];
+    const replacements = [];
+
+    const domainColumn = await this.resolveExistingColumn(tableName, [ 'domain' ]);
+    if (domainColumn) {
+      sets.push(`\`${domainColumn}\` = ?`);
+      replacements.push(domain);
+    }
+
+    const mobileColumn = await this.resolveExistingColumn(tableName, [ 'mobile' ]);
+    if (mobileColumn) {
+      sets.push(`\`${mobileColumn}\` = ?`);
+      replacements.push(mobile);
+    }
+
+    const qqColumn = await this.resolveExistingColumn(tableName, [ 'qq' ]);
+    if (qqColumn) {
+      sets.push(`\`${qqColumn}\` = ?`);
+      replacements.push(qq);
+    }
+
+    const auditStatusColumn = await this.resolveExistingColumn(tableName, [ 'audit_status', 'auditStatus' ]);
+    if (auditStatusColumn) {
+      sets.push(`\`${auditStatusColumn}\` = ?`);
+      replacements.push(0);
+    }
+
+    const updateTimeColumn = await this.resolveExistingColumn(tableName, [ 'update_time', 'updateTime' ]);
+    if (updateTimeColumn) {
+      sets.push(`\`${updateTimeColumn}\` = ?`);
+      replacements.push(now);
+    }
+
+    if (sets.length === 0) {
+      throw new Error('授权表缺少可更新字段');
+    }
+
+    replacements.push(licenseId, Number(userId || 0));
+    await ctx.model.query(
+      `
+      UPDATE ${tableName}
+      SET ${sets.join(', ')}
+      WHERE id = ?
+        AND user_id = ?
+        AND is_delete = 0
+      `,
+      {
+        replacements,
+        type: ctx.app.Sequelize.QueryTypes.UPDATE,
+      }
+    );
+
+    return {
+      id: licenseId,
+      domain,
+      mobile,
+      qq,
+      auditStatus: 0,
+      mode,
+    };
+  }
+
+  /**
+   * 绑定授权域名
+   * @param {number} userId 用户ID
+   * @param {object} params 请求参数
+   * @returns {Promise<object>} 最新状态
+   */
+  async bindLicenseDomain(userId, params = {}) {
+    return await this.saveLicenseDomainRequest(userId, params, 'bind');
+  }
+
+  /**
+   * 修改授权域名
+   * @param {number} userId 用户ID
+   * @param {object} params 请求参数
+   * @returns {Promise<object>} 最新状态
+   */
+  async changeLicenseDomain(userId, params = {}) {
+    return await this.saveLicenseDomainRequest(userId, params, 'change');
   }
 
   /**
@@ -2533,6 +2876,232 @@ class UserService extends Service {
   }
 
   /**
+   * 获取用户评论类型对应的数据表与目标字段
+   * @param {'article'|'website'} type 评论类型
+   * @returns {{tableName:string,targetIdField:string,targetKey:string}} 元数据
+   */
+  getUserCommentMeta(type = 'website') {
+    const normalizedType = String(type || '').trim().toLowerCase() === 'article' ? 'article' : 'website';
+    if (normalizedType === 'article') {
+      return {
+        tableName: 'uied_article_comment',
+        targetIdField: 'article_id',
+        targetKey: 'articleId',
+      };
+    }
+    return {
+      tableName: 'uied_website_comment',
+      targetIdField: 'website_id',
+      targetKey: 'websiteId',
+    };
+  }
+
+  /**
+   * 查询当前用户评论详情（仅允许操作自己的评论）
+   * @param {number} userId 用户ID
+   * @param {number|string} commentId 评论ID
+   * @param {'article'|'website'} type 评论类型
+   * @returns {Promise<object|null>} 评论记录
+   */
+  async getUserOwnedComment(userId, commentId, type = 'website') {
+    const { app } = this;
+    const meta = this.getUserCommentMeta(type);
+    const [ row ] = await app.model.query(
+      `
+      SELECT *
+      FROM ${meta.tableName}
+      WHERE id = ?
+        AND user_id = ?
+        AND is_delete = 0
+      LIMIT 1
+      `,
+      {
+        replacements: [ Number(commentId || 0), Number(userId || 0) ],
+        type: app.Sequelize.QueryTypes.SELECT,
+      }
+    );
+    return row || null;
+  }
+
+  /**
+   * 用户中心删除评论（软删除）
+   * @param {number} userId 用户ID
+   * @param {object} params 请求参数
+   * @param {'article'|'website'} type 评论类型
+   * @returns {Promise<boolean>} 是否成功
+   */
+  async deleteUserComment(userId, params = {}, type = 'website') {
+    const { app } = this;
+    await this.ensureUiedCommentTableCompatibility();
+    const commentId = Number(params.commentId || params.id || 0);
+    if (!commentId) {
+      throw new Error('评论ID不能为空');
+    }
+    const existed = await this.getUserOwnedComment(userId, commentId, type);
+    if (!existed) {
+      throw new Error('评论不存在或无权限操作');
+    }
+    const meta = this.getUserCommentMeta(type);
+    const now = Math.floor(Date.now() / 1000);
+    await app.model.query(
+      `
+      UPDATE ${meta.tableName}
+      SET is_delete = 1, delete_time = ?, update_time = ?
+      WHERE id = ? AND user_id = ? AND is_delete = 0
+      `,
+      {
+        replacements: [ now, now, commentId, Number(userId || 0) ],
+        type: app.Sequelize.QueryTypes.UPDATE,
+      }
+    );
+    return true;
+  }
+
+  /**
+   * 用户中心编辑评论内容
+   * @param {number} userId 用户ID
+   * @param {object} params 请求参数
+   * @param {'article'|'website'} type 评论类型
+   * @returns {Promise<object>} 更新后的评论摘要
+   */
+  async updateUserComment(userId, params = {}, type = 'website') {
+    const { app } = this;
+    await this.ensureUiedCommentTableCompatibility();
+    const commentId = Number(params.commentId || params.id || 0);
+    const content = String(params.content || '').trim();
+    if (!commentId) {
+      throw new Error('评论ID不能为空');
+    }
+    if (!content) {
+      throw new Error('评论内容不能为空');
+    }
+    if (content.length > 1000) {
+      throw new Error('评论内容不能超过1000字符');
+    }
+    const existed = await this.getUserOwnedComment(userId, commentId, type);
+    if (!existed) {
+      throw new Error('评论不存在或无权限操作');
+    }
+    const meta = this.getUserCommentMeta(type);
+    const now = Math.floor(Date.now() / 1000);
+    await app.model.query(
+      `
+      UPDATE ${meta.tableName}
+      SET content = ?, update_time = ?, status = 'approved'
+      WHERE id = ? AND user_id = ? AND is_delete = 0
+      `,
+      {
+        replacements: [ content, now, commentId, Number(userId || 0) ],
+        type: app.Sequelize.QueryTypes.UPDATE,
+      }
+    );
+    return {
+      id: commentId,
+      content,
+      updateTime: moment(now * 1000).format('YYYY-MM-DD HH:mm:ss'),
+      status: 'approved',
+    };
+  }
+
+  /**
+   * 用户中心回复评论（楼中楼）
+   * @param {number} userId 用户ID
+   * @param {object} params 请求参数
+   * @param {'article'|'website'} type 评论类型
+   * @returns {Promise<object>} 新增回复内容
+   */
+  async replyUserComment(userId, params = {}, type = 'website') {
+    const { ctx } = this;
+    await this.ensureUiedCommentTableCompatibility();
+    const commentId = Number(params.commentId || 0);
+    const content = String(params.content || '').trim();
+    if (!commentId) {
+      throw new Error('父评论ID不能为空');
+    }
+    if (!content) {
+      throw new Error('回复内容不能为空');
+    }
+    if (content.length > 1000) {
+      throw new Error('回复内容不能超过1000字符');
+    }
+    const meta = this.getUserCommentMeta(type);
+    const [ parentComment ] = await ctx.app.model.query(
+      `
+      SELECT id, ${meta.targetIdField} AS target_id
+      FROM ${meta.tableName}
+      WHERE id = ? AND is_delete = 0
+      LIMIT 1
+      `,
+      {
+        replacements: [ commentId ],
+        type: ctx.app.Sequelize.QueryTypes.SELECT,
+      }
+    );
+    if (!parentComment) {
+      throw new Error('父评论不存在');
+    }
+    const targetId = Number(params.targetId || parentComment.target_id || 0);
+    if (!targetId) {
+      throw new Error('评论目标不存在');
+    }
+    const userInfo = await this.getSafeUserInfoById(userId, false);
+    const payload = {
+      parentId: commentId,
+      content,
+      userId,
+      userName: String(userInfo.nickname || userInfo.username || `用户${userId}`),
+    };
+    if (type === 'article') {
+      payload.articleId = targetId;
+    } else {
+      payload.websiteId = targetId;
+    }
+    return await ctx.service.uied.comment.add(payload);
+  }
+
+  /**
+   * 用户中心删除文章评论
+   */
+  async articleCommentDelete(userId, params = {}) {
+    return await this.deleteUserComment(userId, params, 'article');
+  }
+
+  /**
+   * 用户中心删除网址评论
+   */
+  async websiteCommentDelete(userId, params = {}) {
+    return await this.deleteUserComment(userId, params, 'website');
+  }
+
+  /**
+   * 用户中心编辑文章评论
+   */
+  async articleCommentUpdate(userId, params = {}) {
+    return await this.updateUserComment(userId, params, 'article');
+  }
+
+  /**
+   * 用户中心编辑网址评论
+   */
+  async websiteCommentUpdate(userId, params = {}) {
+    return await this.updateUserComment(userId, params, 'website');
+  }
+
+  /**
+   * 用户中心回复文章评论
+   */
+  async articleCommentReply(userId, params = {}) {
+    return await this.replyUserComment(userId, params, 'article');
+  }
+
+  /**
+   * 用户中心回复网址评论
+   */
+  async websiteCommentReply(userId, params = {}) {
+    return await this.replyUserComment(userId, params, 'website');
+  }
+
+  /**
    * 地址列表
    */
   async addressList(userId, params = {}) {
@@ -2646,10 +3215,73 @@ class UserService extends Service {
   }
 
   /**
+   * 确保前台用户登录日志表存在
+   */
+  async ensureUserLoginLogTable() {
+    const { ctx, app } = this;
+    if (app.__userLoginLogTableReady) return true;
+    try {
+      await ctx.model.query(`
+        CREATE TABLE IF NOT EXISTS \`la_user_login_log\` (
+          \`id\` int unsigned NOT NULL AUTO_INCREMENT,
+          \`user_id\` int unsigned NOT NULL DEFAULT 0,
+          \`ip\` varchar(64) NOT NULL DEFAULT '',
+          \`os\` varchar(255) NOT NULL DEFAULT '',
+          \`browser\` varchar(255) NOT NULL DEFAULT '',
+          \`status\` tinyint unsigned NOT NULL DEFAULT 1 COMMENT '1成功 2失败',
+          \`create_time\` int unsigned NOT NULL DEFAULT 0,
+          PRIMARY KEY (\`id\`),
+          KEY \`idx_user_time\` (\`user_id\`, \`create_time\`),
+          KEY \`idx_status\` (\`status\`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+      `);
+      app.__userLoginLogTableReady = true;
+      return true;
+    } catch (error) {
+      ctx.logger.warn(`ensureUserLoginLogTable skipped: ${error.message || error}`);
+      return false;
+    }
+  }
+
+  /**
+   * 解析登录日志中的终端信息字符串
+   */
+  parseLoginTerminalText(rawValue = '') {
+    const text = String(rawValue || '').trim();
+    if (!text) return '';
+    const jsonValue = safeJsonParse(text, null);
+    if (jsonValue && typeof jsonValue === 'object') {
+      const name = String(jsonValue.name || '').trim();
+      const version = String(jsonValue.version || '').trim();
+      return name ? `${name}${version ? ` ${version}` : ''}` : '';
+    }
+    return text;
+  }
+
+  /**
+   * 统一格式化用户登录日志项
+   */
+  formatUserLoginLogItem(row) {
+    const osText = this.parseLoginTerminalText(row?.os || '');
+    const browserText = this.parseLoginTerminalText(row?.browser || '');
+    return {
+      id: Number(row?.id || 0),
+      userId: Number(row?.userId || row?.user_id || 0),
+      ip: String(row?.ip || ''),
+      os: osText,
+      browser: browserText,
+      device: `${browserText || '未知浏览器'} · ${osText || '未知系统'}`,
+      status: Number(row?.status || 0),
+      createTime: Number(row?.createTime || row?.create_time || 0),
+    };
+  }
+
+  /**
    * 登录日志
    */
   async loginLog(userId, params) {
     const { ctx } = this;
+    await this.ensureUserLoginLogTable();
     if (!this.hasModel('UserLoginLog')) {
       ctx.logger.warn('[user.loginLog] UserLoginLog 模型未注册，返回空列表');
       return {
@@ -2672,7 +3304,7 @@ class UserService extends Service {
       pageNo,
       pageSize,
       total: count,
-      lists: rows,
+      lists: rows.map(item => this.formatUserLoginLogItem(item)),
     };
   }
 
@@ -3011,14 +3643,105 @@ class UserService extends Service {
   }
 
   /**
+   * 从扩展信息中提取授权ID（兼容多种历史字段）
+   * @param {object} extra 扩展信息
+   * @returns {number} 授权ID
+   */
+  resolveLicenseMessageExtraId(extra = {}) {
+    if (!extra || typeof extra !== 'object') {
+      return 0;
+    }
+    const directId = Number(extra.licenseId || extra.license_id || 0);
+    if (directId > 0) {
+      return directId;
+    }
+    const nestedLicense = extra.license && typeof extra.license === 'object' ? extra.license : null;
+    const nestedId = Number(nestedLicense?.licenseId || nestedLicense?.license_id || nestedLicense?.id || 0);
+    if (nestedId > 0) {
+      return nestedId;
+    }
+    const payload = extra.payload && typeof extra.payload === 'object' ? extra.payload : null;
+    return Number(payload?.licenseId || payload?.license_id || 0);
+  }
+
+  /**
+   * 根据订单ID反查授权ID（用于授权审核消息兜底）
+   * @param {number} userId 用户ID
+   * @param {number} orderId 订单ID
+   * @returns {Promise<number>} 授权ID
+   */
+  async resolveLicenseIdByOrderId(userId, orderId) {
+    const { ctx } = this;
+    const targetOrderId = Number(orderId || 0);
+    if (!targetOrderId) {
+      return 0;
+    }
+    const tableName = this.getLicenseTableName();
+    const orderColumn = await this.resolveExistingColumn(tableName, [ 'order_id', 'orderId' ]);
+    if (!orderColumn) {
+      return 0;
+    }
+    const [ row ] = await ctx.model.query(
+      `
+      SELECT id
+      FROM ${tableName}
+      WHERE user_id = ?
+        AND \`${orderColumn}\` = ?
+        AND is_delete = 0
+      ORDER BY id DESC
+      LIMIT 1
+      `,
+      {
+        replacements: [ Number(userId || 0), targetOrderId ],
+        type: ctx.app.Sequelize.QueryTypes.SELECT,
+      }
+    );
+    return Number(row?.id || 0);
+  }
+
+  /**
+   * 规范化用户消息扩展信息，确保授权类消息带标准 licenseId
+   * @param {number} userId 用户ID
+   * @param {string} type 消息类型
+   * @param {object} extra 原始扩展信息
+   * @returns {Promise<object>} 规范化后的扩展信息
+   */
+  async normalizeUserMessageExtra(userId, type, extra = {}) {
+    const noticeType = String(type || '').trim();
+    const source = extra && typeof extra === 'object' ? { ...extra } : {};
+    if (![ 'license_domain_audit', 'license_audit' ].includes(noticeType)) {
+      return source;
+    }
+    const directLicenseId = this.resolveLicenseMessageExtraId(source);
+    if (directLicenseId > 0) {
+      return {
+        ...source,
+        licenseId: directLicenseId,
+      };
+    }
+    const orderId = Number(source.orderId || source.order_id || 0);
+    if (orderId > 0) {
+      const resolvedLicenseId = await this.resolveLicenseIdByOrderId(userId, orderId);
+      if (resolvedLicenseId > 0) {
+        return {
+          ...source,
+          licenseId: resolvedLicenseId,
+        };
+      }
+    }
+    return source;
+  }
+
+  /**
    * 创建用户站内信消息
    */
   async createUserMessage(userId, title, content, type = 'system', extra = {}) {
     const { ctx } = this;
     await this.ensureUserMessageExtraColumn();
     const now = Math.floor(Date.now() / 1000);
-    const hasExtra = extra && typeof extra === 'object' && Object.keys(extra).length > 0;
-    const extraText = hasExtra ? JSON.stringify(extra) : '';
+    const normalizedExtra = await this.normalizeUserMessageExtra(userId, type, extra);
+    const hasExtra = normalizedExtra && typeof normalizedExtra === 'object' && Object.keys(normalizedExtra).length > 0;
+    const extraText = hasExtra ? JSON.stringify(normalizedExtra) : '';
     await ctx.model.UserMessage.create({
       userId,
       title: String(title || '').slice(0, 100),
@@ -3097,6 +3820,528 @@ class UserService extends Service {
       content,
       'system'
     );
+  }
+
+  /**
+   * 确保用户安全配置表存在（2FA）
+   */
+  async ensureUserSecurityTable() {
+    const { ctx, app } = this;
+    if (app.__userSecurityTableReady) return true;
+    try {
+      await ctx.model.query(`
+        CREATE TABLE IF NOT EXISTS \`la_user_security\` (
+          \`id\` int unsigned NOT NULL AUTO_INCREMENT,
+          \`user_id\` int unsigned NOT NULL DEFAULT 0,
+          \`two_fa_enabled\` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '是否启用2FA',
+          \`two_fa_type\` varchar(20) NOT NULL DEFAULT '' COMMENT '2FA类型：mobile/email',
+          \`two_fa_account\` varchar(120) NOT NULL DEFAULT '' COMMENT '2FA账号',
+          \`last_verify_time\` int unsigned NOT NULL DEFAULT 0 COMMENT '最近通过2FA时间',
+          \`is_delete\` tinyint unsigned NOT NULL DEFAULT 0,
+          \`create_time\` int unsigned NOT NULL DEFAULT 0,
+          \`update_time\` int unsigned NOT NULL DEFAULT 0,
+          \`delete_time\` int unsigned NOT NULL DEFAULT 0,
+          PRIMARY KEY (\`id\`),
+          UNIQUE KEY \`uk_user_id\` (\`user_id\`),
+          KEY \`idx_enabled\` (\`two_fa_enabled\`, \`is_delete\`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+      `);
+      app.__userSecurityTableReady = true;
+      return true;
+    } catch (error) {
+      ctx.logger.warn(`ensureUserSecurityTable skipped: ${error.message || error}`);
+      return false;
+    }
+  }
+
+  /**
+   * 获取用户 2FA 配置
+   */
+  async getUserSecurityRow(userId) {
+    const { ctx } = this;
+    await this.ensureUserSecurityTable();
+    const [ row ] = await ctx.model.query(
+      `
+      SELECT *
+      FROM la_user_security
+      WHERE user_id = ?
+        AND is_delete = 0
+      LIMIT 1
+      `,
+      {
+        replacements: [ Number(userId || 0) ],
+        type: ctx.app.Sequelize.QueryTypes.SELECT,
+      }
+    );
+    return row || null;
+  }
+
+  /**
+   * 写入用户 2FA 配置
+   */
+  async saveUserSecurityRow(userId, payload = {}) {
+    const { ctx } = this;
+    await this.ensureUserSecurityTable();
+    const now = Math.floor(Date.now() / 1000);
+    const exists = await this.getUserSecurityRow(userId);
+    const nextData = {
+      enabled: Number(payload.two_fa_enabled || 0) === 1 ? 1 : 0,
+      type: String(payload.two_fa_type || '').trim(),
+      account: String(payload.two_fa_account || '').trim(),
+      verifyTime: Number(payload.last_verify_time || 0),
+    };
+    if (exists) {
+      await ctx.model.query(
+        `
+        UPDATE la_user_security
+        SET two_fa_enabled = ?,
+            two_fa_type = ?,
+            two_fa_account = ?,
+            last_verify_time = ?,
+            update_time = ?,
+            is_delete = 0,
+            delete_time = 0
+        WHERE user_id = ?
+        `,
+        {
+          replacements: [ nextData.enabled, nextData.type, nextData.account, nextData.verifyTime, now, Number(userId || 0) ],
+          type: ctx.app.Sequelize.QueryTypes.UPDATE,
+        }
+      );
+      return true;
+    }
+    await ctx.model.query(
+      `
+      INSERT INTO la_user_security (
+        user_id, two_fa_enabled, two_fa_type, two_fa_account, last_verify_time,
+        is_delete, create_time, update_time, delete_time
+      ) VALUES (?, ?, ?, ?, ?, 0, ?, ?, 0)
+      `,
+      {
+        replacements: [ Number(userId || 0), nextData.enabled, nextData.type, nextData.account, nextData.verifyTime, now, now ],
+        type: ctx.app.Sequelize.QueryTypes.INSERT,
+      }
+    );
+    return true;
+  }
+
+  /**
+   * 规范化 2FA 通道类型
+   */
+  normalizeTwoFactorType(type = '') {
+    const normalized = String(type || '').trim().toLowerCase();
+    if (normalized === 'email') return 'email';
+    if (normalized === 'mobile') return 'mobile';
+    return '';
+  }
+
+  /**
+   * 脱敏 2FA 账号
+   */
+  maskTwoFactorAccount(account = '', type = 'mobile') {
+    const text = String(account || '').trim();
+    if (!text) return '';
+    if (String(type) === 'email') {
+      const [ name = '', domain = '' ] = text.split('@');
+      if (!name || !domain) return text;
+      return `${name.slice(0, 2)}${'*'.repeat(Math.max(2, name.length - 2))}@${domain}`;
+    }
+    if (text.length <= 7) return text;
+    return `${text.slice(0, 3)}****${text.slice(-4)}`;
+  }
+
+  /**
+   * 构建 2FA 验证码缓存键
+   */
+  buildTwoFactorCodeCacheKey(purpose, type, account, sceneId) {
+    return `user:2fa:code:${String(purpose || '')}:${String(type || '')}:${String(account || '')}:${String(sceneId || '')}`;
+  }
+
+  /**
+   * 下发 2FA 验证码（当前版本通过日志输出用于联调）
+   */
+  async issueTwoFactorCode({ userId, purpose, type, account, sceneId }) {
+    const { ctx } = this;
+    const now = Math.floor(Date.now() / 1000);
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const key = this.buildTwoFactorCodeCacheKey(purpose, type, account, sceneId);
+    await ctx.service.redis.set(key, {
+      code,
+      userId: Number(userId || 0),
+      purpose: String(purpose || ''),
+      type: String(type || ''),
+      account: String(account || ''),
+      sceneId: String(sceneId || ''),
+      createTime: now,
+    }, 300);
+    if (String(ctx.app.config.env || '') !== 'prod') {
+      ctx.logger.info(`[2fa] ${purpose} code(${type}:${account}) => ${code}`);
+    }
+    return {
+      method: String(type || ''),
+      maskedAccount: this.maskTwoFactorAccount(account, type),
+      expireSeconds: 300,
+    };
+  }
+
+  /**
+   * 验证 2FA 验证码
+   */
+  async verifyTwoFactorCode({ userId, purpose, type, account, sceneId, code }) {
+    const { ctx } = this;
+    const key = this.buildTwoFactorCodeCacheKey(purpose, type, account, sceneId);
+    const cached = await ctx.service.redis.get(key);
+    if (!cached) {
+      throw new Error('验证码已过期，请重新发送');
+    }
+    if (Number(cached.userId || 0) !== Number(userId || 0)) {
+      throw new Error('验证码校验失败');
+    }
+    if (String(cached.code || '') !== String(code || '').trim()) {
+      throw new Error('验证码错误');
+    }
+    await ctx.service.redis.del(key);
+    return true;
+  }
+
+  /**
+   * 获取当前账号 2FA 状态
+   */
+  async twoFactorStatus(userId) {
+    const { ctx } = this;
+    const user = await ctx.model.User.findOne({
+      where: { id: Number(userId || 0), isDelete: 0 },
+      attributes: [ 'id', 'mobile', 'email' ],
+    });
+    if (!user) {
+      throw new Error('用户不存在');
+    }
+    const row = await this.getUserSecurityRow(userId);
+    const method = this.normalizeTwoFactorType(row?.two_fa_type || '');
+    const enabled = Number(row?.two_fa_enabled || 0) === 1;
+    const account = String(row?.two_fa_account || '');
+    return {
+      enabled,
+      method,
+      maskedAccount: enabled ? this.maskTwoFactorAccount(account, method) : '',
+      hasMobile: Boolean(String(user.mobile || '').trim()),
+      hasEmail: Boolean(String(user.email || '').trim()),
+      lastVerifyTime: Number(row?.last_verify_time || 0),
+    };
+  }
+
+  /**
+   * 发送 2FA 配置验证码（启用/关闭）
+   */
+  async sendTwoFactorSecurityCode(userId, params = {}) {
+    const { ctx } = this;
+    const purpose = String(params.purpose || '').trim().toLowerCase();
+    if (![ 'enable', 'disable' ].includes(purpose)) {
+      throw new Error('验证码用途不正确');
+    }
+    const user = await ctx.model.User.findOne({
+      where: { id: Number(userId || 0), isDelete: 0 },
+      attributes: [ 'id', 'mobile', 'email' ],
+    });
+    if (!user) {
+      throw new Error('用户不存在');
+    }
+    const row = await this.getUserSecurityRow(userId);
+    const inputType = this.normalizeTwoFactorType(params.type || '');
+    const method = purpose === 'disable'
+      ? (this.normalizeTwoFactorType(row?.two_fa_type || '') || inputType)
+      : inputType;
+    if (!method) {
+      throw new Error('请选择验证方式');
+    }
+    const account = method === 'mobile' ? String(user.mobile || '').trim() : String(user.email || '').trim();
+    if (!account) {
+      throw new Error(method === 'mobile' ? '请先绑定手机号' : '请先绑定邮箱');
+    }
+    return await this.issueTwoFactorCode({
+      userId,
+      purpose: `security_${purpose}`,
+      type: method,
+      account,
+      sceneId: String(userId || 0),
+    });
+  }
+
+  /**
+   * 启用 2FA
+   */
+  async enableTwoFactor(userId, params = {}) {
+    const { ctx } = this;
+    const password = String(params.password || '').trim();
+    const code = String(params.code || '').trim();
+    const method = this.normalizeTwoFactorType(params.type || '');
+    if (!password || !code || !method) {
+      throw new Error('参数错误');
+    }
+    const user = await ctx.model.User.findOne({
+      where: { id: Number(userId || 0), isDelete: 0 },
+      attributes: [ 'id', 'password', 'mobile', 'email' ],
+    });
+    if (!user) {
+      throw new Error('用户不存在');
+    }
+    if (String(user.password || '') !== md5(password)) {
+      throw new Error('当前密码不正确');
+    }
+    const account = method === 'mobile' ? String(user.mobile || '').trim() : String(user.email || '').trim();
+    if (!account) {
+      throw new Error(method === 'mobile' ? '请先绑定手机号' : '请先绑定邮箱');
+    }
+    await this.verifyTwoFactorCode({
+      userId,
+      purpose: 'security_enable',
+      type: method,
+      account,
+      sceneId: String(userId || 0),
+      code,
+    });
+    const now = Math.floor(Date.now() / 1000);
+    await this.saveUserSecurityRow(userId, {
+      two_fa_enabled: 1,
+      two_fa_type: method,
+      two_fa_account: account,
+      last_verify_time: now,
+    });
+    return {
+      enabled: true,
+      method,
+      maskedAccount: this.maskTwoFactorAccount(account, method),
+    };
+  }
+
+  /**
+   * 关闭 2FA
+   */
+  async disableTwoFactor(userId, params = {}) {
+    const { ctx } = this;
+    const password = String(params.password || '').trim();
+    const code = String(params.code || '').trim();
+    if (!password || !code) {
+      throw new Error('参数错误');
+    }
+    const user = await ctx.model.User.findOne({
+      where: { id: Number(userId || 0), isDelete: 0 },
+      attributes: [ 'id', 'password', 'mobile', 'email' ],
+    });
+    if (!user) {
+      throw new Error('用户不存在');
+    }
+    if (String(user.password || '') !== md5(password)) {
+      throw new Error('当前密码不正确');
+    }
+    const row = await this.getUserSecurityRow(userId);
+    const method = this.normalizeTwoFactorType(row?.two_fa_type || '');
+    if (Number(row?.two_fa_enabled || 0) !== 1 || !method) {
+      throw new Error('当前未开启 2FA');
+    }
+    const account = String(row?.two_fa_account || '').trim() || (method === 'mobile' ? String(user.mobile || '').trim() : String(user.email || '').trim());
+    await this.verifyTwoFactorCode({
+      userId,
+      purpose: 'security_disable',
+      type: method,
+      account,
+      sceneId: String(userId || 0),
+      code,
+    });
+    await this.saveUserSecurityRow(userId, {
+      two_fa_enabled: 0,
+      two_fa_type: '',
+      two_fa_account: '',
+      last_verify_time: Math.floor(Date.now() / 1000),
+    });
+    return { enabled: false };
+  }
+
+  /**
+   * 创建登录 2FA 挑战并下发验证码
+   */
+  async createLoginTwoFactorChallenge(user) {
+    const { ctx } = this;
+    const row = await this.getUserSecurityRow(user.id);
+    const enabled = Number(row?.two_fa_enabled || 0) === 1;
+    const method = this.normalizeTwoFactorType(row?.two_fa_type || '');
+    if (!enabled || !method) return null;
+    const account = String(row?.two_fa_account || '').trim() || (method === 'mobile' ? String(user.mobile || '').trim() : String(user.email || '').trim());
+    if (!account) return null;
+    const challengeToken = `${ctx.randomString()}_${Date.now()}`;
+    const challengeKey = `user:2fa:login:challenge:${challengeToken}`;
+    await ctx.service.redis.set(challengeKey, {
+      userId: Number(user.id || 0),
+      method,
+      account,
+      createTime: Math.floor(Date.now() / 1000),
+    }, 300);
+    await this.issueTwoFactorCode({
+      userId: Number(user.id || 0),
+      purpose: 'login',
+      type: method,
+      account,
+      sceneId: challengeToken,
+    });
+    return {
+      challengeToken,
+      method,
+      maskedAccount: this.maskTwoFactorAccount(account, method),
+      expireSeconds: 300,
+    };
+  }
+
+  /**
+   * 重新发送登录 2FA 验证码
+   */
+  async sendLoginTwoFactorCode(params = {}) {
+    const { ctx } = this;
+    const challengeToken = String(params.challengeToken || '').trim();
+    if (!challengeToken) {
+      throw new Error('挑战令牌不能为空');
+    }
+    const challenge = await ctx.service.redis.get(`user:2fa:login:challenge:${challengeToken}`);
+    if (!challenge || !challenge.userId) {
+      throw new Error('登录验证已过期，请重新登录');
+    }
+    return await this.issueTwoFactorCode({
+      userId: Number(challenge.userId || 0),
+      purpose: 'login',
+      type: String(challenge.method || ''),
+      account: String(challenge.account || ''),
+      sceneId: challengeToken,
+    });
+  }
+
+  /**
+   * 校验登录 2FA 并签发正式令牌
+   */
+  async verifyLoginTwoFactor(params = {}) {
+    const { ctx } = this;
+    const challengeToken = String(params.challengeToken || '').trim();
+    const code = String(params.code || '').trim();
+    if (!challengeToken || !code) {
+      throw new Error('参数错误');
+    }
+    const challengeKey = `user:2fa:login:challenge:${challengeToken}`;
+    const challenge = await ctx.service.redis.get(challengeKey);
+    if (!challenge || !challenge.userId) {
+      throw new Error('登录验证已过期，请重新登录');
+    }
+    await this.verifyTwoFactorCode({
+      userId: Number(challenge.userId || 0),
+      purpose: 'login',
+      type: String(challenge.method || ''),
+      account: String(challenge.account || ''),
+      sceneId: challengeToken,
+      code,
+    });
+    const user = await ctx.model.User.findOne({
+      where: { id: Number(challenge.userId || 0), isDelete: 0 },
+    });
+    if (!user) {
+      throw new Error('账号不存在');
+    }
+    if (Number(user.isDisable || 0) === 1) {
+      throw new Error('账号已禁用');
+    }
+    const now = Math.floor(Date.now() / 1000);
+    await ctx.model.User.update({
+      lastLoginIp: ctx.request.ip,
+      lastLoginTime: now,
+      updateTime: now,
+    }, {
+      where: { id: user.id },
+    });
+    await this.saveUserSecurityRow(user.id, {
+      two_fa_enabled: 1,
+      two_fa_type: String(challenge.method || ''),
+      two_fa_account: String(challenge.account || ''),
+      last_verify_time: now,
+    });
+    await this.recordLoginLog(user.id, 1);
+    const token = await this.createUserToken(user, {
+      loginType: 'password+2fa',
+      twoFactorVerified: true,
+    });
+    await ctx.service.redis.del(challengeKey);
+    await this.ensurePersonalCenterDemoData(user.id, user.nickname || user.username || '');
+    const userInfo = await this.getSafeUserInfoById(user.id, true);
+    return { user: userInfo, userInfo, token };
+  }
+
+  /**
+   * 活跃登录设备列表（会话）
+   */
+  async sessionList(userId) {
+    const { ctx } = this;
+    const appConfig = this.getAppConfig();
+    const userTokenKey = appConfig.userTokenKey || extendConfig.userTokenKey;
+    const userTokenSet = appConfig.userTokenSet || extendConfig.userTokenSet;
+    const currentToken = this.extractUserTokenFromRequest();
+    if (!ctx.app.redis) {
+      return { lists: [], total: 0 };
+    }
+    const tokens = await ctx.app.redis.smembers(userTokenSet + userId);
+    const lists = [];
+    const tokenTtlSeconds = this.getUserTokenTtlSeconds();
+    for (const token of (tokens || [])) {
+      const uid = await ctx.service.redis.get(userTokenKey + token);
+      if (Number(uid || 0) !== Number(userId || 0)) {
+        continue;
+      }
+      const remainSeconds = Number(await ctx.service.redis.ttl(userTokenKey + token) || -1);
+      const session = await this.getUserSessionByToken(token);
+      lists.push({
+        sessionId: String(session?.sessionId || token.slice(0, 24)),
+        token: String(token || ''),
+        ip: String(session?.ip || ''),
+        device: String(session?.device || '未知设备'),
+        browser: String(session?.browser?.name || ''),
+        os: String(session?.os?.name || ''),
+        loginType: String(session?.loginType || 'password'),
+        twoFactorVerified: Number(session?.twoFactorVerified || 0) === 1,
+        createTime: Number(session?.createTime || 0),
+        lastActiveTime: Number(session?.lastActiveTime || session?.createTime || 0),
+        expireInSeconds: remainSeconds > 0 ? remainSeconds : 0,
+        willExpireAt: remainSeconds > 0 ? Math.floor(Date.now() / 1000) + remainSeconds : 0,
+        ttlTotal: tokenTtlSeconds,
+        isCurrent: token === currentToken,
+      });
+    }
+    lists.sort((a, b) => Number(b.lastActiveTime || 0) - Number(a.lastActiveTime || 0));
+    return {
+      lists,
+      total: lists.length,
+    };
+  }
+
+  /**
+   * 下线指定设备
+   */
+  async sessionKick(userId, params = {}) {
+    const { ctx } = this;
+    const token = String(params.token || '').trim();
+    if (!token) {
+      throw new Error('会话令牌不能为空');
+    }
+    const currentToken = this.extractUserTokenFromRequest();
+    if (token === currentToken) {
+      throw new Error('不能下线当前设备，请直接退出登录');
+    }
+    const appConfig = this.getAppConfig();
+    const userTokenKey = appConfig.userTokenKey || extendConfig.userTokenKey;
+    const userTokenSet = appConfig.userTokenSet || extendConfig.userTokenSet;
+    const bindUserId = await ctx.service.redis.get(userTokenKey + token);
+    if (Number(bindUserId || 0) !== Number(userId || 0)) {
+      throw new Error('设备不存在或无权限下线');
+    }
+    await ctx.service.redis.del(userTokenKey + token);
+    await this.removeUserSessionByToken(token);
+    if (ctx.app.redis) {
+      await ctx.app.redis.srem(userTokenSet + userId, token);
+    }
+    return true;
   }
 
   /**
@@ -3238,6 +4483,7 @@ class UserService extends Service {
       if (tokens && tokens.length > 0) {
         for (const token of tokens) {
           await ctx.app.redis.del(userTokenKey + token);
+          await this.removeUserSessionByToken(token);
         }
       }
       await ctx.app.redis.del(setKey);

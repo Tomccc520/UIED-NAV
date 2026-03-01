@@ -48,6 +48,7 @@ coverage/
 /docs/*
 !/docs/API/
 !/docs/API/**
+/docs/API/reports/*.json
 
 # 开发工具脚本
 add_copyright.py
@@ -55,3 +56,7 @@ add_copyright.py
 # 模块安装临时目录
 server/.module_backup/
 server/.module_report/
+
+# Egg 运行时/生成文件
+server/server/run/
+server/server/typings/
