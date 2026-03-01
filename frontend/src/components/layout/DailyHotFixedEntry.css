@@ -1,0 +1,73 @@
+/**
+ * @file DailyHotFixedEntry.css
+ * @description 每日热榜固定入口样式
+ */
+
+.daily-hot-fixed-entry {
+  position: fixed;
+  right: 20px;
+  bottom: 104px;
+  z-index: 1400;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 14px 0 12px;
+  border-radius: 999px;
+  text-decoration: none;
+  color: #fff;
+  background: linear-gradient(135deg, #ff6a00 0%, #ff3d3d 100%);
+  box-shadow: 0 12px 28px rgba(255, 77, 79, 0.28), 0 4px 10px rgba(255, 106, 0, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+}
+
+.daily-hot-fixed-entry:hover {
+  transform: translateY(-2px);
+  color: #fff;
+  box-shadow: 0 16px 34px rgba(255, 77, 79, 0.34), 0 6px 14px rgba(255, 106, 0, 0.28);
+}
+
+.daily-hot-fixed-entry:active {
+  transform: translateY(0);
+}
+
+.daily-hot-fixed-entry__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  font-size: 15px;
+  line-height: 1;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.daily-hot-fixed-entry__label {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .daily-hot-fixed-entry {
+    right: 12px;
+    bottom: 88px;
+    height: 40px;
+    padding: 0 12px 0 10px;
+    gap: 6px;
+  }
+
+  .daily-hot-fixed-entry__icon {
+    width: 20px;
+    height: 20px;
+    font-size: 13px;
+  }
+
+  .daily-hot-fixed-entry__label {
+    font-size: 12px;
+  }
+}

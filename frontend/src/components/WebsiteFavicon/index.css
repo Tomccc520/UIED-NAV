@@ -1,0 +1,26 @@
+/**
+ * @file WebsiteFavicon/index.css
+ * @description 统一的网站 Favicon 图标组件样式
+ * @author Tomda
+ * @copyright 版权所有 (c) 2026 UIED技术团队
+ * @website https://fsuied.com
+ * @license MIT
+ * @version 1.0.0
+ */
+
+.website-favicon {
+  display: inline-block;
+  border-radius: 6px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.website-favicon-letter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  border-radius: 6px;
+  user-select: none;
+  line-height: 1;
+}

@@ -1,0 +1,45 @@
+/**
+ * @file index.css
+ * @description Global Styles & Resets (Variables moved to styles/design-system.css)
+ * @author Tomda
+ * @copyright 版权所有 (c) 2026 UIED技术团队
+ * @website https://fsuied.com
+ * @license MIT
+ * @version 1.1.0
+ */
+
+/* 
+ * 注意：所有CSS变量定义已移动到 src/styles/design-system.css
+ * 这里只保留基础重置和字体设置
+ */
+
+body {
+  margin: 0;
+  font-family: var(--font-sans) !important;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: var(--font-mono) !important;
+}
+
+/* 全局高亮文本样式 */
+.highlight-text {
+  color: var(--primary-color);
+  font-weight: var(--font-extrabold);
+}
+
+/* 强制所有元素使用Lexend字体 */
+* {
+  font-family: var(--font-sans) !important;
+  box-sizing: border-box;
+}
+
+/* 代码相关元素保持等宽字体 */
+code, pre, .code, .monospace, 
+kbd, samp, var, tt {
+  font-family: var(--font-mono) !important;
+}

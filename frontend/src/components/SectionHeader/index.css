@@ -1,0 +1,175 @@
+/**
+ * @file SectionHeader/index.css
+ * @description 通用区块标题组件样式 - 简洁设计风格
+ * @copyright 版权所有 (c) 2025 UIED技术团队
+ * @website https://fsuied.com
+ * @license MIT
+ * @version 2.0.0 - 重新设计，简洁风格
+ */
+
+/* 区块标题容器 - 使用更具体的类名避免冲突 */
+.hero-section-header {
+  position: relative;
+  text-align: center;
+  margin-bottom: 1rem;
+  background: transparent;
+  overflow: hidden;
+}
+
+/* 带背景图片的样式 */
+.hero-section-header.with-background {
+  min-height: 12rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+}
+
+/* 背景图片层 */
+.hero-section-header-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: transform 0.3s ease;
+}
+
+/* 背景遮罩层 */
+.hero-section-header-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: background-color 0.3s ease;
+}
+
+/* 悬停效果 */
+.hero-section-header.with-background:hover .hero-section-header-bg {
+  transform: scale(1.02);
+}
+
+/* 主标题样式 */
+.hero-main-title {
+  position: relative;
+  z-index: 2;
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 1rem 0;
+  color: var(--text-primary, #333333);
+  text-shadow: none;
+}
+
+/* 带背景时的标题颜色 */
+.hero-section-header.with-background .hero-main-title {
+  color: #ffffff;
+}
+
+/* 文字容器 */
+.hero-text-container {
+  position: relative;
+  display: inline-block;
+  min-height: 3rem;
+  width: 100%;
+}
+
+/* 描述文字样式 */
+.hero-section-desc {
+  position: relative;
+  z-index: 2;
+  font-size: 1.125rem;
+  color: #333333;
+  line-height: 1.6;
+  margin: 0 0 1rem 0;
+  font-weight: 400;
+  opacity: 0.9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 响应式设计 - 平板端 */
+@media (max-width: 768px) {
+  .hero-section-header {
+    padding: 1.5rem 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .hero-section-header.with-background {
+    min-height: 10rem;
+  }
+  
+  .hero-main-title {
+    font-size: 2rem;
+  }
+  
+  .hero-section-desc {
+    font-size: 1rem;
+  }
+}
+
+/* 响应式设计 - 移动端 */
+@media (max-width: 480px) {
+  .hero-section-header {
+    padding: 1.25rem 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .hero-section-header.with-background {
+    min-height: 8rem;
+    border-radius: 0.5rem;
+  }
+  
+  .hero-main-title {
+    font-size: 1.75rem;
+  }
+  
+  .hero-text-container {
+    min-height: 2.5rem;
+  }
+  
+  .hero-section-desc {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  
+  /* 移动端减少动效 */
+  .hero-section-header.with-background:hover .hero-section-header-bg {
+    transform: scale(1.01);
+  }
+}
+
+/* 暗色模式适配 */
+[data-theme="dark"] .hero-main-title {
+  color: var(--text-primary-dark, #ffffff);
+}
+
+[data-theme="dark"] .hero-section-desc {
+  color: var(--text-secondary-dark, #cccccc);
+}
+
+[data-theme="dark"] .hero-section-header-overlay {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+  .hero-main-title {
+    color: #000000;
+    text-shadow: none;
+  }
+  
+  .hero-section-desc {
+    color: #333333;
+  }
+  
+  .hero-section-header-overlay {
+    background: rgba(0, 0, 0, 0.6);
+  }
+} 

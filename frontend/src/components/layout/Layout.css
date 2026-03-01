@@ -1,0 +1,284 @@
+/**
+ * @file Layout.css
+ * @description 前端用户界面组件
+ * @author Tomda
+ * @copyright 版权所有 (c) 2026 UIED技术团队
+ * @website https://fsuied.com
+ * @license MIT
+ * @version 1.0.0
+ */
+
+/* 布局样式 - 适配新的导航栏和页脚 */
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 头部样式 */
+.layout-header {
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-content {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--spacing-6);
+  height: var(--header-height);
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.logo {
+  font-size: var(--text-3xl);
+  margin-right: var(--spacing-3);
+}
+
+.logo-text {
+  font-size: var(--text-xl);
+  font-weight: bold;
+  color: var(--primary-600);
+}
+
+.nav-menu {
+  flex: 1;
+  margin: 0 var(--spacing-10);
+  border-bottom: none;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.user-btn {
+  border: none;
+  padding: 4px;
+}
+
+/* 内容区域样式 */
+.layout-content {
+  flex: 1;
+  background: var(--bg-page);
+  margin-top: var(--header-height); /* 为固定导航栏留出空间 */
+  min-height: calc(100vh - var(--header-height));
+  padding: 0; /* 移除默认内边距，让页面组件自己控制 */
+}
+
+/* 主内容区域样式 - 对应Layout.tsx中的layout-main */
+.layout-main {
+  flex: 1;
+  /*background: var(--bg-page);*/
+  margin-top: var(--header-height); /* 为固定导航栏留出空间 */
+  min-height: calc(100vh - var(--header-height));
+  padding: 0; /* 移除默认内边距，让页面组件自己控制 */
+  transition: margin-top 0.3s ease-in-out;
+}
+
+/* 当导航栏隐藏时，减少顶部间距 */
+body.navbar-is-hidden .layout-main {
+  margin-top: 0;
+}
+
+/* 底部样式 */
+.layout-footer {
+  background: var(--neutral-900);
+  color: var(--neutral-400);
+  text-align: center;
+  padding: var(--spacing-6) 0;
+}
+
+.footer-content {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing-6);
+}
+
+.footer-info {
+  margin-bottom: var(--spacing-4);
+}
+
+.footer-info p {
+  margin: 4px 0;
+  line-height: 1.5;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-6);
+}
+
+.footer-links a {
+  color: var(--neutral-400);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.footer-links a:hover {
+  color: var(--primary-color);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .header-content {
+    padding: 0 var(--spacing-4);
+    flex-wrap: wrap;
+    height: auto;
+    min-height: var(--header-height);
+  }
+  
+  .nav-menu {
+    display: none;
+  }
+  
+  .header-actions {
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
+  }
+  
+  .header-actions .arco-input-search {
+    width: 100% !important;
+    max-width: 400px;
+  }
+  
+  .footer-links {
+    flex-wrap: wrap;
+    gap: var(--spacing-4);
+  }
+  
+  .layout-content {
+    margin-top: var(--header-height);
+    min-height: calc(100vh - var(--header-height));
+  }
+}
+
+/* 应用布局样式 */
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--bg-page);
+}
+
+.app-content {
+  margin-top: var(--header-height); /* 为固定导航栏留出空间 */
+  min-height: calc(100vh - var(--header-height)); /* 确保内容区域至少占满屏幕 */
+  display: flex;
+  flex-direction: column;
+}
+
+.content-wrapper {
+  flex: 1;
+  width: 100%;
+}
+
+/* 页面容器 */
+.page-container {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: var(--spacing-5);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .app-content {
+    margin-top: var(--header-height);
+    min-height: calc(100vh - var(--header-height));
+  }
+  
+  .page-container {
+    padding: var(--spacing-4);
+  }
+}
+
+@media (max-width: 480px) {
+  .page-container {
+    padding: var(--spacing-2-5);
+  }
+}
+
+/* 确保页面内容不被固定导航栏遮挡 */
+.app-content .content-wrapper {
+  position: relative;
+  z-index: 1;
+}
+
+/* Banner在内容上方的样式调整 */
+.layout-main .banner-section {
+  margin-bottom: 1.5rem; /* 添加与内容之间的间距 */
+  width: 100%;
+  z-index: 2;
+}
+
+/* 在移动端上调整Banner样式 */
+@media (max-width: 768px) {
+  .layout-main .banner-section {
+    margin-bottom: 1rem;
+  }
+}
+
+/* 滚动优化 */
+.app-layout {
+  scroll-behavior: smooth;
+}
+
+/* 加载状态样式 */
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+/* 错误状态样式 */
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+}
+
+.error-container h2 {
+  margin-bottom: 16px;
+  color: var(--danger-color);
+}
+
+.error-container p {
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--neutral-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--neutral-300);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--neutral-400);
+} 

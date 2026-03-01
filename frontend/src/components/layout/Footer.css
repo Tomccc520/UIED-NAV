@@ -1,0 +1,778 @@
+/**
+ * @file Footer.css
+ * @description 前端用户界面组件
+ * @author Tomda
+ * @copyright 版权所有 (c) 2026 UIED技术团队
+ * @website https://fsuied.com
+ * @license MIT
+ * @version 1.0.0
+ */
+
+/* 页脚容器样式 */
+/* 
+ * 变量定义已移至 design-system.css
+ * 使用标准 Token 替代硬编码值
+ */
+
+/* 移动端文本样式 - 替代内联样式 */
+.mobile-text-center {
+  text-align: center !important;
+  margin: var(--spacing-2) 0 !important;
+  padding: 0 var(--spacing-5) !important;
+}
+
+.footer-container {
+  color: var(--text-secondary);
+  background-color: var(--bg-card); /* 改为卡片背景色，更干净 */
+  position: relative;
+  z-index: 1;
+  margin-top: var(--spacing-10);
+  font-size: var(--text-sm);
+  border-top: 1px solid var(--border-light); /* 添加顶部边框 */
+}
+
+/* 移除原有的背景图片设置，保持简洁专业 */
+.footer-container::before {
+  display: none;
+}
+
+/* 移动端和桌面端视图控制 */
+.footer-mobile-view {
+  display: none;
+}
+
+.footer-desktop-view {
+  display: block;
+}
+
+/* 移动端展开/收起按钮 */
+.footer-toggle-btn {
+  display: block;
+  width: 100%;
+  padding: var(--spacing-2) 0;
+  margin: var(--spacing-2) 0;
+  background-color: var(--bg-secondary);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.footer-toggle-btn:hover {
+  background-color: var(--bg-hover);
+  color: var(--primary-color);
+}
+
+/* 主要内容区域 */
+.footer-main {
+  padding: var(--spacing-10) 0 var(--spacing-6);
+}
+
+.footer-content-wrapper {
+  max-width: 1400px; /* 与其他容器对齐 */
+  margin: 0 auto;
+  padding: 0 var(--spacing-4);
+}
+
+/* 网格布局 - 6列：关于(1.5fr) + 4个分组(1fr) + 关注交流(120px) */
+.footer-sections-grid {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(4, 1fr) 120px;
+  gap: var(--spacing-5);
+  align-items: start;
+}
+
+/* 关于UIED区域 */
+.footer-about-section {
+  display: flex;
+  flex-direction: column;
+  grid-column: 1;
+}
+
+/* 关注交流区域 - 固定宽度确保不被挤压 */
+.footer-social-section {
+  min-width: 120px;
+  flex-shrink: 0;
+}
+
+/* 提交网站和关注交流放在一行 */
+.footer-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-6);
+  margin-top: var(--spacing-4);
+}
+
+.footer-section {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 标题样式 */
+.widget-title {
+  font-size: var(--text-base) !important;
+  font-weight: 600 !important;
+  margin-bottom: var(--spacing-3) !important;
+  color: var(--text-primary) !important;
+  position: relative;
+}
+
+/* 文本内容 */
+.textwidget {
+  color: var(--text-secondary);
+  line-height: var(--leading-relaxed);
+  font-size: var(--text-sm) !important;
+}
+
+/* 菜单列表 */
+.footer-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-menu li {
+  margin-bottom: var(--spacing-2);
+}
+
+.footer-menu li a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.footer-menu li a:hover {
+  color: var(--primary-500);
+}
+
+/* 二维码容器 */
+.qr-container {
+  display: flex;
+  gap: var(--spacing-4);
+  flex-wrap: nowrap;
+  margin-top: var(--spacing-2);
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+/* 同一行中的二维码容器 */
+.footer-desktop-view .qr-container {
+  gap: var(--spacing-6);
+  margin-top: var(--spacing-2);
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.footer-desktop-view .qr-item {
+  margin-right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.footer-desktop-view .qr-item .qr-tips {
+  font-size: var(--text-xs);
+  margin-top: var(--spacing-1);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.footer-desktop-view .qr-item img {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+}
+
+.mobile-qr {
+  justify-content: center;
+  margin: var(--spacing-4) 0;
+  gap: var(--spacing-5);
+}
+
+.qr-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.qr-item img {
+  border-radius: 4px;
+  box-shadow: none;
+}
+
+.qr-tips {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+/* 二维码链接样式 */
+.qr-link {
+  display: block;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.qr-link:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+.qr-link img {
+  display: block;
+}
+
+/* 友情链接 */
+.friend-links-container {
+  background-color: var(--bg-lighter);
+  padding: 12px 0;
+  border-top: 1px solid var(--border-color);
+  position: relative;
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.friend-links-wrapper {
+  max-width: 1230px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.friend-links-title {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: var(--text-color) !important;
+  display: inline;
+  margin-bottom: 0 !important;
+  margin-right: 20px !important;
+}
+
+.friend-links-list {
+  display: inline;
+}
+
+.friend-link {
+  color: var(--text-lighter);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.3s ease;
+  margin: 0 15px 0 0;
+}
+
+.friend-link:hover {
+  color: var(--text-light);
+  text-decoration: none;
+}
+
+.friend-link:not(:last-child)::after {
+  content: '';
+}
+
+/* 底部版权信息 */
+.footer-bottom {
+  background-color: var(--bg-dark);
+  padding: 20px 0;
+  border-top: 1px solid var(--border-dark);
+}
+
+.footer-bottom-wrapper {
+  max-width: 1230px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.footer-copyright {
+  color: var(--text-light);
+  font-size: 13px;
+  text-align: center;
+}
+
+.footer-copyright p {
+  margin: 0;
+  line-height: 1.8;
+}
+
+.footer-copyright a {
+  color: var(--text-light);
+  text-decoration: none;
+}
+
+.footer-copyright a:hover {
+  color: var(--primary-color);
+}
+
+.copyright-desktop {
+  display: block;
+}
+
+.copyright-mobile {
+  display: none;
+}
+
+.copyright-mobile p {
+  margin: 5px 0;
+}
+
+.dot {
+  display: inline-block;
+  margin: 0 5px;
+  color: var(--text-lighter);
+}
+
+.footer-copyright img {
+  vertical-align: middle;
+  margin-right: 4px;
+  height: 16px;
+}
+
+/* 响应式适配 */
+@media (max-width: 1024px) {
+  .footer-desktop-view .qr-container {
+    justify-content: flex-start;
+  }
+  
+  .footer-sections-grid {
+    grid-template-columns: 1.5fr repeat(4, 1fr) 100px; /* 6列紧凑版 */
+    gap: 16px;
+  }
+  
+  .footer-social-section {
+    min-width: 100px;
+  }
+}
+
+@media (max-width: 960px) {
+  .footer-main {
+    padding: 30px 0;
+  }
+  
+  .widget-title {
+    margin-top: 15px !important;
+  }
+  
+  .footer-sections-grid {
+    grid-template-columns: repeat(3, 1fr); /* 3列布局 */
+    gap: 20px;
+  }
+  
+  .footer-about-section {
+    grid-column: 1 / -1; /* 关于区域占满整行 */
+  }
+  
+  .footer-social-section {
+    min-width: auto; /* 在小屏幕上允许自适应 */
+  }
+  
+  /* 中等屏幕下的二维码调整 */
+  .footer-desktop-view .qr-container {
+    justify-content: flex-start;
+    align-items: center;
+  }
+  
+  .footer-desktop-view .qr-item img {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .footer-desktop-view .qr-item .qr-tips {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 768px) {
+  .footer-container {
+    margin-top: 15px;
+  }
+  
+  /* 切换移动端和桌面端视图 */
+  .footer-mobile-view {
+    display: block;
+  }
+  
+  .footer-desktop-view {
+    display: none;
+  }
+  
+  /* 版权信息移动端视图 */
+  .copyright-desktop {
+    display: none;
+  }
+  
+  .copyright-mobile {
+    display: block;
+  }
+  
+  .footer-main {
+    padding: 15px 10px;
+  }
+  
+  .footer-content-wrapper {
+    padding: 0 15px;
+  }
+  
+  .footer-sections-mobile {
+    margin-top: 15px;
+  }
+  
+  .footer-sections-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+  
+  .footer-section-mobile {
+    margin-bottom: 15px;
+  }
+  
+  .qr-container {
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 0;
+  }
+  
+  .mobile-qr {
+    padding: 10px 0;
+  }
+  
+  .qr-item img {
+    width: 70px;
+    height: 70px;
+    box-shadow: none;
+  }
+  
+  .qr-item .qr-tips {
+    font-size: 12px;
+    margin-top: 5px;
+  }
+  
+  .widget-title {
+    font-size: 14px !important;
+    margin-bottom: 8px !important;
+    margin-top: 15px !important;
+  }
+  
+  .textwidget {
+    font-size: 13px !important;
+    line-height: 1.5;
+  }
+  
+  /* 移动端介绍文本特殊样式 */
+  .footer-mobile-view .textwidget {
+    background-color: var(--bg-medium);
+    border-radius: 8px;
+    padding: 10px 15px !important;
+    margin: 12px 10px !important;
+    line-height: 1.4;
+    box-shadow: 0 1px 2px var(--shadow-light);
+  }
+  
+  .footer-menu li {
+    margin-bottom: 6px;
+  }
+  
+  .footer-menu li a {
+    font-size: 13px;
+  }
+  
+  /* 优化移动端展开按钮 */
+  .footer-toggle-btn {
+    margin: 8px 0;
+    padding: 6px 0;
+    font-size: 13px;
+    background-color: var(--bg-medium);
+    border-radius: 20px;
+    max-width: 150px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .friend-links-container {
+    padding: 10px 15px;
+    white-space: normal;
+  }
+  
+  .friend-links-wrapper {
+    padding: 0;
+  }
+  
+  .friend-links-title {
+    font-size: 13px !important;
+    margin-right: 5px;
+    display: block;
+    margin-bottom: 5px !important;
+  }
+  
+  .friend-links-list {
+    display: block;
+  }
+  
+  .friend-link {
+    font-size: 12px;
+    margin: 0 12px 5px 0;
+    display: inline-block;
+  }
+  
+  /* 移动端关注交流区域 */
+  .footer-mobile-social {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+  }
+  
+  .footer-mobile-social .widget-title {
+    text-align: center;
+    margin-top: 0 !important;
+    margin-bottom: 12px !important;
+  }
+  
+  .footer-mobile-social .social-media-section {
+    margin: 0;
+  }
+  
+  .footer-mobile-social .social-media-groups {
+    justify-content: center;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .footer-main {
+    padding: 10px 8px;
+  }
+  
+  .qr-container {
+    justify-content: center;
+    margin-top: 0;
+  }
+  
+  .footer-bottom {
+    padding: 12px 0;
+  }
+  
+  .footer-copyright p {
+    font-size: 12px;
+    padding: 0 10px;
+    line-height: 1.4;
+  }
+  
+  .copyright-mobile-break {
+    display: block;
+    height: 3px;
+  }
+  
+  .footer-copyright .dot {
+    display: none; /* 在小屏幕上不显示点号分隔符，让每个链接独占一行 */
+  }
+  
+  .footer-copyright a {
+    margin: 3px 0;
+  }
+  
+  /* 使备案信息在小屏幕上更紧凑 */
+  .footer-copyright img {
+    height: 12px;
+    margin-right: 2px;
+  }
+  
+  /* 更小屏幕上的介绍文本 */
+  .footer-mobile-view .textwidget {
+    padding: 8px 12px !important;
+    margin: 10px 5px !important;
+    font-size: 12px !important;
+  }
+  
+  .friend-links-container {
+    padding: 12px 0;
+  }
+  
+  .friend-links-wrapper {
+    padding: 0 15px;
+  }
+  
+  .friend-links-list {
+    gap: 0;
+  }
+  
+  .friend-link:not(:last-child)::after {
+    margin-left: 3px;
+  }
+}
+
+/* 修复移动端横屏状态 */
+@media (max-width: 896px) and (orientation: landscape) {
+  .footer-main {
+    padding: 15px;
+  }
+  
+  .footer-container {
+    margin-top: 15px;
+  }
+  
+  .widget-title {
+    margin-top: 10px !important;
+    margin-bottom: 8px !important;
+  }
+  
+  .footer-menu li {
+    margin-bottom: 5px;
+  }
+}
+
+/* 链接样式覆盖 - 防止MUI默认样式干扰 */
+.friend-link.MuiLink-root,
+.footer-menu a.MuiLink-root {
+  text-decoration: none !important;
+}
+
+.footer-menu a.MuiLink-root:hover {
+  text-decoration: none !important;
+  color: var(--primary-color) !important;
+}
+
+.friend-link.MuiLink-root {
+  color: var(--text-lighter) !important;
+}
+
+.friend-link.MuiLink-root:hover {
+  color: var(--text-light) !important;
+}
+
+/* MUI自动生成类名的样式覆盖 */
+.css-nh7p4f-MuiTypography-root-MuiLink-root.friend-link {
+  color: var(--text-lighter) !important;
+  text-decoration: none !important;
+  transition: color 0.3s ease !important;
+}
+
+.css-nh7p4f-MuiTypography-root-MuiLink-root.friend-link:hover {
+  color: var(--text-light) !important;
+  text-decoration: none !important;
+} 
+
+/* 关注交流分组区域 - 在 footer-actions 中 */
+.footer-actions .social-media-section {
+  margin-top: 0;
+}
+
+.footer-actions .social-media-groups {
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .footer-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .footer-actions .social-media-groups {
+    justify-content: flex-start;
+  }
+}
+
+/* 提交网站按钮 */
+.submit-website-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  text-decoration: none;
+}
+
+.submit-website-btn svg {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.submit-website-btn:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #6d28d9 100%);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+  color: #fff;
+}
+
+.submit-website-btn:hover svg {
+  transform: rotate(90deg);
+}
+
+.submit-website-btn:active {
+  opacity: 0.9;
+}
+
+.submit-website-btn:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* 页脚操作按钮统一样式 */
+.footer-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+
+.footer-action-btn svg {
+  flex-shrink: 0;
+}
+
+/* 提交网站按钮 - 主要按钮 */
+.footer-submit-btn {
+  background: var(--primary-color, #0066ff);
+  color: #fff;
+  border-color: var(--primary-color, #0066ff);
+}
+
+.footer-submit-btn:hover {
+  background: var(--primary-dark, #0052cc);
+  border-color: var(--primary-dark, #0052cc);
+  color: #fff;
+}
+
+/* 更新记录按钮 - 次要按钮 */
+.footer-changelog-btn {
+  background: transparent;
+  color: var(--text-light, #666);
+  border-color: var(--border-color, #eaeaea);
+}
+
+.footer-changelog-btn:hover {
+  background: var(--bg-medium, #f5f5f5);
+  color: var(--primary-color, #0066ff);
+  border-color: var(--primary-color, #0066ff);
+}
+
+/* 无障碍：减少动画 */
+@media (prefers-reduced-motion: reduce) {
+  .submit-website-btn,
+  .submit-website-btn svg,
+  .footer-action-btn {
+    transition: none;
+  }
+  
+  .submit-website-btn:hover svg {
+    transform: none;
+  }
+}

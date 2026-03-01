@@ -1,0 +1,86 @@
+/**
+ * @file Card.css
+ * @description 前端用户界面组件
+ * @author Tomda
+ * @copyright 版权所有 (c) 2026 UIED技术团队
+ * @website https://fsuied.com
+ * @license MIT
+ * @version 1.0.0
+ */
+
+/* 自定义卡片样式 - 无阴影版本 */
+.custom-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-top: 4px solid transparent;
+}
+
+.custom-card--hoverable:hover {
+  border-color: var(--primary-color);
+}
+
+.custom-card--clickable {
+  cursor: pointer;
+}
+
+.custom-card--clickable:hover {
+  border-color: var(--primary-color);
+}
+
+/* 功能卡片特殊样式 */
+.feature-card {
+  height: 100%;
+  position: relative;
+}
+
+.feature-card .card-header {
+  padding: 32px 24px 16px;
+  text-align: center;
+  position: relative;
+}
+
+.feature-card .card-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover .card-icon {
+  transform: scale(1.1);
+}
+
+.feature-card .card-status {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--danger-color);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.feature-card .card-content {
+  padding: 0 24px 32px;
+  text-align: center;
+}
+
+.feature-card .card-title {
+  margin: 0 0 12px 0;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+.feature-card .card-description {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+} 

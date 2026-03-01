@@ -1,0 +1,227 @@
+/**
+ * @file index.css
+ * @description 前端用户界面组件
+ * @author Tomda
+ * @copyright 版权所有 (c) 2026 UIED技术团队
+ * @website https://fsuied.com
+ * @license MIT
+ * @version 1.0.0
+ */
+
+/* 广告 Banner 组件样式 */
+
+.ad-banner {
+  width: 100%;
+}
+
+/* HTML 代码类型广告容器 */
+.html-banner-container {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.html-banner-wrapper {
+  width: 100%;
+}
+
+/* 顶部横幅 */
+.ad-banner-top {
+  margin-bottom: 24px;
+}
+
+/* 运营位：全局横条（global_strip）不保留上下留白，避免挤占首屏 */
+.ad-banner--slot-global_strip.ad-banner-top {
+  margin-bottom: 0;
+}
+
+.ad-banner--slot-global_strip .html-banner-container {
+  margin-bottom: 0;
+}
+
+.ad-banner-top .banner-single {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.ad-banner-top .banner-single:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.ad-banner-top .banner-single img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.ad-banner-top .banner-title {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 20px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.banner-text-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.banner-text-item {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.banner-text-item:hover {
+  border-color: var(--primary-300);
+  background: var(--bg-hover);
+}
+
+.banner-text-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.banner-text-badge {
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 11px;
+  color: #fff;
+  background: var(--primary-color);
+}
+
+.banner-text-desc {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* 轮播样式 */
+.banner-carousel {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  height: 200px;
+}
+
+.banner-carousel .banner-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  animation: bannerFade 15s infinite;
+}
+
+.banner-carousel .banner-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@keyframes bannerFade {
+  0%, 30% { opacity: 1; }
+  33%, 100% { opacity: 0; }
+}
+
+/* 侧边栏样式 */
+.ad-banner-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sidebar-banner-item {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.sidebar-banner-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.sidebar-banner-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.sidebar-banner-item .banner-title {
+  padding: 12px 16px 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+.sidebar-banner-item .banner-desc {
+  padding: 0 16px 12px;
+  font-size: 12px;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* 底部样式 */
+.ad-banner-bottom {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.bottom-banner-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.bottom-banner-item {
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.bottom-banner-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.bottom-banner-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .banner-carousel {
+    height: 150px;
+  }
+
+  .bottom-banner-grid {
+    grid-template-columns: 1fr;
+  }
+}

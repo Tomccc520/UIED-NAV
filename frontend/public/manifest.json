@@ -1,0 +1,30 @@
+{
+  "short_name": "UIED导航",
+  "name": "UIED设计导航 - 精选设计工具与资源导航平台",
+  "description": "专业的设计师导航网站，精选优质UI/UX设计工具、平面设计资源、AI设计工具",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#1976d2",
+  "background_color": "#ffffff",
+  "categories": ["productivity", "design", "utilities"],
+  "lang": "zh-CN",
+  "scope": "/",
+  "orientation": "any"
+}

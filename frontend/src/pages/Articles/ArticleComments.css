@@ -1,0 +1,467 @@
+/**
+ * @file pages/Articles/ArticleComments.css
+ * @description 文章评论组件样式（Pro 功能）
+ * @author Tomda
+ * @copyright 版权所有 (c) 2026 UIED技术团队
+ * @website https://fsuied.com
+ * @license MIT
+ * @version 1.0.0
+ */
+
+/* 评论区容器 */
+.article-comments-section {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color, #e8e8e8);
+  border-radius: 16px;
+  background: rgba(255,255,255,0.78);
+}
+
+.article-comments-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a1a);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.article-comments-count {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary, #666);
+}
+
+.article-comments-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.article-comments-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.article-comments-sort-btn {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #fff;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.article-comments-sort-btn:hover {
+  border-color: rgba(37, 99, 235, 0.18);
+  color: #1d4ed8;
+}
+
+.article-comments-sort-btn.is-active {
+  border-color: rgba(37, 99, 235, 0.25);
+  background: rgba(239, 246, 255, 0.9);
+  color: #1d4ed8;
+}
+
+/* 评论列表 */
+.article-comments-list {
+  margin-bottom: 24px;
+  border: 1px solid rgba(15, 23, 42, 0.05);
+  border-radius: 14px;
+  background: #fff;
+  padding: 8px 14px;
+}
+
+.article-comments-loading,
+.article-comments-empty {
+  text-align: center;
+  padding: 32px;
+  color: var(--text-secondary, #666);
+}
+
+.article-comments-empty p {
+  margin: 0;
+}
+
+.article-comments-empty span {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+/* 单条评论 */
+.article-comment-item {
+  display: flex;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-color-light, #f0f0f0);
+}
+
+.article-comment-item:last-child {
+  border-bottom: none;
+}
+
+.article-comment-avatar {
+  flex-shrink: 0;
+}
+
+.article-comment-avatar img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.article-comment-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.article-comment-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.article-comment-author {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary, #1a1a1a);
+}
+
+.article-comment-time {
+  font-size: 12px;
+  color: var(--text-tertiary, #999);
+}
+
+.article-comment-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary, #333);
+  margin: 0;
+  word-break: break-word;
+}
+
+.article-comment-actions-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.article-comment-like-count {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.article-comment-action-link {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1d4ed8;
+  cursor: pointer;
+}
+
+.article-comment-action-link:hover {
+  color: #1e40af;
+  text-decoration: underline;
+}
+
+.article-comment-replies {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.article-comment-reply-item {
+  display: flex;
+  gap: 10px;
+}
+
+.article-comment-reply-form {
+  margin-top: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 10px;
+  background: rgba(248, 250, 252, 0.82);
+  padding: 10px;
+}
+
+.article-comment-reply-textarea {
+  width: 100%;
+  min-height: 72px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 8px;
+  padding: 9px 10px;
+  resize: vertical;
+  font-size: 13px;
+  line-height: 1.55;
+  background: #fff;
+  color: #0f172a;
+  box-sizing: border-box;
+}
+
+.article-comment-reply-textarea:focus {
+  outline: none;
+  border-color: rgba(37, 99, 235, 0.42);
+}
+
+.article-comment-reply-textarea:disabled {
+  background: #f1f5f9;
+}
+
+.article-comment-reply-form__footer {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.article-comment-reply-submit-btn {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 0;
+  background: #1d4ed8;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.article-comment-reply-submit-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* 加载更多按钮 */
+.article-comments-load-more {
+  margin-top: 10px;
+}
+
+.article-btn-load-more,
+.article-load-more-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: var(--bg-secondary, #f5f5f5);
+  border: 1px solid var(--border-color, #e8e8e8);
+  border-radius: 8px;
+  color: var(--text-secondary, #666);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.article-btn-load-more:hover:not(:disabled) {
+  background: var(--bg-tertiary, #eee);
+  color: var(--text-primary, #1a1a1a);
+}
+
+.article-btn-load-more:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 错误提示 */
+.article-comments-error,
+.article-comment-error {
+  color: #f5222d;
+  font-size: 14px;
+  margin: 12px 0;
+  padding: 8px 12px;
+  background: #fff2f0;
+  border-radius: 4px;
+}
+
+/* 评论表单 */
+.article-comment-form-container {
+  border: 1px solid rgba(15, 23, 42, 0.05);
+  border-radius: 14px;
+  background: #fff;
+  padding: 14px;
+}
+
+.article-comment-form-container > h4 {
+  margin: 0 0 10px;
+  color: #0f172a;
+  font-size: 15px;
+}
+
+.article-comment-form {
+  background: var(--bg-secondary, #fafafa);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.04);
+}
+
+.article-comment-input,
+.article-comment-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: 1px solid var(--border-color, #e8e8e8);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: vertical;
+  background: white;
+  color: var(--text-primary, #1a1a1a);
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.article-comment-input:focus,
+.article-comment-textarea:focus {
+  outline: none;
+  border-color: var(--primary-color, #1890ff);
+}
+
+.article-comment-input:disabled,
+.article-comment-textarea:disabled {
+  background: var(--bg-tertiary, #f0f0f0);
+  cursor: not-allowed;
+}
+
+.article-comment-input::placeholder,
+.article-comment-textarea::placeholder {
+  color: var(--text-tertiary, #999);
+}
+
+.article-comment-form-footer,
+.article-comment-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  gap: 10px;
+}
+
+.article-comment-char-count {
+  font-size: 12px;
+  color: var(--text-tertiary, #999);
+}
+
+.article-btn-submit-comment,
+.article-comment-submit-btn {
+  padding: 8px 20px;
+  background: var(--primary-color, #1890ff);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.article-btn-submit-comment:hover:not(:disabled),
+.article-comment-submit-btn:hover:not(:disabled) {
+  background: var(--primary-color-hover, #40a9ff);
+  transform: translateY(-1px);
+}
+
+.article-btn-submit-comment:disabled,
+.article-comment-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.article-comment-login-hint {
+  font-size: 12px;
+  color: var(--text-tertiary, #999);
+  margin: 8px 0 0 0;
+  text-align: center;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .article-comments-section {
+    margin-top: 32px;
+    padding-top: 24px;
+  }
+
+  .article-comments-title {
+    font-size: 18px;
+  }
+
+  .article-comments-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .article-comment-item {
+    gap: 10px;
+    padding: 12px 0;
+  }
+
+  .article-comment-avatar img,
+  .article-comment-avatar-default {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 12px !important;
+  }
+
+  .article-comment-header {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .article-comment-form {
+    padding: 12px;
+  }
+
+  .article-comment-input,
+  .article-comment-textarea {
+    min-height: 80px;
+    padding: 10px;
+  }
+
+  .article-comment-form-footer,
+  .article-comment-actions {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .article-comment-reply-form__footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .article-comment-reply-submit-btn {
+    width: 100%;
+    height: 34px;
+  }
+
+  .article-comment-char-count {
+    text-align: right;
+  }
+
+  .article-btn-submit-comment,
+  .article-comment-submit-btn {
+    width: 100%;
+    padding: 12px;
+  }
+}

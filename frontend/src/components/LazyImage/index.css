@@ -1,0 +1,51 @@
+/**
+ * @file index.css
+ * @description 前端用户界面组件
+ * @author Tomda
+ * @copyright 版权所有 (c) 2026 UIED技术团队
+ * @website https://fsuied.com
+ * @license MIT
+ * @version 1.0.0
+ */
+
+/**
+ * LazyImage Component Styles
+ * 图片懒加载组件样式
+ */
+
+.lazy-image {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  background-color: #f5f5f5;
+  object-fit: cover;
+}
+
+.lazy-image--loaded {
+  opacity: 1;
+}
+
+.lazy-image--error {
+  opacity: 1;
+  background-color: #f0f0f0;
+}
+
+/* 加载中的占位效果 */
+.lazy-image:not(.lazy-image--loaded):not(.lazy-image--error) {
+  animation: lazy-image-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes lazy-image-pulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* 响应式适配 */
+@media (max-width: 768px) {
+  .lazy-image {
+    transition: opacity 0.2s ease-in-out;
+  }
+}

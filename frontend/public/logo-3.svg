@@ -1,0 +1,80 @@
+<svg width="100%" height="100%" viewBox="0 0 204 96" version="1.1" xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>logo-3</title>
+    <defs>
+        <polygon id="path-9z3bcfbp2n-1" points="4.24080877e-17 0 51 0 51 49 4.24080877e-17 49"></polygon>
+    </defs>
+    <style>
+        /* 控制描边的动画，从左到右逐渐进行 */
+        .svg-elem {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            stroke-width: 1;
+            /* 调整描边粗细，设置为较细的值 */
+            fill: transparent;
+            stroke: #fff;
+            stroke-linejoin: round;
+            stroke-linecap: round;
+            animation: draw 2s linear forwards, fill-color 2s linear forwards;
+        }
+
+        /* 描边动画，模拟从左到右的描边效果 */
+        @keyframes draw {
+            from {
+                stroke-dashoffset: 1000;
+            }
+
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        /* 填充颜色的动画，与描边同步，从左到右进行 */
+        @keyframes fill-color {
+            0% {
+                fill: transparent;
+            }
+
+            100% {
+                fill: #fff;
+            }
+        }
+
+        /* 背景的渐变 */
+        #background-rect {
+            fill: #4999EF;
+        }
+    </style>
+
+    <g id="page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="logo-3">
+            <!-- 背景填充 -->
+            <rect id="background-rect" x="0" y="0" width="204" height="96" rx="48"></rect>
+
+            <!-- 新Logo 使用从左到右的描边和填充动画 -->
+            <g id="logo-copy" transform="translate(19, 24)">
+                <path
+                    d="M118,0 L115.645416,11.671646 L89.1332623,11.6686726 L87.7228145,17.840708 L112.989339,17.840708 C113.408529,18.1263717 113.114499,18.8863009 113.032836,19.3722478 C112.438806,22.9040708 111.360981,26.3980885 110.730064,29.9260885 L85.5115139,29.9743009 C84.8626866,30.1945487 84.4307036,35.0482832 83.8848614,35.8938053 L110.750533,35.8938053 L108.191898,48 L68,48 L78.1279318,0 L118,0 Z"
+                    class="svg-elem"></path>
+
+                <g id="group">
+                    <mask id="mask-9z3bcfbp2n-2" fill="white">
+                        <use xlink:href="#path-9z3bcfbp2n-1"></use>
+                    </mask>
+                    <g id="Clip-4"></g>
+                    <path
+                        d="M44.5484942,30.672481 C43.6369216,34.1601855 42.3502837,37.0948777 40.1324788,39.9385435 C28.0481786,55.4312424 -2.16172007,50.8094556 0.122748964,27.9765993 L5.84733956,0 L18.8393787,0 L13.1475876,27.5812233 C12.2451734,40.7777001 30.3841898,38.4394988 31.9817846,27.4591408 L37.5819924,0 L51,0"
+                        class="svg-elem" mask="url(#mask-9z3bcfbp2n-2)"></path>
+                </g>
+
+                <path
+                    d="M120.705221,11.6887342 L123.39497,0 L145.56178,0.00424573989 C177.801018,2.69604483 171.345066,47.5474041 141.724125,48 L119,47.8847282 L129.665791,35.9981425 C135.974363,35.4867431 142.366969,37.0738007 147.947383,33.3899845 C154.358119,29.1580432 155.653618,18.4243882 148.929352,13.8476929 C147.754359,13.0480078 144.776461,11.6887342 143.420175,11.6887342 L120.705221,11.6887342 Z"
+                    class="svg-elem"></path>
+
+                <polygon points="70 0 59.7432432 48 47 48 56.9459459 0" class="svg-elem"></polygon>
+
+                <polygon points="133 18 130.359061 29.1389362 113 48 119.628981 18" class="svg-elem"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

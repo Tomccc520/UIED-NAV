@@ -1,0 +1,574 @@
+/* 导航栏样式 */
+.navbar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2000;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease-in-out;
+  height: 64px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.navbar-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #fff;
+  opacity: 0.8;
+  z-index: -1;
+}
+
+.navbar-visible {
+  transform: translateY(0);
+}
+
+.navbar-hidden {
+  transform: translateY(-100%);
+}
+
+.navbar-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1230px;
+  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  padding: 0 2rem;
+}
+
+/* Logo区域 */
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.navbar-logo-img {
+  height: 32px;
+  width: auto;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-brand-main {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1976d2;
+  letter-spacing: 0.3px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.navbar-brand-separator {
+  opacity: 0.5;
+  font-size: 12px;
+}
+
+.navbar-brand-sub {
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+  margin-left: 6px;
+}
+
+/* 桌面端菜单 */
+.navbar-menu {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navbar-menu-item {
+  position: relative;
+  padding: 0.25rem 0.5rem;
+}
+
+.navbar-menu-button {
+  color: #333 !important;
+  font-weight: 500;
+  opacity: 0.9;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  padding: 0.5rem 0.75rem !important;
+  border-radius: 0.375rem;
+  white-space: nowrap;
+}
+
+.navbar-menu-button:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.04) !important;
+  transform: translateY(-0.0625rem);
+}
+
+/* 导航栏标签样式 */
+.navbar-chip {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.5rem;
+  font-size: 0.6875rem !important;
+  height: 1.125rem !important;
+  line-height: 1rem;
+  padding: 0 0.375rem !important;
+  border-radius: 0.5625rem !important;
+  font-weight: 600;
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.navbar-chip--info {
+  background: linear-gradient(to right, #0066ff 0%, #2b76ff 100%) !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+.navbar-chip--shop {
+  background: #ff4d4f !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+.navbar-menu-item:hover .navbar-chip {
+  transform: scale(1.05) translateY(-0.0625rem);
+}
+
+/* 移动端样式 - 优化间距 */
+.navbar-mobile-toggle {
+  color: #333 !important;
+  padding: 0.5rem !important;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+}
+
+.navbar-mobile-toggle:hover {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+.navbar-mobile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 2000;
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.navbar-mobile-menu {
+  position: fixed;
+  top: 3.5rem;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem;
+  margin: 0 0.75rem;
+  border-radius: 0 0 0.75rem 0.75rem;
+  z-index: 2001;
+  max-height: calc(100vh - 3.5rem);
+  overflow-y: auto;
+  animation: slideDown 0.3s ease-out;
+}
+
+.navbar-mobile-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  margin-bottom: 0.25rem;
+  border-radius: 0.5rem;
+  color: #333;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 2.5rem;
+  gap: 0.5rem;
+}
+
+.navbar-mobile-menu-item:last-child {
+  margin-bottom: 0;
+}
+
+.navbar-mobile-menu-text {
+  flex: 1;
+}
+
+.navbar-mobile-menu-item:hover {
+  background: rgba(25, 118, 210, 0.08);
+  transform: none;
+}
+
+.navbar-mobile-chip {
+  margin-left: 0.5rem;
+  font-size: 0.6875rem !important;
+  height: 1.25rem !important;
+  padding: 0 0.5rem !important;
+  transition: all 0.2s;
+  position: relative;
+  z-index: 10;
+}
+
+.navbar-mobile-menu-item:hover .navbar-mobile-chip {
+  transform: scale(1.05);
+}
+
+/* 背景装饰 */
+.navbar-decoration {
+  position: absolute;
+  top: -20px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: url('https://img.uied.cn/wp-content/themes/b2Jitheme/Center/Assets/images/one_header.png') no-repeat top center / 1400px;
+  z-index: 9;
+  pointer-events: none;
+}
+
+/* 响应式设计 - 优化间距 */
+@media (max-width: 768px) {
+  .navbar-container {
+    height: 3.5rem; /* 56px 转换为rem */
+  }
+
+  .navbar-content {
+    padding: 0 1rem;
+  }
+
+  .navbar-logo {
+    gap: 0.5rem;
+  }
+
+  .navbar-logo-img {
+    height: 1.75rem; /* 28px 转换为rem */
+  }
+
+  .navbar-brand-main {
+    font-size: 0.875rem; /* 14px 转换为rem */
+    font-weight: 600;
+  }
+
+  .navbar-brand-sub {
+    font-size: 0.75rem; /* 12px 转换为rem */
+    margin-left: 0.375rem;
+  }
+  
+  .navbar-menu {
+    display: none; /* 在移动端隐藏桌面菜单 */
+  }
+
+  /* 移动端切换按钮优化 */
+  .navbar-mobile-toggle {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 1.125rem;
+    border-radius: 0.5rem;
+  }
+
+  /* 移动端菜单优化 */
+  .navbar-mobile-menu {
+    position: fixed;
+    top: 3.5rem;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 0.5rem;
+    margin: 0 0.75rem;
+    border-radius: 0 0 0.75rem 0.75rem;
+    z-index: 2001;
+    max-height: calc(100vh - 3.5rem);
+    overflow-y: auto;
+  }
+
+  .navbar-mobile-menu-item {
+    padding: 0.75rem;
+    margin-bottom: 0.25rem;
+    border-radius: 0.5rem;
+    font-size: 0.9375rem;
+    min-height: 2.5rem;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .navbar-mobile-menu-item:hover {
+    background: rgba(25, 118, 210, 0.08);
+    transform: none;
+  }
+
+  .navbar-mobile-chip {
+    margin-left: 0.375rem;
+    font-size: 0.6875rem !important;
+    height: 1.25rem !important;
+    padding: 0 0.5rem !important;
+  }
+
+  /* 移动端触摸优化 */
+  .navbar-container * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+
+  .navbar-logo,
+  .navbar-mobile-toggle,
+  .navbar-mobile-menu-item {
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+  }
+
+  .navbar-mobile-menu {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* 防止页面滚动 */
+  .navbar-mobile-menu-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-content {
+    padding: 0 0.75rem;
+  }
+
+  .navbar-logo {
+    gap: 0.375rem;
+  }
+
+  .navbar-brand {
+    display: flex;
+    align-items: center;
+  }
+
+  .navbar-brand-separator {
+    display: inline;
+    opacity: 0.5;
+    font-size: 0.625rem;
+    margin: 0 0.25rem;
+  }
+
+  .navbar-brand-sub {
+    margin-left: 0;
+  }
+  
+  .navbar-logo-img {
+    height: 1.5rem; /* 24px 转换为rem，进一步缩小 */
+  }
+  
+  .navbar-brand-main {
+    font-size: 0.8125rem; /* 13px 转换为rem */
+  }
+  
+  .navbar-brand-sub {
+    font-size: 0.6875rem; /* 11px 转换为rem */
+  }
+
+  /* 小屏幕切换按钮 */
+  .navbar-mobile-toggle {
+    padding: 0.375rem 0.5rem !important;
+    font-size: 1rem;
+  }
+
+  /* 小屏幕菜单项 */
+  .navbar-mobile-menu {
+    padding: 0.375rem;
+    margin: 0 0.5rem;
+  }
+
+  .navbar-mobile-menu-item {
+    padding: 0.625rem;
+    font-size: 0.875rem;
+    min-height: 2.25rem;
+    margin-bottom: 0.125rem;
+  }
+
+  .navbar-mobile-chip {
+    margin-left: 0.25rem;
+    font-size: 0.625rem !important;
+    height: 1.125rem !important;
+    padding: 0 0.375rem !important;
+  }
+}
+
+/* 深色模式适配 */
+@media (prefers-color-scheme: dark) {
+  .navbar-container {
+    background: rgba(31, 35, 41, 0.9);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .navbar-container::before {
+    background: #1f2329;
+    opacity: 0.9;
+  }
+
+  .navbar-brand-main {
+    color: #60a5fa;
+  }
+
+  .navbar-brand-sub {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .navbar-mobile-toggle {
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+
+  .navbar-mobile-toggle:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .navbar-mobile-overlay {
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .navbar-mobile-menu {
+    background: #1f2329;
+    border-top-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .navbar-mobile-menu-item {
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .navbar-mobile-menu-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  
+  .navbar-chip--info {
+    background: linear-gradient(to right, #0066ff 0%, #2b76ff 100%) !important;
+    color: #fff !important;
+    border: none !important;
+  }
+  
+  .navbar-chip--shop {
+    background: #ff4d4f !important;
+    color: #fff !important;
+    border: none !important;
+  }
+  
+  .navbar-menu-item:hover .navbar-chip {
+    transform: scale(1.05) translateY(-0.0625rem);
+  }
+  
+  .navbar-mobile-chip:hover {
+    transform: scale(1.05);
+  }
+}
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+  .navbar-container {
+    border-bottom: 2px solid;
+  }
+  
+  .navbar-chip {
+    border: 1px solid transparent !important;
+  }
+  
+  .navbar-chip:hover,
+  .navbar-chip:focus {
+    border-color: currentColor !important;
+  }
+}
+
+/* 动画优化 */
+.navbar-container,
+.navbar-menu-item,
+.navbar-mobile-toggle,
+.navbar-logo {
+  will-change: transform, opacity;
+}
+
+/* 背景装饰动画 */
+.navbar-decoration {
+  animation: subtle-float 8s ease-in-out infinite;
+}
+
+@keyframes subtle-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 移动端触摸优化 */
+.navbar-container * {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+.navbar-logo,
+.navbar-mobile-toggle {
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.navbar-mobile-menu-item {
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.navbar-mobile-chip {
+  pointer-events: none;
+}
+
+.navbar-mobile-menu {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  pointer-events: auto;
+}
+
+/* 防止页面滚动 */
+.navbar-mobile-menu-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+} 

@@ -1,0 +1,101 @@
+/**
+ * @file Input.css
+ * @description 前端用户界面组件
+ * @author Tomda
+ * @copyright 版权所有 (c) 2026 UIED技术团队
+ * @website https://fsuied.com
+ * @license MIT
+ * @version 1.0.1
+ */
+
+/* 自定义输入框样式 */
+.custom-input-wrapper {
+  display: flex;
+  align-items: center;
+  border: 2px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  transition: var(--transition-all);
+  position: relative;
+}
+
+.custom-input-wrapper:focus-within {
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-100);
+}
+
+.custom-input-wrapper--disabled {
+  background: var(--neutral-50);
+  border-color: var(--neutral-200);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 输入框尺寸 */
+.custom-input-wrapper--small {
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--radius-sm);
+}
+
+.custom-input-wrapper--medium {
+  padding: var(--spacing-3) var(--spacing-4);
+}
+
+.custom-input-wrapper--large {
+  padding: var(--spacing-4) var(--spacing-5);
+  border-radius: var(--radius-lg);
+}
+
+/* 输入框本体 */
+.custom-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: var(--text-base);
+  color: var(--neutral-700);
+  font-family: inherit;
+}
+
+.custom-input::placeholder {
+  color: var(--neutral-400);
+}
+
+.custom-input:disabled {
+  cursor: not-allowed;
+  color: var(--neutral-500);
+}
+
+/* 图标样式 */
+.custom-input__icon {
+  display: flex;
+  align-items: center;
+  margin-right: var(--spacing-3);
+  color: var(--neutral-500);
+  font-size: var(--text-lg);
+}
+
+.custom-input__suffix {
+  display: flex;
+  align-items: center;
+  margin-left: var(--spacing-3);
+  color: var(--neutral-500);
+}
+
+/* 特殊样式变体 */
+.custom-input-wrapper--search {
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-lg);
+}
+
+.custom-input-wrapper--search:focus-within {
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+}
+
+/* 搜索框特殊样式 */
+.hero-search .custom-input-wrapper {
+  border-radius: var(--radius-full);
+}

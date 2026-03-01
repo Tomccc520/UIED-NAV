@@ -1,0 +1,269 @@
+/**
+ * @file AuthModal.css
+ * @description 认证弹窗样式 - 极简扁平风格
+ * @copyright 版权所有 (c) 2026 UIED技术团队
+ */
+/**
+ * @copyright Tomda (https://www.tomda.top)
+ * @copyright UIED技术团队 (https://fsuied.com)
+ * @author UIED技术团队
+ * @createDate 2026.1.27
+ */
+
+.auth-modal-content {
+  padding: var(--spacing-12) var(--spacing-10) var(--spacing-10);
+  position: relative;
+  background-color: var(--bg-card);
+}
+
+/* 覆盖 Modal 组件的默认 padding */
+.auth-modal .modal-content {
+  padding: 0;
+}
+
+/* 头部设计 */
+.auth-header {
+  text-align: center;
+  margin-bottom: var(--spacing-10); /* 加大间距 */
+}
+
+.auth-logo {
+  width: 3.5rem; /* 56px */
+  height: 3.5rem;
+  background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+  color: var(--text-inverse);
+  border-radius: var(--radius-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-extrabold);
+  font-size: var(--text-base);
+  margin: 0 auto var(--spacing-5);
+}
+
+.auth-title {
+  font-size: var(--text-2xl);
+  color: var(--neutral-900);
+  font-weight: var(--font-bold);
+  margin: 0 0 var(--spacing-2);
+  line-height: var(--leading-tight);
+  letter-spacing: -0.02em;
+}
+
+.auth-subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: var(--leading-normal);
+}
+
+/* 关闭按钮 */
+.auth-close-btn {
+  position: absolute;
+  top: var(--spacing-4);
+  right: var(--spacing-4);
+  background: none;
+  border: none;
+  font-size: var(--text-2xl);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 0;
+  width: var(--spacing-8);
+  height: var(--spacing-8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  transition: var(--transition-all);
+  z-index: 10;
+}
+
+.auth-close-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+}
+
+/* 模式切换 */
+.auth-switch-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--spacing-10); /* 加大间距 */
+}
+
+.auth-switch-simple {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-6); /* 加大文字间距 */
+}
+
+.auth-switch-divider {
+  width: 1px;
+  height: 16px;
+  background-color: #e5e7eb;
+}
+
+.auth-switch-btn {
+  border: none;
+  background: none;
+  padding: 8px 16px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.auth-switch-btn.active {
+  color: #111827;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.auth-switch-btn:hover:not(.active) {
+  color: #4b5563;
+}
+
+/* 表单样式 */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px; /* 加大表单项间距 */
+}
+
+.form-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-label {
+  font-size: 14px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.form-input {
+  width: 100%;
+  padding: 14px 18px; /* 加大内边距 */
+  font-size: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  background: #f9fafb;
+  color: #111827;
+  line-height: 1.5;
+}
+
+.form-input:hover {
+  background: #ffffff;
+  border-color: #d1d5db;
+}
+
+.form-input:focus {
+  background: #ffffff;
+  border-color: #3b82f6;
+}
+
+.form-input.error {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.form-input.error:focus {
+  border-color: #ef4444;
+}
+
+.form-error-msg {
+  font-size: 12px;
+  color: #ef4444;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.form-error-msg::before {
+  content: "!";
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background: #ef4444;
+  color: white;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 14px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+/* 提交按钮 */
+.auth-submit-btn {
+  margin-top: 16px; /* 加大按钮上方间距 */
+  width: 100%;
+  padding: 16px; /* 加大按钮高度 */
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.02em;
+}
+
+.auth-submit-btn:hover {
+  opacity: 0.9;
+}
+
+.auth-submit-btn:active {
+  opacity: 1;
+}
+
+.auth-submit-btn:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+}
+
+/* 底部辅助链接 */
+.auth-footer {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.auth-link {
+  color: #3b82f6;
+  cursor: pointer;
+  text-decoration: none;
+  margin-left: 6px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.auth-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+/* 全局错误提示 */
+.auth-global-error {
+  background-color: #fef2f2;
+  border: 1px solid #fee2e2;
+  color: #ef4444;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 24px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}

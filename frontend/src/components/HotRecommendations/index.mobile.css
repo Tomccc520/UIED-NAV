@@ -1,0 +1,299 @@
+/**
+ * @file HotRecommendations/index.mobile.css
+ * @description 热门推荐组件移动端样式 - 支持子分类切换
+ * @copyright 版权所有 (c) 2025 UIED技术团队
+ * @website https://fsuied.com
+ * @license MIT
+ * @version 1.2.0 - 增加子分类支持
+ */
+
+/* ===== 移动端热门推荐样式 ===== */
+@media (max-width: 750px) {
+  .hot-recommendations {
+    background: var(--background-primary);
+    margin: 1rem 0;
+    padding: 0;
+  }
+
+    /* ===== 移动端标题样式 - 与Home页面tools-header保持一致 ===== */
+  .hot-recommendations-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .hot-recommendations-title {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* 这些样式已不再使用，标题样式已通过hot-recommendations-title类统一处理 */
+
+  /* 推荐统计信息 */
+  .recommendations-stats {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .stats-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  
+  .stats-number {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+  
+  .stats-label {
+    font-size: 0.75rem;
+    color: var(--text-light);
+  }
+  
+  .stats-divider {
+    color: var(--text-light);
+    opacity: 0.5;
+    font-size: 0.75rem;
+  }
+  
+  /* ===== 移动端子分类切换标签样式 ===== */
+  .hot-recommendations-subcategories {
+    margin-bottom: 1rem;
+    padding: 0;
+  }
+
+  .subcategory-tabs {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding: 0 0 0.5rem 0;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* 移动端隐藏滚动条 */
+  .subcategory-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .subcategory-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.375rem 0.625rem;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 32px; /* 触摸友好的最小高度 */
+  }
+
+  .subcategory-tab:hover,
+  .subcategory-tab:active {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+
+  .subcategory-tab.active {
+    background: transparent;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+
+  .subcategory-tab.active:hover,
+  .subcategory-tab.active:active {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+
+  .tab-name {
+    font-weight: 500;
+  }
+
+  .tab-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0.875rem;
+    height: 0.875rem;
+    padding: 0 0.1875rem;
+    background: var(--border-color);
+    border-radius: 0.4375rem;
+    font-size: 0.625rem;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--text-light);
+  }
+
+  .subcategory-tab.active .tab-count {
+    background: var(--primary-color);
+    color: var(--white);
+  }
+
+  .subcategory-tab:hover:not(.active) .tab-count,
+  .subcategory-tab:active:not(.active) .tab-count {
+    background: var(--primary-color);
+    color: var(--white);
+  }
+  
+  /* ===== 移动端网格布局 - 一行两个，与Home页面tools-grid保持一致 ===== */
+  .hot-recommendations-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 固定一行两个，与Home页面一致 */
+    gap: 0.75rem; /* 与Home页面一致 */
+    margin: 0;
+    overflow: hidden; /* 防止子元素溢出 */
+  }
+  
+  /* 确保卡片容器不溢出 */
+  .hot-recommendations-grid > * {
+    min-width: 0; /* 允许flex/grid子元素收缩 */
+    max-width: 100%;
+    overflow: hidden;
+  }
+  
+  /* 注意：工具卡片样式现在完全由ToolCard/index.mobile.css管理，无需在此重复定义 */
+  
+  /* ===== 移动端查看更多按钮 - 移除阴影 ===== */
+  .hot-recommendations-footer {
+    margin-top: 2rem;
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+  }
+  
+  .see-more-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500; /* 与PC端一致 */
+    color: var(--primary-color);
+    background: var(--white);
+    border: 2px solid var(--primary-color); /* 稍微加粗边框 */
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    box-shadow: none; /* 移除阴影 */
+    min-height: 44px; /* 触摸友好 */
+  }
+  
+  .see-more-button:hover,
+  .see-more-button:active {
+    background: var(--primary-color);
+    color: var(--white);
+    transform: translateY(-1px);
+    box-shadow: none; /* 移除阴影 */
+  }
+  
+  .see-more-button svg {
+    transition: transform 0.2s ease;
+  }
+  
+  .see-more-button:hover svg {
+    transform: translateX(2px);
+  }
+}
+
+/* ===== 小屏幕设备优化 (iPhone SE等) ===== */
+@media (max-width: 375px) {
+  .hot-recommendations {
+    margin: 1.5rem 0;
+  }
+
+  .hot-recommendations-title {
+    gap: 0.5rem;
+  }
+
+  /* 这些样式已不再使用 */
+
+  .hot-recommendations-grid {
+    gap: 0.5rem;
+  }
+
+  .see-more-button {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.8125rem;
+  }
+
+  /* 小屏幕子分类标签优化 */
+  .subcategory-tabs {
+    gap: 0.375rem;
+    padding-bottom: 0.375rem;
+  }
+
+  .subcategory-tab {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    min-height: 32px;
+  }
+
+  .tab-count {
+    min-width: 1rem;
+    height: 1rem;
+    font-size: 0.625rem;
+  }
+}
+
+/* ===== 横屏优化 ===== */
+@media (max-width: 750px) and (max-height: 500px) and (orientation: landscape) {
+  .hot-recommendations {
+    margin: 1rem 0;
+  }
+
+  .hot-recommendations-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .hot-recommendations.with-sub-categories .hot-recommendations-header {
+    margin-bottom: 0.75rem;
+  }
+
+  .hot-recommendations-subcategories {
+    margin-bottom: 1rem;
+  }
+}
+
+/* ===== 深色模式适配 ===== */
+
+/* ===== 触摸设备优化 ===== */
+@media (max-width: 750px) {
+  .hot-recommendations * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .see-more-button {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .subcategory-tab {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+} 

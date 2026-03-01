@@ -1,0 +1,296 @@
+/**
+ * @file SocialMediaSection/index.css
+ * @description 关注交流组件样式 - 简洁的图标+名称布局
+ */
+
+.social-media-section {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.social-media-groups {
+  display: flex;
+  gap: 24px;
+}
+
+/* 分组容器 */
+.social-media-group {
+  position: relative;
+}
+
+/* 分组触发器 - 简洁的图标+名称 */
+.group-trigger {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.social-media-group:hover .group-trigger {
+  transform: translateY(-2px);
+}
+
+.group-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary, #666);
+}
+
+.group-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.social-media-group:hover .group-icon {
+  color: var(--primary-color, #0066ff);
+}
+
+.group-name {
+  font-size: 12px;
+  color: var(--text-secondary, #666);
+  white-space: nowrap;
+}
+
+.social-media-group:hover .group-name {
+  color: var(--primary-color, #0066ff);
+}
+
+/* 悬浮内容 */
+.group-content {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-0.5rem);
+  min-width: 280px;
+  background: var(--white, #fff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  z-index: 100;
+}
+
+.social-media-group:hover .group-content,
+.social-media-group.active .group-content {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-0.25rem);
+}
+
+/* 链接列表样式 */
+.links-display {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.link-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.link-item:hover {
+  background: var(--background-light, #f6f8fb);
+}
+
+.link-icon {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-light, rgba(0, 102, 255, 0.1));
+  color: var(--primary-color, #0066ff);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.link-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.link-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary, #333);
+}
+
+.link-desc {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #666);
+}
+
+/* 二维码展示样式 */
+.qrcode-display {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+.qrcode-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.qrcode-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color, #e5e7eb);
+}
+
+.qrcode-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.qrcode-name {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-primary, #333);
+}
+
+.qrcode-desc {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #666);
+  text-align: center;
+}
+
+/* 混合展示样式 */
+.mixed-display {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mixed-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mixed-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.mixed-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-color, #0066ff);
+  color: white;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.mixed-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary, #333);
+}
+
+/* 群列表 */
+.group-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.375rem 1rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.group-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #666);
+}
+
+.group-num {
+  font-weight: 600;
+  color: var(--primary-color, #0066ff);
+  min-width: 1.25rem;
+}
+
+/* 混合底部 */
+.mixed-footer {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color, #e5e7eb);
+}
+
+.mixed-qrcode {
+  width: 80px;
+  height: 80px;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color, #e5e7eb);
+  flex-shrink: 0;
+}
+
+.mixed-desc-box {
+  flex: 1;
+}
+
+.mixed-desc {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #666);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .social-media-groups {
+    gap: 20px;
+    justify-content: center;
+  }
+
+  .group-content {
+    position: fixed;
+    left: 50%;
+    bottom: auto;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 90vw;
+  }
+
+  .social-media-group:hover .group-content,
+  .social-media-group.active .group-content {
+    transform: translate(-50%, -50%);
+  }
+
+  .qrcode-display {
+    flex-wrap: wrap;
+  }
+
+  .group-list {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,747 @@
+/**
+ * @file index.css
+ * @description 前端用户界面组件
+ * @author Tomda
+ * @copyright 版权所有 (c) 2026 UIED技术团队
+ * @website https://fsuied.com
+ * @license MIT
+ * @version 1.0.0
+ */
+
+/**
+ * CategorySidebar - 通用导航侧边栏组件样式
+ * 完全自包含，无需外部样式配合
+ */
+
+/* =================================
+   侧边栏容器基础样式
+   ================================= */
+.category-sidebar {
+  width: 16rem;
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  height: fit-content;
+  padding: 1rem 0;
+}
+
+/* 静态模式 - 跟随页面滚动 */
+.category-sidebar.static {
+  position: static;
+  margin-left: 1rem; /* 与固定模式的left值保持一致 */
+}
+
+/* 固定模式 - 滚动时固定在屏幕左侧 */
+.category-sidebar.sticky {
+  position: fixed;
+  top: 5rem; /* 调整为5rem，降低固定位置，让用户滑动到热门推荐区域时再固定 */
+  left: 1rem; /* 左侧1rem边距 */
+  width: 16rem; /* 明确设置宽度，不使用right */
+  z-index: 1000;
+  max-height: calc(100vh - 6rem - 150px); /* 视窗高度 - 顶部偏移 - Footer预留空间 */
+  overflow: hidden;
+}
+
+/* 当侧边栏固定时，为右侧内容留出空间并添加右边距 */
+.category-sidebar.sticky + * {
+  margin-left: 18rem; /* 16rem宽度 + 1rem左边距 + 1rem间距 */
+  margin-right: 1rem; /* 添加右侧1rem边距 */
+}
+
+/* =================================
+   侧边栏头部
+   ================================= */
+.sidebar-header {
+  padding: 0 1.5rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* 导航切换区域 */
+.nav-switch-container {
+  position: relative;
+  width: 100%;
+}
+
+.nav-switch-trigger {
+  width: 100%;
+  background: var(--background-light);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-switch-trigger:hover {
+  background: var(--primary-light);
+  border-color: var(--primary-color);
+}
+
+.nav-switch-current {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+.nav-switch-icon {
+  width: 1rem;
+  height: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nav-switch-name {
+  flex: 1;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: left;
+  color: var(--text-primary);
+}
+
+.nav-switch-arrow {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+  color: var(--text-secondary);
+}
+
+.nav-switch-arrow.open {
+  transform: rotate(180deg);
+}
+
+/* 导航切换下拉菜单 */
+.nav-switch-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 2000;
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 0;
+  margin-top: 0.25rem;
+  overflow-y: auto;
+}
+
+.nav-switch-option {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.nav-switch-option:hover {
+  background: var(--primary-light);
+}
+
+.nav-switch-option.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+.nav-switch-option-icon {
+  width: 1rem;
+  height: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nav-switch-option-content {
+  flex: 1;
+}
+
+.nav-switch-option-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.125rem;
+}
+
+.nav-switch-option.active .nav-switch-option-name {
+  color: white;
+}
+
+.nav-switch-option-desc {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+
+.nav-switch-option.active .nav-switch-option-desc {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* 导航切换当前项的类型标签 */
+.nav-switch-type-badge {
+  font-size: 0.6rem;
+  font-weight: 600;
+  padding: 0.15rem 0.3rem;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--primary-light);
+  color: var(--primary-color);
+  margin-left: 0.5rem;
+}
+
+/* 导航切换选项的类型标签 */
+.nav-switch-option-badge {
+  font-size: 0.6rem;
+  font-weight: 600;
+  padding: 0.15rem 0.3rem;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(0, 0, 0, 0.1);
+  color: var(--text-secondary);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.nav-switch-option.active .nav-switch-option-badge {
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* 不同导航类型的徽章颜色 */
+.nav-switch-type-badge[data-type="design"],
+.nav-switch-option-badge[data-type="design"] {
+  background: rgba(255, 152, 0, 0.1);
+  color: #ff9800;
+}
+
+.nav-switch-type-badge[data-type="ai"],
+.nav-switch-option-badge[data-type="ai"] {
+  background: rgba(139, 69, 255, 0.1);
+  color: #8b45ff;
+}
+
+.nav-switch-type-badge[data-type="uiux"],
+.nav-switch-option-badge[data-type="uiux"] {
+  background: rgba(24, 144, 255, 0.1);
+  color: #1890ff;
+}
+
+.nav-switch-type-badge[data-type="font"],
+.nav-switch-option-badge[data-type="font"] {
+  background: rgba(255, 87, 51, 0.1);
+  color: #ff5733;
+}
+
+.nav-switch-type-badge[data-type="tools"],
+.nav-switch-option-badge[data-type="tools"] {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+}
+
+.nav-switch-type-badge[data-type="resources"],
+.nav-switch-option-badge[data-type="resources"] {
+  background: rgba(255, 193, 7, 0.1);
+  color: #ffc107;
+}
+
+/* 标题区域 */
+.sidebar-header-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sidebar-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.sidebar-type-badge {
+  font-size: 0.6rem;
+  font-weight: 600;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--primary-light);
+  color: var(--primary-color);
+  margin-left: 0.5rem;
+}
+
+/* 不同类型的徽章颜色 */
+.sidebar-type-badge[data-type="design"] {
+  background: rgba(24, 144, 255, 0.1);
+  color: #1890ff;
+}
+
+.sidebar-type-badge[data-type="ai"] {
+  background: rgba(139, 69, 255, 0.1);
+  color: #8b45ff;
+}
+
+.sidebar-type-badge[data-type="font"] {
+  background: rgba(255, 87, 51, 0.1);
+  color: #ff5733;
+}
+
+.sidebar-type-badge[data-type="tools"] {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+}
+
+.sidebar-type-badge[data-type="resources"] {
+  background: rgba(255, 193, 7, 0.1);
+  color: #ffc107;
+}
+
+/* 外部链接图标 */
+.category-nav-external {
+  margin-left: 0.5rem;
+  opacity: 0.6;
+  display: flex;
+  align-items: center;
+}
+
+.category-nav-item:hover .category-nav-external {
+  opacity: 1;
+}
+
+/* =================================
+   导航列表容器
+   ================================= */
+.category-nav {
+  padding: 0.5rem 0;
+  max-height: calc(100vh - 8rem);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* 固定模式下的滚动条 */
+.category-sidebar.sticky .category-nav {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+.category-sidebar.sticky .category-nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.category-sidebar.sticky .category-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.category-sidebar.sticky .category-nav::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+.category-sidebar.sticky .category-nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* =================================
+   导航项样式
+   ================================= */
+.category-nav-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  margin: 0.125rem 0.75rem;
+  border: none;
+  background: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.category-nav-item:hover:not(.disabled) {
+  background: var(--primary-light);
+  color: var(--primary-color);
+}
+
+.category-nav-item.active {
+  background: var(--primary-color) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+.category-nav-item.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: var(--text-light);
+}
+
+.category-nav-item.disabled:hover {
+  background: none;
+}
+
+/* 搜索项特殊样式 */
+.category-nav-item.search-item {
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 0.5rem;
+  padding-bottom: 1rem;
+}
+
+/* =================================
+   导航项内容元素
+   ================================= */
+.category-nav-icon {
+  margin-right: 0.875rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.category-nav-name {
+  flex: 1;
+  font-weight: 500;
+  transition: font-weight 0.3s ease;
+}
+
+.category-nav-item.active .category-nav-name {
+  font-weight: 600;
+}
+
+.category-nav-count {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.1875rem 0.5625rem;
+  border-radius: 0.75rem;
+  min-width: 1.5rem;
+  text-align: center;
+  margin-left: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.category-nav-item:not(.active) .category-nav-count {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-light);
+}
+
+.category-nav-item:hover:not(.active):not(.disabled) .category-nav-count {
+  background: rgba(24, 144, 255, 0.15);
+  color: var(--primary-color);
+}
+
+.category-nav-item.active .category-nav-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.category-nav-badge {
+  font-size: 0.625rem;
+  font-weight: 600;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.75rem;
+  margin-left: 0.375rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.category-nav-item:not(.active) .category-nav-badge {
+  background: rgba(255, 87, 51, 0.1);
+  color: #ff5733;
+}
+
+.category-nav-item.active .category-nav-badge {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+/* 徽章颜色变体 */
+.category-nav-badge[data-badge="new"] {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+}
+
+.category-nav-badge[data-badge="hot"] {
+  background: rgba(255, 87, 51, 0.1);
+  color: #ff5733;
+}
+
+.category-nav-badge[data-badge="beta"] {
+  background: rgba(255, 193, 7, 0.1);
+  color: #ffc107;
+}
+
+/* =================================
+   响应式设计
+   ================================= */
+
+/* 平板及以下：取消固定定位和左边距 */
+@media (max-width: 1024px) {
+  .category-sidebar.sticky {
+    position: static !important;
+    top: auto;
+    left: auto;
+    max-height: none;
+    margin-left: 1rem;
+  }
+  
+  .category-sidebar.sticky + * {
+    margin-left: 0 !important;
+  }
+}
+
+/* 移动端：仅显示导航切换器，隐藏分类列表 */
+@media (max-width: 750px) {
+  /* 移动端隐藏整个分类侧边栏 */
+  .category-sidebar {
+    display: none;
+  }
+  
+  /* 如果需要显示导航切换器，可以添加特殊类名 */
+  .category-sidebar.mobile-nav-only {
+    display: block;
+    width: 100%;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+    margin: 0 1.5rem 1rem;
+    padding: 1rem;
+    background: var(--white);
+  }
+  
+  /* 移动端只显示导航切换器，隐藏分类列表 */
+  .category-sidebar.mobile-nav-only .category-nav {
+    display: none;
+  }
+  
+  /* 移动端导航切换器样式优化 */
+  .category-sidebar.mobile-nav-only .sidebar-header {
+    padding: 0;
+    margin-bottom: 0;
+    background: transparent;
+    border-bottom: none;
+  }
+  
+  /* 移动端导航切换器触发按钮优化 */
+  .category-sidebar.mobile-nav-only .nav-switch-trigger {
+    min-height: 44px; /* 触摸友好 */
+    padding: 0.75rem 1rem;
+  }
+}
+
+/* 旧的768px媒体查询保留，仅用于其他需要的情况 */
+@media (max-width: 768px) {
+  /* 这个媒体查询在750px查询之后，主要用于更大屏幕的平板设备 */
+  .category-sidebar:not(.mobile-nav-only) {
+    width: 100%;
+    margin-left: 0 !important;
+    margin-bottom: 0.5rem;
+  }
+
+  .category-sidebar:not(.mobile-nav-only) .sidebar-header {
+    padding: 1rem 1.25rem 0.75rem;
+    text-align: center;
+    background: var(--background-light);
+    border-bottom: 1px solid var(--border-color);
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .sidebar-type-badge {
+    margin: 0;
+  }
+
+  .category-nav {
+    display: flex;
+    overflow-x: auto;
+    gap: 0.5rem;
+    padding: 1rem;
+    scroll-behavior: smooth;
+    max-height: none;
+  }
+
+  .category-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .category-nav-item {
+    width: 3rem;
+    height: 3rem;
+    padding: 0.375rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    flex-direction: column;
+    gap: 0.125rem;
+    justify-content: center;
+    font-size: 0.6875rem;
+    border: 1px solid var(--border-color);
+    background: var(--white);
+    flex-shrink: 0;
+    margin: 0;
+  }
+
+  .category-nav-item:hover:not(.disabled) {
+    background: var(--primary-light);
+    transform: translateY(-1px);
+    border-color: var(--primary-color);
+  }
+
+  .category-nav-item.active {
+    background: var(--primary-color) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--primary-color) !important;
+  }
+
+  .category-nav-item .category-nav-icon {
+    margin: 0 0 0.125rem 0;
+    transform: scale(0.75);
+  }
+
+  .category-nav-item .category-nav-name {
+    font-weight: 500;
+    line-height: 1.1;
+    font-size: 0.5625rem;
+  }
+
+  .category-nav-item .category-nav-count {
+    font-size: 0.375rem;
+    padding: 0.0625rem 0.1875rem;
+    border-radius: 0.25rem;
+    margin: 0.0625rem 0 0 0;
+    opacity: 0.8;
+  }
+
+  .category-nav-item .category-nav-badge {
+    display: none;
+  }
+}
+
+/* 超小屏幕优化 */
+@media (max-width: 375px) {
+  .category-nav-item {
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0.25rem;
+    font-size: 0.625rem;
+  }
+  
+  .category-nav-item .category-nav-icon {
+    transform: scale(0.7);
+  }
+  
+  .category-nav-item .category-nav-name {
+    font-size: 0.5rem;
+  }
+
+  .category-nav-item .category-nav-count {
+    font-size: 0.3125rem;
+    padding: 0.0625rem 0.125rem;
+  }
+}
+
+/* =================================
+   子分类样式
+   ================================= */
+.category-nav-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.category-nav-item.has-children {
+  position: relative;
+}
+
+.category-nav-arrow {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.category-nav-arrow .expanded {
+  transform: rotate(180deg);
+}
+
+.category-nav-item.active .category-nav-arrow {
+  color: #ffffff;
+}
+
+/* 子分类列表 */
+.category-subcategories {
+  display: flex;
+  flex-direction: column;
+  padding: 0.25rem 0 0.5rem 0;
+  margin-left: 1.5rem;
+  border-left: 2px solid var(--primary-light);
+}
+
+/* 子分类项 */
+.category-subcategory-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem 0.5rem 0.75rem;
+  margin: 0.125rem 0;
+  background: transparent;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  transition: background 0.15s ease, color 0.15s ease;
+  text-align: left;
+  width: calc(100% - 0.5rem);
+}
+
+.category-subcategory-item:hover {
+  background: var(--primary-light);
+  color: var(--primary-color);
+}
+
+.subcategory-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.subcategory-count {
+  font-size: 0.6875rem;
+  padding: 0.125rem 0.375rem;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 0.25rem;
+  color: var(--text-light);
+  margin-left: 0.5rem;
+}
+
+.category-subcategory-item:hover .subcategory-count {
+  background: rgba(24, 144, 255, 0.1);
+  color: var(--primary-color);
+}
+
+/* 移动端隐藏子分类 */
+@media (max-width: 768px) {
+  .category-subcategories {
+    display: none;
+  }
+  
+  .category-nav-arrow {
+    display: none;
+  }
+}

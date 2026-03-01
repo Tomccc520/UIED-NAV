@@ -1,0 +1,9 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# 搜索页面应该被索引，但需要正确处理
+Allow: /search
+
+# Sitemap
+Sitemap: https://hao.uied.cn/sitemap.xml

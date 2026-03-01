@@ -34,7 +34,6 @@ backend/exports/*
 !backend/exports/.gitkeep
 
 # 子项目的 Git 目录（避免嵌套仓库）
-frontend/.git/
 backend/.git/
 admin/.git/
 

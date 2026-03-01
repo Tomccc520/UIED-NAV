@@ -1,0 +1,426 @@
+/**
+ * @file index.css
+ * @description 前端用户界面组件
+ * @author Tomda
+ * @copyright 版权所有 (c) 2026 UIED技术团队
+ * @website https://fsuied.com
+ * @license MIT
+ * @version 1.0.0
+ */
+
+/* 更新记录页面样式 */
+.changelog-page {
+  min-height: 100vh;
+  background: var(--background-light, #f6f8fb);
+  padding: 40px 20px 80px;
+}
+
+/* 布局容器 */
+.changelog-layout {
+  display: flex;
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 左侧目录导航 */
+.changelog-toc {
+  position: sticky;
+  top: 100px;
+  width: 220px;
+  flex-shrink: 0;
+  height: fit-content;
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+  background: var(--white, #fff);
+  border-radius: 12px;
+  border: 1px solid var(--border-color, #e5e7eb);
+  padding: 16px;
+  align-self: flex-start;
+  margin-top: 200px; /* 与内容区头部对齐 */
+}
+
+.toc-header {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a1a);
+  padding-bottom: 12px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.toc-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.toc-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 8px 10px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.toc-item:hover {
+  background: var(--bg-light, #f6f8fb);
+}
+
+.toc-item.active {
+  background: rgba(0, 102, 255, 0.08);
+}
+
+.toc-item.active .toc-version {
+  color: var(--primary-color, #0066ff);
+}
+
+.toc-version {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary, #666);
+}
+
+.toc-title {
+  font-size: 12px;
+  color: var(--text-light, #999);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* 主内容区 */
+.changelog-container {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 页面标题 */
+.changelog-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.changelog-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary, #1a1a1a);
+  margin: 0 0 16px;
+}
+
+.header-desc {
+  font-size: 14px;
+  color: var(--text-secondary, #666);
+  margin: 0 0 16px;
+  line-height: 1.6;
+}
+
+.author-link {
+  color: var(--primary-color, #0066ff);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.author-link:hover {
+  color: var(--primary-dark, #0052cc);
+}
+
+/* 仓库链接 */
+.repo-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.repo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary, #666);
+  font-size: 14px;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.repo-link:hover {
+  color: var(--primary-color, #0066ff);
+}
+
+.repo-link svg {
+  flex-shrink: 0;
+}
+
+/* 相关平台链接 */
+.platform-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.platform-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: var(--bg-light, #f6f8fb);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 8px;
+  color: var(--text-secondary, #666);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.platform-link:hover {
+  color: var(--primary-color, #0066ff);
+  border-color: var(--primary-color, #0066ff);
+  background: rgba(0, 102, 255, 0.05);
+}
+
+.platform-link svg {
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: all 0.2s;
+}
+
+.platform-link:hover svg {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* 统计信息 */
+.stats-info {
+  font-size: 12px;
+  color: var(--text-light, #999);
+  margin-top: 8px;
+}
+
+/* 时间线 */
+.changelog-timeline {
+  position: relative;
+}
+
+.changelog-item {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.changelog-item:last-child {
+  margin-bottom: 0;
+}
+
+/* 时间线标记 */
+.changelog-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 20px;
+}
+
+.marker-dot {
+  width: 12px;
+  height: 12px;
+  background: var(--primary-color, #0066ff);
+  border-radius: 50%;
+  border: 3px solid var(--background-light, #f6f8fb);
+  box-shadow: 0 0 0 2px var(--primary-color, #0066ff);
+  flex-shrink: 0;
+}
+
+.marker-line {
+  width: 2px;
+  flex: 1;
+  background: var(--border-color, #e5e7eb);
+  margin-top: 8px;
+}
+
+/* 内容卡片 */
+.changelog-content {
+  flex: 1;
+  background: var(--white, #fff);
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid var(--border-color, #e5e7eb);
+}
+
+/* 元信息 */
+.changelog-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.version-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: var(--primary-color, #0066ff);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 4px;
+}
+
+.release-date {
+  font-size: 13px;
+  color: var(--text-light, #999);
+}
+
+/* 发布标题 */
+.release-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a1a);
+  margin: 0 0 16px;
+}
+
+/* 变更列表 */
+.changes-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.change-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-color, #f0f0f0);
+}
+
+.change-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+/* 变更类型标签 */
+.change-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.tag-feature {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.tag-improve {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.tag-fix {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.change-text {
+  font-size: 14px;
+  color: var(--text-secondary, #666);
+  line-height: 1.5;
+}
+
+/* 响应式 */
+@media (max-width: 960px) {
+  .changelog-toc {
+    display: none;
+  }
+
+  .changelog-layout {
+    display: block;
+  }
+}
+
+@media (max-width: 768px) {
+  .changelog-page {
+    padding: 24px 16px 60px;
+  }
+
+  .changelog-header h1 {
+    font-size: 22px;
+  }
+
+  .header-desc {
+    font-size: 13px;
+  }
+
+  .repo-links {
+    gap: 12px;
+  }
+
+  .repo-link {
+    font-size: 13px;
+  }
+
+  .repo-link svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .platform-links {
+    gap: 8px;
+  }
+
+  .platform-link {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+
+  .stats-info {
+    font-size: 11px;
+  }
+
+  .changelog-item {
+    gap: 16px;
+  }
+
+  .changelog-marker {
+    width: 16px;
+  }
+
+  .marker-dot {
+    width: 10px;
+    height: 10px;
+  }
+
+  .changelog-content {
+    padding: 16px;
+  }
+
+  .release-title {
+    font-size: 16px;
+  }
+
+  .change-item {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .change-tag {
+    align-self: flex-start;
+  }
+}

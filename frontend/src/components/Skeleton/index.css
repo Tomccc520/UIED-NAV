@@ -1,0 +1,310 @@
+/**
+ * @file index.css
+ * @description 前端用户界面组件
+ * @author Tomda
+ * @copyright 版权所有 (c) 2026 UIED技术团队
+ * @website https://fsuied.com
+ * @license MIT
+ * @version 1.0.0
+ */
+
+/**
+ * Skeleton Component Styles
+ * 骨架屏组件样式
+ * 
+ * Requirements: 6.1 - 页面数据加载中显示骨架屏
+ */
+
+/* ==================== 基础骨架屏样式 ==================== */
+
+.skeleton {
+  display: inline-block;
+  background-color: #e0e0e0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Pulse 动画 */
+.skeleton--pulse {
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Wave 动画 */
+.skeleton--wave::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: skeleton-wave 1.5s linear infinite;
+}
+
+@keyframes skeleton-wave {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* 无动画 */
+.skeleton--none {
+  animation: none;
+}
+
+/* ==================== 工具卡片骨架屏 ==================== */
+
+.skeleton-tool-card {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.skeleton-tool-card__icon {
+  flex-shrink: 0;
+  margin-right: 12px;
+}
+
+.skeleton-tool-card__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.skeleton-tool-card__tags {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* ==================== 工具网格骨架屏 ==================== */
+
+.skeleton-tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+/* ==================== 分类侧边栏骨架屏 ==================== */
+
+.skeleton-category-sidebar {
+  width: 240px;
+  padding: 16px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.skeleton-category-sidebar__header {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.skeleton-category-sidebar__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeleton-category-sidebar__item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+/* ==================== 热门推荐骨架屏 ==================== */
+
+.skeleton-hot-recommendations {
+  padding: 24px 0;
+}
+
+.skeleton-hot-recommendations__header {
+  margin-bottom: 16px;
+}
+
+.skeleton-hot-recommendations__tabs {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+/* ==================== 文章卡片骨架屏 ==================== */
+
+.skeleton-article-card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.skeleton-article-card__content {
+  padding: 16px;
+}
+
+.skeleton-article-card__meta {
+  display: flex;
+  align-items: center;
+  margin-top: 12px;
+}
+
+/* ==================== 文章网格骨架屏 ==================== */
+
+.skeleton-article-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+/* ==================== 排行榜骨架屏 ==================== */
+
+.skeleton-ranking-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-ranking-list__item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+.skeleton-ranking-list__content {
+  flex: 1;
+  margin-left: 12px;
+}
+
+.skeleton-ranking-list__meta {
+  display: flex;
+  margin-top: 6px;
+}
+
+/* ==================== Hero Banner 骨架屏 ==================== */
+
+.skeleton-hero-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+  border-radius: 16px;
+  margin-bottom: 24px;
+}
+
+.skeleton-hero-banner__tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* ==================== 页面骨架屏 ==================== */
+
+.skeleton-page {
+  padding: 20px;
+}
+
+.skeleton-page__main {
+  display: flex;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.skeleton-page__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.skeleton-page__section {
+  margin-top: 32px;
+}
+
+/* ==================== 响应式适配 ==================== */
+
+@media (max-width: 1024px) {
+  .skeleton-category-sidebar {
+    display: none;
+  }
+  
+  .skeleton-page__main {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .skeleton-tool-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .skeleton-article-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .skeleton-hero-banner {
+    padding: 40px 16px;
+  }
+  
+  .skeleton-tool-card {
+    padding: 12px;
+  }
+  
+  .skeleton-hot-recommendations__tabs {
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+}
+
+/* ==================== 暗色模式支持 ==================== */
+
+@media (prefers-color-scheme: dark) {
+  .skeleton {
+    background-color: #3a3a3a;
+  }
+  
+  .skeleton--wave::after {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+  }
+  
+  .skeleton-tool-card,
+  .skeleton-category-sidebar,
+  .skeleton-article-card {
+    background: #2a2a2a;
+  }
+  
+  .skeleton-category-sidebar__item,
+  .skeleton-ranking-list__item {
+    background: #333;
+  }
+  
+  .skeleton-hero-banner {
+    background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+  }
+}

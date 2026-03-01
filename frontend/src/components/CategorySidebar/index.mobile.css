@@ -1,0 +1,251 @@
+/**
+ * @file CategorySidebar/index.mobile.css
+ * @description CategorySidebar组件移动端样式 - 遵循苹果设计规范
+ * @copyright 版权所有 (c) 2025 UIED技术团队
+ * @website https://fsuied.com
+ * @license MIT
+ * @version 1.0.0
+ */
+
+/* 移动端CategorySidebar样式 - 750px以下设备，遵循苹果设计规范 */
+@media (max-width: 750px) {
+  /* ===== 侧边栏容器 ===== */
+  .category-sidebar {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px); /* 苹果毛玻璃效果 */
+    border-radius: 12px; /* 苹果推荐圆角 */
+    border: 0.5px solid rgba(0, 0, 0, 0.1); /* 苹果细边框 */
+    margin-bottom: 16px; /* 8的倍数 */
+    /* 移除阴影 */
+    overflow: hidden;
+  }
+
+  .category-sidebar.sticky {
+    position: sticky;
+    top: 72px; /* 导航栏高度 + 间距 */
+    /* 限制最大高度，确保不会超出视窗并给Footer留出空间 */
+    max-height: calc(100vh - 72px - 120px); /* 视窗高度 - 顶部偏移 - Footer预留空间 */
+    overflow-y: auto; /* 内容超出时允许滚动 */
+    z-index: 10;
+  }
+
+  /* ===== 侧边栏头部 ===== */
+  .sidebar-header {
+    padding: 16px; /* 8的倍数 */
+    border-bottom: 0.5px solid rgba(0, 0, 0, 0.05); /* 苹果分割线 */
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  .sidebar-header-title {
+    font-size: 17px; /* 苹果Body */
+    font-weight: 600; /* 苹果Semibold */
+    color: #000; /* 苹果主文本 */
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* 8的倍数 */
+  }
+
+  .sidebar-type-badge {
+    font-size: 11px; /* 苹果Caption2 */
+    font-weight: 500; /* 苹果Medium */
+    color: #6d6d70; /* 苹果次要颜色 */
+    background: rgba(0, 0, 0, 0.05);
+    padding: 2px 6px; /* 8的倍数 */
+    border-radius: 4px; /* 小圆角 */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ===== 导航列表 ===== */
+  .category-nav {
+    padding: 8px; /* 8的倍数 */
+  }
+
+  /* ===== 导航项样式 - 修复对齐问题 ===== */
+  .category-nav-item {
+    display: flex;
+    align-items: center; /* 确保垂直居中对齐 */
+    width: 100%;
+    padding: 12px 16px; /* 8的倍数，统一内边距 */
+    margin-bottom: 4px; /* 8的倍数 */
+    border-radius: 8px; /* 苹果推荐圆角 */
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease; /* 苹果动画时长 */
+    text-align: left;
+    font-family: inherit;
+    gap: 12px; /* 8的倍数，统一间距 */
+    min-height: 44px; /* 苹果最小触摸目标 */
+    /* 移除阴影 */
+  }
+
+  .category-nav-item:hover:not(.disabled) {
+    background: rgba(0, 0, 0, 0.05); /* 苹果浅色背景 */
+  }
+
+  .category-nav-item.active {
+    background: var(--primary-color, #007aff) !important; /* 使用主题色 */
+    color: #ffffff !important;
+  }
+
+  .category-nav-item.disabled {
+    opacity: 0.4; /* 苹果禁用透明度 */
+    cursor: not-allowed;
+  }
+
+  /* ===== 搜索项特殊样式 - 修复对齐 ===== */
+  .category-nav-item.search-item {
+    background: rgba(0, 122, 255, 0.1); /* 苹果蓝色背景 */
+    border: 0.5px solid rgba(0, 122, 255, 0.2); /* 苹果蓝色边框 */
+  }
+
+  .category-nav-item.search-item:hover {
+    background: rgba(0, 122, 255, 0.15);
+    border-color: rgba(0, 122, 255, 0.3);
+  }
+
+  /* ===== 导航项图标 ===== */
+  .category-nav-icon {
+    width: 20px; /* 8的倍数 */
+    height: 20px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6d6d70; /* 苹果次要颜色 */
+  }
+
+  .category-nav-item.active .category-nav-icon {
+    color: #ffffff !important; /* 选中时图标白色 */
+  }
+
+  .category-nav-item.search-item .category-nav-icon {
+    color: #007aff; /* 苹果蓝色 */
+  }
+
+  /* ===== 导航项文本 ===== */
+  .category-nav-name {
+    flex: 1;
+    font-size: 15px; /* 苹果Subheadline */
+    font-weight: 400; /* 苹果Regular */
+    color: #000; /* 苹果主文本 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+  }
+
+  .category-nav-item.active .category-nav-name {
+    font-weight: 600; /* 选中时加粗 */
+    color: #ffffff !important;
+  }
+
+  .category-nav-item.search-item .category-nav-name {
+    color: #007aff; /* 苹果蓝色 */
+    font-weight: 500;
+  }
+
+  /* ===== 导航项计数 ===== */
+  .category-nav-count {
+    font-size: 13px; /* 苹果Caption */
+    font-weight: 500; /* 苹果Medium */
+    color: #6d6d70; /* 苹果次要颜色 */
+    background: rgba(0, 0, 0, 0.05);
+    padding: 2px 6px; /* 8的倍数 */
+    border-radius: 10px; /* 胶囊形状 */
+    min-width: 20px; /* 最小宽度 */
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .category-nav-item.active .category-nav-count {
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff !important;
+  }
+
+  .category-nav-item.search-item .category-nav-count {
+    background: rgba(0, 122, 255, 0.2);
+    color: #007aff;
+  }
+
+  /* ===== 导航项徽章 ===== */
+  .category-nav-badge {
+    font-size: 11px; /* 苹果Caption2 */
+    font-weight: 600; /* 苹果Semibold */
+    color: white;
+    background: #ff3b30; /* 苹果红色 */
+    padding: 2px 6px; /* 8的倍数 */
+    border-radius: 8px; /* 小圆角 */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+
+  /* ===== 外部链接图标 ===== */
+  .category-nav-external {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    color: #6d6d70; /* 苹果次要颜色 */
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+  }
+
+  .category-nav-item:hover .category-nav-external {
+    opacity: 1;
+  }
+
+  .category-nav-item.search-item .category-nav-external {
+    color: #007aff; /* 苹果蓝色 */
+  }
+}
+
+/* ===== 超小屏幕优化 (375px以下) ===== */
+@media (max-width: 375px) {
+  .category-sidebar {
+    margin-bottom: 12px; /* 减少间距 */
+  }
+
+  .sidebar-header {
+    padding: 12px; /* 减少内边距 */
+  }
+
+  .sidebar-header-title {
+    font-size: 15px; /* 适配小屏幕 */
+  }
+
+  .category-nav {
+    padding: 6px; /* 减少内边距 */
+  }
+
+  .category-nav-item {
+    padding: 10px 12px; /* 减少内边距 */
+    gap: 10px; /* 减少间距 */
+    min-height: 40px; /* 适配小屏幕 */
+  }
+
+  .category-nav-icon {
+    width: 18px; /* 适配小屏幕 */
+    height: 18px;
+  }
+
+  .category-nav-name {
+    font-size: 14px; /* 适配小屏幕 */
+  }
+
+  .category-nav-count {
+    font-size: 12px; /* 适配小屏幕 */
+    padding: 1px 4px;
+    min-width: 18px;
+  }
+
+  .category-nav-badge {
+    font-size: 10px; /* 适配小屏幕 */
+    padding: 1px 4px;
+  }
+}
+
+/* ===== 深色模式适配 - 苹果深色模式规范 ===== */

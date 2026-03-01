@@ -1,0 +1,202 @@
+/**
+ * @file design-system.css
+ * @description Design System Tokens - Single source of truth for all design values
+ * @copyright Tomda (https://www.tomda.top)
+ * @copyright UIED技术团队 (https://fsuied.com)
+ * @author UIED技术团队
+ * @createDate 2026.02.21
+ */
+
+:root {
+  /* ==========================================================================
+     Color Palette
+     ========================================================================== */
+  
+  /* Primary Colors - Blue */
+  --primary-50: #eff6ff;
+  --primary-100: #dbeafe;
+  --primary-200: #bfdbfe;
+  --primary-300: #93c5fd;
+  --primary-400: #60a5fa;
+  --primary-500: #3b82f6;  /* Standard Primary */
+  --primary-600: #2563eb;  /* Hover/Active */
+  --primary-700: #1d4ed8;
+  --primary-800: #1e40af;
+  --primary-900: #1e3a8a;
+
+  /* Legacy Primary Variables (for backward compatibility) */
+  --primary-color: var(--primary-500);
+  --primary-light: rgba(59, 130, 246, 0.1);
+  --primary-dark: var(--primary-700);
+
+  /* Neutral Colors - Gray/Slate */
+  --neutral-0: #ffffff;
+  --neutral-50: #f8f9fa;   /* Page Background */
+  --neutral-100: #f1f5f9;
+  --neutral-200: #e2e8f0;  /* Borders */
+  --neutral-300: #cbd5e1;
+  --neutral-400: #94a3b8;  /* Icons/Disabled Text */
+  --neutral-500: #64748b;  /* Secondary Text */
+  --neutral-600: #475569;
+  --neutral-700: #334155;  /* Primary Text */
+  --neutral-800: #1e293b;  /* Headings */
+  --neutral-900: #0f172a;
+
+  /* Semantic Colors */
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --error-color: #ef4444;
+  --info-color: #3b82f6;
+
+  /* Text Colors */
+  --text-primary: var(--neutral-800);
+  --text-secondary: var(--neutral-500);
+  --text-tertiary: var(--neutral-400);
+  --text-disabled: var(--neutral-300);
+  --text-inverse: var(--neutral-0);
+
+  /* Background Colors */
+  --bg-page: var(--neutral-50);
+  --bg-card: var(--neutral-0);
+  --bg-hover: var(--neutral-50);
+  --bg-active: var(--neutral-100);
+  --bg-input: var(--neutral-50);
+  
+  /* Legacy Background Variables */
+  --white: var(--neutral-0);
+  --background-light: var(--bg-page);
+
+  /* Border Colors */
+  --border-light: rgba(0, 0, 0, 0.04);
+  --border-medium: var(--neutral-200);
+  --border-dark: var(--neutral-300);
+  
+  /* Legacy Border Variables */
+  --border-color: var(--border-light);
+
+  /* ==========================================================================
+     Layout Variables
+     ========================================================================== */
+  
+  --container-width: 1200px;
+  --container-padding: 1.25rem;
+  --header-height: 64px;
+  --footer-height: auto;
+
+  /* ==========================================================================
+     Glassmorphism
+     ========================================================================== */
+  
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.3);
+  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  --backdrop-blur: blur(10px);
+
+  /* ==========================================================================
+     Typography
+     ========================================================================== */
+  
+  --font-sans: 'Lexend', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+
+  /* Font Sizes */
+  --text-xs: 0.6875rem;   /* 11px */
+  --text-sm: 0.8125rem;   /* 13px */
+  --text-base: 0.9375rem; /* 15px */
+  --text-lg: 1.0625rem;   /* 17px */
+  --text-xl: 1.1875rem;   /* 19px */
+  --text-2xl: 1.375rem;   /* 22px */
+  --text-3xl: 1.625rem;   /* 26px */
+  --text-4xl: 2rem;       /* 32px */
+
+  /* Font Weights */
+  --font-light: 300;
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  --font-extrabold: 800;
+
+  /* Line Heights */
+  --leading-none: 1;
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose: 2;
+
+  /* ==========================================================================
+     Spacing & Layout
+     ========================================================================== */
+  
+  --spacing-1: 0.25rem;  /* 4px */
+  --spacing-2: 0.5rem;   /* 8px */
+  --spacing-3: 0.75rem;  /* 12px */
+  --spacing-4: 1rem;     /* 16px */
+  --spacing-5: 1.25rem;  /* 20px */
+  --spacing-6: 1.5rem;   /* 24px */
+  --spacing-8: 2rem;     /* 32px */
+  --spacing-10: 2.5rem;  /* 40px */
+  --spacing-12: 3rem;    /* 48px */
+  --spacing-16: 4rem;    /* 64px */
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;  /* 4px */
+  --radius-md: 0.5rem;   /* 8px */
+  --radius-lg: 0.75rem;  /* 12px */
+  --radius-xl: 1rem;     /* 16px */
+  --radius-2xl: 1.5rem;  /* 24px */
+  --radius-full: 9999px;
+
+  /* Legacy Radius Variables */
+  --border-radius-small: var(--radius-md);
+  --border-radius: var(--radius-lg);
+  --border-radius-large: var(--radius-xl);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.02);
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+
+  /* Legacy Shadow Variables */
+  --shadow-light: var(--shadow-sm);
+  --shadow-medium: var(--shadow-md);
+
+  /* ==========================================================================
+     Animation & Transition
+     ========================================================================== */
+  
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+
+  --transition-all: all var(--duration-normal) var(--ease-in-out);
+  --transition-colors: color var(--duration-normal) var(--ease-in-out), background-color var(--duration-normal) var(--ease-in-out), border-color var(--duration-normal) var(--ease-in-out);
+  --transition-transform: transform var(--duration-normal) var(--ease-out);
+
+  /* Legacy Transition Variables */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  
+  /* ==========================================================================
+     Z-Index Layers
+     ========================================================================== */
+  
+  --z-negative: -1;
+  --z-elevated: 100;
+  --z-dropdown: 1000;
+  --z-sticky: 1100;
+  --z-fixed: 1200;
+  --z-modal-backdrop: 2000;
+  --z-modal: 2001;
+  --z-popover: 2002;
+  --z-toast: 3000;
+  --z-tooltip: 4000;
+}

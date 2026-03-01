@@ -1,0 +1,102 @@
+/**
+ * @file RankingHeader.module.css
+ * @description 热榜标题组件样式模块
+ * @copyright 版权所有 (c) 2025 UIED技术团队
+ * @website https://fsuied.com
+ * @license MIT
+ * @version 1.0.0
+ */
+
+/* 热榜标题容器 */
+.rankingHeader {
+  text-align: center;
+  padding: 2rem 1rem;
+  margin-bottom: 2rem;
+  background: transparent;
+}
+
+/* 主标题样式 */
+.mainTitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 1rem 0;
+  color: var(--text-primary, #333333);
+  text-shadow: none;
+}
+
+/* 文字容器 */
+.textContainer {
+  position: relative;
+  display: inline-block;
+  min-height: 3rem;
+  width: 100%;
+}
+
+/* 描述文字样式 */
+.rankingDesc {
+  font-size: 1.125rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.6;
+  margin: 0;
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+/* 响应式设计 - 平板端 */
+@media (max-width: 768px) {
+  .rankingHeader {
+    padding: 1.5rem 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .mainTitle {
+    font-size: 2rem;
+  }
+  
+  .rankingDesc {
+    font-size: 1rem;
+  }
+}
+
+/* 响应式设计 - 移动端 */
+@media (max-width: 480px) {
+  .rankingHeader {
+    padding: 1.25rem 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .mainTitle {
+    font-size: 1.75rem;
+  }
+  
+  .textContainer {
+    min-height: 2.5rem;
+  }
+  
+  .rankingDesc {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+}
+
+/* 暗色模式适配 */
+[data-theme="dark"] .mainTitle {
+  color: var(--text-primary-dark, #ffffff);
+}
+
+[data-theme="dark"] .rankingDesc {
+  color: var(--text-secondary-dark, #cccccc);
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+  .mainTitle {
+    color: #000000;
+    text-shadow: none;
+  }
+  
+  .rankingDesc {
+    color: #333333;
+  }
+} 

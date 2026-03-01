@@ -1,0 +1,263 @@
+/**
+ * 404页面样式 - 简洁优雅设计
+ * @description 页面未找到的简洁样式定义，符合整站设计规范
+ * @copyright 版权所有 (c) 2025 UIED技术团队
+ * @website https://fsuied.com
+ * @license MIT
+ * @version 1.0.0
+ */
+
+/* 404页面容器 */
+.not-found-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: var(--background-light, #f6f8fb);
+  margin-top: -4rem; /* 抵消Layout的margin-top */
+  padding-top: 6rem; /* 为导航栏留出空间 */
+}
+
+/* 主内容区域 */
+.not-found-content {
+  max-width: 40rem;
+  text-align: center;
+  background: var(--white, #ffffff);
+  border-radius: var(--border-radius-large, 1rem);
+  padding: 3rem 2rem;
+  border: 0.0625rem solid var(--border-color, #f0f0f0);
+  box-shadow: var(--shadow-light, 0 0.125rem 0.5rem rgba(0, 0, 0, 0.05));
+}
+
+/* 404数字显示 */
+.not-found-icon {
+  margin-bottom: 2rem;
+}
+
+.number-404 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.number {
+  font-size: 6rem;
+  font-weight: 700;
+  color: var(--primary-color, #0066ff);
+  line-height: 1;
+  font-family: 'Lexend', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.error-subtitle {
+  font-size: 1.25rem;
+  color: var(--text-secondary, #666);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* 错误信息 */
+.not-found-message {
+  margin-bottom: 2.5rem;
+}
+
+.not-found-message h1 {
+  font-size: 1.75rem;
+  color: var(--text-primary, #333);
+  margin-bottom: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.not-found-message p {
+  font-size: 1rem;
+  color: var(--text-secondary, #666);
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.auto-redirect {
+  font-size: 0.875rem;
+  color: var(--text-light, #999);
+  margin-bottom: 0;
+}
+
+.countdown {
+  font-weight: 600;
+  color: var(--primary-color, #0066ff);
+}
+
+/* 操作按钮 */
+.not-found-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius-small, 0.5rem);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-normal, 0.3s ease);
+  border: none;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 7rem;
+}
+
+.btn-primary {
+  background: var(--primary-color, #0066ff);
+  color: var(--white, #ffffff);
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark, #0052cc);
+  transform: translateY(-0.125rem);
+  text-decoration: none;
+  color: var(--white, #ffffff);
+}
+
+.btn-secondary {
+  background: var(--white, #ffffff);
+  color: var(--text-primary, #333);
+  border: 0.0625rem solid var(--border-color, #f0f0f0);
+}
+
+.btn-secondary:hover {
+  border-color: var(--primary-color, #0066ff);
+  color: var(--primary-color, #0066ff);
+  transform: translateY(-0.125rem);
+}
+
+/* 推荐链接 */
+.not-found-links h3 {
+  font-size: 1.125rem;
+  color: var(--text-primary, #333);
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.link-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: 1rem;
+  max-width: 32rem;
+  margin: 0 auto;
+}
+
+.category-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0.75rem;
+  background: var(--background-light, #f6f8fb);
+  border-radius: var(--border-radius, 0.75rem);
+  text-decoration: none;
+  color: var(--text-secondary, #666);
+  transition: var(--transition-normal, 0.3s ease);
+  border: 0.0625rem solid transparent;
+}
+
+.category-link:hover {
+  background: var(--white, #ffffff);
+  border-color: var(--primary-color, #0066ff);
+  color: var(--primary-color, #0066ff);
+  transform: translateY(-0.125rem);
+  text-decoration: none;
+  box-shadow: var(--shadow-light, 0 0.125rem 0.5rem rgba(0, 0, 0, 0.05));
+}
+
+.link-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.link-text {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .not-found-container {
+    padding: 1rem;
+    min-height: 100vh;
+    margin-top: -3.5rem; /* 移动端导航栏稍小 */
+    padding-top: 5rem; /* 移动端调整 */
+  }
+
+  .not-found-content {
+    padding: 2rem 1.5rem;
+  }
+
+  .number {
+    font-size: 4rem;
+  }
+
+  .error-subtitle {
+    font-size: 1rem;
+  }
+
+  .not-found-message h1 {
+    font-size: 1.5rem;
+  }
+
+  .not-found-message p {
+    font-size: 0.875rem;
+  }
+
+  .not-found-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .btn {
+    width: 100%;
+    max-width: 16rem;
+  }
+
+  .link-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .category-link {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .link-text {
+    font-size: 0.6875rem;
+  }
+
+  .link-icon {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .number {
+    font-size: 3rem;
+  }
+
+  .number-404 {
+    gap: 0.25rem;
+  }
+
+  .not-found-message h1 {
+    font-size: 1.25rem;
+  }
+
+  .link-grid {
+    grid-template-columns: 1fr;
+  }
+} 

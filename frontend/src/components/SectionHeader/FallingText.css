@@ -1,0 +1,160 @@
+/**
+ * @file FallingText.css
+ * @description 文字下落动画组件样式
+ * @copyright 版权所有 (c) 2025 UIED技术团队
+ * @website https://fsuied.com
+ * @license MIT
+ * @version 1.0.0
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap');
+
+.falling-text-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  text-align: center;
+  padding-top: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Lexend', sans-serif;
+  background: transparent;
+}
+
+.falling-text-target {
+  display: inline-block;
+  font-family: 'Lexend', sans-serif;
+  font-weight: 500;
+  max-width: 90%;
+  background: transparent;
+  text-align: center;
+}
+
+.word {
+  display: inline-block;
+  margin: 0 6px;
+  padding: 3px 6px;
+  user-select: none;
+  font-family: 'Lexend', sans-serif;
+  font-weight: 600;
+  transition: transform 0.2s ease;
+  line-height: 1.5;
+  border-radius: 4px;
+  color: #333333;
+}
+
+.highlighted {
+  color: cyan;
+  font-weight: bold;
+  text-shadow: none;
+}
+
+.highlight-red {
+  color: #ff5252;
+  font-weight: bold;
+  text-shadow: none;
+}
+
+.highlight-green {
+  color: #4caf50;
+  font-weight: bold;
+  text-shadow: none;
+}
+
+.highlight-purple {
+  color: #9c27b0;
+  font-weight: bold;
+  text-shadow: none;
+}
+
+.highlight-orange {
+  color: #ff9800;
+  font-weight: bold;
+  text-shadow: none;
+}
+
+.highlight-blue {
+  color: #1e90ff;
+  font-weight: bold;
+  text-shadow: none;
+}
+
+.highlight-pink {
+  color: #ff69b4;
+  font-weight: bold;
+  text-shadow: none;
+}
+
+.highlight-teal {
+  color: #20b2aa;
+  font-weight: bold;
+  text-shadow: none;
+}
+
+.falling-text-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background: transparent;
+}
+
+/* 响应式设计 - 只调整字体和间距 */
+@media (max-width: 768px) {
+  .word {
+    margin: 0 4px;
+    padding: 2px 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .word {
+    margin: 0 2px;
+    padding: 1px 3px;
+    font-size: 0.9em;
+  }
+}
+
+/* 暗色模式适配 */
+[data-theme="dark"] .word {
+  color: #333333;
+}
+
+[data-theme="dark"] .highlight-purple { 
+  color: #9c27b0; 
+}
+
+[data-theme="dark"] .highlight-green { 
+  color: #4caf50; 
+}
+
+[data-theme="dark"] .highlight-orange { 
+  color: #ff9800; 
+}
+
+[data-theme="dark"] .highlight-red { 
+  color: #ff5252; 
+}
+
+[data-theme="dark"] .highlight-blue {
+  color: #1e90ff;
+}
+
+[data-theme="dark"] .highlight-pink {
+  color: #ff69b4;
+}
+
+[data-theme="dark"] .highlight-teal {
+  color: #20b2aa;
+}
+
+[data-theme="dark"] .highlighted { 
+  color: cyan; 
+}
+
+ 

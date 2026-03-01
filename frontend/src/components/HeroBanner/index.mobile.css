@@ -1,0 +1,429 @@
+/**
+ * @file HeroBanner/index.mobile.css
+ * @description HeroBanner组件移动端样式 - 遵循苹果设计规范
+ * @copyright 版权所有 (c) 2025 UIED技术团队
+ * @website https://fsuied.com
+ * @license MIT
+ * @version 1.0.0
+ */
+
+/* 移动端专用样式 - 750px以下设备，遵循苹果设计规范 */
+@media (max-width: 750px) {
+  /* ===== HeroBanner容器移动端优化 ===== */
+  .hero-banner {
+    min-height: 17.5rem; /* 280px - 改为最小高度，允许内容撑开 */
+    height: auto; /* 自动高度，适应滚动图标 */
+    padding: var(--spacing-5) 0; /* 20px - 苹果推荐使用8的倍数 */
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column; /* 垂直排列 */
+    align-items: center;
+    justify-content: flex-start; /* 从顶部开始排列，不要居中 */
+  }
+
+  /* 移动端滚动图标墙 */
+  .hero-icon-scroll {
+    width: 100vw;
+    flex-shrink: 0; /* 防止被压缩 */
+    margin-bottom: var(--spacing-4); /* 16px */
+  }
+
+  .hero-content {
+    padding: 0 var(--spacing-4) !important; /* 16px - 苹果推荐的16px边距 */
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  /* ===== 移动端文本样式 - 苹果字体规范 ===== */
+
+  .hero-title {
+    font-size: 1.75rem; /* 28px - 苹果Large Title规范 */
+    font-weight: 700;
+    line-height: 1.2; /* 苹果推荐行高 */
+    margin-bottom: var(--spacing-3); /* 8的倍数 */
+    color: var(--text-primary); /* 苹果纯黑色文本 */
+    text-align: center;
+    letter-spacing: -0.5px; /* 苹果字母间距 */
+  }
+
+  .hero-description {
+    font-size: var(--text-base); /* 17px -> 16px (Base) - 苹果Body文本规范 */
+    color: var(--text-secondary); /* 苹果次要文本颜色 */
+    line-height: 1.4; /* 苹果推荐行高 */
+    margin-bottom: var(--spacing-4);
+    text-align: center;
+    padding: 0 var(--spacing-2);
+    font-weight: 400; /* 苹果Regular权重 */
+  }
+
+  /* ===== 移动端统计信息样式 - 苹果卡片设计 ===== */
+  .website-stats {
+    font-size: var(--text-sm); /* 15px -> 14px (SM) - 苹果Subheadline规范 */
+    border-radius: var(--radius-lg); /* 苹果推荐圆角 */
+    background: rgba(255, 255, 255, 0.95);
+    border: 0.5px solid var(--border-light); /* 苹果细边框 */
+    /* 移除阴影 - 符合要求 */
+  }
+
+  .stats-text {
+    font-size: var(--text-sm); /* 15px -> 14px (SM) - 苹果Subheadline */
+    color: var(--text-primary);
+    font-weight: 400;
+  }
+
+  .stats-number {
+    font-size: var(--text-base); /* 17px -> 16px (Base) - 苹果Body */
+    font-weight: 600; /* 苹果Semibold */
+  }
+
+  /* ===== 移动端搜索框样式 - 苹果搜索栏设计 ===== */
+  .hero-search-modern {
+    margin: var(--spacing-4) 0;
+    padding: 0 var(--spacing-2);
+  }
+
+  .search-container {
+    max-width: 100%;
+    padding: var(--spacing-3) var(--spacing-4); /* 12px 16px - 苹果推荐内边距 */
+    border-radius: var(--radius-lg); /* 苹果搜索栏圆角 */
+    background: rgba(255, 255, 255, 0.95);
+    border: 0.5px solid var(--border-light); /* 苹果细边框 */
+    /* 移除阴影 - 符合要求 */
+    gap: var(--spacing-2); /* 8的倍数 */
+    transition: all 0.2s ease; /* 苹果动画时长 */
+  }
+
+  .search-container:hover,
+  .search-container:focus-within {
+    transform: none; /* 移除变换动画 */
+    border-color: var(--primary-color); /* 苹果蓝色 */
+    /* 移除阴影 - 符合要求 */
+  }
+
+  /* AI和UI/UX页面移动端搜索框蓝色主题 */
+  .hero-banner.ai-theme .search-container:focus-within,
+  .hero-banner.uiux-theme .search-container:focus-within {
+    border-color: var(--primary-color); /* 统一使用苹果蓝色 */
+    /* 移除阴影 - 符合要求 */
+  }
+
+  .search-icon {
+    opacity: 0.6; /* 苹果图标透明度 */
+    color: var(--text-secondary); /* 苹果次要颜色 */
+  }
+
+  .search-input {
+    font-size: var(--text-base); /* 17px -> 16px (Base) - 苹果Body文本 */
+    line-height: 1.4;
+    color: var(--text-primary); /* 苹果主文本颜色 */
+    font-weight: 400;
+  }
+
+  .search-input::placeholder {
+    font-size: var(--text-base); /* 17px -> 16px (Base) */
+    opacity: 0.6; /* 苹果占位符透明度 */
+    color: var(--text-secondary); /* 苹果次要颜色 */
+  }
+
+  /* ===== 移动端搜索框样式 ===== */
+  .hero-search-modern {
+    margin: var(--spacing-3) 0 !important; /* 12px */
+    padding: 0 var(--spacing-4) !important; /* 16px */
+    width: 100% !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .search-container {
+    width: calc(100% - var(--spacing-8)) !important; /* 32px */
+    max-width: none !important;
+    margin: 0 auto !important;
+    padding: var(--spacing-2) var(--spacing-3) !important; /* 8px 12px */
+    border-radius: var(--radius-2xl) !important; /* 24px */
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid var(--border-light) !important;
+    gap: var(--spacing-2) !important; /* 8px */
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+  }
+
+  .search-icon {
+    flex-shrink: 0;
+    width: 1.125rem; /* 18px */
+    height: 1.125rem;
+    opacity: 0.6;
+    color: var(--text-secondary); /* #6d6d70 */
+  }
+
+  .search-input {
+    flex: 1;
+    min-width: 0; /* 关键：允许收缩 */
+    width: 100%;
+    font-size: var(--text-sm); /* 14px */
+    border: none;
+    outline: none;
+    background: transparent;
+  }
+
+  /* ===== 移动端 AI 搜索按钮 ===== */
+  .ai-search-btn {
+    min-width: 70px !important;
+    max-width: 80px !important;
+    width: auto !important;
+    height: var(--spacing-8) !important; /* 32px */
+    border-radius: var(--radius-xl) !important; /* 16px */
+    padding: 0 10px !important;
+    margin-left: var(--spacing-1) !important; /* 4px */
+    gap: 3px !important;
+    background: #1C1A1C !important;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+  }
+
+  .ai-search-btn .sparkle {
+    width: var(--spacing-3) !important; /* 12px */
+    height: var(--spacing-3) !important;
+  }
+
+  .ai-search-btn .text {
+    font-size: 0.6875rem !important; /* 11px */
+    white-space: nowrap !important;
+  }
+  
+  .ai-search-btn:hover:not(:disabled),
+  .ai-search-btn:active:not(:disabled) {
+    background: linear-gradient(0deg, #A47CF3, #683FEA) !important;
+    transform: none !important;
+  }
+
+  /* ===== 移动端热门标签样式 - 苹果按钮设计，减小尺寸 ===== */
+  .hot-tags-modern {
+    margin-top: var(--spacing-4);
+    gap: 0.375rem; /* 6px - 减小间距 */
+    padding: 0 var(--spacing-2);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .tags-label {
+    font-size: var(--text-xs); /* 13px -> 12px (XS) - 减小字体，苹果Caption */
+    color: var(--text-primary);
+    margin-right: var(--spacing-1); /* 4px */
+    margin-bottom: var(--spacing-1); /* 4px */
+    width: 100%;
+    text-align: center;
+    font-weight: 400;
+  }
+
+  .tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem; /* 6px - 减小间距 */
+    justify-content: center;
+    width: 100%;
+  }
+
+  .tag-btn {
+    padding: 0.375rem var(--spacing-3); /* 6px 12px - 减小内边距，8的倍数 */
+    font-size: var(--text-xs); /* 13px -> 12px (XS) - 减小字体，苹果Caption */
+    border-radius: var(--radius-xl); /* 16px - 减小圆角 */
+    background: rgba(255, 255, 255, 0.95);
+    border: 0.5px solid var(--border-light); /* 苹果细边框 */
+    color: var(--text-primary);
+    font-weight: 400; /* 苹果Regular */
+    transition: all 0.2s ease; /* 苹果动画时长 */
+    white-space: nowrap;
+    min-height: var(--spacing-8); /* 32px - 减小最小高度，8的倍数 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 移除阴影 - 符合要求 */
+  }
+
+  .tag-btn:hover,
+  .tag-btn:active {
+    background: var(--primary-color); /* 苹果蓝色 */
+    border-color: var(--primary-color);
+    color: white;
+    transform: none; /* 移除变换动画 */
+    /* 移除阴影 - 符合要求 */
+  }
+
+  /* 各页面移动端标签主题样式 */
+  /* AI和UI/UX页面 - 苹果蓝色主题 */
+  .hero-banner.ai-theme .tag-btn:hover,
+  .hero-banner.ai-theme .tag-btn:active,
+  .hero-banner.uiux-theme .tag-btn:hover,
+  .hero-banner.uiux-theme .tag-btn:active {
+    background: var(--primary-color); /* 统一使用苹果蓝色 */
+    border-color: var(--primary-color);
+    color: white;
+  }
+
+  /* 3D页面 - 紫色主题 */
+  .hero-banner.threed-theme .tag-btn:hover,
+  .hero-banner.threed-theme .tag-btn:active {
+    background: #6f42c1;
+    border-color: #6f42c1;
+    color: white;
+  }
+
+  /* 电商页面 - 红色主题 */
+  .hero-banner.ecommerce-theme .tag-btn:hover,
+  .hero-banner.ecommerce-theme .tag-btn:active {
+    background: #e74c3c;
+    border-color: #e74c3c;
+    color: white;
+  }
+
+  /* 室内设计页面 - 绿色主题 */
+  .hero-banner.interior-theme .tag-btn:hover,
+  .hero-banner.interior-theme .tag-btn:active {
+    background: #27ae60;
+    border-color: #27ae60;
+    color: white;
+  }
+
+  /* 设计资源页面 - 橙色主题 */
+  .hero-banner.design-theme .tag-btn:hover,
+  .hero-banner.design-theme .tag-btn:active {
+    background: #f39c12;
+    border-color: #f39c12;
+    color: white;
+  }
+}
+
+/* ===== 超小屏幕优化 (375px以下) - 苹果iPhone SE规范 ===== */
+@media (max-width: 375px) {
+  .hero-banner {
+    min-height: 15rem; /* 240px - 改为最小高度 */
+    height: auto;
+    padding: var(--spacing-4) 0; /* 16px - 8的倍数 */
+  }
+
+  .hero-content {
+    padding: 0 var(--spacing-4); /* 16px - 保持苹果边距 */
+  }
+
+  .hero-title {
+    font-size: var(--text-2xl); /* 24px - 适配小屏幕 */
+    margin-bottom: var(--spacing-2); /* 8px */
+    letter-spacing: -0.3px;
+  }
+
+  .hero-description {
+    font-size: var(--text-sm); /* 15px -> 14px (SM) - 苹果Subheadline */
+    margin-bottom: var(--spacing-3); /* 12px */
+    padding: 0 var(--spacing-1); /* 4px */
+  }
+
+  .website-stats {
+    padding: var(--spacing-2) var(--spacing-3); /* 8px 12px - 8的倍数 */
+    margin: var(--spacing-3) 0; /* 12px */
+  }
+
+  .stats-text {
+    font-size: var(--text-xs); /* 13px -> 12px (XS) - 苹果Caption */
+  }
+
+  .stats-number {
+    font-size: var(--text-sm); /* 15px -> 14px (SM) - 苹果Subheadline */
+  }
+
+  .search-container {
+    padding: 0.625rem var(--spacing-3); /* 10px 12px - 8的倍数 */
+    border-radius: 0.625rem; /* 10px */
+  }
+
+  .search-input {
+    font-size: var(--text-sm); /* 15px -> 14px (SM) - 苹果Subheadline */
+  }
+
+  .search-btn {
+    padding: 0.375rem 0.625rem; /* 6px 10px - 8的倍数 */
+    font-size: var(--text-xs); /* 13px -> 12px (XS) - 苹果Caption */
+    min-width: 50px; /* 适配小屏幕 */
+    height: var(--spacing-8); /* 32px - 8的倍数 */
+  }
+
+  .tag-btn {
+    padding: var(--spacing-1) var(--spacing-2); /* 4px 8px - 8的倍数 */
+    font-size: var(--text-xs); /* 12px - 更小字体 */
+    min-height: 1.75rem; /* 28px - 小屏幕适配，8的倍数 */
+    border-radius: 0.875rem; /* 14px - 适配小屏幕 */
+  }
+
+  .tags-label {
+    font-size: var(--text-xs); /* 12px - 更小字体 */
+  }
+
+  .hot-tags-modern {
+    gap: var(--spacing-1); /* 4px - 更小间距 */
+  }
+
+  .tags-list {
+    gap: var(--spacing-1); /* 4px - 更小间距 */
+  }
+}
+
+/* ===== 横屏模式优化 - 苹果横屏规范 ===== */
+@media (max-width: 750px) and (max-height: 500px) and (orientation: landscape) {
+  .hero-banner {
+    min-height: 12.5rem; /* 200px - 改为最小高度 */
+    height: auto;
+    padding: var(--spacing-3) 0; /* 12px - 8的倍数 */
+  }
+
+  .hero-title {
+    font-size: 1.375rem; /* 22px - 横屏适配 */
+    margin-bottom: var(--spacing-2); /* 8px */
+  }
+
+  .hero-description {
+    font-size: var(--text-sm); /* 15px -> 14px (SM) */
+    margin-bottom: var(--spacing-3); /* 12px */
+  }
+
+  .website-stats {
+    margin: var(--spacing-2) 0; /* 8px */
+  }
+
+  .hot-tags-modern {
+    margin-top: var(--spacing-2); /* 8px */
+  }
+
+  .tag-btn {
+    padding: var(--spacing-1) var(--spacing-2); /* 4px 8px - 横屏紧凑布局 */
+    font-size: var(--text-xs); /* 12px */
+    min-height: 1.75rem; /* 28px */
+  }
+}
+
+/* ===== 触摸设备优化 - 苹果触摸规范 ===== */
+@media (max-width: 750px) and (pointer: coarse) {
+  .tag-btn {
+    min-height: var(--spacing-8); /* 32px - 苹果最小触摸目标 */
+    min-width: var(--spacing-8);
+  }
+
+  .search-container {
+    min-height: 2.75rem; /* 44px - 苹果最小触摸目标 */
+  }
+
+  .search-btn {
+    min-height: 2.25rem; /* 36px - 苹果推荐触摸目标 */
+    min-width: 60px;
+  }
+}
+
+/* ===== 深色模式移动端适配 - 苹果深色模式规范 ===== */

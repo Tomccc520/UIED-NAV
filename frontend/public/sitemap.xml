@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+  <!-- 首页 -->
+  <url>
+    <loc>https://hao.uied.cn/</loc>
+    <lastmod>2025-01-13T10:00:00+08:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  <!-- AI工具导航 -->
+  <url>
+    <loc>https://hao.uied.cn/ai</loc>
+    <lastmod>2025-01-13T10:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- UI/UX设计导航 -->
+  <url>
+    <loc>https://hao.uied.cn/uiux</loc>
+    <lastmod>2025-01-13T10:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- 设计资源导航 -->
+  <url>
+    <loc>https://hao.uied.cn/design</loc>
+    <lastmod>2025-01-13T10:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- 字体导航 -->
+  <url>
+    <loc>https://hao.uied.cn/font</loc>
+    <lastmod>2025-01-13T10:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- 3D设计导航 -->
+  <url>
+    <loc>https://hao.uied.cn/3d</loc>
+    <lastmod>2025-01-13T10:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- 室内设计导航 -->
+  <url>
+    <loc>https://hao.uied.cn/interior</loc>
+    <lastmod>2025-01-13T10:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- 电商设计导航 -->
+  <url>
+    <loc>https://hao.uied.cn/ecommerce</loc>
+    <lastmod>2025-01-13T10:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- 搜索页面 -->
+  <url>
+    <loc>https://hao.uied.cn/search</loc>
+    <lastmod>2025-01-13T10:00:00+08:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+</urlset> 

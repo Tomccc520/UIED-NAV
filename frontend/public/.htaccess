@@ -1,0 +1,18 @@
+# 启用重写引擎
+RewriteEngine On
+
+# 如果请求的不是真实文件或目录，则重定向到index.html
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [QSA,L]
+
+# 添加正确的MIME类型
+<IfModule mod_mime.c>
+  AddType application/javascript js
+  AddType text/css css
+</IfModule>
+
+# 启用CORS支持
+<IfModule mod_headers.c>
+  Header set Access-Control-Allow-Origin "*"
+</IfModule> 
