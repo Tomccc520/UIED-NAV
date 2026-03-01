@@ -70,7 +70,11 @@ UIED 导航系统是一个现代化的设计资源导航网站系统，采用前
 ```bash
 git clone https://github.com/Tomccc520/UIED-NAV.git
 cd UIED-NAV
+git submodule update --init --recursive
 ```
+
+> 注意：当前仓库采用“双仓结构”，`frontend/` 是独立 Git 子模块。  
+> 首次拉取、切换分支、或其他人克隆后，必须执行 `git submodule update --init --recursive`，否则 `frontend/` 目录不会拿到完整前端代码。
 
 #### 2. 启动 MySQL 数据库
 
@@ -93,6 +97,16 @@ npm install
 cd ../../frontend
 npm install
 ```
+
+### 子模块说明（重要）
+
+- 根仓：负责后端、管理后台、文档、脚本，以及记录 `frontend` 子模块指针。
+- `frontend/`：独立前端仓库，需要单独提交、单独推送。
+- 日常开发与发布时，必须按以下顺序操作：
+  1. 先在 `frontend/` 仓库提交并推送前端代码
+  2. 再回根仓提交 `frontend` 指针变化和后端改动
+
+如果只提交根仓、不先推 `frontend`，根仓中的子模块指针可能会指向一个远端尚不存在的前端提交，其他人拉代码时会失败。
 
 #### 4. 配置环境变量
 
