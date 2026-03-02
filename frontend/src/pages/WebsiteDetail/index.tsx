@@ -191,10 +191,13 @@ interface DetailPageConfig {
   footerTipEnabled?: boolean;
   footerTipText?: string;
   shareEnabled?: boolean;
+  sharingEnabled?: boolean;
   shareText?: string;
+  shareChannels?: Array<{ key: string; name: string; enabled: boolean; sort: number; icon?: string }>;
   reportEnabled?: boolean;
   reportText?: string;
   reportEmail?: string;
+  sidebarModules?: Array<{ key: string; name: string; enabled: boolean; sort: number }>;
   // 直达按钮配置
   visitArrowEnabled?: boolean;
   visitArrowText?: string;
@@ -1511,14 +1514,15 @@ const WebsiteDetailPage: React.FC = () => {
                 </div>
               )}
               
-              {hasFeature(FEATURES.SHARING) && (
+              {hasFeature(FEATURES.SHARING) && detailPageConfig.sharingEnabled !== false && detailPageConfig.shareEnabled !== false && (
                 <div className="interaction-block share-block">
-                  <span className="share-label">分享：</span>
                   <ShareButtons
                     websiteId={website.id}
                     websiteName={website.name}
                     websiteDescription={website.description}
                     websiteUrl={website.url}
+                    shareChannels={detailPageConfig.shareChannels}
+                    shareText={detailPageConfig.shareText}
                   />
                 </div>
               )}
@@ -1588,6 +1592,7 @@ const WebsiteDetailPage: React.FC = () => {
                 relatedWebsites={relatedWebsites}
                 tags={website.tags || []}
                 websiteTags={websiteTags}
+                detailPageConfig={detailPageConfig}
                 category={website.category}
                 loading={relatedLoading}
               />

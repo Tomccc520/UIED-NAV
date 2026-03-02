@@ -1498,15 +1498,26 @@ class UserService extends Service {
       isDelete: 0,
     };
 
+    /**
+     * 订单状态筛选兼容：
+     * pending/paid/afterSale/cancelled 为前台用户中心新筛选值；
+     * completed 为历史参数，保持兼容。
+     */
     if (status === 'pending') {
       where.payStatus = 0;
       where.orderStatus = { [Op.ne]: 2 };
-    }
-    if (status === 'completed') {
+    } else if (status === 'paid') {
       where.payStatus = 1;
       where.orderStatus = { [Op.ne]: 2 };
-    }
-    if (status === 'cancelled') {
+      where.refundStatus = 0;
+    } else if (status === 'afterSale') {
+      where.payStatus = 1;
+      where.orderStatus = { [Op.ne]: 2 };
+      where.refundStatus = { [Op.gt]: 0 };
+    } else if (status === 'completed') {
+      where.payStatus = 1;
+      where.orderStatus = { [Op.ne]: 2 };
+    } else if (status === 'cancelled') {
       where.orderStatus = 2;
     }
 

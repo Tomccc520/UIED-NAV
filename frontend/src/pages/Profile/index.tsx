@@ -877,10 +877,12 @@ const LoginLogsList: React.FC = () => {
 
 // 子组件：订单列表
 const OrdersList: React.FC = () => {
+  type OrderFilterType = 'all' | 'pending' | 'paid' | 'afterSale' | 'cancelled';
   const [list, setList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [moduleEnabled, setModuleEnabled] = useState(true);
   const [moduleMessage, setModuleMessage] = useState('');
+  const [orderFilter, setOrderFilter] = useState<OrderFilterType>('all');
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailVisible, setDetailVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
@@ -893,6 +895,9 @@ const OrdersList: React.FC = () => {
     title: '',
     taxNo: '',
     email: '',
+  });
+  const [refundForm, setRefundForm] = useState({
+    reason: '',
   });
   const [orderActionKey, setOrderActionKey] = useState('');
 
@@ -959,14 +964,24 @@ const OrdersList: React.FC = () => {
         taxNo: '',
         email: String(pickValue(orderDetail, [ 'email', 'userEmail' ], '')),
       });
+      setRefundForm({ reason: '' });
     } catch (error) {
       setSelectedOrder(null);
       setInvoiceItems([]);
       setLicenseForms({});
       setInvoiceForm({ title: '', taxNo: '', email: '' });
+      setRefundForm({ reason: '' });
     } finally {
       setDetailLoading(false);
     }
+  };
+
+  /**
+   * 从列表进入退款流程：先打开订单详情，再提示填写退款原因
+   */
+  const handleOpenRefundDrawer = async (orderId: number) => {
+    await handleOpenOrderDetail(orderId);
+    setDetailMessage('请填写退款原因后提交申请');
   };
 
   /**
@@ -980,6 +995,7 @@ const OrdersList: React.FC = () => {
     setLicenseSubmittingId(0);
     setLicenseForms({});
     setInvoiceForm({ title: '', taxNo: '', email: '' });
+    setRefundForm({ reason: '' });
   };
 
   /**
@@ -1031,6 +1047,20 @@ const OrdersList: React.FC = () => {
   };
 
   /**
+   * 判断订单是否匹配当前筛选项
+   */
+  const matchesOrderFilter = (source: any, filter: OrderFilterType) => {
+    if (filter === 'all') return true;
+    const orderState = resolveOrderStatus(source);
+    const refundState = resolveRefundStatus(source);
+    if (filter === 'pending') return orderState.normalizedStatus === 0;
+    if (filter === 'paid') return orderState.normalizedStatus === 1 && refundState.value === 0;
+    if (filter === 'afterSale') return refundState.value > 0;
+    if (filter === 'cancelled') return orderState.normalizedStatus === 2;
+    return true;
+  };
+
+  /**
    * 将订单状态同步回当前列表与详情，避免操作成功后仍显示旧状态
    */
   const applyOrderPatchToLocalState = (orderId: number, patch: Record<string, any>) => {
@@ -1074,11 +1104,9 @@ const OrdersList: React.FC = () => {
   /**
    * 提交退款申请（支持填写可选原因）
    */
-  const handleRefundOrder = async (order: any) => {
+  const handleRefundOrder = async (order: any, reason: string) => {
     const orderId = Number(order?.id || 0);
     if (!orderId) return;
-    const reason = window.prompt('请输入退款原因（选填，取消则不提交）', '');
-    if (reason === null) return;
     setOrderActionKey(`refund-${orderId}`);
     setDetailMessage('');
     try {
@@ -1093,6 +1121,19 @@ const OrdersList: React.FC = () => {
     } finally {
       setOrderActionKey('');
     }
+  };
+
+  /**
+   * 在订单详情抽屉内提交退款申请
+   */
+  const handleSubmitRefundInDrawer = async () => {
+    if (!selectedOrder) return;
+    const reason = String(refundForm.reason || '').trim();
+    if (!reason) {
+      setDetailMessage('请填写退款原因');
+      return;
+    }
+    await handleRefundOrder(selectedOrder, reason);
   };
 
   /**
@@ -1254,6 +1295,11 @@ const OrdersList: React.FC = () => {
   };
 
   if (loading) return <div>加载中...</div>;
+  const filteredOrders = list.filter(item => matchesOrderFilter(item, orderFilter));
+  const pendingCount = list.filter(item => matchesOrderFilter(item, 'pending')).length;
+  const paidCount = list.filter(item => matchesOrderFilter(item, 'paid')).length;
+  const afterSaleCount = list.filter(item => matchesOrderFilter(item, 'afterSale')).length;
+  const cancelledCount = list.filter(item => matchesOrderFilter(item, 'cancelled')).length;
 
   return (
     <div>
@@ -1271,14 +1317,54 @@ const OrdersList: React.FC = () => {
           {moduleMessage || '当前版本暂未启用订单系统'}
         </div>
       )}
+      {moduleEnabled && list.length > 0 && (
+        <div className="profile-type-tabs" role="tablist" aria-label="订单状态筛选">
+          <button
+            type="button"
+            className={`profile-type-tab ${orderFilter === 'all' ? 'is-active' : ''}`}
+            onClick={() => setOrderFilter('all')}
+          >
+            全部 ({list.length})
+          </button>
+          <button
+            type="button"
+            className={`profile-type-tab ${orderFilter === 'pending' ? 'is-active' : ''}`}
+            onClick={() => setOrderFilter('pending')}
+          >
+            待支付 ({pendingCount})
+          </button>
+          <button
+            type="button"
+            className={`profile-type-tab ${orderFilter === 'paid' ? 'is-active' : ''}`}
+            onClick={() => setOrderFilter('paid')}
+          >
+            已支付 ({paidCount})
+          </button>
+          <button
+            type="button"
+            className={`profile-type-tab ${orderFilter === 'afterSale' ? 'is-active' : ''}`}
+            onClick={() => setOrderFilter('afterSale')}
+          >
+            售后中 ({afterSaleCount})
+          </button>
+          <button
+            type="button"
+            className={`profile-type-tab ${orderFilter === 'cancelled' ? 'is-active' : ''}`}
+            onClick={() => setOrderFilter('cancelled')}
+          >
+            已取消 ({cancelledCount})
+          </button>
+        </div>
+      )}
       {moduleEnabled && list.length === 0 ? (
         <div className="empty-state">
           <span className="empty-icon">订单</span>
           暂无订单记录
         </div>
       ) : moduleEnabled ? (
-        <div className="collections-list">
-          {list.map(item => {
+        filteredOrders.length > 0 ? (
+          <div className="collections-list">
+            {filteredOrders.map(item => {
             const statusValue = Number(pickValue(item, [ 'status', 'payStatus', 'pay_status' ], 0));
             const normalizedStatus = statusValue === 2 ? 2 : (statusValue === 1 ? 1 : 0);
             const refundState = resolveRefundStatus(item);
@@ -1323,18 +1409,23 @@ const OrdersList: React.FC = () => {
                       <button
                         type="button"
                         className="action-btn"
-                        disabled={orderActionKey === `refund-${Number(item.id || 0)}`}
-                        onClick={() => handleRefundOrder(item)}
+                        onClick={() => handleOpenRefundDrawer(Number(item.id || 0))}
                       >
-                        {orderActionKey === `refund-${Number(item.id || 0)}` ? '提交中...' : '申请退款'}
+                        申请退款
                       </button>
                     )}
                   </div>
                 </div>
               </div>
             );
-          })}
-        </div>
+            })}
+          </div>
+        ) : (
+          <div className="empty-state">
+            <span className="empty-icon">筛选</span>
+            当前筛选下暂无订单记录
+          </div>
+        )
       ) : null}
       {detailVisible && (
         <div className="profile-drawer-mask" onClick={handleCloseOrderDetail}>
@@ -1352,28 +1443,16 @@ const OrdersList: React.FC = () => {
                     {detailMessage}
                   </div>
                 )}
-                {(canCancelOrder(selectedOrder) || canRefundOrder(selectedOrder)) && (
+                {canCancelOrder(selectedOrder) && (
                   <div className="profile-toolbar">
-                    {canCancelOrder(selectedOrder) && (
-                      <button
-                        type="button"
-                        className="action-btn action-btn--danger"
-                        disabled={orderActionKey === `cancel-${Number(selectedOrder.id || 0)}`}
-                        onClick={() => handleCancelOrder(selectedOrder)}
-                      >
-                        {orderActionKey === `cancel-${Number(selectedOrder.id || 0)}` ? '取消中...' : '取消订单'}
-                      </button>
-                    )}
-                    {canRefundOrder(selectedOrder) && (
-                      <button
-                        type="button"
-                        className="action-btn"
-                        disabled={orderActionKey === `refund-${Number(selectedOrder.id || 0)}`}
-                        onClick={() => handleRefundOrder(selectedOrder)}
-                      >
-                        {orderActionKey === `refund-${Number(selectedOrder.id || 0)}` ? '提交中...' : '申请退款'}
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      className="action-btn action-btn--danger"
+                      disabled={orderActionKey === `cancel-${Number(selectedOrder.id || 0)}`}
+                      onClick={() => handleCancelOrder(selectedOrder)}
+                    >
+                      {orderActionKey === `cancel-${Number(selectedOrder.id || 0)}` ? '取消中...' : '取消订单'}
+                    </button>
                   </div>
                 )}
                 <div className="order-detail-grid">
@@ -1412,6 +1491,29 @@ const OrdersList: React.FC = () => {
                     <span>{resolveRefundStatus(selectedOrder).label}</span>
                   </div>
                 </div>
+                {canRefundOrder(selectedOrder) && (
+                  <div className="order-detail-section">
+                    <div className="order-detail-section__title">申请退款</div>
+                    <div className="order-detail-form">
+                      <textarea
+                        value={refundForm.reason}
+                        onChange={event => setRefundForm({ reason: event.target.value })}
+                        placeholder="请填写退款原因（必填）"
+                        rows={3}
+                      />
+                      <div className="security-action-row">
+                        <button
+                          type="button"
+                          className="save-btn"
+                          disabled={orderActionKey === `refund-${Number(selectedOrder.id || 0)}`}
+                          onClick={handleSubmitRefundInDrawer}
+                        >
+                          {orderActionKey === `refund-${Number(selectedOrder.id || 0)}` ? '提交中...' : '提交退款申请'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <div className="order-detail-section">
                   <div className="order-detail-section__title">授权码</div>
                   {Array.isArray(selectedOrder.licenseList) && selectedOrder.licenseList.length > 0 ? (
