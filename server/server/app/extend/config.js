@@ -160,6 +160,8 @@ const rsa = {
     'ai-config:chat', // POST /api/ai-config/chat
     'ai-config:smart-search', // POST /api/ai-config/smart-search
     'ai-search', // POST /api/ai-search
+    'search', // GET /api/search、POST /api/search/advanced、GET /api/search/*
+    'search:*', // 兼容 /api/search/suggestions、/api/search/hot 等扩展路径
     'wordpress:categories:active', // GET /api/wordpress/categories/active
     'wordpress:tags', // GET /api/wordpress/tags
     'wordpress:widgets:active', // GET /api/wordpress/widgets/active
