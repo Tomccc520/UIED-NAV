@@ -1547,6 +1547,9 @@ class UserService extends Service {
         amount: Number(order.price || 0).toFixed(2),
         originalAmount: Number(order.originPrice || 0).toFixed(2),
         status: statusValue,
+        payStatus: Number(order.payStatus || 0),
+        orderStatus: Number(order.orderStatus || 0),
+        refundStatus: Number(order.refundStatus ?? order.refund_status ?? 0),
         createTime: order.createTime,
       };
     });
@@ -1585,6 +1588,10 @@ class UserService extends Service {
     data.amount = Number(order.price || 0).toFixed(2);
     data.originalAmount = Number(order.originPrice || 0).toFixed(2);
     data.couponAmount = Number(order.couponAmount || 0).toFixed(2);
+    data.payStatus = Number(order.payStatus ?? data.payStatus ?? 0);
+    data.orderStatus = Number(order.orderStatus ?? data.orderStatus ?? 0);
+    data.status = data.orderStatus === 2 ? 2 : (data.payStatus === 1 ? 1 : 0);
+    data.refundStatus = Number(data.refundStatus ?? data.refund_status ?? order.refundStatus ?? order.refund_status ?? 0);
     /**
      * 兼容订单详情页展示“授权码/下载记录”：缺失时返回空数组，避免前端兜底报错。
      */

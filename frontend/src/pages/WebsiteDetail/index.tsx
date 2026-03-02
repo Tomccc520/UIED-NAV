@@ -1,11 +1,8 @@
 /**
- * @file pages/WebsiteDetail/index.tsx
- * @description 网址详情页主组件
- * @author Tomda
- * @copyright 版权所有 (c) 2026 UIED技术团队
- * @website https://fsuied.com
- * @license MIT
- * @version 2.1.0
+ * @copyright Tomda (https://www.tomda.top)
+ * @copyright UIED技术团队 (https://fsuied.com)
+ * @author UIED技术团队
+ * @createDate 2026-03-01
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
@@ -29,6 +26,7 @@ import { getFullImageUrl, processContentImageUrls } from '../../utils/urlUtils';
 import { unwrapApiList, unwrapApiResponse } from '../../utils/apiResponse';
 import { debugLog } from '../../utils/debugHelper';
 import publicSettingService, { DEFAULT_DETAIL_PAGE } from '../../services/publicSettingService';
+import useCache from '../../hooks/useCache';
 import DetailCommercialSlot from './DetailCommercialSlot';
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -122,6 +120,25 @@ interface WebsitePreviewSnapshotData {
   fallback?: boolean;
   fallbackUrls?: string[];
 }
+
+interface WebsitePreviewSnapshotCacheEntry {
+  websiteId: string;
+  payload: WebsitePreviewSnapshotData | null;
+}
+
+/**
+ * 统一规范化后端预览截图返回，便于前端缓存与展示共用同一份结构
+ */
+const normalizePreviewSnapshotPayload = (payload: WebsitePreviewSnapshotData | null) => {
+  const previewUrl = String(payload?.url || '').trim();
+  const fallbackUrls = Array.isArray(payload?.fallbackUrls)
+    ? payload?.fallbackUrls?.map(item => String(item || '').trim()).filter(Boolean) || []
+    : [];
+  return {
+    url: previewUrl.startsWith('/uploads/') ? getFullImageUrl(previewUrl) : previewUrl,
+    fallbackUrls,
+  };
+};
 
 interface DetailPageConfig {
   pageStylePreset?: 'showcase' | 'compact' | 'enterprise';
@@ -530,6 +547,49 @@ const WebsiteDetailPage: React.FC = () => {
   // 图片灯箱状态
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const localScreenshots = Array.isArray(website?.screenshots)
+    ? (website?.screenshots || []).filter(Boolean)
+    : (website?.screenshots ? [ website.screenshots ] : []);
+  const shouldUsePreviewSnapshotCache = detailPageConfigLoaded
+    && Boolean(website?.id)
+    && !website?.thumbnail
+    && localScreenshots.length === 0
+    && !(
+      detailPageConfig.previewSnapshotEnabled === false
+      && detailPageConfig.previewSnapshotAllowFallbackMshots === false
+    );
+  const previewSnapshotCacheKey = website?.id
+    ? `website-detail-preview-snapshot-${website.id}`
+    : 'website-detail-preview-snapshot-empty';
+  const previewSnapshotCacheTtlMs = Math.max(
+    60 * 1000,
+    Number(detailPageConfig.previewSnapshotCacheTtlSeconds || 0) * 1000 || 5 * 60 * 1000
+  );
+
+  /**
+   * 请求后端预览截图接口（供前端 SWR 缓存复用）
+   */
+  const fetchPreviewSnapshotFromApi = useCallback(async (): Promise<WebsitePreviewSnapshotCacheEntry | null> => {
+    if (!website?.id) {
+      return null;
+    }
+    const timeoutMs = Number(detailPageConfig.previewSnapshotTimeoutMs || 0);
+    const response = await api.get(`/websites/${website.id}/preview-snapshot`, {
+      params: timeoutMs > 0 ? { timeout: timeoutMs } : undefined,
+    });
+    return {
+      websiteId: String(website.id),
+      payload: unwrapApiResponse<WebsitePreviewSnapshotData | null>(response.data, null),
+    };
+  }, [website?.id, detailPageConfig.previewSnapshotTimeoutMs]);
+
+  const { data: cachedPreviewSnapshotEntry } = useCache<WebsitePreviewSnapshotCacheEntry | null>({
+    key: previewSnapshotCacheKey,
+    fetcher: fetchPreviewSnapshotFromApi,
+    ttl: previewSnapshotCacheTtlMs,
+    staleWhileRevalidate: true,
+    enabled: shouldUsePreviewSnapshotCache,
+  });
 
   // 获取网站详情
   const fetchWebsiteDetail = useCallback(async () => {
@@ -647,77 +707,27 @@ const WebsiteDetailPage: React.FC = () => {
   }, [website?.id, website?.thumbnail, website?.screenshots, backendPreviewSnapshotUrl, backendPreviewFallbackUrls]);
 
   /**
-   * 当后台未上传预览图/截图时，优先尝试后端本地截图服务（Playwright 缓存），失败再由前端 mShots 兜底
+   * 同步前端缓存中的预览截图数据，避免详情页重复进入时重复请求接口
    */
   useEffect(() => {
-    let cancelled = false;
+    if (
+      !detailPageConfigLoaded
+      || !shouldUsePreviewSnapshotCache
+      || String(cachedPreviewSnapshotEntry?.websiteId || '') !== String(website?.id || '')
+    ) {
+      setBackendPreviewSnapshotUrl('');
+      setBackendPreviewFallbackUrls([]);
+      return;
+    }
 
-    const fetchPreviewSnapshot = async () => {
-      // 等待详情页配置加载完成，避免先用默认配置请求后又被真实配置覆盖导致“闪一下消失”
-      if (!detailPageConfigLoaded) {
-        return;
-      }
-
-      if (!website?.id) {
-        setBackendPreviewSnapshotUrl('');
-        setBackendPreviewFallbackUrls([]);
-        return;
-      }
-      const localScreenshots = Array.isArray(website.screenshots)
-        ? website.screenshots.filter(Boolean)
-        : (website.screenshots ? [ website.screenshots ] : []);
-      if (website.thumbnail || localScreenshots.length > 0) {
-        setBackendPreviewSnapshotUrl('');
-        setBackendPreviewFallbackUrls([]);
-        return;
-      }
-
-      if (
-        detailPageConfig.previewSnapshotEnabled === false &&
-        detailPageConfig.previewSnapshotAllowFallbackMshots === false
-      ) {
-        setBackendPreviewSnapshotUrl('');
-        setBackendPreviewFallbackUrls([]);
-        return;
-      }
-
-      try {
-        const timeoutMs = Number(detailPageConfig.previewSnapshotTimeoutMs || 0);
-        const response = await api.get(`/websites/${website.id}/preview-snapshot`, {
-          params: timeoutMs > 0 ? { timeout: timeoutMs } : undefined,
-        });
-        const payload = unwrapApiResponse<WebsitePreviewSnapshotData | null>(response.data, null);
-        if (cancelled) return;
-        const previewUrl = String(payload?.url || '').trim();
-        const fallbackUrls = Array.isArray(payload?.fallbackUrls)
-          ? payload!.fallbackUrls!.map(item => String(item || '').trim()).filter(Boolean)
-          : [];
-        setBackendPreviewFallbackUrls(fallbackUrls);
-        if (!previewUrl) {
-          setBackendPreviewSnapshotUrl('');
-          return;
-        }
-        setBackendPreviewSnapshotUrl(
-          previewUrl.startsWith('/uploads/') ? getFullImageUrl(previewUrl) : previewUrl
-        );
-      } catch (error) {
-        // 保持已有成功截图，避免接口二次请求失败时把已显示的预览图清空
-        if (cancelled) return;
-      }
-    };
-
-    fetchPreviewSnapshot();
-    return () => {
-      cancelled = true;
-    };
+    const normalizedPreview = normalizePreviewSnapshotPayload(cachedPreviewSnapshotEntry?.payload || null);
+    setBackendPreviewFallbackUrls(normalizedPreview.fallbackUrls);
+    setBackendPreviewSnapshotUrl(normalizedPreview.url);
   }, [
     detailPageConfigLoaded,
+    shouldUsePreviewSnapshotCache,
+    cachedPreviewSnapshotEntry,
     website?.id,
-    website?.thumbnail,
-    website?.screenshots,
-    detailPageConfig.previewSnapshotEnabled,
-    detailPageConfig.previewSnapshotTimeoutMs,
-    detailPageConfig.previewSnapshotAllowFallbackMshots,
   ]);
 
   /**

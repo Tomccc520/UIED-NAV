@@ -17,7 +17,7 @@ import {
 } from '../../services/articleService';
 import './Profile.css';
 
-type ActiveTab = 'profile' | 'licenses' | 'collections' | 'likes' | 'comments' | 'messages' | 'orders' | 'security';
+type ActiveTab = 'profile' | 'licenses' | 'collections' | 'likes' | 'comments' | 'messages' | 'orders' | 'loginLogs' | 'security';
 
 /**
  * 兼容驼峰/下划线字段读取
@@ -241,6 +241,8 @@ const ProfilePage: React.FC = () => {
         );
       case 'orders':
         return <OrdersList />;
+      case 'loginLogs':
+        return <LoginLogsList />;
       case 'security':
         return <SecuritySettings user={user} onUpdate={refreshProfile} />;
       default:
@@ -361,6 +363,16 @@ const ProfilePage: React.FC = () => {
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
               </svg>
               我的评论
+            </div>
+            <div 
+              className={`menu-item ${activeTab === 'loginLogs' ? 'active' : ''}`}
+              onClick={() => setActiveTab('loginLogs')}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 8v4l3 3"></path>
+                <circle cx="12" cy="12" r="9"></circle>
+              </svg>
+              登录日志
             </div>
             <div 
               className={`menu-item ${activeTab === 'security' ? 'active' : ''}`}
@@ -800,6 +812,69 @@ const MessagesList: React.FC<{ onOpenLicenses: (licenseId?: number) => void }> =
   );
 };
 
+// 子组件：登录日志
+const LoginLogsList: React.FC = () => {
+  const [list, setList] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    userService.getLoginLog({ page: 1, pageSize: 20 })
+      .then(res => {
+        setList(Array.isArray(res?.lists) ? res.lists : []);
+      })
+      .catch(() => {
+        setList([]);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  /**
+   * 统一展示登录日志状态
+   */
+  const resolveLoginStatusLabel = (value: any) => {
+    return Number(value || 0) === 1 ? '成功' : '失败';
+  };
+
+  if (loading) return <div>加载中...</div>;
+
+  return (
+    <div>
+      <div className="content-header">
+        <h2 className="content-title">登录日志</h2>
+      </div>
+      {list.length === 0 ? (
+        <div className="empty-state">
+          <span className="empty-icon">日志</span>
+          暂无登录记录
+        </div>
+      ) : (
+        <div className="collections-list">
+          {list.map(item => (
+            <div key={`login-log-${item.id}`} className="list-item list-item--rich">
+              <div className="item-main">
+                <div className="item-title">
+                  {pickValue(item, [ 'device' ], '未知设备')}
+                  <span className={`status-badge status-${Number(pickValue(item, [ 'status' ], 0)) === 1 ? 1 : 2}`}>
+                    {resolveLoginStatusLabel(pickValue(item, [ 'status' ], 0))}
+                  </span>
+                </div>
+                <div className="item-meta">
+                  <span>IP：{pickValue(item, [ 'ip' ], '-')}</span>
+                  <span>浏览器：{pickValue(item, [ 'browser' ], '未知浏览器')}</span>
+                  <span>系统：{pickValue(item, [ 'os' ], '未知系统')}</span>
+                </div>
+                <div className="item-meta" style={{ marginTop: 8 }}>
+                  <span>登录时间：{formatUserDate(pickValue(item, [ 'createTime', 'create_time' ]))}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // 子组件：订单列表
 const OrdersList: React.FC = () => {
   const [list, setList] = useState<any[]>([]);
@@ -819,16 +894,34 @@ const OrdersList: React.FC = () => {
     taxNo: '',
     email: '',
   });
+  const [orderActionKey, setOrderActionKey] = useState('');
+
+  /**
+   * 拉取订单列表，并同步订单模块开关状态
+   */
+  const loadOrders = async (options: { silent?: boolean } = {}) => {
+    const { silent = false } = options;
+    if (!silent) {
+      setLoading(true);
+    }
+    try {
+      const res = await userService.getOrderList({ page: 1, pageSize: 20 });
+      setList(Array.isArray(res?.lists) ? res.lists : []);
+      setModuleEnabled(res?.moduleEnabled !== false);
+      setModuleMessage(String(res?.moduleMessage || ''));
+    } catch (_error) {
+      if (!silent) {
+        setList([]);
+      }
+    } finally {
+      if (!silent) {
+        setLoading(false);
+      }
+    }
+  };
 
   useEffect(() => {
-    userService.getOrderList({ page: 1, pageSize: 20 })
-      .then(res => {
-        setList(res.lists || []);
-        setModuleEnabled(res.moduleEnabled !== false);
-        setModuleMessage(String(res.moduleMessage || ''));
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    loadOrders().catch(() => {});
   }, []);
 
   /**
@@ -899,6 +992,107 @@ const OrdersList: React.FC = () => {
       normalizedStatus,
       label: normalizedStatus === 2 ? '已取消' : (normalizedStatus === 1 ? '已支付' : '待支付'),
     };
+  };
+
+  /**
+   * 统一退款/售后状态展示
+   */
+  const resolveRefundStatus = (source: any) => {
+    const rawValue = Number(pickValue(source, [ 'refundStatus', 'refund_status', 'afterSaleStatus', 'after_sale_status' ], 0));
+    if (rawValue === 1) {
+      return { value: 1, label: '退款审核中', isBlocking: true };
+    }
+    if (rawValue === 2) {
+      return { value: 2, label: '已退款', isBlocking: true };
+    }
+    if (rawValue === 3) {
+      return { value: 3, label: '退款已驳回', isBlocking: false };
+    }
+    if (rawValue > 3) {
+      return { value: rawValue, label: '退款处理中', isBlocking: true };
+    }
+    return { value: 0, label: '未申请', isBlocking: false };
+  };
+
+  /**
+   * 判断订单是否允许取消
+   */
+  const canCancelOrder = (source: any) => {
+    return resolveOrderStatus(source).normalizedStatus === 0;
+  };
+
+  /**
+   * 判断订单是否允许再次申请退款
+   */
+  const canRefundOrder = (source: any) => {
+    const orderState = resolveOrderStatus(source);
+    const refundState = resolveRefundStatus(source);
+    return orderState.normalizedStatus === 1 && !refundState.isBlocking;
+  };
+
+  /**
+   * 将订单状态同步回当前列表与详情，避免操作成功后仍显示旧状态
+   */
+  const applyOrderPatchToLocalState = (orderId: number, patch: Record<string, any>) => {
+    const updateOrder = (target: any) => {
+      if (Number(target?.id || 0) !== orderId) return target;
+      return {
+        ...target,
+        ...patch,
+      };
+    };
+    setList(prev => prev.map(updateOrder));
+    setSelectedOrder((prev: any) => (prev ? updateOrder(prev) : prev));
+  };
+
+  /**
+   * 取消待支付订单
+   */
+  const handleCancelOrder = async (order: any) => {
+    const orderId = Number(order?.id || 0);
+    if (!orderId) return;
+    if (!window.confirm('确认取消该订单吗？取消后将无法继续使用当前订单支付。')) return;
+    setOrderActionKey(`cancel-${orderId}`);
+    setDetailMessage('');
+    try {
+      await userService.cancelOrder(orderId);
+      applyOrderPatchToLocalState(orderId, {
+        status: 2,
+        payStatus: Number(pickValue(order, [ 'payStatus', 'pay_status' ], 0)),
+        pay_status: Number(pickValue(order, [ 'payStatus', 'pay_status' ], 0)),
+        orderStatus: 2,
+        order_status: 2,
+      });
+      setDetailMessage('订单已取消');
+    } catch (error: any) {
+      setDetailMessage(error?.message || '取消订单失败，请稍后重试');
+    } finally {
+      setOrderActionKey('');
+    }
+  };
+
+  /**
+   * 提交退款申请（支持填写可选原因）
+   */
+  const handleRefundOrder = async (order: any) => {
+    const orderId = Number(order?.id || 0);
+    if (!orderId) return;
+    const reason = window.prompt('请输入退款原因（选填，取消则不提交）', '');
+    if (reason === null) return;
+    setOrderActionKey(`refund-${orderId}`);
+    setDetailMessage('');
+    try {
+      await userService.refundOrder(orderId, String(reason || '').trim());
+      applyOrderPatchToLocalState(orderId, {
+        refundStatus: 1,
+        refund_status: 1,
+      });
+      setDetailMessage('退款申请已提交，请等待审核');
+    } catch (error: any) {
+      setDetailMessage(error?.message || '退款申请失败，请稍后重试');
+    } finally {
+      setOrderActionKey('');
+    }
   };
 
   /**
@@ -1066,6 +1260,11 @@ const OrdersList: React.FC = () => {
       <div className="content-header">
         <h2 className="content-title">我的订单</h2>
       </div>
+      {!detailVisible && detailMessage && (
+        <div className={`profile-action-message ${detailMessage.includes('失败') ? 'is-error' : 'is-success'}`}>
+          {detailMessage}
+        </div>
+      )}
       {!moduleEnabled && (
         <div className="empty-state">
           <span className="empty-icon">提示</span>
@@ -1082,6 +1281,7 @@ const OrdersList: React.FC = () => {
           {list.map(item => {
             const statusValue = Number(pickValue(item, [ 'status', 'payStatus', 'pay_status' ], 0));
             const normalizedStatus = statusValue === 2 ? 2 : (statusValue === 1 ? 1 : 0);
+            const refundState = resolveRefundStatus(item);
             return (
               <div key={item.id} className="list-item">
                 <div className="item-main">
@@ -1094,19 +1294,42 @@ const OrdersList: React.FC = () => {
                   <div className="item-meta">
                     <span>{pickValue(item, [ 'productName', 'goodsName', 'goods_name' ], '商品')}</span>
                     <span>¥{pickValue(item, [ 'amount', 'orderAmount', 'order_amount' ], 0)}</span>
+                    {refundState.value > 0 && <span>售后：{refundState.label}</span>}
                   </div>
                   <div className="item-meta">
                     <span>{formatUserDate(pickValue(item, [ 'createTime', 'create_time' ]))}</span>
                   </div>
                 </div>
-                <div className="item-action">
-                  <button
-                    type="button"
-                    className="action-btn"
-                    onClick={() => handleOpenOrderDetail(Number(item.id || 0))}
-                  >
-                    查看详情
-                  </button>
+                <div className="item-action item-action--top">
+                  <div className="order-detail-license-item__actions">
+                    <button
+                      type="button"
+                      className="action-btn"
+                      onClick={() => handleOpenOrderDetail(Number(item.id || 0))}
+                    >
+                      查看详情
+                    </button>
+                    {canCancelOrder(item) && (
+                      <button
+                        type="button"
+                        className="action-btn action-btn--danger"
+                        disabled={orderActionKey === `cancel-${Number(item.id || 0)}`}
+                        onClick={() => handleCancelOrder(item)}
+                      >
+                        {orderActionKey === `cancel-${Number(item.id || 0)}` ? '取消中...' : '取消订单'}
+                      </button>
+                    )}
+                    {canRefundOrder(item) && (
+                      <button
+                        type="button"
+                        className="action-btn"
+                        disabled={orderActionKey === `refund-${Number(item.id || 0)}`}
+                        onClick={() => handleRefundOrder(item)}
+                      >
+                        {orderActionKey === `refund-${Number(item.id || 0)}` ? '提交中...' : '申请退款'}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             );
@@ -1127,6 +1350,30 @@ const OrdersList: React.FC = () => {
                 {detailMessage && (
                   <div className={`profile-action-message ${detailMessage.includes('失败') ? 'is-error' : 'is-success'}`}>
                     {detailMessage}
+                  </div>
+                )}
+                {(canCancelOrder(selectedOrder) || canRefundOrder(selectedOrder)) && (
+                  <div className="profile-toolbar">
+                    {canCancelOrder(selectedOrder) && (
+                      <button
+                        type="button"
+                        className="action-btn action-btn--danger"
+                        disabled={orderActionKey === `cancel-${Number(selectedOrder.id || 0)}`}
+                        onClick={() => handleCancelOrder(selectedOrder)}
+                      >
+                        {orderActionKey === `cancel-${Number(selectedOrder.id || 0)}` ? '取消中...' : '取消订单'}
+                      </button>
+                    )}
+                    {canRefundOrder(selectedOrder) && (
+                      <button
+                        type="button"
+                        className="action-btn"
+                        disabled={orderActionKey === `refund-${Number(selectedOrder.id || 0)}`}
+                        onClick={() => handleRefundOrder(selectedOrder)}
+                      >
+                        {orderActionKey === `refund-${Number(selectedOrder.id || 0)}` ? '提交中...' : '申请退款'}
+                      </button>
+                    )}
                   </div>
                 )}
                 <div className="order-detail-grid">
@@ -1159,6 +1406,10 @@ const OrdersList: React.FC = () => {
                   <div className="order-detail-item">
                     <span className="label">发票状态</span>
                     <span>{resolveInvoiceStatusLabel(pickValue(selectedOrder, [ 'invoiceStatus' ], -1))}</span>
+                  </div>
+                  <div className="order-detail-item">
+                    <span className="label">售后状态</span>
+                    <span>{resolveRefundStatus(selectedOrder).label}</span>
                   </div>
                 </div>
                 <div className="order-detail-section">

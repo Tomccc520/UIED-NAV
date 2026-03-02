@@ -151,6 +151,8 @@ module.exports = app => {
   router.all('/api/user/index/stats', controller.user.indexStats);
   router.all('/api/user/order/list', controller.user.orderList);
   router.all('/api/user/order/detail/:id', controller.user.orderDetail);
+  router.all('/api/user/order/cancel/:id', controller.user.cancelOrder);
+  router.all('/api/user/order/refund/:id', controller.user.refundOrder);
   router.all('/api/user/license/list', controller.user.licenseList);
   router.all('/api/user/license/bind', controller.user.bindLicense);
   router.all('/api/user/license/change-domain', controller.user.changeLicenseDomain);

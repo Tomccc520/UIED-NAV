@@ -238,6 +238,20 @@ export const userService = {
   },
 
   /**
+   * 取消订单
+   */
+  cancelOrder: async (id: number | string): Promise<void> => {
+    await api.post(`/user/order/cancel/${id}`);
+  },
+
+  /**
+   * 提交退款申请
+   */
+  refundOrder: async (id: number | string, reason = ''): Promise<void> => {
+    await api.post(`/user/order/refund/${id}`, { reason });
+  },
+
+  /**
    * 获取许可证列表
    */
   getLicenseList: async (params: { page?: number; pageSize?: number }): Promise<any> => {
