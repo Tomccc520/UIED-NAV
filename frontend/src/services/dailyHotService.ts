@@ -14,6 +14,7 @@ import api from './api';
 import { unwrapApiResponse } from '../utils/apiResponse';
 import { DailyHotItem, DailyHotPlatform, DailyHotParams, DailyHotDisplayConfig } from '../types/dailyHot';
 import { AxiosError } from 'axios';
+import { getFullImageUrl } from '../utils/urlUtils';
 
 interface DailyHotBackendPlatformRow {
   title?: string;
@@ -22,8 +23,15 @@ interface DailyHotBackendPlatformRow {
   isEnabled?: boolean;
   sort?: number;
   icon?: string;
+  iconUrl?: string;
   url?: string;
   link?: string;
+  siteUrl?: string;
+  extra?: {
+    icon?: string;
+    url?: string;
+    link?: string;
+  };
 }
 
 interface DailyHotBackendItemRow {
@@ -172,11 +180,13 @@ const normalizeDailyHotPlatformsResponse = (payload: unknown): DailyHotPlatform[
   const rows = Array.isArray(unwrapped?.platforms) ? unwrapped.platforms : [];
   return rows.map((row) => {
     const platformTitle = String(row?.platformTitle || row?.title || '').trim();
+    const icon = String(row?.icon || row?.iconUrl || row?.extra?.icon || '').trim();
+    const link = String(row?.url || row?.link || row?.siteUrl || row?.extra?.url || row?.extra?.link || '').trim();
     return {
       platformTitle,
       displayName: String(row?.displayName || platformTitle),
-      icon: row?.icon ? String(row.icon) : undefined,
-      url: row?.url ? String(row.url) : (row?.link ? String(row.link) : undefined),
+      icon: icon ? getFullImageUrl(icon) : undefined,
+      url: link || undefined,
       isEnabled: row?.isEnabled !== false,
       sort: typeof row?.sort === 'number' ? row.sort : Number(row?.sort || 0),
     };

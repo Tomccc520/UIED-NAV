@@ -24,9 +24,10 @@ import vueSetupExtend from 'vite-plugin-vue-setup-extend'
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), '')
     const apiTarget = env.VITE_PROXY_TARGET || 'http://127.0.0.1:8002'
+    const appBasePath = normalizeBasePath(env.VITE_APP_BASE_PATH || '/')
 
     return {
-        // base: '/admin/',
+        base: appBasePath,
         server: {
             host: '0.0.0.0',
             proxy: {
@@ -81,3 +82,15 @@ export default defineConfig(({ mode }) => {
         }
     }
 })
+
+/**
+ * 规范化后台基础路径，确保以 "/" 开头并以 "/" 结尾
+ * @param basePath 原始基础路径
+ */
+function normalizeBasePath(basePath: string): string {
+    const value = String(basePath || '/').trim()
+    if (!value || value === '/') return '/'
+    let normalized = value.startsWith('/') ? value : `/${value}`
+    if (!normalized.endsWith('/')) normalized = `${normalized}/`
+    return normalized
+}

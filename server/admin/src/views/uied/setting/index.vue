@@ -637,25 +637,61 @@
                         <el-form-item label-width="0">
                             <div class="nav-switch-setting-table">
                                 <div class="nav-switch-setting-header">
+                                    <span>拖拽</span>
                                     <span>Slug</span>
                                     <span>名称</span>
                                     <span>图标</span>
                                     <span>显示</span>
                                     <span>排序</span>
                                 </div>
-                                <div
-                                    v-for="(item, idx) in homepageData.navSwitchItems"
-                                    :key="`${item.slug}-${idx}`"
-                                    class="nav-switch-setting-row"
+                                <Draggable
+                                    v-model="homepageData.navSwitchItems"
+                                    item-key="slug"
+                                    handle=".nav-switch-row-handle"
+                                    :animation="180"
+                                    ghost-class="nav-switch-setting-row--ghost"
+                                    @end="handleNavSwitchSortEnd"
                                 >
-                                    <el-input v-model="item.slug" placeholder="slug" />
-                                    <el-input v-model="item.name" placeholder="显示名称" />
-                                    <el-input
-                                        v-model="item.icon"
-                                        placeholder="图标关键字（如 AI/Figma）"
-                                    />
-                                    <el-switch v-model="item.visible" />
-                                    <el-input-number v-model="item.sort" :min="1" :max="999" />
+                                    <template #item="{ element }">
+                                        <div class="nav-switch-setting-row">
+                                            <span class="nav-switch-row-handle">⋮⋮</span>
+                                            <el-input v-model="element.slug" placeholder="slug" />
+                                            <el-input v-model="element.name" placeholder="显示名称" />
+                                            <el-input
+                                                v-model="element.icon"
+                                                placeholder="图标关键字（如 AI/Figma）"
+                                            />
+                                            <el-switch v-model="element.visible" />
+                                            <el-input-number v-model="element.sort" :min="1" :max="999" />
+                                        </div>
+                                    </template>
+                                </Draggable>
+                            </div>
+                            <div class="nav-switch-live-preview">
+                                <div class="nav-switch-live-preview__title">
+                                    前端 <code>nav-switch-trigger</code> 实时预览
+                                </div>
+                                <div class="nav-switch-trigger-preview">
+                                    <button class="nav-switch-trigger-preview__button" type="button">
+                                        <span class="nav-switch-trigger-preview__icon">
+                                            {{ currentNavSwitchPreviewItem?.icon || 'Design' }}
+                                        </span>
+                                        <span class="nav-switch-trigger-preview__name">
+                                            {{ currentNavSwitchPreviewItem?.name || '导航切换' }}
+                                        </span>
+                                        <span class="nav-switch-trigger-preview__arrow">⌄</span>
+                                    </button>
+                                    <div class="nav-switch-trigger-preview__dropdown">
+                                        <div
+                                            v-for="(item, idx) in visibleNavSwitchPreviewItems"
+                                            :key="`${item.slug}-${idx}`"
+                                            class="nav-switch-trigger-preview__option"
+                                        >
+                                            <span class="nav-switch-trigger-preview__option-icon">{{ item.icon }}</span>
+                                            <span class="nav-switch-trigger-preview__option-name">{{ item.name }}</span>
+                                            <el-tag size="small" effect="plain">{{ item.slug }}</el-tag>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </el-form-item>
@@ -1102,6 +1138,15 @@
                         <p class="section-desc">控制搜索功能的基本行为。</p>
                         <el-form-item>
                             <template #label
+                                ><span>启用站内搜索</span
+                                ><el-tooltip content="关闭后，前台搜索页将不再执行站内搜索请求" placement="top"
+                                    ><el-icon class="label-tip-icon"
+                                        ><QuestionFilled /></el-icon></el-tooltip
+                            ></template>
+                            <el-switch v-model="searchData.enabled" />
+                        </el-form-item>
+                        <el-form-item>
+                            <template #label
                                 ><span>搜索占位文字</span
                                 ><el-tooltip content="搜索框中的提示文字" placement="top"
                                     ><el-icon class="label-tip-icon"
@@ -1110,6 +1155,7 @@
                             <el-input
                                 v-model="searchData.placeholder"
                                 placeholder="搜索网站名称..."
+                                :disabled="!searchData.enabled"
                             />
                         </el-form-item>
                         <el-form-item>
@@ -1126,6 +1172,7 @@
                                 :min="100"
                                 :max="1000"
                                 :step="100"
+                                :disabled="!searchData.enabled"
                             />
                             <span class="form-tip">毫秒</span>
                         </el-form-item>
@@ -1140,7 +1187,10 @@
                                     ><el-icon class="label-tip-icon"
                                         ><QuestionFilled /></el-icon></el-tooltip
                             ></template>
-                            <el-switch v-model="searchData.aiSearchEnabled" />
+                            <el-switch
+                                v-model="searchData.aiSearchEnabled"
+                                :disabled="!searchData.enabled"
+                            />
                         </el-form-item>
                         <el-form-item>
                             <template #label
@@ -1152,7 +1202,7 @@
                             <el-input
                                 v-model="searchData.aiSearchBtnText"
                                 placeholder="AI 搜索"
-                                :disabled="!searchData.aiSearchEnabled"
+                                :disabled="!searchData.enabled || !searchData.aiSearchEnabled"
                             />
                         </el-form-item>
                         <el-divider content-position="left">搜索结果</el-divider>
@@ -1179,6 +1229,7 @@
                                 v-model="searchData.resultsPerPage"
                                 :min="10"
                                 :max="100"
+                                :disabled="!searchData.enabled"
                             />
                         </el-form-item>
                         <el-form-item>
@@ -1420,6 +1471,7 @@ import {
     uiedSettingSave
 } from '@/api/uied'
 import { QuestionFilled } from '@element-plus/icons-vue'
+import Draggable from 'vuedraggable'
 import feedback from '@/utils/feedback'
 
 const activeTab = ref('siteInfo')
@@ -1509,6 +1561,32 @@ const normalizeNavSwitchItems = (items: unknown) => {
 }
 
 /**
+ * 导航切换预览数据（按排序字段实时排序并过滤隐藏项）。
+ */
+const visibleNavSwitchPreviewItems = computed(() =>
+    normalizeNavSwitchItems(homepageData.navSwitchItems).filter((item) => item.visible !== false)
+)
+
+/**
+ * 导航切换预览中当前触发器显示项（取第一个可见项）。
+ */
+const currentNavSwitchPreviewItem = computed(
+    () => visibleNavSwitchPreviewItems.value[0] || normalizeNavSwitchItems(homepageData.navSwitchItems)[0]
+)
+
+/**
+ * 处理导航切换拖拽排序，拖拽后按 10 递增重新写入 sort 值。
+ */
+const handleNavSwitchSortEnd = () => {
+    homepageData.navSwitchItems = normalizeNavSwitchItems(homepageData.navSwitchItems).map(
+        (item, index) => ({
+            ...item,
+            sort: (index + 1) * 10
+        })
+    )
+}
+
+/**
  * 规范化首页配置，确保轮播/推荐区和导航切换项可后台控制
  */
 const normalizeHomepageConfigData = (config: any) => ({
@@ -1593,6 +1671,7 @@ const sidebarData = reactive({
 // ==================== 搜索配置 ====================
 const searchLoading = ref(false)
 const searchData = reactive({
+    enabled: true,
     placeholder: '搜索网站名称...',
     debounceDelay: 300,
     aiSearchEnabled: true,
@@ -2133,7 +2212,7 @@ onMounted(() => {
 .nav-switch-setting-header,
 .nav-switch-setting-row {
     display: grid;
-    grid-template-columns: 1fr 1.2fr 1.2fr 90px 120px;
+    grid-template-columns: 36px 1fr 1.2fr 1.2fr 90px 120px;
     gap: 10px;
     align-items: center;
     padding: 10px 12px;
@@ -2148,5 +2227,107 @@ onMounted(() => {
 
 .nav-switch-setting-row {
     border-top: 1px solid #f0f2f5;
+}
+
+.nav-switch-row-handle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #909399;
+    cursor: move;
+    user-select: none;
+    font-size: 14px;
+}
+
+:deep(.nav-switch-setting-row--ghost) {
+    background: #f5f7fa;
+    opacity: 0.75;
+}
+
+.nav-switch-live-preview {
+    margin-top: 12px;
+    padding: 12px;
+    border: 1px dashed #dcdfe6;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.nav-switch-live-preview__title {
+    font-size: 12px;
+    color: #606266;
+    margin-bottom: 8px;
+}
+
+.nav-switch-trigger-preview__button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid #dcdfe6;
+    border-radius: 8px;
+    background: #fff;
+    color: #303133;
+}
+
+.nav-switch-trigger-preview__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 54px;
+    height: 24px;
+    border-radius: 12px;
+    font-size: 12px;
+    color: #606266;
+    background: #f4f4f5;
+}
+
+.nav-switch-trigger-preview__name {
+    flex: 1;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.nav-switch-trigger-preview__arrow {
+    color: #909399;
+}
+
+.nav-switch-trigger-preview__dropdown {
+    margin-top: 8px;
+    border: 1px solid #ebeef5;
+    border-radius: 8px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.nav-switch-trigger-preview__option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-top: 1px solid #f2f2f2;
+}
+
+.nav-switch-trigger-preview__option:first-child {
+    border-top: none;
+}
+
+.nav-switch-trigger-preview__option-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    height: 20px;
+    border-radius: 10px;
+    font-size: 11px;
+    color: #606266;
+    background: #f4f4f5;
+}
+
+.nav-switch-trigger-preview__option-name {
+    flex: 1;
+    font-size: 13px;
+    color: #303133;
 }
 </style>

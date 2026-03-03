@@ -160,10 +160,9 @@ const handlePopupSuccess = () => {
 const getTopicFrontendPath = (row: any) => {
     const path = frontendArticleListPath || '/articles'
     const queryKey = frontendArticleTopicQueryKey || 'topicId'
-    const value =
-        queryKey.toLowerCase().includes('id')
-            ? String(row?.id || '').trim()
-            : String(row?.slug || row?.id || '').trim()
+    const value = queryKey.toLowerCase().includes('id')
+        ? String(row?.id || '').trim()
+        : String(row?.slug || row?.id || '').trim()
     if (!value) return path
     return `${path}?${encodeURIComponent(queryKey)}=${encodeURIComponent(value)}`
 }

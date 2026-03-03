@@ -4,8 +4,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import api from '../services/api';
-import { unwrapApiResponse } from '../utils/apiResponse';
+import searchService from '../services/searchService';
 
 export interface AISearchResult {
   id: string;
@@ -53,17 +52,12 @@ export const useAISearch = (): UseAISearchReturn => {
     setError(null);
 
     try {
-      const response = await api.post('/ai-config/smart-search', {
-        query,
-        categoryId: options.categoryId,
-        limit: options.limit || 10,
-      });
-      const payload = unwrapApiResponse<{
+      const payload = await searchService.aiSearch(query, options.limit || 10) as {
         results?: AISearchResult[];
         mode?: 'ai' | 'keyword';
         reason?: string;
         message?: string;
-      }>(response.data, {});
+      };
 
       setResults(Array.isArray(payload.results) ? payload.results : []);
       setMode(payload.mode || 'keyword');

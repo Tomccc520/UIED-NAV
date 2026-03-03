@@ -149,17 +149,17 @@ class CommentService extends Service {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
     const { articleId, websiteId, parentId = 0, content, userId, userName, email } = data;
-    
+
     // 判断类型
     const type = articleId ? 'article' : (websiteId ? 'website' : null);
     if (!type) {
       throw new Error('未指定评论对象');
     }
-    
+
     const tableName = type === 'article' ? 'uied_article_comment' : 'uied_website_comment';
     const targetIdField = type === 'article' ? 'article_id' : 'website_id';
     const targetId = articleId || websiteId;
-    
+
     // 插入评论
     const insertResult = await app.model.query(
       `INSERT INTO ${tableName} 
@@ -174,7 +174,7 @@ class CommentService extends Service {
           userName || '匿名用户',
           email || '',
           now,
-          now
+          now,
         ],
         type: app.Sequelize.QueryTypes.INSERT,
       }

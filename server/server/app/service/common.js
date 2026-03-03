@@ -5,18 +5,22 @@ const { version, publicUrl } = require('../extend/config');
 const util = require('../util/urlUtil');
 
 class CommonService extends Service {
+  /**
+   * 获取控制台工作台数据
+   * @return {Promise<object>}
+   */
   async getConsole() {
     try {
       // 版本信息
-      const name = await this.getVal('website', 'name', 'LikeAdmin-Nodejs');
+      const name = await this.getVal('website', 'name', 'UIED 导航管理系统');
       const versionInfo = {
         name,
         version,
-        website: 'www.likeadmin.cn',
-        based: 'Vue3.x、ElementUI、MySQL',
+        website: 'www.tomda.top',
+        based: 'Vue3.x、Element Plus、Egg.js、MySQL',
         channel: {
-          gitee: 'https://gitee.com/likeadmin/likeadmin_python',
-          website: 'https://www.likeadmin.cn',
+          website: 'https://www.tomda.top',
+          docs: 'https://fsuied.com',
         },
       };
 
@@ -56,6 +60,10 @@ class CommonService extends Service {
     }
   }
 
+  /**
+   * 获取后台站点配置
+   * @return {Promise<object>}
+   */
   async getConfig() {
     try {
       const website = await this.get('website');
@@ -77,6 +85,13 @@ class CommonService extends Service {
     }
   }
 
+  /**
+   * 获取指定配置值（支持默认值）
+   * @param {string} cnfType
+   * @param {string} name
+   * @param {any} defaultVal
+   * @return {Promise<any>}
+   */
   async getVal(cnfType, name, defaultVal) {
     try {
       const config = await this.get(cnfType, name);
@@ -90,6 +105,12 @@ class CommonService extends Service {
     }
   }
 
+  /**
+   * 获取指定配置并解析为对象
+   * @param {string} cnfType
+   * @param {string} name
+   * @return {Promise<object>}
+   */
   async getMap(cnfType, name) {
     try {
       const val = await this.getVal(cnfType, name, '');
@@ -103,6 +124,12 @@ class CommonService extends Service {
     }
   }
 
+  /**
+   * 查询配置项
+   * @param {string} cnfType
+   * @param {string} name
+   * @return {Promise<object>}
+   */
   async get(cnfType, name) {
     const { ctx } = this;
     try {
@@ -123,6 +150,13 @@ class CommonService extends Service {
     }
   }
 
+  /**
+   * 保存单个配置项
+   * @param {string} cnfType
+   * @param {string} name
+   * @param {string} val
+   * @return {Promise<void>}
+   */
   async set(cnfType, name, val) {
     const { ctx } = this;
     const { SystemConfig } = ctx.model;

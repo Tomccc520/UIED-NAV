@@ -76,7 +76,10 @@
                         />
                         <el-table-column label="链接类型" width="100">
                             <template #default="{ row }">
-                                <el-tag :type="row.linkMode === 'builtin' ? 'warning' : 'info'" size="small">
+                                <el-tag
+                                    :type="row.linkMode === 'builtin' ? 'warning' : 'info'"
+                                    size="small"
+                                >
                                     {{ row.linkMode === 'builtin' ? '内置功能' : '自定义' }}
                                 </el-tag>
                             </template>
@@ -162,8 +165,16 @@
                         <el-radio label="builtin">内置功能</el-radio>
                     </el-radio-group>
                 </el-form-item>
-                <el-form-item v-if="linkData.linkMode === 'builtin'" label="内置功能" prop="builtinKey">
-                    <el-select v-model="linkData.builtinKey" placeholder="请选择内置功能" style="width: 100%">
+                <el-form-item
+                    v-if="linkData.linkMode === 'builtin'"
+                    label="内置功能"
+                    prop="builtinKey"
+                >
+                    <el-select
+                        v-model="linkData.builtinKey"
+                        placeholder="请选择内置功能"
+                        style="width: 100%"
+                    >
                         <el-option
                             v-for="item in builtinFooterEntryOptions"
                             :key="item.key"
@@ -263,26 +274,30 @@ const linkData = reactive({
 const linkRules: FormRules = {
     groupId: [{ required: true, message: '请选择分组', trigger: 'change' }],
     name: [{ required: true, message: '请输入链接名称', trigger: 'blur' }],
-    url: [{
-        validator: (_rule, value, callback) => {
-            if (linkData.linkMode === 'custom' && !String(value || '').trim()) {
-                callback(new Error('请输入链接地址'))
-                return
-            }
-            callback()
-        },
-        trigger: 'blur'
-    }],
-    builtinKey: [{
-        validator: (_rule, value, callback) => {
-            if (linkData.linkMode === 'builtin' && !String(value || '').trim()) {
-                callback(new Error('请选择内置功能'))
-                return
-            }
-            callback()
-        },
-        trigger: 'change'
-    }]
+    url: [
+        {
+            validator: (_rule, value, callback) => {
+                if (linkData.linkMode === 'custom' && !String(value || '').trim()) {
+                    callback(new Error('请输入链接地址'))
+                    return
+                }
+                callback()
+            },
+            trigger: 'blur'
+        }
+    ],
+    builtinKey: [
+        {
+            validator: (_rule, value, callback) => {
+                if (linkData.linkMode === 'builtin' && !String(value || '').trim()) {
+                    callback(new Error('请选择内置功能'))
+                    return
+                }
+                callback()
+            },
+            trigger: 'change'
+        }
+    ]
 }
 
 /**
@@ -296,7 +311,9 @@ const builtinFooterEntryOptions = [
  * 获取内置页脚入口默认路径
  */
 const getBuiltinFooterDefaultPath = (builtinKey?: string): string => {
-    const option = builtinFooterEntryOptions.find((item) => item.key === String(builtinKey || '').trim())
+    const option = builtinFooterEntryOptions.find(
+        (item) => item.key === String(builtinKey || '').trim()
+    )
     return option?.defaultPath || ''
 }
 
@@ -391,10 +408,12 @@ const handleSubmitLink = async () => {
     try {
         const submitData = {
             ...linkData,
-            builtinKey: linkData.linkMode === 'builtin' ? String(linkData.builtinKey || '').trim() : '',
-            url: linkData.linkMode === 'builtin'
-                ? (getBuiltinFooterDefaultPath(linkData.builtinKey) || String(linkData.url || ''))
-                : String(linkData.url || '').trim()
+            builtinKey:
+                linkData.linkMode === 'builtin' ? String(linkData.builtinKey || '').trim() : '',
+            url:
+                linkData.linkMode === 'builtin'
+                    ? getBuiltinFooterDefaultPath(linkData.builtinKey) || String(linkData.url || '')
+                    : String(linkData.url || '').trim()
         }
         if (linkData.id) {
             await uiedFooterLinkEdit(submitData)

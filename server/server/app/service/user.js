@@ -158,7 +158,7 @@ class UserService extends Service {
   /**
    * 读取指定数据表字段集合（兼容不同客户库结构）
    * @param {string} tableName 数据表名
-   * @returns {Promise<Set<string>>} 字段集合
+   * @return {Promise<Set<string>>} 字段集合
    */
   async getTableColumns(tableName = '') {
     const normalizedTableName = String(tableName || '').trim();
@@ -202,7 +202,7 @@ class UserService extends Service {
    * 判断指定数据表是否包含目标字段（支持候选字段名）
    * @param {string} tableName 数据表名
    * @param {string|string[]} candidates 候选字段名
-   * @returns {Promise<boolean>} 是否存在
+   * @return {Promise<boolean>} 是否存在
    */
   async hasTableColumn(tableName = '', candidates = []) {
     const columns = await this.getTableColumns(tableName);
@@ -214,7 +214,7 @@ class UserService extends Service {
    * 返回数据表中第一个存在的字段名
    * @param {string} tableName 数据表名
    * @param {string|string[]} candidates 候选字段名
-   * @returns {Promise<string>} 已存在字段名
+   * @return {Promise<string>} 已存在字段名
    */
   async resolveExistingColumn(tableName = '', candidates = []) {
     const columns = await this.getTableColumns(tableName);
@@ -226,7 +226,7 @@ class UserService extends Service {
   /**
    * 判断是否为个人中心演示数据自动补齐账号
    * @param {string} username 用户名
-   * @returns {boolean} 是否命中演示账号
+   * @return {boolean} 是否命中演示账号
    */
   isPersonalCenterSeedUser(username = '') {
     const normalized = String(username || '').trim().toLowerCase();
@@ -1743,7 +1743,7 @@ class UserService extends Service {
 
   /**
    * 获取授权表名
-   * @returns {string} 授权表名
+   * @return {string} 授权表名
    */
   getLicenseTableName() {
     const prefix = String(extendConfig.dbTablePrefix || 'la_').trim() || 'la_';
@@ -1753,7 +1753,7 @@ class UserService extends Service {
   /**
    * 归一化授权绑定域名（兼容粘贴完整 URL）
    * @param {string} input 原始输入
-   * @returns {string} 处理后的域名
+   * @return {string} 处理后的域名
    */
   normalizeLicenseDomain(input = '') {
     const raw = String(input || '').trim().toLowerCase();
@@ -1767,7 +1767,7 @@ class UserService extends Service {
   /**
    * 校验授权绑定域名格式
    * @param {string} domain 域名
-   * @returns {boolean} 是否合法
+   * @return {boolean} 是否合法
    */
   isValidLicenseDomain(domain = '') {
     const value = this.normalizeLicenseDomain(domain);
@@ -1781,7 +1781,7 @@ class UserService extends Service {
    * 获取当前用户拥有的授权记录（原始 SQL，兼容未生成 model 的裁剪版）
    * @param {number} userId 用户ID
    * @param {number|string} licenseId 授权ID
-   * @returns {Promise<object|null>} 授权记录
+   * @return {Promise<object|null>} 授权记录
    */
   async getUserOwnedLicenseRow(userId, licenseId) {
     const { ctx } = this;
@@ -1808,7 +1808,7 @@ class UserService extends Service {
    * @param {number} userId 用户ID
    * @param {object} params 请求参数
    * @param {'bind'|'change'} mode 操作模式
-   * @returns {Promise<object>} 返回最新状态
+   * @return {Promise<object>} 返回最新状态
    */
   async saveLicenseDomainRequest(userId, params = {}, mode = 'bind') {
     const { ctx } = this;
@@ -1902,7 +1902,7 @@ class UserService extends Service {
    * 绑定授权域名
    * @param {number} userId 用户ID
    * @param {object} params 请求参数
-   * @returns {Promise<object>} 最新状态
+   * @return {Promise<object>} 最新状态
    */
   async bindLicenseDomain(userId, params = {}) {
     return await this.saveLicenseDomainRequest(userId, params, 'bind');
@@ -1912,7 +1912,7 @@ class UserService extends Service {
    * 修改授权域名
    * @param {number} userId 用户ID
    * @param {object} params 请求参数
-   * @returns {Promise<object>} 最新状态
+   * @return {Promise<object>} 最新状态
    */
   async changeLicenseDomain(userId, params = {}) {
     return await this.saveLicenseDomainRequest(userId, params, 'change');
@@ -2415,7 +2415,7 @@ class UserService extends Service {
    * @param {Object} params 查询参数
    * @param {string} tableName 表名（uied_website_favorite / uied_website_like）
    * @param {string} timeField 返回时间字段名
-   * @returns {Promise<object>} 分页列表
+   * @return {Promise<object>} 分页列表
    */
   async getUserWebsiteInteractionList(userId, params = {}, tableName, timeField = 'createTime') {
     const { ctx, app } = this;
@@ -2433,7 +2433,7 @@ class UserService extends Service {
     /**
      * 兼容历史匿名行为：同一用户当前 IP 下的匿名互动可在登录后合并展示。
      */
-    const actorKeys = [`u:${uid}`];
+    const actorKeys = [ `u:${uid}` ];
     try {
       const ip = ctx.service.uied?.websiteInteraction?.getClientIp
         ? ctx.service.uied.websiteInteraction.getClientIp()
@@ -2453,8 +2453,8 @@ class UserService extends Service {
       ? `(ui.user_id = ? OR ui.actor_key IN (${actorKeyPlaceholders}))`
       : 'ui.user_id = ?';
     const actorWhereReplacements = uniqueActorKeys.length > 0
-      ? [uid, ...uniqueActorKeys]
-      : [uid];
+      ? [ uid, ...uniqueActorKeys ]
+      : [ uid ];
 
     const [ countRow ] = await app.model.query(
       `SELECT COUNT(1) AS total
@@ -2539,7 +2539,7 @@ class UserService extends Service {
    * 用户中心收藏网址列表
    * @param {number} userId 用户ID
    * @param {object} params 查询参数
-   * @returns {Promise<object>} 收藏网址分页列表
+   * @return {Promise<object>} 收藏网址分页列表
    */
   async websiteFavoriteList(userId, params = {}) {
     return await this.getUserWebsiteInteractionList(userId, params, 'uied_website_favorite', 'favoriteTime');
@@ -2549,7 +2549,7 @@ class UserService extends Service {
    * 用户中心点赞网址列表
    * @param {number} userId 用户ID
    * @param {object} params 查询参数
-   * @returns {Promise<object>} 点赞网址分页列表
+   * @return {Promise<object>} 点赞网址分页列表
    */
   async websiteLikeList(userId, params = {}) {
     return await this.getUserWebsiteInteractionList(userId, params, 'uied_website_like', 'likeTime');
@@ -2638,7 +2638,7 @@ class UserService extends Service {
 
   /**
    * 确保 UIED 评论表兼容字段存在（兼容历史库无 parent_id/like_count）
-   * @returns {Promise<void>}
+   * @return {Promise<void>}
    */
   async ensureUiedCommentTableCompatibility() {
     const { app } = this;
@@ -2714,7 +2714,7 @@ class UserService extends Service {
    * 仅对演示账号自动补齐个人中心演示数据
    * @param {number} userId 用户ID
    * @param {string} nickname 兜底昵称
-   * @returns {Promise<void>}
+   * @return {Promise<void>}
    */
   async ensurePersonalCenterDemoData(userId, nickname = '') {
     const { ctx } = this;
@@ -2745,7 +2745,7 @@ class UserService extends Service {
    * @param {number} userId 用户ID
    * @param {object} params 分页与筛选参数
    * @param {'article'|'website'} type 评论类型
-   * @returns {Promise<{pageNo:number,pageSize:number,total:number,lists:Array}>} 评论分页列表
+   * @return {Promise<{pageNo:number,pageSize:number,total:number,lists:Array}>} 评论分页列表
    */
   async getUserCommentList(userId, params = {}, type = 'website') {
     const { ctx, app } = this;
@@ -2877,7 +2877,7 @@ class UserService extends Service {
    * 用户中心文章评论列表
    * @param {number} userId 用户ID
    * @param {object} params 查询参数
-   * @returns {Promise<object>} 文章评论分页列表
+   * @return {Promise<object>} 文章评论分页列表
    */
   async articleCommentList(userId, params = {}) {
     return await this.getUserCommentList(userId, params, 'article');
@@ -2887,7 +2887,7 @@ class UserService extends Service {
    * 用户中心网址评论列表
    * @param {number} userId 用户ID
    * @param {object} params 查询参数
-   * @returns {Promise<object>} 网址评论分页列表
+   * @return {Promise<object>} 网址评论分页列表
    */
   async websiteCommentList(userId, params = {}) {
     return await this.getUserCommentList(userId, params, 'website');
@@ -2896,7 +2896,7 @@ class UserService extends Service {
   /**
    * 获取用户评论类型对应的数据表与目标字段
    * @param {'article'|'website'} type 评论类型
-   * @returns {{tableName:string,targetIdField:string,targetKey:string}} 元数据
+   * @return {{tableName:string,targetIdField:string,targetKey:string}} 元数据
    */
   getUserCommentMeta(type = 'website') {
     const normalizedType = String(type || '').trim().toLowerCase() === 'article' ? 'article' : 'website';
@@ -2919,7 +2919,7 @@ class UserService extends Service {
    * @param {number} userId 用户ID
    * @param {number|string} commentId 评论ID
    * @param {'article'|'website'} type 评论类型
-   * @returns {Promise<object|null>} 评论记录
+   * @return {Promise<object|null>} 评论记录
    */
   async getUserOwnedComment(userId, commentId, type = 'website') {
     const { app } = this;
@@ -2946,7 +2946,7 @@ class UserService extends Service {
    * @param {number} userId 用户ID
    * @param {object} params 请求参数
    * @param {'article'|'website'} type 评论类型
-   * @returns {Promise<boolean>} 是否成功
+   * @return {Promise<boolean>} 是否成功
    */
   async deleteUserComment(userId, params = {}, type = 'website') {
     const { app } = this;
@@ -2980,7 +2980,7 @@ class UserService extends Service {
    * @param {number} userId 用户ID
    * @param {object} params 请求参数
    * @param {'article'|'website'} type 评论类型
-   * @returns {Promise<object>} 更新后的评论摘要
+   * @return {Promise<object>} 更新后的评论摘要
    */
   async updateUserComment(userId, params = {}, type = 'website') {
     const { app } = this;
@@ -3026,7 +3026,7 @@ class UserService extends Service {
    * @param {number} userId 用户ID
    * @param {object} params 请求参数
    * @param {'article'|'website'} type 评论类型
-   * @returns {Promise<object>} 新增回复内容
+   * @return {Promise<object>} 新增回复内容
    */
   async replyUserComment(userId, params = {}, type = 'website') {
     const { ctx } = this;
@@ -3663,7 +3663,7 @@ class UserService extends Service {
   /**
    * 从扩展信息中提取授权ID（兼容多种历史字段）
    * @param {object} extra 扩展信息
-   * @returns {number} 授权ID
+   * @return {number} 授权ID
    */
   resolveLicenseMessageExtraId(extra = {}) {
     if (!extra || typeof extra !== 'object') {
@@ -3686,7 +3686,7 @@ class UserService extends Service {
    * 根据订单ID反查授权ID（用于授权审核消息兜底）
    * @param {number} userId 用户ID
    * @param {number} orderId 订单ID
-   * @returns {Promise<number>} 授权ID
+   * @return {Promise<number>} 授权ID
    */
   async resolveLicenseIdByOrderId(userId, orderId) {
     const { ctx } = this;
@@ -3722,7 +3722,7 @@ class UserService extends Service {
    * @param {number} userId 用户ID
    * @param {string} type 消息类型
    * @param {object} extra 原始扩展信息
-   * @returns {Promise<object>} 规范化后的扩展信息
+   * @return {Promise<object>} 规范化后的扩展信息
    */
   async normalizeUserMessageExtra(userId, type, extra = {}) {
     const noticeType = String(type || '').trim();

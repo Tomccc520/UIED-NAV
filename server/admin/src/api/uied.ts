@@ -185,6 +185,16 @@ export function uiedSaveSiteInfo(params: any) {
     return request.post({ url: '/uied/setting/saveSiteInfo', params })
 }
 
+// 导出后台设置备份
+export function uiedSettingBackupExport() {
+    return request.get({ url: '/uied/setting/backup/export' })
+}
+
+// 导入后台设置备份
+export function uiedSettingBackupImport(params: any) {
+    return request.post({ url: '/uied/setting/backup/import', params })
+}
+
 // 获取公开设置
 export function uiedPublicSettings() {
     return request.get({ url: '/uied/setting/public' })

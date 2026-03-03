@@ -33,7 +33,11 @@
             <template #header>
                 <div class="flex items-center justify-between">
                     <span class="font-medium">榜单系统前台显示配置</span>
-                    <el-button type="primary" :loading="savingModule" @click="handleSaveModuleConfig">
+                    <el-button
+                        type="primary"
+                        :loading="savingModule"
+                        @click="handleSaveModuleConfig"
+                    >
                         保存前台显示配置
                     </el-button>
                 </div>
@@ -72,7 +76,10 @@
                     <el-col :span="24">
                         <el-form-item label="前台显示位置">
                             <div class="w-full">
-                                <el-checkbox-group v-model="moduleForm.displayPlacements" class="placement-group">
+                                <el-checkbox-group
+                                    v-model="moduleForm.displayPlacements"
+                                    class="placement-group"
+                                >
                                     <el-checkbox-button
                                         v-for="item in displayPlacementOptions"
                                         :key="item.value"
@@ -81,7 +88,9 @@
                                         {{ item.label }}
                                     </el-checkbox-button>
                                 </el-checkbox-group>
-                                <div class="form-tip mt-2">勾选后可用于前端导航快捷入口、首页榜单区块等位置。</div>
+                                <div class="form-tip mt-2">
+                                    勾选后可用于前端导航快捷入口、首页榜单区块等位置。
+                                </div>
                             </div>
                         </el-form-item>
                     </el-col>
@@ -97,7 +106,12 @@
                     </el-col>
                     <el-col :span="6">
                         <el-form-item label="入口排序">
-                            <el-input-number v-model="moduleForm.displaySort" :min="1" :max="9999" class="!w-full" />
+                            <el-input-number
+                                v-model="moduleForm.displaySort"
+                                :min="1"
+                                :max="9999"
+                                class="!w-full"
+                            />
                         </el-form-item>
                     </el-col>
                     <el-col :span="8">
@@ -117,7 +131,12 @@
                     </el-col>
                     <el-col :span="8">
                         <el-form-item label="前台最多展示榜单数">
-                            <el-input-number v-model="moduleForm.maxVisibleBoards" :min="1" :max="30" class="!w-full" />
+                            <el-input-number
+                                v-model="moduleForm.maxVisibleBoards"
+                                :min="1"
+                                :max="30"
+                                class="!w-full"
+                            />
                         </el-form-item>
                     </el-col>
                     <el-col :span="16">
@@ -163,7 +182,7 @@
                     :key="item.value"
                     :type="boardMetricFilter === item.value ? '' : 'info'"
                     class="cursor-pointer"
-                    @click="boardMetricFilter = (boardMetricFilter === item.value ? '' : item.value)"
+                    @click="boardMetricFilter = boardMetricFilter === item.value ? '' : item.value"
                 >
                     {{ item.label }}
                 </el-tag>
@@ -172,7 +191,7 @@
                     :key="`period-${item.value}`"
                     :type="boardPeriodFilter === item.value ? '' : 'info'"
                     class="cursor-pointer"
-                    @click="boardPeriodFilter = (boardPeriodFilter === item.value ? '' : item.value)"
+                    @click="boardPeriodFilter = boardPeriodFilter === item.value ? '' : item.value"
                 >
                     {{ item.label }}
                 </el-tag>
@@ -236,12 +255,22 @@
                 </el-table-column>
                 <el-table-column label="排序" width="100">
                     <template #default="{ row }">
-                        <el-input-number v-model="row.sort" :min="1" :max="100000" class="!w-full" />
+                        <el-input-number
+                            v-model="row.sort"
+                            :min="1"
+                            :max="100000"
+                            class="!w-full"
+                        />
                     </template>
                 </el-table-column>
                 <el-table-column label="默认条数" width="110">
                     <template #default="{ row }">
-                        <el-input-number v-model="row.limitCount" :min="1" :max="100" class="!w-full" />
+                        <el-input-number
+                            v-model="row.limitCount"
+                            :min="1"
+                            :max="100"
+                            class="!w-full"
+                        />
                     </template>
                 </el-table-column>
                 <el-table-column label="预览" width="90" fixed="right">
@@ -260,12 +289,18 @@
                     <span class="font-medium">前台预览：{{ previewTitle || '全部榜单' }}</span>
                     <div class="flex items-center gap-2">
                         <el-button @click="handleLoadAllBoards">查看全部榜单</el-button>
-                        <el-button type="primary" @click="activePageTab = 'boards'">返回调整榜单</el-button>
+                        <el-button type="primary" @click="activePageTab = 'boards'"
+                            >返回调整榜单</el-button
+                        >
                     </div>
                 </div>
             </template>
             <template v-if="previewBoards.length > 0">
-                <div v-for="board in previewBoards" :key="board.boardKey || board.key" class="preview-board-block">
+                <div
+                    v-for="board in previewBoards"
+                    :key="board.boardKey || board.key"
+                    class="preview-board-block"
+                >
                     <div class="preview-board-block__head">
                         <div>
                             <div class="preview-board-block__title">
@@ -277,14 +312,21 @@
                                 <span>共 {{ board.total || (board.items || []).length }} 条</span>
                             </div>
                         </div>
-                        <div class="preview-board-block__desc">{{ board.description || '按后台配置规则生成' }}</div>
+                        <div class="preview-board-block__desc">
+                            {{ board.description || '按后台配置规则生成' }}
+                        </div>
                     </div>
                     <el-table :data="board.items || []" size="small" border>
                         <el-table-column prop="name" label="站点" min-width="180" />
                         <el-table-column prop="category" label="分类" min-width="120" />
                         <el-table-column prop="clickCount" label="点击" width="90" />
                         <el-table-column prop="score" label="分值" width="110" />
-                        <el-table-column prop="url" label="链接" min-width="260" show-overflow-tooltip />
+                        <el-table-column
+                            prop="url"
+                            label="链接"
+                            min-width="260"
+                            show-overflow-tooltip
+                        />
                     </el-table>
                 </div>
             </template>
@@ -394,7 +436,7 @@ const periodOptions = ref<OptionItem[]>([
 
 const moduleForm = reactive<RankBoardModuleForm>({
     enabled: true,
-    displayPlacements: [ 'nav_quick_entry', 'home_block' ],
+    displayPlacements: ['nav_quick_entry', 'home_block'],
     displayLabel: '榜单系统',
     displayPath: '/p/rankings',
     displaySort: 88,
@@ -439,7 +481,7 @@ const normalizeRowExtra = (source: any): RankBoardRowExtra => {
         metric: String(extra.metric || '').trim() || 'curated',
         period: String(extra.period || '').trim() || 'all',
         boardGroup: String(extra.boardGroup || '').trim() || 'operations',
-        displayPlacements: toStringList(extra.displayPlacements || [ 'rankings_page' ]),
+        displayPlacements: toStringList(extra.displayPlacements || ['rankings_page']),
         showOnRankingsPage: extra.showOnRankingsPage !== false
     }
 }
@@ -448,13 +490,18 @@ const normalizeRowExtra = (source: any): RankBoardRowExtra => {
  * 榜单配置表筛选结果
  */
 const filteredBoardRows = computed(() => {
-    const keyword = String(boardKeyword.value || '').trim().toLowerCase()
+    const keyword = String(boardKeyword.value || '')
+        .trim()
+        .toLowerCase()
     return configRows.value.filter((row) => {
         if (boardMetricFilter.value && row.extra.metric !== boardMetricFilter.value) return false
         if (boardPeriodFilter.value && row.extra.period !== boardPeriodFilter.value) return false
         if (!keyword) return true
-        return [ row.boardKey, row.boardName, row.description, row.algorithm ]
-            .some((text) => String(text || '').toLowerCase().includes(keyword))
+        return [row.boardKey, row.boardName, row.description, row.algorithm].some((text) =>
+            String(text || '')
+                .toLowerCase()
+                .includes(keyword)
+        )
     })
 })
 
@@ -482,14 +529,14 @@ const schemaText = computed(() => {
  * 获取指标文案
  */
 const getMetricLabel = (metric: string) => {
-    return metricOptions.value.find((item) => item.value === metric)?.label || (metric || '未分类')
+    return metricOptions.value.find((item) => item.value === metric)?.label || metric || '未分类'
 }
 
 /**
  * 获取周期文案
  */
 const getPeriodLabel = (period: string) => {
-    return periodOptions.value.find((item) => item.value === period)?.label || (period || '全部')
+    return periodOptions.value.find((item) => item.value === period)?.label || period || '全部'
 }
 
 /**
@@ -508,7 +555,9 @@ const getMetricTagType = (metric: string) => {
 const patchModuleForm = (source: any) => {
     const value = source && typeof source === 'object' ? source : {}
     moduleForm.enabled = value.enabled !== false
-    moduleForm.displayPlacements = toStringList(value.displayPlacements || [ 'nav_quick_entry', 'home_block' ])
+    moduleForm.displayPlacements = toStringList(
+        value.displayPlacements || ['nav_quick_entry', 'home_block']
+    )
     moduleForm.displayLabel = String(value.displayLabel || '榜单系统')
     moduleForm.displayPath = String(value.displayPath || '/p/rankings')
     moduleForm.displaySort = toInt(value.displaySort, 88, 1, 9999)
@@ -553,26 +602,34 @@ const loadSchema = async () => {
     try {
         const data = await uiedRankBoardSchema()
         schemaData.value = data || {}
-        const placementRows = Array.isArray(data?.draft?.displayPlacementOptions) ? data.draft.displayPlacementOptions : []
+        const placementRows = Array.isArray(data?.draft?.displayPlacementOptions)
+            ? data.draft.displayPlacementOptions
+            : []
         if (placementRows.length > 0) {
-            displayPlacementOptions.value = placementRows.map((item: any) => ({
-                value: String(item.value || ''),
-                label: String(item.label || item.value || '')
-            })).filter((item: OptionItem) => item.value)
+            displayPlacementOptions.value = placementRows
+                .map((item: any) => ({
+                    value: String(item.value || ''),
+                    label: String(item.label || item.value || '')
+                }))
+                .filter((item: OptionItem) => item.value)
         }
         const metrics = Array.isArray(data?.draft?.metricOptions) ? data.draft.metricOptions : []
         if (metrics.length > 0) {
-            metricOptions.value = metrics.map((item: any) => ({
-                value: String(item.value || ''),
-                label: String(item.label || item.value || '')
-            })).filter((item: OptionItem) => item.value)
+            metricOptions.value = metrics
+                .map((item: any) => ({
+                    value: String(item.value || ''),
+                    label: String(item.label || item.value || '')
+                }))
+                .filter((item: OptionItem) => item.value)
         }
         const periods = Array.isArray(data?.draft?.periodOptions) ? data.draft.periodOptions : []
         if (periods.length > 0) {
-            periodOptions.value = periods.map((item: any) => ({
-                value: String(item.value || ''),
-                label: String(item.label || item.value || '')
-            })).filter((item: OptionItem) => item.value)
+            periodOptions.value = periods
+                .map((item: any) => ({
+                    value: String(item.value || ''),
+                    label: String(item.label || item.value || '')
+                }))
+                .filter((item: OptionItem) => item.value)
         }
         if (data?.moduleConfig) {
             patchModuleForm(data.moduleConfig)
@@ -597,7 +654,7 @@ const handleSaveBoards = async () => {
         limitCount: toInt(row.limitCount, 20, 1, 100),
         extra: {
             ...normalizeRowExtra(row.extra),
-            displayPlacements: toStringList(row.extra.displayPlacements || [ 'rankings_page' ])
+            displayPlacements: toStringList(row.extra.displayPlacements || ['rankings_page'])
         }
     }))
 
@@ -673,15 +730,17 @@ const handlePreviewBoard = async (boardKey: string) => {
     if (!boardKey) return
     const res = await uiedRankBoardPreview({ boardKey })
     previewTitle.value = boardKey
-    previewBoards.value = [ {
-        key: boardKey,
-        boardKey,
-        boardName: boardKey,
-        metric: configRows.value.find((item) => item.boardKey === boardKey)?.extra.metric || '',
-        period: configRows.value.find((item) => item.boardKey === boardKey)?.extra.period || '',
-        total: Number(res?.total || 0),
-        items: Array.isArray(res?.items) ? res.items : []
-    } ]
+    previewBoards.value = [
+        {
+            key: boardKey,
+            boardKey,
+            boardName: boardKey,
+            metric: configRows.value.find((item) => item.boardKey === boardKey)?.extra.metric || '',
+            period: configRows.value.find((item) => item.boardKey === boardKey)?.extra.period || '',
+            total: Number(res?.total || 0),
+            items: Array.isArray(res?.items) ? res.items : []
+        }
+    ]
     activePageTab.value = 'preview'
 }
 
@@ -704,9 +763,15 @@ const handleLoadAllBoards = async () => {
  */
 const handleEnableMetricPreset = () => {
     const targetKeys = new Set([
-        'daily_visits', 'weekly_visits', 'monthly_visits',
-        'daily_favorites', 'weekly_favorites', 'monthly_favorites',
-        'daily_likes', 'weekly_likes', 'monthly_likes'
+        'daily_visits',
+        'weekly_visits',
+        'monthly_visits',
+        'daily_favorites',
+        'weekly_favorites',
+        'monthly_favorites',
+        'daily_likes',
+        'weekly_likes',
+        'monthly_likes'
     ])
     configRows.value = configRows.value.map((row) => ({
         ...row,
@@ -730,7 +795,7 @@ const handleBoardKeywordChange = () => {
  * 刷新全部数据
  */
 const handleReloadAll = async () => {
-    await Promise.all([ loadSchema(), loadConfigs() ])
+    await Promise.all([loadSchema(), loadConfigs()])
     await handleLoadAllBoards()
 }
 

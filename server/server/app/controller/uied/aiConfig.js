@@ -168,18 +168,64 @@ const normalizeAiConfigPayload = payload => {
 /**
  * 写入 SSE 消息片段（OpenAI delta 兼容格式）
  * @param {import('http').ServerResponse} res - Node 响应对象
- * @param {string} chunk - 文本片段
+ * @param {string} contentChunk - 正文增量片段
+ * @param {string} [reasoningChunk=''] - 推理增量片段
  */
-const writeSseDeltaChunk = (res, chunk) => {
+const writeSseDeltaChunk = (res, contentChunk, reasoningChunk = '') => {
+  const content = String(contentChunk || '');
+  const reasoning = String(reasoningChunk || '');
+  if (!content && !reasoning) return;
+  const delta = {};
+  if (content) delta.content = content;
+  if (reasoning) delta.reasoning_content = reasoning;
   const payload = JSON.stringify({
     choices: [
       {
-        delta: { content: chunk },
+        delta,
       },
     ],
   });
   res.write(`data: ${payload}\n\n`);
 };
+
+/**
+ * 将 SSE delta 内容归一化为字符串（兼容 string/array/object）
+ * @param {any} value - 原始 delta 字段
+ * @return {string} 合并后的文本
+ */
+const normalizeSseDeltaText = value => {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value)) {
+    return value
+      .map(item => {
+        if (typeof item === 'string') return item;
+        if (item && typeof item === 'object') {
+          const text = item.text;
+          return typeof text === 'string' ? text : '';
+        }
+        return '';
+      })
+      .join('');
+  }
+  if (value && typeof value === 'object') {
+    const text = value.text;
+    return typeof text === 'string' ? text : '';
+  }
+  return '';
+};
+
+/**
+ * 从 SSE 事件包中提取 data 行，兼容多行 data 拼接
+ * @param {string} packet - SSE 单个事件包
+ * @return {string} data 内容
+ */
+const extractSsePacketData = packet => String(packet || '')
+  .split('\n')
+  .map(line => line.trim())
+  .filter(line => line.startsWith('data:'))
+  .map(line => line.replace(/^data:\s?/, ''))
+  .join('');
 
 /**
  * 结束 SSE 输出
@@ -475,7 +521,7 @@ class AiConfigController extends baseController {
 
   /**
    * 编辑器 AI 流式对话（SSE）
-   * 说明：底层仍复用 AI 配置服务，返回 OpenAI delta 兼容数据结构。
+   * 说明：优先透传上游真实 SSE（含 reasoning_content），失败时回退普通对话分片输出。
    */
   async chatCompletionsEditor() {
     const { ctx } = this;
@@ -496,27 +542,135 @@ class AiConfigController extends baseController {
       res.flushHeaders();
     }
 
+    let sseClosed = false;
+    let hasStreamChunk = false;
+    const safeEndSse = () => {
+      if (sseClosed) return;
+      sseClosed = true;
+      endSseStream(res);
+    };
+
+    try {
+      const aiService = ctx.service.uied.aiConfig;
+      const config = await aiService.getDefault();
+      if (!config) {
+        throw new Error('没有可用的 AI 配置');
+      }
+      const requestUrl = aiService.resolveChatApiUrl(config.provider, config.apiUrl);
+      const requestModel = aiService.resolveChatModel(config.provider, config.model);
+      const systemPrompt = '你是 UIED 设计导航的 AI 助手，专注于帮助设计师解决问题。';
+      const messages = [
+        { role: 'system', content: systemPrompt },
+        ...context,
+        { role: 'user', content: prompt },
+      ];
+
+      const upstreamResponse = await aiService.requestChatCompletions({
+        url: requestUrl,
+        apiKey: config.apiKey,
+        data: aiService.buildChatRequestData(config, {
+          model: requestModel,
+          messages,
+          temperature: 0.7,
+          max_tokens: 1200,
+          stream: true,
+        }),
+        timeout: 90000,
+        streaming: true,
+      });
+
+      const upstreamStream = upstreamResponse?.res;
+      if (Number(upstreamResponse?.status || 500) !== 200 || !upstreamStream) {
+        throw new Error(`AI 流式请求失败（HTTP ${upstreamResponse?.status || 500}）`);
+      }
+
+      /**
+       * 转发上游 SSE 事件包，并提取正文/推理增量字段
+       * @param {string} packet - 上游 SSE 事件包
+       */
+      const forwardPacket = packet => {
+        if (sseClosed) return;
+        const payloadText = extractSsePacketData(packet);
+        if (!payloadText) return;
+        if (payloadText === '[DONE]') {
+          safeEndSse();
+          return;
+        }
+        try {
+          const payload = JSON.parse(payloadText);
+          const contentDelta = normalizeSseDeltaText(payload?.choices?.[0]?.delta?.content);
+          const reasoningDelta = normalizeSseDeltaText(
+            payload?.choices?.[0]?.delta?.reasoning_content
+          );
+          if (!contentDelta && !reasoningDelta) return;
+          hasStreamChunk = true;
+          writeSseDeltaChunk(res, contentDelta, reasoningDelta);
+        } catch (parseError) {
+          ctx.logger.warn(`编辑器AI流式片段解析失败: ${payloadText}`);
+        }
+      };
+
+      let sseBuffer = '';
+      await new Promise((resolve, reject) => {
+        ctx.req.on('close', () => {
+          if (!upstreamStream.destroyed) {
+            upstreamStream.destroy();
+          }
+        });
+        upstreamStream.on('data', chunk => {
+          if (sseClosed) return;
+          sseBuffer += String(chunk || '');
+          const packets = sseBuffer.split(/\r?\n\r?\n/);
+          sseBuffer = packets.pop() || '';
+          packets.forEach(packet => forwardPacket(packet));
+        });
+        upstreamStream.on('end', () => {
+          if (sseBuffer.trim()) {
+            forwardPacket(sseBuffer);
+            sseBuffer = '';
+          }
+          resolve();
+        });
+        upstreamStream.on('error', reject);
+      });
+
+      if (hasStreamChunk) {
+        safeEndSse();
+        return;
+      }
+      throw new Error('AI 流式未返回可用内容');
+    } catch (streamError) {
+      ctx.logger.warn(`编辑器AI流式对话失败，准备回退普通接口: ${streamError?.message || streamError}`);
+      if (hasStreamChunk) {
+        safeEndSse();
+        return;
+      }
+    }
+
     try {
       const result = await ctx.service.uied.aiConfig.chat(prompt, context);
       const reply = String(result?.reply || '').trim();
-      if (!reply) {
+      const reasoningText = String(result?.reasoningContent || result?.reasoning_content || '').trim();
+      if (!reply && !reasoningText) {
         writeSseDeltaChunk(res, 'AI 未返回可用内容，请稍后重试。');
-        endSseStream(res);
+        safeEndSse();
         return;
       }
-      const chunks = splitTextForSse(reply);
-      for (const chunk of chunks) {
-        writeSseDeltaChunk(res, chunk);
+      const replyChunks = splitTextForSse(reply);
+      const reasoningChunks = splitTextForSse(reasoningText);
+      const maxLen = Math.max(replyChunks.length, reasoningChunks.length);
+      for (let i = 0; i < maxLen; i += 1) {
+        writeSseDeltaChunk(res, replyChunks[i] || '', reasoningChunks[i] || '');
       }
-      endSseStream(res);
+      safeEndSse();
     } catch (error) {
-      ctx.logger.error('编辑器AI流式对话失败:', error);
+      ctx.logger.error('编辑器AI回退对话失败:', error);
       const readableMessage = formatAiErrorMessage(error);
       const outputMessage = /^AI\s*(处理失败|服务)/.test(readableMessage)
         ? readableMessage
         : `AI 处理失败：${readableMessage}`;
       writeSseDeltaChunk(res, outputMessage);
-      endSseStream(res);
+      safeEndSse();
     }
   }
 }

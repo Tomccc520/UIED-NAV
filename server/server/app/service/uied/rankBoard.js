@@ -698,7 +698,7 @@ class RankBoardService extends Service {
   async queryVisitBoardByPeriod({ period = 'day', limit = 20 } = {}) {
     const _period = String(period || 'day').trim().toLowerCase();
     const items = await this.queryTodayHot(limit);
-    return items.map((row) => ({
+    return items.map(row => ({
       ...row,
       score: Number(row.clickCount || 0),
       visitPeriod: [ 'day', 'week', 'month' ].includes(_period) ? _period : 'day',

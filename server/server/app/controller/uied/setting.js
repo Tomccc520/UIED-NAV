@@ -78,6 +78,40 @@ class SettingController extends baseController {
   }
 
   /**
+   * 导出后台设置备份
+   */
+  async backupExport() {
+    const { ctx } = this;
+    try {
+      const backup = await ctx.service.uied.setting.exportBackup();
+      this.result({ data: backup, message: '导出成功' });
+    } catch (error) {
+      ctx.logger.error('导出后台设置备份失败:', error);
+      this.result({ code: 500, message: '导出后台设置备份失败' });
+    }
+  }
+
+  /**
+   * 导入后台设置备份
+   */
+  async backupImport() {
+    const { ctx } = this;
+    try {
+      const body = ctx.request.body || {};
+      const payload = body.payload || body.backup || body;
+      const options = {
+        applySiteInfo: body.applySiteInfo !== false,
+        applyAuthConfig: body.applyAuthConfig !== false,
+      };
+      const result = await ctx.service.uied.setting.importBackup(payload, options);
+      this.result({ data: result, message: '导入成功' });
+    } catch (error) {
+      ctx.logger.error('导入后台设置备份失败:', error);
+      this.result({ code: 500, message: error.message || '导入后台设置备份失败' });
+    }
+  }
+
+  /**
    * 获取公开设置（前端访问）
    */
   async publicSettings() {
@@ -88,6 +122,35 @@ class SettingController extends baseController {
     } catch (error) {
       ctx.logger.error('获取公开设置失败:', error);
       this.result({ code: 500, message: '获取公开设置失败' });
+    }
+  }
+
+  /**
+   * 获取注册/登录配置
+   */
+  async getAuthConfig() {
+    const { ctx } = this;
+    try {
+      const config = await ctx.service.uied.setting.getAuthConfig();
+      this.result({ data: config });
+    } catch (e) {
+      ctx.logger.error('获取注册/登录配置失败:', e);
+      this.result({ data: '', message: e.message, code: 1001 });
+    }
+  }
+
+  /**
+   * 更新注册/登录配置
+   */
+  async updateAuthConfig() {
+    const { ctx } = this;
+    try {
+      const body = ctx.request.body || {};
+      await ctx.service.uied.setting.updateAuthConfig(body);
+      this.result({ data: true, message: '保存成功' });
+    } catch (e) {
+      ctx.logger.error('更新注册/登录配置失败:', e);
+      this.result({ data: '', message: e.message, code: 1001 });
     }
   }
 

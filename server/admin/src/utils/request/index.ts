@@ -21,7 +21,10 @@ function parseCommercialFeatureGuardError(error: any) {
     if (!featureKey) return null
     return {
         featureKey,
-        edition: String(body?.data?.edition || 'free').trim().toLowerCase() || 'free'
+        edition:
+            String(body?.data?.edition || 'free')
+                .trim()
+                .toLowerCase() || 'free'
     }
 }
 
@@ -66,11 +69,12 @@ const axiosHooks: AxiosHooks = {
         if (!isTransformResponse) {
             return response.data
         }
-        const { code, data, show, msg } = response.data
+        const { code, data, show, msg, message } = response.data || {}
+        const messageText = String(msg || message || '').trim()
         switch (code) {
             case RequestCodeEnum.SUCCESS:
                 if (show) {
-                    msg && feedback.msgSuccess(msg)
+                    messageText && feedback.msgSuccess(messageText)
                 }
                 return data
 
@@ -84,7 +88,7 @@ const axiosHooks: AxiosHooks = {
             case RequestCodeEnum.NO_PERMISSTION:
             case RequestCodeEnum.FAILED:
             case RequestCodeEnum.SYSTEM_ERROR:
-                msg && feedback.msgError(msg)
+                messageText && feedback.msgError(messageText)
                 return Promise.reject(data)
 
             case RequestCodeEnum.TOKEN_INVALID:
@@ -94,6 +98,18 @@ const axiosHooks: AxiosHooks = {
                 return Promise.reject()
 
             default:
+                /**
+                 * 兼容后端返回 code=1001/1002 等历史业务码：
+                 * 非 200 一律视为失败并提示 message，避免登录页“无提示失败”。
+                 */
+                if (Number(code) !== RequestCodeEnum.SUCCESS) {
+                    feedback.msgError(messageText || `请求失败（${String(code || 'UNKNOWN')}）`)
+                    return Promise.reject({
+                        code,
+                        data,
+                        message: messageText || '请求失败'
+                    })
+                }
                 return data
         }
     },
@@ -103,7 +119,9 @@ const axiosHooks: AxiosHooks = {
             const featureDenied = parseCommercialFeatureGuardError(error)
             if (featureDenied) {
                 feedback.msgError(
-                    `当前版本未授权该功能（${featureDenied.featureKey}，当前版本：${featureDenied.edition.toUpperCase()}）`
+                    `当前版本未授权该功能（${
+                        featureDenied.featureKey
+                    }，当前版本：${featureDenied.edition.toUpperCase()}）`
                 )
             } else {
                 error.message && feedback.msgError(error.message)

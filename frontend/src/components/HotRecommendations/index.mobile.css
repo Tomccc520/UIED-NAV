@@ -162,14 +162,14 @@
     grid-template-columns: 1fr 1fr; /* 固定一行两个，与Home页面一致 */
     gap: 0.75rem; /* 与Home页面一致 */
     margin: 0;
-    overflow: hidden; /* 防止子元素溢出 */
+    overflow: visible; /* 允许卡片选中描边完整显示 */
   }
   
   /* 确保卡片容器不溢出 */
   .hot-recommendations-grid > * {
     min-width: 0; /* 允许flex/grid子元素收缩 */
     max-width: 100%;
-    overflow: hidden;
+    overflow: visible; /* 避免裁切卡片描边 */
   }
   
   /* 注意：工具卡片样式现在完全由ToolCard/index.mobile.css管理，无需在此重复定义 */

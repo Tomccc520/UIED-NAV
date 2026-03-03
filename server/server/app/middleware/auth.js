@@ -63,7 +63,15 @@ module.exports = options => {
 
     const hexist = await ctx.service.redis.hExists(backstageManageKey, uidStr);
     if (!hexist) {
-      await ctx.service.authAdmin.CacheAdminUserByUid(uid);
+      /**
+       * 回填后台管理员缓存（兼容历史大小写方法名）
+       */
+      const cacheAdminUserByUid =
+        ctx.service.authAdmin.cacheAdminUserByUid
+        || ctx.service.authAdmin.CacheAdminUserByUid;
+      if (typeof cacheAdminUserByUid === 'function') {
+        await cacheAdminUserByUid.call(ctx.service.authAdmin, uid);
+      }
     }
 
     // 校验用户被删除
@@ -266,6 +274,8 @@ module.exports = options => {
       'uied:setting:articleTopicsConfig': [ 'uied:setting:get' ],
       'uied:setting:saveArticleConfig': [ 'uied:setting:save' ],
       'uied:setting:saveArticleTopicsConfig': [ 'uied:setting:save' ],
+      'uied:setting:backup:export': [ 'uied:setting:get' ],
+      'uied:setting:backup:import': [ 'uied:setting:save' ],
       // 商业版：AI 配置 detail 兼容别名复用 get 权限
       'uied:aiConfig:detail': [ 'uied:aiConfig:get', 'uied:aiConfig:list' ],
       // 商业版：WordPress 标签/组件复用原有分类管理权限，避免历史角色漏配

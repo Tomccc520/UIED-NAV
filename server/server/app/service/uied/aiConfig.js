@@ -248,6 +248,13 @@ class AiConfigService extends Service {
     ) {
       nextData.thinking_budget = Number(advanced.thinkingBudget);
     }
+    // SiliconFlow 推理模式兼容：显式透传 enable_thinking，避免仅切模型但服务端未进入推理流。
+    if (
+      provider === 'siliconflow' &&
+      !Object.prototype.hasOwnProperty.call(nextData, 'enable_thinking')
+    ) {
+      nextData.enable_thinking = !!advanced.reasoningEnabled;
+    }
     return nextData;
   }
 
@@ -315,6 +322,7 @@ class AiConfigService extends Service {
    * @param {string} options.apiKey - API Key
    * @param {Object} options.data - 请求体
    * @param {number} [options.timeout=30000] - 超时时间（毫秒）
+   * @param {boolean} [options.streaming=false] - 是否以流式模式返回上游响应流
    * @return {Promise<any>} HTTP 响应
    */
   async requestChatCompletions(options = {}) {
@@ -322,6 +330,7 @@ class AiConfigService extends Service {
     const url = String(options.url || '').trim();
     const apiKey = String(options.apiKey || '').trim();
     const timeout = Number(options.timeout || 30000);
+    const streaming = options.streaming === true;
     const data = options.data || {};
     const baseOptions = {
       method: 'POST',
@@ -329,9 +338,11 @@ class AiConfigService extends Service {
       data,
       headers: {
         Authorization: `Bearer ${apiKey}`,
+        Accept: streaming ? 'text/event-stream' : 'application/json',
       },
       timeout,
-      dataType: 'json',
+      dataType: streaming ? 'text' : 'json',
+      streaming,
     };
 
     try {
@@ -702,8 +713,6 @@ class AiConfigService extends Service {
    * 测试 AI 连接
    */
   async testConnection(provider, apiKey, apiUrl, options = {}) {
-    const { ctx } = this;
-
     if (!apiKey) {
       return { success: false, message: '请提供 API Key' };
     }

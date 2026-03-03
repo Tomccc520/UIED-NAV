@@ -11,6 +11,7 @@ module.exports = app => {
    */
   const allFeature = (path, featureKey, action) => router.all(path, featureGuard(featureKey), action);
   router.all('/api/system/login', controller.system.login);
+  router.all('/api/system/login/captcha', controller.system.loginCaptcha);
   router.all('/api/system/logout', controller.system.logout);
   router.all('/api/system/menu/route', controller.system.menusRoute);
   router.all('/api/common/index/console', controller.system.console);

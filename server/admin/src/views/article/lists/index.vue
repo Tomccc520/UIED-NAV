@@ -38,14 +38,24 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="发布状态">
-                    <el-select class="w-[220px]" v-model="queryParams.isShow" clearable @change="handleSearchFieldChange">
+                    <el-select
+                        class="w-[220px]"
+                        v-model="queryParams.isShow"
+                        clearable
+                        @change="handleSearchFieldChange"
+                    >
                         <el-option label="全部" value />
                         <el-option label="已发布" :value="1" />
                         <el-option label="待发布" :value="0" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="审核状态">
-                    <el-select class="w-[220px]" v-model="queryParams.reviewStatus" clearable @change="handleSearchFieldChange">
+                    <el-select
+                        class="w-[220px]"
+                        v-model="queryParams.reviewStatus"
+                        clearable
+                        @change="handleSearchFieldChange"
+                    >
                         <el-option label="全部" value />
                         <el-option label="待审核" :value="1" />
                         <el-option label="已通过" :value="2" />
@@ -54,7 +64,13 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="文章标签">
-                    <el-select class="w-[280px]" v-model="queryParams.tagId" clearable filterable @change="handleSearchFieldChange">
+                    <el-select
+                        class="w-[280px]"
+                        v-model="queryParams.tagId"
+                        clearable
+                        filterable
+                        @change="handleSearchFieldChange"
+                    >
                         <el-option label="全部" value />
                         <el-option
                             v-for="item in optionsData.articleTag"
@@ -65,7 +81,13 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="所属专题">
-                    <el-select class="w-[280px]" v-model="queryParams.topicId" clearable filterable @change="handleSearchFieldChange">
+                    <el-select
+                        class="w-[280px]"
+                        v-model="queryParams.topicId"
+                        clearable
+                        filterable
+                        @change="handleSearchFieldChange"
+                    >
                         <el-option label="全部" value />
                         <el-option
                             v-for="item in optionsData.articleTopic"
@@ -112,7 +134,12 @@
             <div class="article-quick-filters mb-3">
                 <span class="article-quick-filters__label">快捷筛选</span>
                 <el-button size="small" @click="applyQuickFilter('all')">全部</el-button>
-                <el-button size="small" type="warning" plain @click="applyQuickFilter('pendingReview')">
+                <el-button
+                    size="small"
+                    type="warning"
+                    plain
+                    @click="applyQuickFilter('pendingReview')"
+                >
                     待审核
                 </el-button>
                 <el-button size="small" type="success" plain @click="applyQuickFilter('published')">
@@ -488,10 +515,7 @@ const handleAuditPass = async (row: ArticleListItem) => {
 const handleView = (row: ArticleListItem) => {
     const articleSlug = String(row?.slug || row?.id || '').trim()
     const articlePath = resolveFrontendArticleDetailPath()
-    window.open(
-        `${frontendUrl}${articlePath}/${encodeURIComponent(articleSlug)}`,
-        '_blank'
-    )
+    window.open(`${frontendUrl}${articlePath}/${encodeURIComponent(articleSlug)}`, '_blank')
 }
 
 /**

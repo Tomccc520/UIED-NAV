@@ -195,6 +195,20 @@ class DailyHotService extends Service {
     const platformTitle = String(source.platformTitle || source.title || '').trim();
     const displayName = String(source.displayName || source.name || platformTitle).trim() || platformTitle;
     const sort = this.parsePositiveInt(source.sort, (index + 1) * 10, 1, 100000);
+    const sourceExtra = source.extra && typeof source.extra === 'object' ? source.extra : {};
+    const icon = String(source.icon || source.iconUrl || sourceExtra.icon || '').trim();
+    const link = String(source.url || source.link || sourceExtra.url || sourceExtra.link || '').trim();
+    const extra = { ...sourceExtra };
+    if (icon) {
+      extra.icon = icon;
+    } else if (Object.prototype.hasOwnProperty.call(extra, 'icon')) {
+      delete extra.icon;
+    }
+    if (link) {
+      extra.url = link;
+    } else if (Object.prototype.hasOwnProperty.call(extra, 'url')) {
+      delete extra.url;
+    }
 
     return {
       id: this.parsePositiveInt(source.id, 0, 1, 99999999),
@@ -205,7 +219,9 @@ class DailyHotService extends Service {
       cacheTtlSeconds: this.parsePositiveInt(source.cacheTtlSeconds, 600, 30, 86400),
       limitCount: this.parsePositiveInt(source.limitCount, 10, 1, 30),
       requestTimeoutMs: this.parsePositiveInt(source.requestTimeoutMs, 12000, 1000, 30000),
-      extra: source.extra && typeof source.extra === 'object' ? source.extra : {},
+      icon,
+      url: link,
+      extra,
     };
   }
 
@@ -603,7 +619,10 @@ class DailyHotService extends Service {
       const conf = configuredMap.get(title);
       merged.push({
         title,
+        platformTitle: title,
         displayName: conf?.displayName || title,
+        icon: String(conf?.icon || ''),
+        url: String(conf?.url || ''),
         isEnabled: conf ? conf.isEnabled : true,
         sort: conf?.sort || (index + 1) * 10,
         cacheTtlSeconds: conf?.cacheTtlSeconds || config.cacheTtlSeconds,
@@ -617,7 +636,10 @@ class DailyHotService extends Service {
     Array.from(configuredMap.values()).forEach(conf => {
       merged.push({
         title: conf.platformTitle,
+        platformTitle: conf.platformTitle,
         displayName: conf.displayName,
+        icon: String(conf?.icon || ''),
+        url: String(conf?.url || ''),
         isEnabled: conf.isEnabled,
         sort: conf.sort,
         cacheTtlSeconds: conf.cacheTtlSeconds,

@@ -16,7 +16,7 @@ const path = require('path');
 class WebsitePreviewSnapshotService extends Service {
   /**
    * 读取详情页截图配置（Playwright 开关/超时/TTL 等）
-   * @returns {Promise<object>} 规范化配置
+   * @return {Promise<object>} 规范化配置
    */
   async getPreviewConfig() {
     const rawConfig = await this.ctx.service.uied.setting.getSettingByKey('detailPageConfig');
@@ -32,7 +32,7 @@ class WebsitePreviewSnapshotService extends Service {
 
   /**
    * 本地截图缓存目录（映射到前端可访问的 /uploads 路径）
-   * @returns {string} 截图缓存目录绝对路径
+   * @return {string} 截图缓存目录绝对路径
    */
   getSnapshotDirAbsolutePath() {
     return path.join(this.app.baseDir, 'app/public/uploads/website-preview-cache');
@@ -41,7 +41,7 @@ class WebsitePreviewSnapshotService extends Service {
   /**
    * 构建本地截图缓存文件名
    * @param {number|string} websiteId 网站ID
-   * @returns {string} 文件名
+   * @return {string} 文件名
    */
   buildSnapshotFileName(websiteId) {
     return `website_${websiteId}.png`;
@@ -50,7 +50,7 @@ class WebsitePreviewSnapshotService extends Service {
   /**
    * 构建前端可访问的截图路径
    * @param {number|string} websiteId 网站ID
-   * @returns {string} 公共访问路径
+   * @return {string} 公共访问路径
    */
   buildSnapshotPublicPath(websiteId) {
     return `/uploads/website-preview-cache/${this.buildSnapshotFileName(websiteId)}`;
@@ -59,7 +59,7 @@ class WebsitePreviewSnapshotService extends Service {
   /**
    * 规范化网址（兼容未填写协议）
    * @param {string} rawUrl 原始网址
-   * @returns {string} 标准化后的网址
+   * @return {string} 标准化后的网址
    */
   normalizeUrl(rawUrl) {
     const value = String(rawUrl || '').trim();
@@ -71,7 +71,7 @@ class WebsitePreviewSnapshotService extends Service {
   /**
    * 构建 mShots 兜底截图地址（作为 Playwright 未安装/失败时的兜底方案）
    * @param {string} rawUrl 原始网址
-   * @returns {string} mShots 截图 URL
+   * @return {string} mShots 截图 URL
    */
   buildMshotsUrl(rawUrl) {
     const normalized = this.normalizeUrl(rawUrl);
@@ -81,7 +81,7 @@ class WebsitePreviewSnapshotService extends Service {
   /**
    * 构建 thum.io 兜底截图地址（用于 mShots 失败时的二级兜底）
    * @param {string} rawUrl 原始网址
-   * @returns {string} thum.io 截图 URL
+   * @return {string} thum.io 截图 URL
    */
   buildThumIoUrl(rawUrl) {
     const normalized = this.normalizeUrl(rawUrl);
@@ -98,7 +98,7 @@ class WebsitePreviewSnapshotService extends Service {
   /**
    * 判断本地截图缓存文件是否存在
    * @param {number|string} websiteId 网站ID
-   * @returns {Promise<boolean>} 是否存在
+   * @return {Promise<boolean>} 是否存在
    */
   async snapshotFileExists(websiteId) {
     const target = path.join(this.getSnapshotDirAbsolutePath(), this.buildSnapshotFileName(websiteId));
@@ -114,7 +114,7 @@ class WebsitePreviewSnapshotService extends Service {
    * 判断本地截图缓存是否可用（结合 TTL）
    * @param {number|string} websiteId 网站ID
    * @param {number} cacheTtlSeconds 缓存秒数
-   * @returns {Promise<boolean>} 是否命中可用缓存
+   * @return {Promise<boolean>} 是否命中可用缓存
    */
   async isSnapshotCacheUsable(websiteId, cacheTtlSeconds) {
     const target = path.join(this.getSnapshotDirAbsolutePath(), this.buildSnapshotFileName(websiteId));
@@ -133,7 +133,7 @@ class WebsitePreviewSnapshotService extends Service {
    * 获取网站预览图（优先本地上传/后台截图，其次本地 Playwright 缓存，最后 mShots）
    * @param {number|string} websiteId 网站ID
    * @param {{ forceRefresh?: boolean, timeoutMs?: number }} options 选项
-   * @returns {Promise<object>} 预览图结果
+   * @return {Promise<object>} 预览图结果
    */
   async getPreviewSnapshotByWebsiteId(websiteId, options = {}) {
     const previewConfig = await this.getPreviewConfig();
@@ -242,7 +242,7 @@ class WebsitePreviewSnapshotService extends Service {
   /**
    * 规范化截图超时（限制范围，避免阻塞 worker）
    * @param {unknown} timeoutMs 超时时间
-   * @returns {number} 规范化后的毫秒值
+   * @return {number} 规范化后的毫秒值
    */
   normalizeTimeout(timeoutMs) {
     const parsed = Number.parseInt(String(timeoutMs || ''), 10);
@@ -253,7 +253,7 @@ class WebsitePreviewSnapshotService extends Service {
   /**
    * 规范化截图缓存 TTL（秒）
    * @param {unknown} cacheTtlSeconds 缓存秒数
-   * @returns {number} 规范化后的缓存秒数
+   * @return {number} 规范化后的缓存秒数
    */
   normalizeCacheTtl(cacheTtlSeconds) {
     const parsed = Number.parseInt(String(cacheTtlSeconds || ''), 10);
@@ -266,7 +266,7 @@ class WebsitePreviewSnapshotService extends Service {
    * @param {number|string} websiteId 网站ID
    * @param {string} rawUrl 原始网址
    * @param {{ timeoutMs: number }} options 截图选项
-   * @returns {Promise<{ok: boolean, reason?: string, reasonCode?: string}>} 截图结果
+   * @return {Promise<{ok: boolean, reason?: string, reasonCode?: string}>} 截图结果
    */
   async captureWithPlaywright(websiteId, rawUrl, options) {
     let browser = null;
@@ -322,7 +322,7 @@ class WebsitePreviewSnapshotService extends Service {
    * 启动 Playwright 浏览器
    * 优先使用 Playwright 默认浏览器；若未安装则回退到本机 Chrome/Chromium（Mac）
    * @param {any} playwright Playwright 模块
-   * @returns {Promise<any>} 浏览器实例
+   * @return {Promise<any>} 浏览器实例
    */
   async launchPlaywrightBrowser(playwright) {
     const baseOptions = {
@@ -350,7 +350,7 @@ class WebsitePreviewSnapshotService extends Service {
 
   /**
    * 查找本机系统浏览器可执行文件（Mac）
-   * @returns {string} 可执行文件路径，找不到返回空字符串
+   * @return {string} 可执行文件路径，找不到返回空字符串
    */
   findSystemChromiumExecutable() {
     const candidates = [
@@ -371,7 +371,7 @@ class WebsitePreviewSnapshotService extends Service {
 
   /**
    * 动态加载 Playwright（未安装时返回 null，避免服务启动报错）
-   * @returns {any|null} Playwright 模块
+   * @return {any|null} Playwright 模块
    */
   loadPlaywright() {
     try {

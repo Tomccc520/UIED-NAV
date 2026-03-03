@@ -66,7 +66,9 @@
             </el-form>
             <template #footer>
                 <el-button @click="showEdit = false">取消</el-button>
-                <el-button type="primary" :loading="editLoading" @click="handleSubmit">确定</el-button>
+                <el-button type="primary" :loading="editLoading" @click="handleSubmit"
+                    >确定</el-button
+                >
             </template>
         </el-dialog>
     </div>

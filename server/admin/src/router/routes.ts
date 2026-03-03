@@ -111,6 +111,40 @@ export const constantRoutes: Array<RouteRecordRaw> = [
                 }
             }
         ]
+    },
+    // 注册/登录配置
+    {
+        path: '/settings/auth-config',
+        component: LAYOUT,
+        children: [
+            {
+                path: '',
+                name: Symbol(),
+                component: () => import('@/views/settings/AuthConfig.vue'),
+                meta: {
+                    title: '注册/登录配置',
+                    hidden: true,
+                    activeMenu: '/system-setting'
+                }
+            }
+        ]
+    },
+    // 详情页配置
+    {
+        path: '/settings/detail-page-config',
+        component: LAYOUT,
+        children: [
+            {
+                path: '',
+                name: Symbol(),
+                component: () => import('@/views/uied/setting/detailPage.vue'),
+                meta: {
+                    title: '网站详情页配置',
+                    hidden: true,
+                    activeMenu: '/system-setting'
+                }
+            }
+        ]
     }
 ]
 

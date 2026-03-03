@@ -48,14 +48,23 @@
                 </el-table-column>
                 <el-table-column label="排序" width="100">
                     <template #default="{ row }">
-                        <el-input-number v-model="row.sort" :min="1" :max="100000" class="!w-full" />
+                        <el-input-number
+                            v-model="row.sort"
+                            :min="1"
+                            :max="100000"
+                            class="!w-full"
+                        />
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" width="240" fixed="right">
                     <template #default="{ row }">
                         <div class="flex gap-2">
-                            <el-button link type="primary" @click="handleSaveTemplate(row)">保存</el-button>
-                            <el-button link type="success" @click="openCreateDialog(row)">一键创建</el-button>
+                            <el-button link type="primary" @click="handleSaveTemplate(row)"
+                                >保存</el-button
+                            >
+                            <el-button link type="success" @click="openCreateDialog(row)"
+                                >一键创建</el-button
+                            >
                             <el-button
                                 link
                                 type="danger"
@@ -80,7 +89,12 @@
             <pre class="schema-view">{{ schemaText }}</pre>
         </el-card>
 
-        <el-dialog v-model="createDialogVisible" title="一键创建专题页" width="680px" destroy-on-close>
+        <el-dialog
+            v-model="createDialogVisible"
+            title="一键创建专题页"
+            width="680px"
+            destroy-on-close
+        >
             <el-form :model="createForm" label-width="120px">
                 <el-form-item label="模板键">
                     <el-input v-model="createForm.templateKey" disabled />
@@ -100,13 +114,20 @@
                     />
                 </el-form-item>
                 <el-form-item label="专题排序">
-                    <el-input-number v-model="createForm.sortOrder" :min="0" :max="100000" class="!w-full" />
+                    <el-input-number
+                        v-model="createForm.sortOrder"
+                        :min="0"
+                        :max="100000"
+                        class="!w-full"
+                    />
                 </el-form-item>
             </el-form>
 
             <el-alert
                 v-if="previewInfo"
-                :title="`预览：匹配分类 ${previewInfo.categoryCount} 个，最终slug：${previewInfo.pageData?.slug || '-'}`"
+                :title="`预览：匹配分类 ${previewInfo.categoryCount} 个，最终slug：${
+                    previewInfo.pageData?.slug || '-'
+                }`"
                 type="success"
                 :closable="false"
                 class="mb-3"
@@ -115,7 +136,9 @@
             <template #footer>
                 <div class="flex justify-end gap-2">
                     <el-button @click="handlePreview">预览</el-button>
-                    <el-button type="primary" :loading="creating" @click="handleCreateTopic">确认创建</el-button>
+                    <el-button type="primary" :loading="creating" @click="handleCreateTopic"
+                        >确认创建</el-button
+                    >
                 </div>
             </template>
         </el-dialog>
@@ -155,7 +178,11 @@ interface TopicTemplateRow {
     pageConfig: Record<string, any>
 }
 
-const BUILTIN_KEYS = [ 'ai-tools-directory', 'design-tools-directory', 'cross-border-tools-directory' ]
+const BUILTIN_KEYS = [
+    'ai-tools-directory',
+    'design-tools-directory',
+    'cross-border-tools-directory'
+]
 
 const loading = ref(false)
 const schemaLoading = ref(false)
@@ -213,7 +240,8 @@ const loadTemplates = async () => {
             categorySlugs: Array.isArray(item.categorySlugs) ? item.categorySlugs : [],
             isEnabled: item.isEnabled !== false,
             sort: Number(item.sort || 10),
-            pageConfig: item.pageConfig && typeof item.pageConfig === 'object' ? item.pageConfig : {}
+            pageConfig:
+                item.pageConfig && typeof item.pageConfig === 'object' ? item.pageConfig : {}
         }))
     } finally {
         loading.value = false
@@ -272,7 +300,9 @@ const openCreateDialog = (row: TopicTemplateRow) => {
     createForm.templateKey = row.templateKey
     createForm.pageName = row.templateName
     createForm.pageSlug = row.defaultSlug
-    createForm.categorySlugsText = (Array.isArray(row.categorySlugs) ? row.categorySlugs : []).join(',')
+    createForm.categorySlugsText = (Array.isArray(row.categorySlugs) ? row.categorySlugs : []).join(
+        ','
+    )
     createForm.sortOrder = Number(row.sort || 0)
     previewInfo.value = null
     createDialogVisible.value = true
@@ -321,7 +351,7 @@ const handleCreateTopic = async () => {
 }
 
 onMounted(async () => {
-    await Promise.all([ loadTemplates(), loadSchema() ])
+    await Promise.all([loadTemplates(), loadSchema()])
 })
 </script>
 

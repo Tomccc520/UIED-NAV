@@ -7,250 +7,370 @@
 <template>
     <div class="uied-commercial-slot-page">
         <template v-if="!featureDeniedState.denied">
-        <el-alert
-            title="商业位体系：置顶位 / 分类广告位 / 专题赞助位（按天/周售卖）"
-            type="info"
-            :closable="false"
-            class="mb-4"
-        />
+            <el-alert
+                title="商业位体系：置顶位 / 分类广告位 / 专题赞助位（按天/周售卖）"
+                type="info"
+                :closable="false"
+                class="mb-4"
+            />
 
-        <el-tabs v-model="activeTab">
-            <el-tab-pane label="广告位配置" name="slots">
-                <el-card class="!border-none" shadow="never">
-                    <template #header>
-                        <div class="flex items-center justify-between">
-                            <span class="font-medium">广告位配置</span>
-                            <div class="flex items-center gap-2">
-                                <el-button @click="loadSlots">刷新</el-button>
-                                <el-button type="primary" @click="openSlotDialog()">新增广告位</el-button>
+            <el-tabs v-model="activeTab">
+                <el-tab-pane label="广告位配置" name="slots">
+                    <el-card class="!border-none" shadow="never">
+                        <template #header>
+                            <div class="flex items-center justify-between">
+                                <span class="font-medium">广告位配置</span>
+                                <div class="flex items-center gap-2">
+                                    <el-button @click="loadSlots">刷新</el-button>
+                                    <el-button type="primary" @click="openSlotDialog()"
+                                        >新增广告位</el-button
+                                    >
+                                </div>
                             </div>
-                        </div>
-                    </template>
-                    <el-table :data="slotRows" v-loading="slotLoading" size="small">
-                        <el-table-column prop="id" label="ID" width="80" />
-                        <el-table-column prop="slotName" label="广告位名称" min-width="160" />
-                        <el-table-column prop="slotKey" label="广告位键" min-width="160" />
-                        <el-table-column prop="slotType" label="类型" width="120" />
-                        <el-table-column prop="scopeType" label="范围" width="120" />
-                        <el-table-column prop="scopeValue" label="范围值" min-width="120" />
-                        <el-table-column prop="saleUnit" label="售卖单位" width="110" />
-                        <el-table-column prop="unitPrice" label="单价" width="100" />
-                        <el-table-column prop="maxPositions" label="位数" width="90" />
-                        <el-table-column prop="sort" label="排序" width="90" />
-                        <el-table-column label="状态" width="90">
-                            <template #default="{ row }">
-                                <el-tag :type="row.isEnabled ? 'success' : 'info'">{{ row.isEnabled ? '启用' : '禁用' }}</el-tag>
-                            </template>
-                        </el-table-column>
-                        <el-table-column label="操作" width="160" fixed="right">
-                            <template #default="{ row }">
-                                <el-button link type="primary" @click="openSlotDialog(row)">编辑</el-button>
-                                <el-button link type="danger" @click="handleDelSlot(row)">删除</el-button>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                </el-card>
-            </el-tab-pane>
+                        </template>
+                        <el-table :data="slotRows" v-loading="slotLoading" size="small">
+                            <el-table-column prop="id" label="ID" width="80" />
+                            <el-table-column prop="slotName" label="广告位名称" min-width="160" />
+                            <el-table-column prop="slotKey" label="广告位键" min-width="160" />
+                            <el-table-column prop="slotType" label="类型" width="120" />
+                            <el-table-column prop="scopeType" label="范围" width="120" />
+                            <el-table-column prop="scopeValue" label="范围值" min-width="120" />
+                            <el-table-column prop="saleUnit" label="售卖单位" width="110" />
+                            <el-table-column prop="unitPrice" label="单价" width="100" />
+                            <el-table-column prop="maxPositions" label="位数" width="90" />
+                            <el-table-column prop="sort" label="排序" width="90" />
+                            <el-table-column label="状态" width="90">
+                                <template #default="{ row }">
+                                    <el-tag :type="row.isEnabled ? 'success' : 'info'">{{
+                                        row.isEnabled ? '启用' : '禁用'
+                                    }}</el-tag>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="操作" width="160" fixed="right">
+                                <template #default="{ row }">
+                                    <el-button link type="primary" @click="openSlotDialog(row)"
+                                        >编辑</el-button
+                                    >
+                                    <el-button link type="danger" @click="handleDelSlot(row)"
+                                        >删除</el-button
+                                    >
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </el-card>
+                </el-tab-pane>
 
-            <el-tab-pane label="投放记录" name="bookings">
-                <el-card class="!border-none" shadow="never">
-                    <template #header>
-                        <div class="flex items-center justify-between">
-                            <span class="font-medium">投放记录（售卖/排期）</span>
-                            <div class="flex items-center gap-2">
-                                <el-select v-model="bookingQuery.slotKey" clearable placeholder="筛选广告位" style="width: 180px">
-                                    <el-option
-                                        v-for="slot in slotRows"
-                                        :key="slot.id"
-                                        :label="slot.slotName"
-                                        :value="slot.slotKey"
-                                    />
-                                </el-select>
-                                <el-select v-model="bookingQuery.status" clearable placeholder="状态" style="width: 140px">
-                                    <el-option
-                                        v-for="item in schemaDraft.bookingStatusOptions || []"
-                                        :key="item.value"
-                                        :label="item.label"
-                                        :value="item.value"
-                                    />
-                                </el-select>
-                                <el-button @click="loadBookings">查询</el-button>
-                                <el-button type="primary" @click="openBookingDialog()">新增投放</el-button>
+                <el-tab-pane label="投放记录" name="bookings">
+                    <el-card class="!border-none" shadow="never">
+                        <template #header>
+                            <div class="flex items-center justify-between">
+                                <span class="font-medium">投放记录（售卖/排期）</span>
+                                <div class="flex items-center gap-2">
+                                    <el-select
+                                        v-model="bookingQuery.slotKey"
+                                        clearable
+                                        placeholder="筛选广告位"
+                                        style="width: 180px"
+                                    >
+                                        <el-option
+                                            v-for="slot in slotRows"
+                                            :key="slot.id"
+                                            :label="slot.slotName"
+                                            :value="slot.slotKey"
+                                        />
+                                    </el-select>
+                                    <el-select
+                                        v-model="bookingQuery.status"
+                                        clearable
+                                        placeholder="状态"
+                                        style="width: 140px"
+                                    >
+                                        <el-option
+                                            v-for="item in schemaDraft.bookingStatusOptions || []"
+                                            :key="item.value"
+                                            :label="item.label"
+                                            :value="item.value"
+                                        />
+                                    </el-select>
+                                    <el-button @click="loadBookings">查询</el-button>
+                                    <el-button type="primary" @click="openBookingDialog()"
+                                        >新增投放</el-button
+                                    >
+                                </div>
                             </div>
+                        </template>
+                        <el-table :data="bookingRows" v-loading="bookingLoading" size="small">
+                            <el-table-column prop="id" label="ID" width="80" />
+                            <el-table-column prop="slotName" label="广告位" min-width="140" />
+                            <el-table-column prop="sponsorTitle" label="投放标题" min-width="180" />
+                            <el-table-column prop="sponsorName" label="客户" width="120" />
+                            <el-table-column prop="status" label="状态" width="110" />
+                            <el-table-column prop="saleUnit" label="单位" width="80" />
+                            <el-table-column prop="totalPrice" label="金额" width="100" />
+                            <el-table-column prop="startTime" label="开始时间戳" width="140" />
+                            <el-table-column prop="endTime" label="结束时间戳" width="140" />
+                            <el-table-column label="显示" width="80">
+                                <template #default="{ row }">
+                                    <el-tag :type="row.isShow ? 'success' : 'info'">{{
+                                        row.isShow ? '显示' : '隐藏'
+                                    }}</el-tag>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="操作" width="160" fixed="right">
+                                <template #default="{ row }">
+                                    <el-button link type="primary" @click="openBookingDialog(row)"
+                                        >编辑</el-button
+                                    >
+                                    <el-button link type="danger" @click="handleDelBooking(row)"
+                                        >删除</el-button
+                                    >
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <div class="mt-4 flex justify-end">
+                            <el-pagination
+                                background
+                                layout="total, prev, pager, next"
+                                :total="bookingPager.total"
+                                :page-size="bookingPager.pageSize"
+                                :current-page="bookingPager.pageNo"
+                                @current-change="handleBookingPageChange"
+                            />
                         </div>
-                    </template>
-                    <el-table :data="bookingRows" v-loading="bookingLoading" size="small">
-                        <el-table-column prop="id" label="ID" width="80" />
-                        <el-table-column prop="slotName" label="广告位" min-width="140" />
-                        <el-table-column prop="sponsorTitle" label="投放标题" min-width="180" />
-                        <el-table-column prop="sponsorName" label="客户" width="120" />
-                        <el-table-column prop="status" label="状态" width="110" />
-                        <el-table-column prop="saleUnit" label="单位" width="80" />
-                        <el-table-column prop="totalPrice" label="金额" width="100" />
-                        <el-table-column prop="startTime" label="开始时间戳" width="140" />
-                        <el-table-column prop="endTime" label="结束时间戳" width="140" />
-                        <el-table-column label="显示" width="80">
-                            <template #default="{ row }">
-                                <el-tag :type="row.isShow ? 'success' : 'info'">{{ row.isShow ? '显示' : '隐藏' }}</el-tag>
-                            </template>
-                        </el-table-column>
-                        <el-table-column label="操作" width="160" fixed="right">
-                            <template #default="{ row }">
-                                <el-button link type="primary" @click="openBookingDialog(row)">编辑</el-button>
-                                <el-button link type="danger" @click="handleDelBooking(row)">删除</el-button>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                    <div class="mt-4 flex justify-end">
-                        <el-pagination
-                            background
-                            layout="total, prev, pager, next"
-                            :total="bookingPager.total"
-                            :page-size="bookingPager.pageSize"
-                            :current-page="bookingPager.pageNo"
-                            @current-change="handleBookingPageChange"
+                    </el-card>
+                </el-tab-pane>
+
+                <el-tab-pane label="字段草案" name="schema">
+                    <el-card class="!border-none" shadow="never">
+                        <template #header>
+                            <div class="flex items-center justify-between">
+                                <span class="font-medium">字段草案（前后端对接）</span>
+                                <el-button @click="loadSchema">刷新草案</el-button>
+                            </div>
+                        </template>
+                        <pre class="schema-view">{{ schemaText }}</pre>
+                    </el-card>
+                </el-tab-pane>
+            </el-tabs>
+
+            <el-dialog
+                v-model="slotDialog.visible"
+                :title="slotDialog.form.id ? '编辑广告位' : '新增广告位'"
+                width="760px"
+            >
+                <el-form :model="slotDialog.form" label-width="110px">
+                    <el-form-item label="广告位名称">
+                        <el-input v-model="slotDialog.form.slotName" />
+                    </el-form-item>
+                    <el-form-item label="广告位键">
+                        <el-input
+                            v-model="slotDialog.form.slotKey"
+                            placeholder="例如 home-top-pinned"
                         />
-                    </div>
-                </el-card>
-            </el-tab-pane>
+                    </el-form-item>
+                    <el-form-item label="广告位类型">
+                        <el-select v-model="slotDialog.form.slotType" style="width: 100%">
+                            <el-option
+                                v-for="item in schemaDraft.slotTypeOptions || []"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value"
+                            />
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="作用范围">
+                        <el-select v-model="slotDialog.form.scopeType" style="width: 100%">
+                            <el-option
+                                v-for="item in schemaDraft.scopeTypeOptions || []"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value"
+                            />
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="范围值">
+                        <el-input
+                            v-model="slotDialog.form.scopeValue"
+                            placeholder="home / all / 分类slug / 专题slug"
+                        />
+                    </el-form-item>
+                    <el-form-item label="售卖单位">
+                        <el-select v-model="slotDialog.form.saleUnit" style="width: 100%">
+                            <el-option
+                                v-for="item in schemaDraft.saleUnitOptions || []"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value"
+                            />
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="单价">
+                        <el-input-number
+                            v-model="slotDialog.form.unitPrice"
+                            :min="0"
+                            :max="99999999"
+                            :precision="2"
+                        />
+                    </el-form-item>
+                    <el-form-item label="最大位数">
+                        <el-input-number
+                            v-model="slotDialog.form.maxPositions"
+                            :min="1"
+                            :max="20"
+                        />
+                    </el-form-item>
+                    <el-form-item label="排序">
+                        <el-input-number v-model="slotDialog.form.sort" :min="0" :max="100000" />
+                    </el-form-item>
+                    <el-form-item label="启用">
+                        <el-switch v-model="slotDialog.form.isEnabled" />
+                    </el-form-item>
+                    <el-form-item label="说明">
+                        <el-input v-model="slotDialog.form.description" type="textarea" :rows="3" />
+                    </el-form-item>
+                </el-form>
+                <template #footer>
+                    <el-button @click="slotDialog.visible = false">取消</el-button>
+                    <el-button type="primary" :loading="slotDialog.saving" @click="handleSaveSlot"
+                        >保存</el-button
+                    >
+                </template>
+            </el-dialog>
 
-            <el-tab-pane label="字段草案" name="schema">
-                <el-card class="!border-none" shadow="never">
-                    <template #header>
-                        <div class="flex items-center justify-between">
-                            <span class="font-medium">字段草案（前后端对接）</span>
-                            <el-button @click="loadSchema">刷新草案</el-button>
-                        </div>
-                    </template>
-                    <pre class="schema-view">{{ schemaText }}</pre>
-                </el-card>
-            </el-tab-pane>
-        </el-tabs>
-
-        <el-dialog v-model="slotDialog.visible" :title="slotDialog.form.id ? '编辑广告位' : '新增广告位'" width="760px">
-            <el-form :model="slotDialog.form" label-width="110px">
-                <el-form-item label="广告位名称">
-                    <el-input v-model="slotDialog.form.slotName" />
-                </el-form-item>
-                <el-form-item label="广告位键">
-                    <el-input v-model="slotDialog.form.slotKey" placeholder="例如 home-top-pinned" />
-                </el-form-item>
-                <el-form-item label="广告位类型">
-                    <el-select v-model="slotDialog.form.slotType" style="width: 100%">
-                        <el-option v-for="item in schemaDraft.slotTypeOptions || []" :key="item.value" :label="item.label" :value="item.value" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="作用范围">
-                    <el-select v-model="slotDialog.form.scopeType" style="width: 100%">
-                        <el-option v-for="item in schemaDraft.scopeTypeOptions || []" :key="item.value" :label="item.label" :value="item.value" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="范围值">
-                    <el-input v-model="slotDialog.form.scopeValue" placeholder="home / all / 分类slug / 专题slug" />
-                </el-form-item>
-                <el-form-item label="售卖单位">
-                    <el-select v-model="slotDialog.form.saleUnit" style="width: 100%">
-                        <el-option v-for="item in schemaDraft.saleUnitOptions || []" :key="item.value" :label="item.label" :value="item.value" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="单价">
-                    <el-input-number v-model="slotDialog.form.unitPrice" :min="0" :max="99999999" :precision="2" />
-                </el-form-item>
-                <el-form-item label="最大位数">
-                    <el-input-number v-model="slotDialog.form.maxPositions" :min="1" :max="20" />
-                </el-form-item>
-                <el-form-item label="排序">
-                    <el-input-number v-model="slotDialog.form.sort" :min="0" :max="100000" />
-                </el-form-item>
-                <el-form-item label="启用">
-                    <el-switch v-model="slotDialog.form.isEnabled" />
-                </el-form-item>
-                <el-form-item label="说明">
-                    <el-input v-model="slotDialog.form.description" type="textarea" :rows="3" />
-                </el-form-item>
-            </el-form>
-            <template #footer>
-                <el-button @click="slotDialog.visible = false">取消</el-button>
-                <el-button type="primary" :loading="slotDialog.saving" @click="handleSaveSlot">保存</el-button>
-            </template>
-        </el-dialog>
-
-        <el-dialog v-model="bookingDialog.visible" :title="bookingDialog.form.id ? '编辑投放' : '新增投放'" width="820px">
-            <el-form :model="bookingDialog.form" label-width="110px">
-                <el-form-item label="广告位">
-                    <el-select v-model="bookingDialog.form.slotId" style="width: 100%">
-                        <el-option v-for="slot in slotRows" :key="slot.id" :label="`${slot.slotName}（${slot.slotKey}）`" :value="slot.id" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="投放标题">
-                    <el-input v-model="bookingDialog.form.sponsorTitle" />
-                </el-form-item>
-                <el-form-item label="客户名称">
-                    <el-input v-model="bookingDialog.form.sponsorName" />
-                </el-form-item>
-                <el-form-item label="跳转链接">
-                    <el-input v-model="bookingDialog.form.targetUrl" />
-                </el-form-item>
-                <el-form-item label="图片地址">
-                    <el-input v-model="bookingDialog.form.imageUrl" />
-                </el-form-item>
-                <el-form-item label="展示文案">
-                    <el-input v-model="bookingDialog.form.textContent" type="textarea" :rows="2" />
-                </el-form-item>
-                <el-form-item label="角标">
-                    <el-input v-model="bookingDialog.form.badgeText" />
-                </el-form-item>
-                <el-form-item label="位序">
-                    <el-input-number v-model="bookingDialog.form.positionIndex" :min="1" :max="20" />
-                </el-form-item>
-                <el-form-item label="售卖单位">
-                    <el-select v-model="bookingDialog.form.saleUnit" style="width: 100%">
-                        <el-option v-for="item in schemaDraft.saleUnitOptions || []" :key="item.value" :label="item.label" :value="item.value" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="单价">
-                    <el-input-number v-model="bookingDialog.form.unitPrice" :min="0" :max="99999999" :precision="2" />
-                </el-form-item>
-                <el-form-item label="总价">
-                    <el-input-number v-model="bookingDialog.form.totalPrice" :min="0" :max="99999999" :precision="2" />
-                </el-form-item>
-                <el-form-item label="开始时间戳">
-                    <el-input-number v-model="bookingDialog.form.startTime" :min="0" :max="9999999999" class="!w-full" />
-                </el-form-item>
-                <el-form-item label="结束时间戳">
-                    <el-input-number v-model="bookingDialog.form.endTime" :min="0" :max="9999999999" class="!w-full" />
-                </el-form-item>
-                <el-form-item label="状态">
-                    <el-select v-model="bookingDialog.form.status" style="width: 100%">
-                        <el-option v-for="item in schemaDraft.bookingStatusOptions || []" :key="item.value" :label="item.label" :value="item.value" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="显示">
-                    <el-switch v-model="bookingDialog.form.isShow" />
-                </el-form-item>
-                <el-form-item label="联系人">
-                    <el-input v-model="bookingDialog.form.contactName" />
-                </el-form-item>
-                <el-form-item label="联系电话">
-                    <el-input v-model="bookingDialog.form.contactPhone" />
-                </el-form-item>
-                <el-form-item label="备注">
-                    <el-input v-model="bookingDialog.form.note" type="textarea" :rows="2" />
-                </el-form-item>
-            </el-form>
-            <template #footer>
-                <el-button @click="bookingDialog.visible = false">取消</el-button>
-                <el-button type="primary" :loading="bookingDialog.saving" @click="handleSaveBooking">保存</el-button>
-            </template>
-        </el-dialog>
+            <el-dialog
+                v-model="bookingDialog.visible"
+                :title="bookingDialog.form.id ? '编辑投放' : '新增投放'"
+                width="820px"
+            >
+                <el-form :model="bookingDialog.form" label-width="110px">
+                    <el-form-item label="广告位">
+                        <el-select v-model="bookingDialog.form.slotId" style="width: 100%">
+                            <el-option
+                                v-for="slot in slotRows"
+                                :key="slot.id"
+                                :label="`${slot.slotName}（${slot.slotKey}）`"
+                                :value="slot.id"
+                            />
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="投放标题">
+                        <el-input v-model="bookingDialog.form.sponsorTitle" />
+                    </el-form-item>
+                    <el-form-item label="客户名称">
+                        <el-input v-model="bookingDialog.form.sponsorName" />
+                    </el-form-item>
+                    <el-form-item label="跳转链接">
+                        <el-input v-model="bookingDialog.form.targetUrl" />
+                    </el-form-item>
+                    <el-form-item label="图片地址">
+                        <el-input v-model="bookingDialog.form.imageUrl" />
+                    </el-form-item>
+                    <el-form-item label="展示文案">
+                        <el-input
+                            v-model="bookingDialog.form.textContent"
+                            type="textarea"
+                            :rows="2"
+                        />
+                    </el-form-item>
+                    <el-form-item label="角标">
+                        <el-input v-model="bookingDialog.form.badgeText" />
+                    </el-form-item>
+                    <el-form-item label="位序">
+                        <el-input-number
+                            v-model="bookingDialog.form.positionIndex"
+                            :min="1"
+                            :max="20"
+                        />
+                    </el-form-item>
+                    <el-form-item label="售卖单位">
+                        <el-select v-model="bookingDialog.form.saleUnit" style="width: 100%">
+                            <el-option
+                                v-for="item in schemaDraft.saleUnitOptions || []"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value"
+                            />
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="单价">
+                        <el-input-number
+                            v-model="bookingDialog.form.unitPrice"
+                            :min="0"
+                            :max="99999999"
+                            :precision="2"
+                        />
+                    </el-form-item>
+                    <el-form-item label="总价">
+                        <el-input-number
+                            v-model="bookingDialog.form.totalPrice"
+                            :min="0"
+                            :max="99999999"
+                            :precision="2"
+                        />
+                    </el-form-item>
+                    <el-form-item label="开始时间戳">
+                        <el-input-number
+                            v-model="bookingDialog.form.startTime"
+                            :min="0"
+                            :max="9999999999"
+                            class="!w-full"
+                        />
+                    </el-form-item>
+                    <el-form-item label="结束时间戳">
+                        <el-input-number
+                            v-model="bookingDialog.form.endTime"
+                            :min="0"
+                            :max="9999999999"
+                            class="!w-full"
+                        />
+                    </el-form-item>
+                    <el-form-item label="状态">
+                        <el-select v-model="bookingDialog.form.status" style="width: 100%">
+                            <el-option
+                                v-for="item in schemaDraft.bookingStatusOptions || []"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value"
+                            />
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="显示">
+                        <el-switch v-model="bookingDialog.form.isShow" />
+                    </el-form-item>
+                    <el-form-item label="联系人">
+                        <el-input v-model="bookingDialog.form.contactName" />
+                    </el-form-item>
+                    <el-form-item label="联系电话">
+                        <el-input v-model="bookingDialog.form.contactPhone" />
+                    </el-form-item>
+                    <el-form-item label="备注">
+                        <el-input v-model="bookingDialog.form.note" type="textarea" :rows="2" />
+                    </el-form-item>
+                </el-form>
+                <template #footer>
+                    <el-button @click="bookingDialog.visible = false">取消</el-button>
+                    <el-button
+                        type="primary"
+                        :loading="bookingDialog.saving"
+                        @click="handleSaveBooking"
+                        >保存</el-button
+                    >
+                </template>
+            </el-dialog>
         </template>
 
         <el-card v-else class="!border-none" shadow="never">
             <el-result icon="warning" title="当前版本未授权该功能">
                 <template #sub-title>
                     <div class="text-center leading-6">
-                        <div>功能键：{{ featureDeniedState.featureKey || 'operations_blocks' }}</div>
-                        <div>当前版本：{{ String(featureDeniedState.edition || 'free').toUpperCase() }}</div>
+                        <div>
+                            功能键：{{ featureDeniedState.featureKey || 'operations_blocks' }}
+                        </div>
+                        <div>
+                            当前版本：{{
+                                String(featureDeniedState.edition || 'free').toUpperCase()
+                            }}
+                        </div>
                         <div>请到「许可证中心 / 功能开关」升级或开启后再使用。</div>
                     </div>
                 </template>
@@ -369,7 +489,10 @@ const parseCommercialFeatureDenied = (error: any) => {
     if (!featureKey) return null
     return {
         featureKey,
-        edition: String(body?.data?.edition || 'free').trim().toLowerCase() || 'free'
+        edition:
+            String(body?.data?.edition || 'free')
+                .trim()
+                .toLowerCase() || 'free'
     }
 }
 

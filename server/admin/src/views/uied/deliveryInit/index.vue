@@ -18,7 +18,9 @@
                         >
                             导出客户包
                         </el-button>
-                        <el-button :loading="previewLoading" @click="handlePreview">刷新预览</el-button>
+                        <el-button :loading="previewLoading" @click="handlePreview"
+                            >刷新预览</el-button
+                        >
                         <el-button type="primary" :loading="executeLoading" @click="handleExecute">
                             执行初始化
                         </el-button>
@@ -125,18 +127,32 @@
             </template>
             <template v-if="previewData">
                 <el-descriptions :column="2" border>
-                    <el-descriptions-item label="模板">{{ previewData.profile || '-' }}</el-descriptions-item>
-                    <el-descriptions-item label="版本">{{ String(previewData.edition || '-').toUpperCase() }}</el-descriptions-item>
-                    <el-descriptions-item label="网站分类数量">{{ previewData?.counts?.websiteCategories ?? 0 }}</el-descriptions-item>
-                    <el-descriptions-item label="网站标签数量">{{ previewData?.counts?.websiteTags ?? 0 }}</el-descriptions-item>
-                    <el-descriptions-item label="示例网站数量">{{ previewData?.counts?.sampleWebsites ?? 0 }}</el-descriptions-item>
-                    <el-descriptions-item label="示例文章数量">{{ previewData?.counts?.sampleArticles ?? 0 }}</el-descriptions-item>
+                    <el-descriptions-item label="模板">{{
+                        previewData.profile || '-'
+                    }}</el-descriptions-item>
+                    <el-descriptions-item label="版本">{{
+                        String(previewData.edition || '-').toUpperCase()
+                    }}</el-descriptions-item>
+                    <el-descriptions-item label="网站分类数量">{{
+                        previewData?.counts?.websiteCategories ?? 0
+                    }}</el-descriptions-item>
+                    <el-descriptions-item label="网站标签数量">{{
+                        previewData?.counts?.websiteTags ?? 0
+                    }}</el-descriptions-item>
+                    <el-descriptions-item label="示例网站数量">{{
+                        previewData?.counts?.sampleWebsites ?? 0
+                    }}</el-descriptions-item>
+                    <el-descriptions-item label="示例文章数量">{{
+                        previewData?.counts?.sampleArticles ?? 0
+                    }}</el-descriptions-item>
                 </el-descriptions>
                 <el-alert
                     class="mt-3"
                     type="success"
                     :closable="false"
-                    :title="`启用模块：${renderEnabledModules(previewData?.modules || {}).join(' / ') || '无'}`"
+                    :title="`启用模块：${
+                        renderEnabledModules(previewData?.modules || {}).join(' / ') || '无'
+                    }`"
                 />
             </template>
             <el-empty v-else description="点击“刷新预览”生成导入预览" />
@@ -148,8 +164,12 @@
             </template>
             <template v-if="executeResult">
                 <el-descriptions :column="2" border>
-                    <el-descriptions-item label="模板">{{ executeResult.profile || '-' }}</el-descriptions-item>
-                    <el-descriptions-item label="版本">{{ String(executeResult.edition || '-').toUpperCase() }}</el-descriptions-item>
+                    <el-descriptions-item label="模板">{{
+                        executeResult.profile || '-'
+                    }}</el-descriptions-item>
+                    <el-descriptions-item label="版本">{{
+                        String(executeResult.edition || '-').toUpperCase()
+                    }}</el-descriptions-item>
                     <el-descriptions-item label="站点配置">
                         {{ executeResult?.summary?.siteSettings?.saved ? '已写入' : '未写入' }}
                     </el-descriptions-item>
@@ -173,7 +193,11 @@
                         {{ executeResult?.summary?.sampleArticles?.updated ?? 0 }}
                     </el-descriptions-item>
                     <el-descriptions-item label="测试用户初始化">
-                        {{ executeResult?.summary?.users?.seeded ? `已执行（${executeResult?.summary?.users?.total ?? 0}）` : '未执行' }}
+                        {{
+                            executeResult?.summary?.users?.seeded
+                                ? `已执行（${executeResult?.summary?.users?.total ?? 0}）`
+                                : '未执行'
+                        }}
                     </el-descriptions-item>
                 </el-descriptions>
             </template>
@@ -191,7 +215,11 @@
  */
 import { onMounted, reactive, ref } from 'vue'
 import feedback from '@/utils/feedback'
-import { uiedDeliveryInitExecute, uiedDeliveryInitPreview, uiedDeliveryPackageExport } from '@/api/uied'
+import {
+    uiedDeliveryInitExecute,
+    uiedDeliveryInitPreview,
+    uiedDeliveryPackageExport
+} from '@/api/uied'
 
 const previewLoading = ref(false)
 const executeLoading = ref(false)
@@ -290,7 +318,9 @@ const renderEnabledModules = (modules: Record<string, boolean>) => {
         license: '许可证',
         seedUsers: '测试用户'
     }
-    return Object.keys(labels).filter((key) => modules?.[key]).map((key) => labels[key])
+    return Object.keys(labels)
+        .filter((key) => modules?.[key])
+        .map((key) => labels[key])
 }
 
 /**

@@ -14,12 +14,25 @@ const Service = require('egg').Service;
 
 class NavMenuService extends Service {
   /**
-   * 规范化内置入口键（当前先支持 daily_hot，后续可扩展）
+   * 获取内置入口映射（键 -> 默认路径）
+   * 说明：仅用于“内置入口”模式，不影响历史自定义链接。
+   */
+  getBuiltinEntryMap() {
+    return {
+      daily_hot: '/p/daily-hot',
+      rankings: '/p/rankings',
+      submit: '/submit',
+      articles: '/articles',
+    };
+  }
+
+  /**
+   * 规范化内置入口键（仅允许受控内置入口）
    */
   normalizeBuiltinKey(value) {
     const key = String(value || '').trim().toLowerCase();
     if (!key) return '';
-    const allowSet = new Set([ 'daily_hot' ]);
+    const allowSet = new Set(Object.keys(this.getBuiltinEntryMap()));
     return allowSet.has(key) ? key : '';
   }
 
@@ -45,8 +58,8 @@ class NavMenuService extends Service {
    */
   getBuiltinDefaultLink(builtinKey) {
     const normalized = this.normalizeBuiltinKey(builtinKey);
-    if (normalized === 'daily_hot') return '/p/daily-hot';
-    return '';
+    const builtinEntryMap = this.getBuiltinEntryMap();
+    return builtinEntryMap[normalized] || '';
   }
 
   /**

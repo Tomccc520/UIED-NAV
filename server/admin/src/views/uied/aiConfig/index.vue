@@ -54,7 +54,10 @@
                                         推理
                                     </el-tag>
                                     <el-tag
-                                        v-if="row.reasoningEnabled && Number(row.thinkingBudget || 0) > 0"
+                                        v-if="
+                                            row.reasoningEnabled &&
+                                            Number(row.thinkingBudget || 0) > 0
+                                        "
                                         size="small"
                                         effect="plain"
                                     >
@@ -586,12 +589,7 @@
                 </el-form-item>
                 <el-divider>思考模型（推理）</el-divider>
                 <el-form-item v-if="editForm.provider === 'siliconflow'">
-                    <el-alert
-                        type="info"
-                        :closable="false"
-                        show-icon
-                        class="ai-reasoning-alert"
-                    >
+                    <el-alert type="info" :closable="false" show-icon class="ai-reasoning-alert">
                         <template #title>
                             SiliconFlow 推理能力配置（支持思考模型与 thinking budget）
                         </template>
@@ -670,11 +668,7 @@
                     >
                         设为 2048
                     </el-button>
-                    <el-button
-                        text
-                        type="primary"
-                        @click="applyReasoningBudgetPreset(4096)"
-                    >
+                    <el-button text type="primary" @click="applyReasoningBudgetPreset(4096)">
                         设为 4096
                     </el-button>
                 </el-form-item>
@@ -756,11 +750,26 @@ const providerMap: Record<string, string> = {
     other: '其他'
 }
 
-const providerModelPresetMap: Record<string, Array<{ label: string; value: string; model: string }>> = {
+const providerModelPresetMap: Record<
+    string,
+    Array<{ label: string; value: string; model: string }>
+> = {
     siliconflow: [
-        { label: 'SiliconFlow / DeepSeek-V3.2（通用）', value: 'siliconflow.chat.deepseek-v3.2', model: 'deepseek-ai/DeepSeek-V3.2' },
-        { label: 'SiliconFlow / Qwen3-32B（通用）', value: 'siliconflow.chat.qwen3-32b', model: 'Qwen/Qwen3-32B' },
-        { label: 'SiliconFlow / GLM-4.5（通用）', value: 'siliconflow.chat.glm-4.5', model: 'zai-org/GLM-4.5' }
+        {
+            label: 'SiliconFlow / DeepSeek-V3.2（通用）',
+            value: 'siliconflow.chat.deepseek-v3.2',
+            model: 'deepseek-ai/DeepSeek-V3.2'
+        },
+        {
+            label: 'SiliconFlow / Qwen3-32B（通用）',
+            value: 'siliconflow.chat.qwen3-32b',
+            model: 'Qwen/Qwen3-32B'
+        },
+        {
+            label: 'SiliconFlow / GLM-4.5（通用）',
+            value: 'siliconflow.chat.glm-4.5',
+            model: 'zai-org/GLM-4.5'
+        }
     ],
     deepseek: [
         { label: 'DeepSeek Chat', value: 'deepseek.chat', model: 'deepseek-chat' },
@@ -777,9 +786,7 @@ const providerReasoningPresetMap: Record<string, Array<{ label: string; value: s
         { label: 'DeepSeek-R1（推理）', value: 'deepseek-ai/DeepSeek-R1' },
         { label: 'Qwen3-32B（思考）', value: 'Qwen/Qwen3-32B' }
     ],
-    deepseek: [
-        { label: 'DeepSeek Reasoner', value: 'deepseek-reasoner' }
-    ]
+    deepseek: [{ label: 'DeepSeek Reasoner', value: 'deepseek-reasoner' }]
 }
 
 const getProviderLabel = (provider: string): string => {
@@ -790,7 +797,9 @@ const getProviderLabel = (provider: string): string => {
  * 获取当前提供商模型预设列表
  */
 const getProviderModelPresets = (provider: string) => {
-    const key = String(provider || '').trim().toLowerCase()
+    const key = String(provider || '')
+        .trim()
+        .toLowerCase()
     return providerModelPresetMap[key] || []
 }
 
@@ -798,7 +807,9 @@ const getProviderModelPresets = (provider: string) => {
  * 获取当前提供商推理模型预设列表
  */
 const getProviderReasoningPresets = (provider: string) => {
-    const key = String(provider || '').trim().toLowerCase()
+    const key = String(provider || '')
+        .trim()
+        .toLowerCase()
     return providerReasoningPresetMap[key] || []
 }
 
@@ -830,9 +841,13 @@ const normalizeConfigItem = (row: any) => {
         apiKey: String(source.apiKey ?? source.api_key ?? ''),
         model: String(source.model || ''),
         modelPreset: String(source.modelPreset || source.model_preset || ''),
-        reasoningEnabled: normalizeBoolean(source.reasoningEnabled ?? source.reasoning_enabled, false),
+        reasoningEnabled: normalizeBoolean(
+            source.reasoningEnabled ?? source.reasoning_enabled,
+            false
+        ),
         reasoningModel: String(source.reasoningModel || source.reasoning_model || ''),
-        thinkingBudget: Number.parseInt(String(source.thinkingBudget ?? source.thinking_budget ?? 0), 10) || 0,
+        thinkingBudget:
+            Number.parseInt(String(source.thinkingBudget ?? source.thinking_budget ?? 0), 10) || 0,
         enabled: normalizeBoolean(source.enabled ?? source.is_enabled, true),
         isDefault: normalizeBoolean(source.isDefault ?? source.is_default, false),
         createdAt: source.createdAt ?? source.create_time ?? 0

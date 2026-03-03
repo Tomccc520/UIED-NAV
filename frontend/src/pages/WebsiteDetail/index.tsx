@@ -111,7 +111,7 @@ interface WebsiteTag {
 }
 
 /**
- * 网站健康探测结果（详情页数据面板展示）
+ * 预览截图接口结果（详情页截图候选源）
  */
 interface WebsitePreviewSnapshotData {
   ok?: boolean;
@@ -124,6 +124,28 @@ interface WebsitePreviewSnapshotData {
 interface WebsitePreviewSnapshotCacheEntry {
   websiteId: string;
   payload: WebsitePreviewSnapshotData | null;
+}
+
+/**
+ * 网站健康探测结果（详情页站点数据面板）
+ */
+interface WebsiteHealthProbeData {
+  checkedAt?: string;
+  summary?: {
+    ok?: boolean;
+    level?: string;
+    text?: string;
+  };
+  http?: {
+    reachable?: boolean;
+    statusCode?: number;
+    responseTimeMs?: number;
+  };
+  ssl?: {
+    enabled?: boolean;
+    validNow?: boolean | null;
+    daysRemaining?: number | null;
+  };
 }
 
 /**
@@ -154,12 +176,19 @@ interface DetailPageConfig {
   relatedCount?: number;
   relatedMode?: 'same_category' | 'same_tags' | 'hot' | 'manual';
   manualWebsiteIds?: string | string[];
+  showHotWebsites?: boolean;
+  hotWebsitesTitle?: string;
+  hotWebsitesCount?: number;
+  showArticles?: boolean;
+  articlesTitle?: string;
+  articlesCount?: number;
   showTags?: boolean;
   tagsTitle?: string;
   tagSource?: 'website' | 'category' | 'manual';
   manualTags?: string | string[];
   showCategory?: boolean;
   categoryTitle?: string;
+  sidebarLinksNewWindow?: boolean;
   sidebarAdEnabled?: boolean;
   sidebarAdSlotKey?: string;
   detailTopAdEnabled?: boolean;
@@ -183,6 +212,7 @@ interface DetailPageConfig {
   previewSnapshotTimeoutMs?: number;
   previewSnapshotCacheTtlSeconds?: number;
   previewSnapshotAllowFallbackMshots?: boolean;
+  commentsEnabled?: boolean;
   copyrightEnabled?: boolean;
   copyrightText?: string;
   copyrightLink?: string;
@@ -220,12 +250,6 @@ interface DetailDataPanelItem {
   value: string;
 }
 
-interface DetailTrafficSourceItem {
-  key: string;
-  label: string;
-  value: number;
-}
-
 /**
  * 规范化缩略图展示样式，避免后台旧配置或异常值导致前端渲染分支错误
  */
@@ -251,26 +275,64 @@ const normalizeDetailLayoutWidthMode = (mode?: string): 'contained' | 'wide' | '
 };
 
 /**
- * 格式化月访问量显示
+ * 格式化响应时延展示文案
  */
-const formatMonthlyVisitsLabel = (value?: number | null): string => {
-  const num = Number(value || 0);
-  if (!Number.isFinite(num) || num <= 0) return '未录入';
-  if (num >= 100000000) return `${(num / 100000000).toFixed(2)} 亿`;
-  if (num >= 10000) return `${(num / 10000).toFixed(1)} 万`;
-  return `${Math.round(num)}`;
+const formatResponseTimeLabel = (milliseconds?: number, loading?: boolean): string => {
+  if (loading) return '检测中...';
+  const value = Number(milliseconds || 0);
+  if (!Number.isFinite(value) || value <= 0) return '未检测';
+  return `${Math.round(value)} ms`;
 };
 
 /**
- * 格式化平均访问时长显示
+ * 将 HTML 文本提取为纯文本（用于 SEO 字数统计）
  */
-const formatVisitDurationLabel = (seconds?: number | null): string => {
-  const num = Number(seconds || 0);
-  if (!Number.isFinite(num) || num <= 0) return '未录入';
-  const m = Math.floor(num / 60);
-  const s = Math.floor(num % 60);
-  if (m > 0) return `${m}分${String(s).padStart(2, '0')}秒`;
-  return `${s}秒`;
+const toPlainText = (value?: string): string =>
+  String(value || '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+/**
+ * 统计文本有效长度（用于 SEO 长度展示）
+ */
+const countEffectiveTextLength = (text?: string): number =>
+  String(text || '')
+    .replace(/\s+/g, '')
+    .trim()
+    .length;
+
+/**
+ * 格式化 SEO 字段长度显示
+ */
+const formatSeoTextLengthLabel = (text?: string): string => {
+  const size = countEffectiveTextLength(text);
+  return size > 0 ? `${size} 字` : '未填写';
+};
+
+/**
+ * 格式化健康状态展示文案
+ */
+const formatHealthStatusLabel = (health?: WebsiteHealthProbeData | null, loading?: boolean): string => {
+  if (loading) return '检测中...';
+  const summaryText = String(health?.summary?.text || '').trim();
+  if (summaryText) return summaryText;
+  if (health?.http?.reachable === false) return '暂不可达';
+  return '未检测';
+};
+
+/**
+ * 格式化 HTTP 状态码展示文案
+ */
+const formatHttpStatusCodeLabel = (statusCode?: number, loading?: boolean): string => {
+  if (loading) return '检测中...';
+  const code = Number(statusCode || 0);
+  if (!Number.isFinite(code) || code <= 0) return '未检测';
+  return `HTTP ${code}`;
 };
 
 /**
@@ -536,6 +598,8 @@ const WebsiteDetailPage: React.FC = () => {
   const [detailPageConfigLoaded, setDetailPageConfigLoaded] = useState<boolean>(false);
   const [backendPreviewSnapshotUrl, setBackendPreviewSnapshotUrl] = useState<string>('');
   const [backendPreviewFallbackUrls, setBackendPreviewFallbackUrls] = useState<string[]>([]);
+  const [websiteHealth, setWebsiteHealth] = useState<WebsiteHealthProbeData | null>(null);
+  const [websiteHealthLoading, setWebsiteHealthLoading] = useState<boolean>(false);
   const [heroAccentRgb, setHeroAccentRgb] = useState<string | null>(null);
   const [comparePickerOpen, setComparePickerOpen] = useState(false);
   const [compareTargetInput, setCompareTargetInput] = useState('');
@@ -682,7 +746,7 @@ const WebsiteDetailPage: React.FC = () => {
   const fetchDetailPageConfig = useCallback(async () => {
     try {
       setDetailPageConfigLoaded(false);
-      const config = await publicSettingService.getDetailPageConfig();
+      const config = await publicSettingService.getDetailPageConfig({ forceFresh: true });
       setDetailPageConfig({ ...DEFAULT_DETAIL_PAGE_CONFIG, ...(config || {}) });
     } catch (err) {
       debugLog.warn('获取详情页配置失败，使用默认配置:', err);
@@ -700,7 +764,44 @@ const WebsiteDetailPage: React.FC = () => {
 
   useEffect(() => {
     fetchDetailPageConfig();
-  }, [fetchDetailPageConfig]);
+  }, [fetchDetailPageConfig, idOrSlug]);
+
+  /**
+   * 获取站点健康探测数据，避免详情页“站点数据”面板长期显示不可用项
+   */
+  useEffect(() => {
+    let cancelled = false;
+
+    const run = async () => {
+      if (!website?.id) {
+        setWebsiteHealth(null);
+        return;
+      }
+      try {
+        setWebsiteHealthLoading(true);
+        const response = await api.get(`/websites/${website.id}/health`, {
+          params: { timeout: 5000 },
+        });
+        if (cancelled) return;
+        const payload = unwrapApiResponse<WebsiteHealthProbeData | null>(response.data, null);
+        setWebsiteHealth(payload);
+      } catch (error) {
+        if (!cancelled) {
+          debugLog.warn('获取站点健康探测失败，站点数据面板降级为基础信息:', error);
+          setWebsiteHealth(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setWebsiteHealthLoading(false);
+        }
+      }
+    };
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [website?.id]);
 
   /**
    * 当网站数据变化时，重置预览图回退索引，确保优先展示最高优先级图片源
@@ -939,7 +1040,7 @@ const WebsiteDetailPage: React.FC = () => {
   const spacingDensity = normalizeDetailSpacingDensity(detailPageConfig.spacingDensity);
   const labelVisualStyle = normalizeDetailLabelVisualStyle(detailPageConfig.labelVisualStyle);
   const showDataPanel = detailPageConfig.dataPanelEnabled !== false;
-  const dataPanelTitle = String(detailPageConfig.dataPanelTitle || '站点数据').trim() || '站点数据';
+  const dataPanelTitle = String(detailPageConfig.dataPanelTitle || 'SEO概览').trim() || 'SEO概览';
   /**
    * 构建预览图候选链路：上传缩略图 > 后台截图数组 > 后端Playwright缓存 > mShots兜底
    */
@@ -969,36 +1070,35 @@ const WebsiteDetailPage: React.FC = () => {
   })();
   const heroPreviewImage = previewImageCandidates[previewFallbackIndex] || '';
   const currentCompareIdentifier = website.slug || website.id;
-  const trafficMetrics = website.trafficMetrics || null;
+  const healthStatusLabel = formatHealthStatusLabel(websiteHealth, websiteHealthLoading);
+  const httpStatusCodeLabel = formatHttpStatusCodeLabel(websiteHealth?.http?.statusCode, websiteHealthLoading);
+  const responseTimeLabel = formatResponseTimeLabel(websiteHealth?.http?.responseTimeMs, websiteHealthLoading);
+  const seoTitleText = String(website.seoTitle || website.name || '').trim();
+  const seoDescriptionText = String(website.seoDescription || website.description || '').trim();
+  const seoKeywords = Array.from(
+    new Set(
+      [
+        ...String(website.seoKeywords || '')
+          .split(/[，,]/)
+          .map(item => item.trim())
+          .filter(Boolean),
+        ...allTags.map(item => String(item || '').trim()).filter(Boolean),
+      ],
+    ),
+  );
+  const detailContentLength = countEffectiveTextLength(toPlainText(String(website.detailContent || '')));
+  const screenshotAssetCount = screenshots.length + (website.thumbnail ? 1 : 0);
   const websiteDataItems: DetailDataPanelItem[] = [
-    { key: 'monthlyVisits', label: '月访问量', value: formatMonthlyVisitsLabel(trafficMetrics?.monthlyVisits) },
-    { key: 'avgVisitDuration', label: '平均访问时长', value: formatVisitDurationLabel(trafficMetrics?.avgVisitDurationSeconds) },
-    {
-      key: 'pagesPerVisit',
-      label: '每次访问页数',
-      value: Number(trafficMetrics?.pagesPerVisit || 0) > 0 ? `${Number(trafficMetrics?.pagesPerVisit || 0).toFixed(2)} 页` : '未录入',
-    },
-    {
-      key: 'bounceRate',
-      label: '跳出率',
-      value: Number(trafficMetrics?.bounceRate || 0) > 0 ? `${Number(trafficMetrics?.bounceRate || 0).toFixed(2)}%` : '未录入',
-    },
-    { key: 'likes', label: '点赞', value: `${website.likeCount || 0}` },
-    { key: 'favorites', label: '收藏', value: `${website.totalFavorites || 0}` },
-    { key: 'comments', label: '评论', value: `${website.commentsCount || 0}` },
-    { key: 'ratings', label: '评分数', value: `${website.totalRatings || 0}` },
-    { key: 'category', label: '分类', value: website.category?.name || '未分类' },
-    { key: 'updated', label: '更新', value: displayUpdatedDate || '未知' },
+    { key: 'health', label: '可访问状态', value: healthStatusLabel },
+    { key: 'httpStatus', label: 'HTTP 状态', value: httpStatusCodeLabel },
+    { key: 'responseTime', label: '响应速度', value: responseTimeLabel },
+    { key: 'seoTitleLength', label: 'SEO 标题长度', value: formatSeoTextLengthLabel(seoTitleText) },
+    { key: 'seoDescriptionLength', label: 'SEO 描述长度', value: formatSeoTextLengthLabel(seoDescriptionText) },
+    { key: 'seoKeywords', label: 'SEO 关键词数', value: `${seoKeywords.length}` },
+    { key: 'contentLength', label: '详情正文字数', value: detailContentLength > 0 ? `${detailContentLength} 字` : '未填写' },
+    { key: 'assets', label: '内容素材数', value: `${screenshotAssetCount}` },
+    { key: 'updated', label: '最近更新', value: displayUpdatedDate || '未知' },
   ];
-  const trafficSourceItems: DetailTrafficSourceItem[] = [
-    { key: 'direct', label: '直接访问', value: Number(trafficMetrics?.sourceBreakdown?.direct || 0) },
-    { key: 'organicSearch', label: '自然搜索', value: Number(trafficMetrics?.sourceBreakdown?.organicSearch || 0) },
-    { key: 'email', label: '邮件', value: Number(trafficMetrics?.sourceBreakdown?.email || 0) },
-    { key: 'referral', label: '外链引荐', value: Number(trafficMetrics?.sourceBreakdown?.referral || 0) },
-    { key: 'social', label: '社交媒体', value: Number(trafficMetrics?.sourceBreakdown?.social || 0) },
-    { key: 'displayAds', label: '展示广告', value: Number(trafficMetrics?.sourceBreakdown?.displayAds || 0) },
-    { key: 'others', label: '其他', value: Number(trafficMetrics?.sourceBreakdown?.others || 0) },
-  ].filter(item => item.value > 0);
   const heroTagPreview = allTags.slice(0, 10);
   const heroTabs = [
     { key: 'summary' as const, label: '简介', visible: true },
@@ -1263,27 +1363,6 @@ const WebsiteDetailPage: React.FC = () => {
                           </div>
                         ))}
                       </div>
-                      {trafficSourceItems.length > 0 && (
-                        <div className="detail-data-panel__sources" aria-label="来源渠道占比">
-                          <div className="detail-data-panel__sources-title">来源渠道占比</div>
-                          <div className="detail-data-panel__sources-list">
-                            {trafficSourceItems.map((item) => (
-                              <div className="detail-data-panel__source-row" key={item.key}>
-                                <div className="detail-data-panel__source-head">
-                                  <span>{item.label}</span>
-                                  <span>{item.value.toFixed(2)}%</span>
-                                </div>
-                                <div className="detail-data-panel__source-track">
-                                  <div
-                                    className="detail-data-panel__source-bar"
-                                    style={{ width: `${Math.min(Math.max(item.value, 0), 100)}%` }}
-                                  />
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
                     </div>
                   )}
 
@@ -1529,7 +1608,7 @@ const WebsiteDetailPage: React.FC = () => {
             </div>
 
             {/* 评论区 */}
-            {hasFeature(FEATURES.COMMENTS) && (
+            {hasFeature(FEATURES.COMMENTS) && detailPageConfig.commentsEnabled !== false && (
               <section className="article-comments">
                 <CommentsSection
                   websiteId={website.id}

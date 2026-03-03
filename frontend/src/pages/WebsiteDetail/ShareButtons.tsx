@@ -9,14 +9,26 @@
  */
 
 // @pro-feature-start: sharing
-import React, { useState, useCallback } from 'react';
-import { debugLog } from '../../utils/debugHelper';
+import React, { useMemo, useState, useCallback } from 'react';
 
 interface ShareButtonsProps {
   websiteId: string;
   websiteName: string;
   websiteDescription: string;
   websiteUrl: string;
+  shareChannels?: ShareChannel[];
+  shareText?: string;
+}
+
+/**
+ * 分享渠道配置接口
+ */
+interface ShareChannel {
+  key: string;
+  name: string;
+  enabled: boolean;
+  sort: number;
+  icon?: string;
 }
 
 /**
@@ -48,19 +60,72 @@ const TwitterIcon: React.FC<{ size?: number }> = ({ size = 18 }) => (
 );
 
 /**
+ * 通用分享图标（用于未单独定制的渠道）
+ */
+const ShareIcon: React.FC<{ size?: number }> = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="18" cy="5" r="3" />
+    <circle cx="6" cy="12" r="3" />
+    <circle cx="18" cy="19" r="3" />
+    <path d="M8.7 10.9l6.6-3.8M8.7 13.1l6.6 3.8" />
+  </svg>
+);
+
+/**
+ * 默认分享渠道（当后台未配置时兜底）
+ */
+const DEFAULT_SHARE_CHANNELS: ShareChannel[] = [
+  { key: 'copylink', name: '复制链接', enabled: true, sort: 1 },
+  { key: 'weibo', name: '微博', enabled: true, sort: 2 },
+  { key: 'twitter', name: 'Twitter', enabled: true, sort: 3 },
+];
+
+/**
  * 分享按钮组件
  */
 const ShareButtons: React.FC<ShareButtonsProps> = ({
   websiteId,
   websiteName,
   websiteDescription,
-  websiteUrl,
+  websiteUrl: _websiteUrl,
+  shareChannels: shareChannelsProp,
+  shareText,
 }) => {
   const [copied, setCopied] = useState(false);
 
-  // 当前页面 URL
-  const pageUrl = `${window.location.origin}/website/${websiteId}`;
-  const shareText = `${websiteName} - ${websiteDescription}`;
+  /**
+   * 统一读取当前详情页链接，优先使用真实 URL（兼容自定义固定链接）
+   */
+  const pageUrl = useMemo(() => {
+    if (typeof window !== 'undefined' && window.location?.href) {
+      return window.location.href;
+    }
+    return `/website/${websiteId}`;
+  }, [websiteId]);
+
+  /**
+   * 统一构建分享文案，支持后台自定义文案覆盖
+   */
+  const shareTextValue = String(shareText || '').trim() || `${websiteName} - ${websiteDescription}`;
+
+  /**
+   * 过滤并排序分享渠道，确保“后台开关 + 排序”即时生效
+   */
+  const enabledChannels = useMemo(() => {
+    const source = Array.isArray(shareChannelsProp) && shareChannelsProp.length > 0
+      ? shareChannelsProp
+      : DEFAULT_SHARE_CHANNELS;
+    return source
+      .filter(channel => channel && channel.enabled !== false)
+      .sort((a, b) => Number(a.sort || 0) - Number(b.sort || 0));
+  }, [shareChannelsProp]);
+
+  /**
+   * 打开分享窗口（统一尺寸）
+   */
+  const openShareWindow = useCallback((url: string) => {
+    window.open(url, '_blank', 'width=760,height=620,noopener,noreferrer');
+  }, []);
 
   /**
    * 复制链接
@@ -71,7 +136,6 @@ const ShareButtons: React.FC<ShareButtonsProps> = ({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      debugLog.error('复制失败:', err);
       // 降级方案
       const textArea = document.createElement('textarea');
       textArea.value = pageUrl;
@@ -85,51 +149,79 @@ const ShareButtons: React.FC<ShareButtonsProps> = ({
   }, [pageUrl]);
 
   /**
-   * 分享到微博
+   * 渠道路由：按渠道 key 执行分享动作
    */
-  const handleShareWeibo = useCallback(() => {
-    const url = `https://service.weibo.com/share/share.php?url=${encodeURIComponent(pageUrl)}&title=${encodeURIComponent(shareText)}`;
-    window.open(url, '_blank', 'width=600,height=400');
-  }, [pageUrl, shareText]);
+  const handleShareByChannel = useCallback((channelKey: string) => {
+    const encodedUrl = encodeURIComponent(pageUrl);
+    const encodedText = encodeURIComponent(shareTextValue);
+    const encodedTitle = encodeURIComponent(websiteName);
+    const encodedSummary = encodeURIComponent(websiteDescription);
+
+    if (channelKey === 'copylink') {
+      handleCopyLink().catch(() => {});
+      return;
+    }
+    if (channelKey === 'weibo') {
+      openShareWindow(`https://service.weibo.com/share/share.php?url=${encodedUrl}&title=${encodedText}`);
+      return;
+    }
+    if (channelKey === 'twitter') {
+      openShareWindow(`https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`);
+      return;
+    }
+    if (channelKey === 'facebook') {
+      openShareWindow(`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`);
+      return;
+    }
+    if (channelKey === 'linkedin') {
+      openShareWindow(`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`);
+      return;
+    }
+    if (channelKey === 'qq') {
+      openShareWindow(`https://connect.qq.com/widget/shareqq/index.html?url=${encodedUrl}&title=${encodedTitle}&summary=${encodedSummary}`);
+      return;
+    }
+    if (channelKey === 'qzone') {
+      openShareWindow(`https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=${encodedUrl}&title=${encodedTitle}&summary=${encodedSummary}`);
+      return;
+    }
+    if (channelKey === 'wechat') {
+      openShareWindow(`https://api.qrserver.com/v1/create-qr-code/?size=320x320&data=${encodedUrl}`);
+      return;
+    }
+    openShareWindow(`https://service.weibo.com/share/share.php?url=${encodedUrl}&title=${encodedText}`);
+  }, [
+    handleCopyLink,
+    openShareWindow,
+    pageUrl,
+    shareTextValue,
+    websiteDescription,
+    websiteName,
+  ]);
 
   /**
-   * 分享到 Twitter/X
+   * 渲染渠道图标
    */
-  const handleShareTwitter = useCallback(() => {
-    const url = `https://twitter.com/intent/tweet?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(shareText)}`;
-    window.open(url, '_blank', 'width=600,height=400');
-  }, [pageUrl, shareText]);
+  const renderChannelIcon = (key: string) => {
+    if (key === 'copylink') return <CopyIcon />;
+    if (key === 'weibo') return <WeiboIcon />;
+    if (key === 'twitter') return <TwitterIcon />;
+    return <ShareIcon />;
+  };
 
   return (
     <div className="share-buttons">
-      <span className="share-label">分享：</span>
-      
-      <button
-        className="btn-share btn-share-copy"
-        onClick={handleCopyLink}
-        title="复制链接"
-      >
-        <CopyIcon />
-        <span>{copied ? '已复制' : '复制链接'}</span>
-      </button>
-      
-      <button
-        className="btn-share btn-share-weibo"
-        onClick={handleShareWeibo}
-        title="分享到微博"
-      >
-        <WeiboIcon />
-        <span>微博</span>
-      </button>
-      
-      <button
-        className="btn-share btn-share-twitter"
-        onClick={handleShareTwitter}
-        title="分享到 Twitter"
-      >
-        <TwitterIcon />
-        <span>Twitter</span>
-      </button>
+      {enabledChannels.map((channel) => (
+        <button
+          key={channel.key}
+          className={`btn-share btn-share-${channel.key}`}
+          onClick={() => handleShareByChannel(channel.key)}
+          title={channel.name}
+        >
+          {renderChannelIcon(channel.key)}
+          <span>{channel.key === 'copylink' && copied ? '已复制' : channel.name}</span>
+        </button>
+      ))}
     </div>
   );
 };

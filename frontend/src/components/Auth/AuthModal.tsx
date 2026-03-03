@@ -14,12 +14,23 @@ import React, { useState, useEffect } from 'react';
 import { useUser } from '../../contexts/UserContext';
 import userService, { LoginTwoFactorChallenge } from '../../services/userService';
 import Modal from '../UI/Modal';
+import api from '../../services/api';
 import './AuthModal.css';
 
 interface AuthModalProps {
   visible: boolean;
   onClose: () => void;
   initialMode?: 'login' | 'register';
+}
+
+/**
+ * 认证配置接口
+ */
+interface AuthConfig {
+  enable_register: number;
+  enable_login: number;
+  register_close_message: string;
+  login_close_message: string;
 }
 
 /**
@@ -36,6 +47,14 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const [twoFactorCode, setTwoFactorCode] = useState('');
   const [sendingTwoFactorCode, setSendingTwoFactorCode] = useState(false);
   
+  // 认证配置状态
+  const [authConfig, setAuthConfig] = useState<AuthConfig>({
+    enable_register: 1,
+    enable_login: 1,
+    register_close_message: '',
+    login_close_message: '',
+  });
+  
   // 表单状态
   const [formData, setFormData] = useState({
     username: '',
@@ -46,6 +65,22 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
   // 本地错误状态（表单验证）
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // 加载认证配置
+  useEffect(() => {
+    const loadAuthConfig = async () => {
+      try {
+        const response = await api.get('/settings/public');
+        if (response.data?.authConfig) {
+          setAuthConfig(response.data.authConfig);
+        }
+      } catch (error) {
+        console.error('加载认证配置失败:', error);
+        // 使用默认配置（允许登录和注册）
+      }
+    };
+    loadAuthConfig();
+  }, []);
 
   useEffect(() => {
     if (visible) {
@@ -94,6 +129,18 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
+
+    // 检查登录开关
+    if (mode === 'login' && authConfig.enable_login === 0) {
+      alert(authConfig.login_close_message || '系统维护中，暂时无法登录');
+      return;
+    }
+
+    // 检查注册开关
+    if (mode === 'register' && authConfig.enable_register === 0) {
+      alert(authConfig.register_close_message || '注册功能暂时关闭');
+      return;
+    }
 
     try {
       if (mode === 'login') {

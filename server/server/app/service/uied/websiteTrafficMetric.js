@@ -46,7 +46,7 @@ class WebsiteTrafficMetricService extends Service {
   /**
    * 读取单个网站访问数据
    * @param {number|string} websiteId 网站ID
-   * @returns {Promise<object|null>} 规范化访问数据
+   * @return {Promise<object|null>} 规范化访问数据
    */
   async getByWebsiteId(websiteId) {
     const { app } = this;
@@ -72,7 +72,7 @@ class WebsiteTrafficMetricService extends Service {
    * 保存单个网站访问数据（手动录入）
    * @param {number|string} websiteId 网站ID
    * @param {object} payload 前端提交数据
-   * @returns {Promise<object|null>} 最新保存结果
+   * @return {Promise<object|null>} 最新保存结果
    */
   async saveByWebsiteId(websiteId, payload = {}) {
     const { app } = this;
@@ -134,7 +134,7 @@ class WebsiteTrafficMetricService extends Service {
   /**
    * 判断是否为空访问数据（全部未填写）
    * @param {object} metrics 规范化后的访问数据
-   * @returns {boolean} 是否为空
+   * @return {boolean} 是否为空
    */
   isEmptyMetrics(metrics) {
     const source = metrics?.sourceBreakdown || {};
@@ -153,7 +153,7 @@ class WebsiteTrafficMetricService extends Service {
   /**
    * 规范化数据库行数据为前端使用结构
    * @param {object} row 数据库行
-   * @returns {object} 规范化对象
+   * @return {object} 规范化对象
    */
   normalizeRow(row = {}) {
     const sourceBreakdown = this.normalizeSourceBreakdown(this.safeJsonParse(row.source_breakdown_json, {}));
@@ -174,7 +174,7 @@ class WebsiteTrafficMetricService extends Service {
   /**
    * 规范化提交数据（数值裁剪 + 来源占比清洗）
    * @param {object} payload 提交数据
-   * @returns {object} 规范化对象
+   * @return {object} 规范化对象
    */
   normalizePayload(payload = {}) {
     const sourcePayload = payload?.sourceBreakdown || payload?.trafficSources || {};
@@ -197,7 +197,7 @@ class WebsiteTrafficMetricService extends Service {
   /**
    * 规范化来源占比数据（百分比）
    * @param {object} source 来源占比
-   * @returns {object} 规范化占比对象
+   * @return {object} 规范化占比对象
    */
   normalizeSourceBreakdown(source = {}) {
     const mapping = {
@@ -228,7 +228,7 @@ class WebsiteTrafficMetricService extends Service {
    * 安全解析 JSON
    * @param {string|object} value 原值
    * @param {any} fallback 兜底值
-   * @returns {any} 解析结果
+   * @return {any} 解析结果
    */
   safeJsonParse(value, fallback) {
     if (!value) return fallback;
@@ -246,7 +246,7 @@ class WebsiteTrafficMetricService extends Service {
    * @param {number} fallback 默认值
    * @param {number} min 最小值
    * @param {number} max 最大值
-   * @returns {number} 规范化整数
+   * @return {number} 规范化整数
    */
   toInt(value, fallback = 0, min = 0, max = Number.MAX_SAFE_INTEGER) {
     const num = Number.parseInt(String(value ?? ''), 10);
@@ -261,7 +261,7 @@ class WebsiteTrafficMetricService extends Service {
    * @param {number} min 最小值
    * @param {number} max 最大值
    * @param {number} precision 保留位数
-   * @returns {number} 规范化小数
+   * @return {number} 规范化小数
    */
   toDecimal(value, fallback = 0, min = 0, max = Number.MAX_SAFE_INTEGER, precision = 2) {
     const num = Number(String(value ?? '').replace(/%/g, ''));

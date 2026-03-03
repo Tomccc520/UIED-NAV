@@ -53,6 +53,8 @@ build_admin() {
   cd "$ROOT_DIR/server/admin"
   cat > .env.production <<EOF
 VITE_APP_BASE_URL=${API_URL}
+VITE_FRONTEND_URL=https://${SITE_DOMAIN}
+VITE_APP_BASE_PATH=/admin/
 EOF
   npm install
   npm run build
@@ -85,4 +87,3 @@ main() {
 }
 
 main "$@"
-

@@ -139,6 +139,10 @@ const DailyHotPage: React.FC = () => {
     const label = String(displayConfig?.displayLabel || '').trim();
     return label || '全网热榜';
   }, [displayConfig?.displayLabel]);
+  const openInNewTab = displayConfig?.displayOpenInNewTab === true;
+  const linkTarget = openInNewTab ? '_blank' : undefined;
+  const linkRel = openInNewTab ? 'noopener noreferrer' : undefined;
+  const isPageDisabled = displayConfig?.enabled === false;
 
   const sectionPlatforms = useMemo(
     () => resolvePagePlatforms(platforms, displayConfig),
@@ -172,6 +176,15 @@ const DailyHotPage: React.FC = () => {
       setError(null);
 
       const config = await getDailyHotDisplayConfig();
+      setDisplayConfig(config);
+      if (config?.enabled === false) {
+        setPlatforms([]);
+        setSections([]);
+        setLastUpdated('');
+        setError('热榜页当前已在后台关闭展示，可在“网站详情页配置”里重新开启。');
+        return;
+      }
+
       let platformRows: DailyHotPlatform[] = [];
       try {
         platformRows = await getDailyHotPlatforms(forceRefresh);
@@ -182,7 +195,6 @@ const DailyHotPage: React.FC = () => {
       const nextPlatforms = (platformRows.length > 0 ? platformRows : buildFallbackPlatformsFromConfig(config))
         .filter((item) => item.isEnabled !== false)
         .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0));
-      setDisplayConfig(config);
       setPlatforms(nextPlatforms);
 
       const targetPlatforms = resolvePagePlatforms(nextPlatforms, config);
@@ -304,7 +316,7 @@ const DailyHotPage: React.FC = () => {
     <div className="daily-hot-page">
       <SEO
         title={pageTitle}
-        description="聚合多平台今日热榜内容，支持后台配置默认平台列表、缓存策略与展示入口。"
+        description="聚合多平台今日热榜内容，支持后台配置默认平台、排序与展示策略。"
         keywords="每日热榜,今日热榜,全网热榜,热点聚合,UIED设计导航"
         url="https://hao.uied.cn/p/daily-hot"
         type="website"
@@ -313,10 +325,10 @@ const DailyHotPage: React.FC = () => {
       <div className="daily-hot-page__container">
         <header className="daily-hot-page__hero">
           <div className="daily-hot-page__hero-content">
-            <div className="daily-hot-page__eyebrow">第三方热榜接口聚合 / 可运营模块</div>
+            <div className="daily-hot-page__eyebrow">全网热点速览</div>
             <h1 className="daily-hot-page__title">{pageTitle}</h1>
             <p className="daily-hot-page__desc">
-              每日热榜使用第三方热榜接口聚合数据；后台可配置默认平台与显示入口，适合作为导航站增长型内容页与运营入口。
+              聚合主流平台热点内容，支持后台配置默认平台与展示顺序，可作为站内高频更新的运营内容入口。
             </p>
             <div className="daily-hot-page__meta">
               <span className="daily-hot-page__meta-chip">
@@ -333,18 +345,18 @@ const DailyHotPage: React.FC = () => {
             </div>
           </div>
           <div className="daily-hot-page__hero-side" aria-hidden="true">
-            <div className="daily-hot-page__hero-chip">多平台</div>
-            <div className="daily-hot-page__hero-chip">后台配置驱动</div>
-            <div className="daily-hot-page__hero-chip">SEO 内容页</div>
+            <div className="daily-hot-page__hero-chip">热点聚合</div>
+            <div className="daily-hot-page__hero-chip">平台可配置</div>
+            <div className="daily-hot-page__hero-chip">运营入口</div>
           </div>
         </header>
 
         <section className="daily-hot-page__platform-bar" aria-label="平台导航">
           <div className="daily-hot-page__platform-bar-head">
             <div>
-              <h2>默认展示平台</h2>
+              <h2>平台分发导航</h2>
               <p>
-                默认平台会优先展示在前；点击标签切换查看单个平台，避免长列表滚动。
+                默认平台会优先展示在前，点击标签可切换查看单个平台热点。
               </p>
             </div>
             <button
@@ -369,8 +381,8 @@ const DailyHotPage: React.FC = () => {
               <button
                 key={platform.platformTitle}
                 type="button"
-                  className={`daily-hot-page__platform-chip ${isDefaultPlatform(platform) ? 'is-default' : ''} ${activePlatformTab === platform.platformTitle ? 'is-active' : ''}`}
-                  onClick={() => handlePlatformTabChange(platform.platformTitle)}
+                className={`daily-hot-page__platform-chip ${isDefaultPlatform(platform) ? 'is-default' : ''} ${activePlatformTab === platform.platformTitle ? 'is-active' : ''}`}
+                onClick={() => handlePlatformTabChange(platform.platformTitle)}
               >
                 {platform.icon ? (
                   <img
@@ -396,15 +408,17 @@ const DailyHotPage: React.FC = () => {
           <div className="daily-hot-page__loading">热榜加载中...</div>
         ) : error ? (
           <div className="daily-hot-page__error">
-            <div className="daily-hot-page__error-title">加载失败</div>
+            <div className="daily-hot-page__error-title">{isPageDisabled ? '页面已关闭' : '加载失败'}</div>
             <div className="daily-hot-page__error-message">{error}</div>
-            <button
-              type="button"
-              className="daily-hot-page__retry"
-              onClick={() => fetchPageData(true)}
-            >
-              重新加载
-            </button>
+            {!isPageDisabled && (
+              <button
+                type="button"
+                className="daily-hot-page__retry"
+                onClick={() => fetchPageData(true)}
+              >
+                重新加载
+              </button>
+            )}
           </div>
         ) : (
           <section
@@ -447,8 +461,8 @@ const DailyHotPage: React.FC = () => {
                   {section.platform.url && (
                     <a
                       href={section.platform.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      target={linkTarget}
+                      rel={linkRel}
                       className="daily-hot-page__platform-source-link"
                     >
                       访问平台
@@ -462,8 +476,8 @@ const DailyHotPage: React.FC = () => {
                       <a
                         key={`${section.platform.platformTitle}-${item.url}-${index}`}
                         href={item.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        target={linkTarget}
+                        rel={linkRel}
                         className={`daily-hot-page__item ${index === 0 ? 'daily-hot-page__item--featured' : ''}`}
                       >
                         <div className={`daily-hot-page__rank ${index < 3 ? `is-top-${index + 1}` : ''}`}>

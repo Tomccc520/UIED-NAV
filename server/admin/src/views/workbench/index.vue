@@ -1,3 +1,11 @@
+<!--
+/**
+ * @copyright Tomda (https://www.tomda.top)
+ * @copyright UIED技术团队 (https://fsuied.com)
+ * @author UIED技术团队
+ * @createDate 2026-03-03
+ */
+-->
 <template>
     <div class="workbench">
         <div class="md:flex">
@@ -17,15 +25,18 @@
                     <div class="flex leading-9">
                         <div class="w-20 felx-none">获取渠道</div>
                         <div>
-                            <a :href="workbenchData.version.channel.website" target="_blank">
+                            <a
+                                :href="frontendOfficialUrl"
+                                target="_blank"
+                            >
                                 <el-button type="success" size="small">官网</el-button>
                             </a>
                             <a
                                 class="ml-3"
-                                href="https://gitee.com/likeadmin/likeadmin_go"
+                                :href="workbenchData.version.channel.docs || defaultChannelLinks.docs"
                                 target="_blank"
                             >
-                                <el-button type="danger" size="small">Gitee</el-button>
+                                <el-button type="primary" size="small">文档</el-button>
                             </a>
                         </div>
                     </div>
@@ -120,7 +131,16 @@
                             <img width="120" height="120" class="flex-none" :src="item.image" />
                             <div class="ml-2">
                                 <div>{{ item.title }}</div>
-                                <div class="text-tx-regular text-xs mt-4">{{ item.desc }}</div>
+                                <div class="text-tx-regular text-xs mt-2 whitespace-pre-line">
+                                    {{ item.desc }}
+                                </div>
+                                <div v-if="item.link" class="mt-2">
+                                    <a :href="item.link" target="_blank" rel="noopener noreferrer">
+                                        <el-button link type="primary" size="small">
+                                            {{ item.actionText || '查看详情' }}
+                                        </el-button>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -131,6 +151,12 @@
 </template>
 
 <script lang="ts" setup name="workbench">
+/**
+ * @copyright Tomda (https://www.tomda.top)
+ * @copyright UIED技术团队 (https://fsuied.com)
+ * @author UIED技术团队
+ * @createDate 2026-03-03
+ */
 import { getWorkbench } from '@/api/app'
 import vCharts from 'vue-echarts'
 import menu_admin from './image/menu_admin.png'
@@ -143,27 +169,47 @@ import menu_auth from './image/menu_auth.png'
 import menu_web from './image/menu_web.png'
 import qq_group from './image/qq_group.png'
 import customer_service from './image/customer_service.png'
-// 表单数据
+
+const defaultChannelLinks = {
+    docs: 'https://fsuied.com'
+}
+
+/**
+ * 计算前端官网地址（优先读取环境变量，默认本地前端开发地址）
+ */
+const frontendOfficialUrl = (import.meta.env.VITE_FRONTEND_URL || 'http://localhost:3003').replace(
+    /\/$/,
+    ''
+)
+
+// 工作台展示数据
 const workbenchData: any = reactive({
     version: {
         version: '', // 版本号
         website: '', // 官网
         based: '',
         channel: {
-            gitee: '',
-            website: ''
+            website: '',
+            docs: ''
         }
     },
     support: [
         {
-            image: qq_group,
-            title: '扫码进入QQ交流群',
-            desc: '疑难疑点 进入QQ群'
+            image: customer_service,
+            title: '品牌信息',
+            desc: `UIED 技术团队
+品牌官网：https://www.tomda.top
+前端官网：${frontendOfficialUrl}`,
+            link: frontendOfficialUrl,
+            actionText: '进入前端官网'
         },
         {
-            image: customer_service,
-            title: '添加企业客服微信',
-            desc: '想了解更多请添加客服'
+            image: qq_group,
+            title: '服务支持',
+            desc: `文档中心：https://fsuied.com
+支持范围：功能答疑 / 运营配置 / 上线协助`,
+            link: defaultChannelLinks.docs,
+            actionText: '打开服务文档'
         }
     ],
     today: {}, // 今日数据
@@ -241,10 +287,19 @@ const workbenchData: any = reactive({
     }
 })
 
-// 获取工作台主页数据
+/**
+ * 拉取工作台首页数据并同步图表
+ */
 const getData = async () => {
     const res = await getWorkbench()
-    workbenchData.version = res.version
+    workbenchData.version = {
+        ...workbenchData.version,
+        ...(res.version || {}),
+        channel: {
+            ...workbenchData.version.channel,
+            ...(res.version?.channel || {})
+        }
+    }
     workbenchData.today = res.today
     workbenchData.visitor = res.visitor
 

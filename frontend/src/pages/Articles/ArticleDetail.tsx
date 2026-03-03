@@ -8,8 +8,10 @@
 import React, { useEffect, useState } from 'react';
 import { AxiosError } from 'axios';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { getArticleDetail, recordArticleView } from '../../services/articleService';
+import { getArticleDetail, getArticles, recordArticleView } from '../../services/articleService';
 import { ArticleDetail as ArticleDetailType } from '../../types/article';
+import api from '../../services/api';
+import { unwrapApiResponse } from '../../utils/apiResponse';
 import SEO from '../../components/SEO';
 import { useLicense, FEATURES } from '../../hooks/useLicense';
 import { usePublicSettings } from '../../hooks/usePublicSettings';
@@ -52,6 +54,68 @@ const normalizeArticleDetailMaxWidth = (value: unknown): number => {
   return Math.max(680, Math.min(1600, parsed));
 };
 
+interface ArticleSidebarModuleConfig {
+  key: string;
+  name: string;
+  enabled: boolean;
+  sort: number;
+}
+
+interface ArticleSidebarHotWebsiteItem {
+  id: string;
+  name: string;
+  slug?: string;
+  description?: string;
+}
+
+interface ArticleSidebarLatestArticleItem {
+  id: number;
+  slug: string;
+  title: string;
+  publishedAt: number | null;
+}
+
+const DEFAULT_ARTICLE_SIDEBAR_MODULES: ArticleSidebarModuleConfig[] = [
+  { key: 'latest_articles', name: '最新文章', enabled: true, sort: 1 },
+  { key: 'hot_websites', name: '热门网址', enabled: true, sort: 2 },
+  { key: 'article_tags', name: '文章标签', enabled: true, sort: 3 },
+];
+
+/**
+ * 规范化文章详情页侧栏模块，确保旧配置下仍有完整模块。
+ */
+const normalizeArticleSidebarModules = (modules: unknown): ArticleSidebarModuleConfig[] => {
+  const list = Array.isArray(modules) ? modules : [];
+  const defaultMap = new Map(DEFAULT_ARTICLE_SIDEBAR_MODULES.map(item => [item.key, item]));
+  const keySet = new Set<string>();
+  const normalized = list
+    .filter(item => String((item as any)?.key || '').trim())
+    .map(item => {
+      const key = String((item as any)?.key || '').trim();
+      keySet.add(key);
+      const defaultItem = defaultMap.get(key);
+      return {
+        key,
+        name: String((item as any)?.name || defaultItem?.name || key),
+        enabled: (item as any)?.enabled !== false,
+        sort: Number.isFinite(Number((item as any)?.sort)) ? Number((item as any).sort) : 0,
+      };
+    });
+  DEFAULT_ARTICLE_SIDEBAR_MODULES.forEach(item => {
+    if (!keySet.has(item.key)) normalized.push({ ...item });
+  });
+  return normalized
+    .sort((a, b) => a.sort - b.sort)
+    .map((item, index) => ({ ...item, sort: index + 1 }));
+};
+
+/**
+ * 判断文章详情侧栏某个模块是否开启。
+ */
+const isArticleSidebarModuleEnabled = (modules: ArticleSidebarModuleConfig[], moduleKey: string): boolean => {
+  return modules.some(module => module.key === moduleKey && module.enabled);
+};
+
 const ArticleDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
@@ -62,6 +126,10 @@ const ArticleDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [readingProgress, setReadingProgress] = useState(0);
+  const [sidebarLatestArticles, setSidebarLatestArticles] = useState<ArticleSidebarLatestArticleItem[]>([]);
+  const [sidebarLatestArticlesLoading, setSidebarLatestArticlesLoading] = useState(false);
+  const [sidebarHotWebsites, setSidebarHotWebsites] = useState<ArticleSidebarHotWebsiteItem[]>([]);
+  const [sidebarHotWebsitesLoading, setSidebarHotWebsitesLoading] = useState(false);
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -127,6 +195,111 @@ const ArticleDetail: React.FC = () => {
     }
   };
 
+  const articleSetting = publicSettings?.article;
+  const detailLayoutWidthMode = normalizeArticleDetailLayoutWidthMode(articleSetting?.detailLayoutWidthMode);
+  const detailHeaderAlign = normalizeArticleDetailHeaderAlign(articleSetting?.detailHeaderAlign);
+  const detailMaxWidth = normalizeArticleDetailMaxWidth(articleSetting?.detailContentMaxWidth);
+  const detailSidebarEnabled = articleSetting?.detailSidebarEnabled !== false;
+  const detailSidebarSticky = articleSetting?.detailSidebarSticky !== false;
+  const detailSidebarTopOffset = Number.isFinite(Number(articleSetting?.detailSidebarTopOffset))
+    ? Math.max(0, Math.min(240, Number(articleSetting?.detailSidebarTopOffset)))
+    : 16;
+  const detailSidebarLinksNewWindow = articleSetting?.detailSidebarLinksNewWindow === true;
+  const detailSidebarLatestArticlesTitle = String(articleSetting?.detailSidebarLatestArticlesTitle || '最新文章');
+  const detailSidebarLatestArticlesCount = Number.isFinite(Number(articleSetting?.detailSidebarLatestArticlesCount))
+    ? Math.max(1, Math.min(20, Number(articleSetting?.detailSidebarLatestArticlesCount)))
+    : 6;
+  const detailSidebarHotWebsitesTitle = String(articleSetting?.detailSidebarHotWebsitesTitle || '热门网址');
+  const detailSidebarHotWebsitesCount = Number.isFinite(Number(articleSetting?.detailSidebarHotWebsitesCount))
+    ? Math.max(1, Math.min(20, Number(articleSetting?.detailSidebarHotWebsitesCount)))
+    : 6;
+  const detailSidebarTagsTitle = String(articleSetting?.detailSidebarTagsTitle || '文章标签');
+  const detailSidebarModules = normalizeArticleSidebarModules(articleSetting?.detailSidebarModules);
+  const detailSidebarLinkTarget = detailSidebarLinksNewWindow ? '_blank' : undefined;
+  const detailSidebarLinkRel = detailSidebarLinksNewWindow ? 'noopener noreferrer' : undefined;
+  const latestArticlesModuleEnabled = isArticleSidebarModuleEnabled(detailSidebarModules, 'latest_articles');
+  const hotWebsitesModuleEnabled = isArticleSidebarModuleEnabled(detailSidebarModules, 'hot_websites');
+  const articleTagsModuleEnabled = isArticleSidebarModuleEnabled(detailSidebarModules, 'article_tags');
+  const shouldRenderSidebar = detailSidebarEnabled && (
+    latestArticlesModuleEnabled
+    || hotWebsitesModuleEnabled
+    || articleTagsModuleEnabled
+  );
+
+  /**
+   * 拉取文章详情页侧栏“最新文章”数据。
+   */
+  useEffect(() => {
+    const fetchSidebarLatestArticles = async () => {
+      if (!detailSidebarEnabled || !latestArticlesModuleEnabled) {
+        setSidebarLatestArticles([]);
+        return;
+      }
+      try {
+        setSidebarLatestArticlesLoading(true);
+        const result = await getArticles({
+          page: 1,
+          pageSize: Math.max(detailSidebarLatestArticlesCount + 3, 8),
+        });
+        const lists = Array.isArray(result?.data) ? result.data : [];
+        setSidebarLatestArticles(
+          lists
+            .filter(item => String(item?.id || '') !== String(article?.id || ''))
+            .slice(0, detailSidebarLatestArticlesCount)
+            .map(item => ({
+              id: Number(item.id || 0),
+              slug: String(item.slug || item.id || ''),
+              title: String(item.title || ''),
+              publishedAt: Number.isFinite(Number(item.publishedAt)) ? Number(item.publishedAt) : null,
+            }))
+        );
+      } catch (fetchError) {
+        setSidebarLatestArticles([]);
+      } finally {
+        setSidebarLatestArticlesLoading(false);
+      }
+    };
+    fetchSidebarLatestArticles();
+  }, [detailSidebarEnabled, latestArticlesModuleEnabled, detailSidebarLatestArticlesCount, article?.id]);
+
+  /**
+   * 拉取文章详情页侧栏“热门网址”数据。
+   */
+  useEffect(() => {
+    const fetchSidebarHotWebsites = async () => {
+      if (!detailSidebarEnabled || !hotWebsitesModuleEnabled) {
+        setSidebarHotWebsites([]);
+        return;
+      }
+      try {
+        setSidebarHotWebsitesLoading(true);
+        const response = await api.get('/websites/hot/list', {
+          params: { limit: detailSidebarHotWebsitesCount },
+        });
+        const payload = unwrapApiResponse<any>(response.data, []);
+        const list = Array.isArray(payload)
+          ? payload
+          : (Array.isArray(payload?.websites) ? payload.websites : []);
+        setSidebarHotWebsites(
+          list
+            .filter((item: any) => item && (item.id || item.slug))
+            .map((item: any) => ({
+              id: String(item.id || ''),
+              name: String(item.name || ''),
+              slug: String(item.slug || item.id || ''),
+              description: String(item.description || ''),
+            }))
+            .slice(0, detailSidebarHotWebsitesCount)
+        );
+      } catch (fetchError) {
+        setSidebarHotWebsites([]);
+      } finally {
+        setSidebarHotWebsitesLoading(false);
+      }
+    };
+    fetchSidebarHotWebsites();
+  }, [detailSidebarEnabled, hotWebsitesModuleEnabled, detailSidebarHotWebsitesCount]);
+
   if (loading) return <div className="detail-loading"><div className="spinner" /></div>;
   
   if (error || !article) {
@@ -138,14 +311,9 @@ const ArticleDetail: React.FC = () => {
     );
   }
 
-  const articleSetting = publicSettings?.article;
-  const detailLayoutWidthMode = normalizeArticleDetailLayoutWidthMode(articleSetting?.detailLayoutWidthMode);
-  const detailHeaderAlign = normalizeArticleDetailHeaderAlign(articleSetting?.detailHeaderAlign);
-  const detailMaxWidth = normalizeArticleDetailMaxWidth(articleSetting?.detailContentMaxWidth);
-
   return (
     <article
-      className={`article-detail-page article-detail-page--layout-${detailLayoutWidthMode} article-detail-page--header-${detailHeaderAlign}`}
+      className={`article-detail-page article-detail-page--layout-${detailLayoutWidthMode} article-detail-page--header-${detailHeaderAlign} ${shouldRenderSidebar ? 'article-detail-page--has-sidebar' : ''}`}
       style={{ '--article-detail-max-width': `${detailMaxWidth}px` } as React.CSSProperties}
     >
       <div className="detail-reading-progress" aria-hidden="true">
@@ -165,80 +333,175 @@ const ArticleDetail: React.FC = () => {
       {/* 沉浸式头部背景 */}
       <div className="detail-hero-bg"></div>
 
-      <div className="detail-container">
-        {/* 导航面包屑 */}
-        <nav className="detail-nav">
-          <Link to="/articles">文章列表</Link>
-          <span className="separator">/</span>
-          <span className="current">{article.category}</span>
-        </nav>
+      <div className={`detail-container ${shouldRenderSidebar ? 'detail-container--with-sidebar' : ''}`}>
+        <div className={`article-detail-layout ${shouldRenderSidebar ? 'article-detail-layout--with-sidebar' : ''}`}>
+          <div className="article-detail-main">
+            {/* 导航面包屑 */}
+            <nav className="detail-nav">
+              <Link to="/articles">文章列表</Link>
+              <span className="separator">/</span>
+              <span className="current">{article.category}</span>
+            </nav>
 
-        {/* 文章头部信息 */}
-        <header className="detail-header">
-          <div className="detail-meta-tags">
-            <span className="category-badge">{article.category}</span>
-            <time className="publish-date">{formatDate(article.publishedAt)}</time>
-          </div>
-          
-          <h1 className="detail-title">{article.title}</h1>
-          
-          <div className="detail-author-bar">
-            <div className="author-info">
-              <div className="author-avatar">
-                {article.author.charAt(0).toUpperCase()}
+            {/* 文章头部信息 */}
+            <header className="detail-header">
+              <div className="detail-meta-tags">
+                <span className="category-badge">{article.category}</span>
+                <time className="publish-date">{formatDate(article.publishedAt)}</time>
               </div>
-              <div className="author-text">
-                <span className="author-name">{article.author}</span>
-                <span className="read-count">{article.viewCount} 次阅读</span>
+
+              <h1 className="detail-title">{article.title}</h1>
+
+              <div className="detail-author-bar">
+                <div className="author-info">
+                  <div className="author-avatar">
+                    {article.author.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="author-text">
+                    <span className="author-name">{article.author}</span>
+                    <span className="read-count">{article.viewCount} 次阅读</span>
+                  </div>
+                </div>
               </div>
+
+              <div className="detail-header-actions">
+                <button type="button" className="detail-header-action" onClick={() => navigate('/articles')}>
+                  返回列表
+                </button>
+                <button type="button" className="detail-header-action detail-header-action--primary" onClick={handleCopyArticleLink}>
+                  复制链接
+                </button>
+              </div>
+            </header>
+
+            {/* 封面图 */}
+            {article.coverImage && (
+              <figure className="detail-cover">
+                <img src={article.coverImage} alt={article.title} />
+              </figure>
+            )}
+
+            {/* 正文区域 */}
+            <div className="detail-content-wrapper">
+              <div 
+                className="detail-content typography"
+                dangerouslySetInnerHTML={{ __html: article.content }} // 注意：实际项目中建议使用 renderMarkdown 或 DOMPurify
+              />
             </div>
+
+            {/* 底部标签 */}
+            {article.tags.length > 0 && (
+              <div className="detail-tags">
+                {article.tags.map(tag => (
+                  <Link key={tag.id} to={`/articles?tag=${tag.slug}`} className="tag-chip">
+                    # {tag.name}
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            <hr className="detail-divider" />
+
+            {/* 评论区 */}
+            {hasFeature(FEATURES.ARTICLE_COMMENTS) && articleSetting?.commentsEnabled !== false && (
+              <section className="detail-comments">
+                <h3>评论互动</h3>
+                <ArticleComments articleId={String(article.id)} />
+              </section>
+            )}
           </div>
 
-          <div className="detail-header-actions">
-            <button type="button" className="detail-header-action" onClick={() => navigate('/articles')}>
-              返回列表
-            </button>
-            <button type="button" className="detail-header-action detail-header-action--primary" onClick={handleCopyArticleLink}>
-              复制链接
-            </button>
-          </div>
-        </header>
-
-        {/* 封面图 */}
-        {article.coverImage && (
-          <figure className="detail-cover">
-            <img src={article.coverImage} alt={article.title} />
-          </figure>
-        )}
-
-        {/* 正文区域 */}
-        <div className="detail-content-wrapper">
-          <div 
-            className="detail-content typography"
-            dangerouslySetInnerHTML={{ __html: article.content }} // 注意：实际项目中建议使用 renderMarkdown 或 DOMPurify
-          />
+          {shouldRenderSidebar && (
+            <aside
+              className={`article-detail-sidebar ${detailSidebarSticky ? 'is-sticky' : ''}`}
+              style={detailSidebarSticky ? { top: `calc(var(--header-height) + ${detailSidebarTopOffset}px)` } : undefined}
+            >
+              {detailSidebarModules.filter(module => module.enabled).map(module => {
+                if (module.key === 'latest_articles') {
+                  return (
+                    <section key={module.key} className="article-sidebar-section">
+                      <h3 className="article-sidebar-title">{detailSidebarLatestArticlesTitle}</h3>
+                      {sidebarLatestArticlesLoading ? (
+                        <div className="article-sidebar-empty">加载中...</div>
+                      ) : sidebarLatestArticles.length > 0 ? (
+                        <div className="article-sidebar-list">
+                          {sidebarLatestArticles.map(item => (
+                            <Link
+                              key={`latest-${item.id}`}
+                              to={`/article/${item.slug || item.id}`}
+                              className="article-sidebar-card"
+                              target={detailSidebarLinkTarget}
+                              rel={detailSidebarLinkRel}
+                            >
+                              <div className="article-sidebar-card__title">{item.title}</div>
+                              <div className="article-sidebar-card__meta">{formatDate(item.publishedAt)}</div>
+                            </Link>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="article-sidebar-empty">暂无最新文章</div>
+                      )}
+                    </section>
+                  );
+                }
+                if (module.key === 'hot_websites') {
+                  return (
+                    <section key={module.key} className="article-sidebar-section">
+                      <h3 className="article-sidebar-title">{detailSidebarHotWebsitesTitle}</h3>
+                      {sidebarHotWebsitesLoading ? (
+                        <div className="article-sidebar-empty">加载中...</div>
+                      ) : sidebarHotWebsites.length > 0 ? (
+                        <div className="article-sidebar-list">
+                          {sidebarHotWebsites.map(site => (
+                            <Link
+                              key={`hot-${site.id}`}
+                              to={`/website/${site.slug || site.id}`}
+                              className="article-sidebar-card"
+                              target={detailSidebarLinkTarget}
+                              rel={detailSidebarLinkRel}
+                            >
+                              <div className="article-sidebar-card__title">{site.name}</div>
+                              {site.description && (
+                                <div className="article-sidebar-card__desc">{site.description}</div>
+                              )}
+                            </Link>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="article-sidebar-empty">暂无热门网址</div>
+                      )}
+                    </section>
+                  );
+                }
+                if (module.key === 'article_tags') {
+                  return (
+                    <section key={module.key} className="article-sidebar-section">
+                      <h3 className="article-sidebar-title">{detailSidebarTagsTitle}</h3>
+                      {article.tags.length > 0 ? (
+                        <div className="article-sidebar-tags">
+                          {article.tags.map(tag => (
+                            <Link
+                              key={`tag-${tag.id}`}
+                              to={`/articles?tag=${tag.slug}`}
+                              className="article-sidebar-tag"
+                              target={detailSidebarLinkTarget}
+                              rel={detailSidebarLinkRel}
+                            >
+                              # {tag.name}
+                            </Link>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="article-sidebar-empty">暂无标签</div>
+                      )}
+                    </section>
+                  );
+                }
+                return null;
+              })}
+            </aside>
+          )}
         </div>
-
-        {/* 底部标签 */}
-        {article.tags.length > 0 && (
-          <div className="detail-tags">
-            {article.tags.map(tag => (
-              <Link key={tag.id} to={`/articles?tag=${tag.slug}`} className="tag-chip">
-                # {tag.name}
-              </Link>
-            ))}
-          </div>
-        )}
-
-        <hr className="detail-divider" />
-
-        {/* 评论区 */}
-        {hasFeature(FEATURES.ARTICLE_COMMENTS) && (
-          <section className="detail-comments">
-            <h3>评论互动</h3>
-            <ArticleComments articleId={String(article.id)} />
-          </section>
-        )}
       </div>
     </article>
   );

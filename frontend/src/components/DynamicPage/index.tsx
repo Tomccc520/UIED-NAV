@@ -413,6 +413,8 @@ const DynamicPage: React.FC<DynamicPageProps> = ({ slug, pageType }) => {
         highlightText={pageConfig?.heroHighlightText}
         heroDisplayMode={pageConfig?.heroDisplayMode}
         heroScrollWebsites={heroScrollWebsites}
+        aiSearchEnabled={frontendConfig?.searchConfig?.enabled !== false && frontendConfig?.searchConfig?.aiSearchEnabled !== false}
+        aiSearchBtnText={frontendConfig?.searchConfig?.aiSearchBtnText || 'AI 搜索'}
       />
 
       <div className={`main-layout ${pageConfig?.showSidebar === false ? 'no-sidebar' : ''}`}>

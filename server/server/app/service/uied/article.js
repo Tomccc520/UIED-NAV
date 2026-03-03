@@ -230,26 +230,26 @@ class ArticleService extends Service {
   async visitIncr(id) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
-    
+
     // 检查文章是否存在
     const [ article ] = await app.model.query(
       'SELECT id, view_count FROM uied_article WHERE id = ? AND is_delete = 0',
       { replacements: [ id ], type: app.Sequelize.QueryTypes.SELECT }
     );
-    
+
     if (!article) {
       throw new Error('文章不存在');
     }
-    
+
     // 更新浏览量
     await app.model.query(
       'UPDATE uied_article SET view_count = view_count + 1 WHERE id = ?',
       { replacements: [ id ], type: app.Sequelize.QueryTypes.UPDATE }
     );
-    
+
     return {
       id: article.id,
-      visit: (article.view_count || 0) + 1
+      visit: (article.view_count || 0) + 1,
     };
   }
 

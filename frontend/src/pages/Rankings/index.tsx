@@ -114,6 +114,7 @@ const RankingsPage: React.FC = () => {
   const [activeOpsBoardKey, setActiveOpsBoardKey] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<string>('');
 
   /**
    * 拉取榜单系统聚合数据
@@ -126,10 +127,28 @@ const RankingsPage: React.FC = () => {
       const list = Array.isArray(data?.boards) ? data.boards.filter((item) => Array.isArray(item.items)) : [];
       setBoards(list);
       setPublicConfig(data?.publicConfig || null);
+      if (Number(data?.requestedAt || 0) > 0) {
+        setLastUpdated(
+          new Date(Number(data?.requestedAt)).toLocaleString('zh-CN', {
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+          })
+        );
+      } else {
+        setLastUpdated('');
+      }
+
+      if (data?.publicConfig?.enabled === false) {
+        setActiveOpsBoardKey('');
+        setError('榜单页当前已在后台关闭展示，可在“榜单系统配置”中重新启用。');
+        return;
+      }
 
       if (!list.length) {
         setActiveOpsBoardKey('');
-        setError('暂无可展示榜单，请在后台“运营管理 -> 榜单系统”开启并配置榜单。');
+        setError('暂无可展示榜单，请先在后台配置可展示榜单。');
         return;
       }
     } catch (e) {
@@ -210,6 +229,13 @@ const RankingsPage: React.FC = () => {
   }, [operationsBoards]);
 
   const pageTitle = String(publicConfig?.displayLabel || '').trim() || '榜单系统';
+  const openInNewTab = publicConfig?.displayOpenInNewTab === true;
+  const linkTarget = openInNewTab ? '_blank' : undefined;
+  const linkRel = openInNewTab ? 'noopener noreferrer' : undefined;
+  const totalItems = useMemo(
+    () => boards.reduce((sum, board) => sum + (Array.isArray(board.items) ? board.items.length : 0), 0),
+    [boards]
+  );
 
   /**
    * 渲染榜单卡片列表
@@ -253,9 +279,15 @@ const RankingsPage: React.FC = () => {
                 </div>
                 <div className="rankings-page__item-main">
                   <div className="rankings-page__item-head">
-                    <Link to={detailLink} className="rankings-page__item-title">
-                      {name}
-                    </Link>
+                    {openInNewTab ? (
+                      <Link to={detailLink} className="rankings-page__item-title" target={linkTarget} rel={linkRel}>
+                        {name}
+                      </Link>
+                    ) : (
+                      <Link to={detailLink} className="rankings-page__item-title">
+                        {name}
+                      </Link>
+                    )}
                     {category && (
                       <span className="rankings-page__item-category">{category}</span>
                     )}
@@ -274,9 +306,15 @@ const RankingsPage: React.FC = () => {
                   </div>
                 </div>
                 <div className="rankings-page__item-side">
-                  <Link to={detailLink} className="rankings-page__detail-link">
-                    详情页
-                  </Link>
+                  {openInNewTab ? (
+                    <Link to={detailLink} className="rankings-page__detail-link" target={linkTarget} rel={linkRel}>
+                      查看详情
+                    </Link>
+                  ) : (
+                    <Link to={detailLink} className="rankings-page__detail-link">
+                      查看详情
+                    </Link>
+                  )}
                   <div className="rankings-page__favicon">
                     {iconUrl ? (
                       <img src={iconUrl} alt={name} loading="lazy" />
@@ -306,11 +344,16 @@ const RankingsPage: React.FC = () => {
       <div className="rankings-page__container">
         <header className="rankings-page__hero">
           <div>
-            <div className="rankings-page__eyebrow">站内榜单系统（网站/文章） / 运营配置驱动</div>
+            <div className="rankings-page__eyebrow">热门榜单中心</div>
             <h1 className="rankings-page__title">{pageTitle}</h1>
             <p className="rankings-page__desc">
-              按指标与周期快速切换查看榜单，兼容运营榜单与数据榜单，适合做导航站导流与 SEO 内链页。
+              聚合站内热门与精选榜单，支持按指标与周期快速筛选，适合运营活动与日常内容分发。
             </p>
+            <div className="rankings-page__meta">
+              <span className="rankings-page__meta-chip">榜单 {boards.length} 个</span>
+              <span className="rankings-page__meta-chip">收录条目 {totalItems} 条</span>
+              {lastUpdated && <span className="rankings-page__meta-chip">更新于 {lastUpdated}</span>}
+            </div>
           </div>
           <button
             type="button"
@@ -333,7 +376,7 @@ const RankingsPage: React.FC = () => {
                 <div className="rankings-page__metric-head">
                   <div>
                     <h2>数据榜单</h2>
-                    <p>按访问量 / 收藏量 / 点赞量与日周月周期切换查看。</p>
+                    <p>按访问量、收藏量、点赞量快速切换，聚焦数据走势。</p>
                   </div>
                 </div>
                 <div className="rankings-page__metric-tabs">
@@ -373,7 +416,7 @@ const RankingsPage: React.FC = () => {
                 <header className="rankings-page__ops-head">
                   <div>
                     <h2>运营榜单</h2>
-                    <p>用于新站曝光、编辑精选、热榜运营等场景。</p>
+                    <p>用于专题活动、编辑精选与重点内容曝光。</p>
                   </div>
                 </header>
                 <div className="rankings-page__tabs">

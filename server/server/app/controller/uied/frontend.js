@@ -14,6 +14,17 @@ const Controller = require('egg').Controller;
 
 class FrontendController extends Controller {
   /**
+   * 设置禁止缓存响应头，确保后台配置改动能被前端及时读取。
+   */
+  setNoCacheHeaders() {
+    const { ctx } = this;
+    ctx.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    ctx.set('Pragma', 'no-cache');
+    ctx.set('Expires', '0');
+    ctx.set('Surrogate-Control', 'no-store');
+  }
+
+  /**
    * 获取所有页面配置
    * GET /api/pages
    */
@@ -394,6 +405,19 @@ class FrontendController extends Controller {
       }
       const pageNo = this.parsePositiveInt(page, 1);
       const limit = this.parsePositiveInt(pageSize, 10);
+      /**
+       * 评论功能被后台关闭时，评论列表返回空数据，避免前端出现历史评论残留。
+       */
+      if (!(await this.isWebsiteCommentsEnabled())) {
+        ctx.body = {
+          lists: [],
+          total: 0,
+          page: pageNo,
+          pageSize: limit,
+          totalPages: 0,
+        };
+        return;
+      }
       const result = await ctx.service.uied.comment.list({
         websiteId,
         page: pageNo,
@@ -441,6 +465,14 @@ class FrontendController extends Controller {
       if (content.length > 1000) {
         ctx.status = 400;
         ctx.body = { error: '评论内容不能超过1000字符' };
+        return;
+      }
+      /**
+       * 评论功能被后台关闭时，直接拒绝提交。
+       */
+      if (!(await this.isWebsiteCommentsEnabled())) {
+        ctx.status = 403;
+        ctx.body = { error: '网站评论功能已关闭' };
         return;
       }
 
@@ -645,6 +677,32 @@ class FrontendController extends Controller {
     const query = String(body.query || '').trim();
     const limit = Math.min(this.parsePositiveInt(body.limit, 10), 100);
     const categoryId = this.parsePositiveInt(body.categoryId, 0);
+    const rawSearchConfig = await ctx.service.uied.setting.get('searchConfig');
+    const searchConfig = ctx.service.uied.setting.normalizeSearchConfig(rawSearchConfig || {});
+
+    if (searchConfig.enabled === false) {
+      ctx.status = 403;
+      ctx.body = {
+        results: [],
+        mode: 'keyword',
+        reason: '站内搜索已关闭',
+        message: '站内搜索功能已关闭',
+        reasoning: '后台已关闭站内搜索，请联系管理员开启后重试',
+      };
+      return;
+    }
+
+    if (searchConfig.aiSearchEnabled === false) {
+      ctx.status = 403;
+      ctx.body = {
+        results: [],
+        mode: 'keyword',
+        reason: 'AI 搜索已关闭',
+        message: 'AI 搜索功能已关闭',
+        reasoning: '后台已关闭 AI 搜索，请联系管理员开启后重试',
+      };
+      return;
+    }
 
     if (!query) {
       ctx.body = {
@@ -659,10 +717,36 @@ class FrontendController extends Controller {
 
     try {
       const pattern = `%${query}%`;
+      const exactPattern = query;
+      const prefixPattern = `${query}%`;
       const whereSql = categoryId > 0 ? ' AND w.category_id = ? ' : '';
-      const replacements = categoryId > 0
-        ? [ pattern, pattern, pattern, pattern, categoryId, limit ]
-        : [ pattern, pattern, pattern, pattern, limit ];
+
+      /**
+       * AI 搜索兜底为关键词检索时，仍按相关性优先排序，提升结果可用性。
+       */
+      const relevanceOrderSql = `
+        (
+          (CASE WHEN w.name = ? THEN 900 ELSE 0 END)
+          + (CASE WHEN w.name LIKE ? THEN 620 ELSE 0 END)
+          + (CASE WHEN w.name LIKE ? THEN 380 ELSE 0 END)
+          + (CASE WHEN w.tags LIKE ? THEN 280 ELSE 0 END)
+          + (CASE WHEN w.description LIKE ? THEN 150 ELSE 0 END)
+          + (CASE WHEN w.url LIKE ? THEN 110 ELSE 0 END)
+        ) DESC
+      `;
+
+      const whereReplacements = categoryId > 0
+        ? [ pattern, pattern, pattern, pattern, categoryId ]
+        : [ pattern, pattern, pattern, pattern ];
+      const relevanceReplacements = [
+        exactPattern,
+        prefixPattern,
+        pattern,
+        pattern,
+        pattern,
+        pattern,
+      ];
+      const replacements = [ ...whereReplacements, ...relevanceReplacements, limit ];
       const rows = await ctx.app.model.query(
         `
         SELECT w.id, w.name, w.slug, w.description, w.url, w.icon_url AS iconUrl, w.tags,
@@ -678,7 +762,13 @@ class FrontendController extends Controller {
             OR w.url LIKE ?
           )
           ${whereSql}
-        ORDER BY w.is_pinned DESC, w.is_hot DESC, w.is_featured DESC, w.click_count DESC, w.id DESC
+        ORDER BY
+          ${relevanceOrderSql},
+          w.is_pinned DESC,
+          w.is_hot DESC,
+          w.is_featured DESC,
+          w.click_count DESC,
+          w.id DESC
         LIMIT ?
         `,
         { replacements, type: ctx.app.Sequelize.QueryTypes.SELECT }
@@ -770,6 +860,7 @@ class FrontendController extends Controller {
     const { ctx } = this;
 
     try {
+      this.setNoCacheHeaders();
       const settings = await ctx.service.uied.setting.getPublicSettings();
       ctx.body = settings;
     } catch (error) {
@@ -787,6 +878,7 @@ class FrontendController extends Controller {
     const { ctx } = this;
 
     try {
+      this.setNoCacheHeaders();
       const config = await ctx.service.uied.setting.getSettingByKey('detailPageConfig');
       ctx.body = config || {};
     } catch (error) {
@@ -854,6 +946,9 @@ class FrontendController extends Controller {
       const normalizedExitModalConfig = ctx.service.uied.setting.normalizeExitModalConfig(
         exitModalConfig || {}
       );
+      const normalizedSearchConfig = ctx.service.uied.setting.normalizeSearchConfig(
+        searchConfig || {}
+      );
 
       ctx.body = {
         exitModalEnabled: true,
@@ -864,7 +959,7 @@ class FrontendController extends Controller {
         homepageConfig: homepageConfig || {},
         cardStyleConfig: cardStyleConfig || {},
         sidebarConfig: sidebarConfig || {},
-        searchConfig: searchConfig || {},
+        searchConfig: normalizedSearchConfig,
         articleConfig: ctx.service.uied.setting.normalizeArticleConfig(articleConfig || {}),
         articleTopicsConfig: ctx.service.uied.setting.normalizeArticleTopicsConfig(articleTopicsConfig || {}),
       };
@@ -1331,6 +1426,35 @@ class FrontendController extends Controller {
   }
 
   /**
+   * 判断网站详情页评论功能是否开启
+   */
+  async isWebsiteCommentsEnabled() {
+    const { ctx } = this;
+    try {
+      const detailPageConfig = await ctx.service.uied.setting.getSettingByKey('detailPageConfig');
+      return detailPageConfig?.commentsEnabled !== false;
+    } catch (error) {
+      ctx.logger.warn('读取网站评论开关失败，按开启处理:', error);
+      return true;
+    }
+  }
+
+  /**
+   * 判断文章评论功能是否开启
+   */
+  async isArticleCommentsEnabled() {
+    const { ctx } = this;
+    try {
+      const articleConfig = await ctx.service.uied.setting.getSettingByKey('articleConfig');
+      const normalized = ctx.service.uied.setting.normalizeArticleConfig(articleConfig || {});
+      return normalized?.commentsEnabled !== false;
+    } catch (error) {
+      ctx.logger.warn('读取文章评论开关失败，按开启处理:', error);
+      return true;
+    }
+  }
+
+  /**
    * 解析正整数参数
    */
   parsePositiveInt(value, defaultValue = 0) {
@@ -1611,7 +1735,7 @@ class FrontendController extends Controller {
       tag,
       tagId,
       tag_id,
-      tagSlug
+      tagSlug,
     } = ctx.query;
 
     try {
@@ -1682,7 +1806,7 @@ class FrontendController extends Controller {
         pageSize: currentPageSize,
         categoryId: resolvedCategoryId || undefined,
         tagId: resolvedTagMeta ? resolvedTagMeta.id : undefined,
-        status: 'published'
+        status: 'published',
       });
 
       const lists = (Array.isArray(result?.lists) ? result.lists : []).map(item => this.formatArticleListItem(item, {
@@ -1737,6 +1861,7 @@ class FrontendController extends Controller {
     try {
       const articleId = this.resolveArticleIdBySlug(slug);
       let article = null;
+      let isLegacyArticle = false;
       /**
        * 优先按 ID 解析，若不是数字 slug 则回退按真实 slug 查询
        */
@@ -1752,6 +1877,23 @@ class FrontendController extends Controller {
         }
       } else {
         article = await ctx.service.uied.article.detailBySlug(String(slug || '').trim());
+      }
+      /**
+       * 兼容历史文章表（la_article）：
+       * 当新表查不到数字 ID 时，尝试读取旧文章服务，避免 /article/:id 旧链接失效。
+       */
+      if (!article && articleId > 0) {
+        try {
+          const legacyArticle = await ctx.service.article.detail(articleId);
+          if (legacyArticle) {
+            article = legacyArticle;
+            isLegacyArticle = true;
+          }
+        } catch (legacyError) {
+          if (!String(legacyError?.message || '').includes('文章不存在')) {
+            throw legacyError;
+          }
+        }
       }
       if (!article) {
         ctx.status = 404;
@@ -1771,6 +1913,23 @@ class FrontendController extends Controller {
       const tagCountMap = await this.getPublicTagCountMap((Array.isArray(tags) ? tags : []).map(item => item.id));
       const tagMetaList = (Array.isArray(tags) ? tags : []).map(item => this.formatArticleTagMeta(item, tagCountMap));
       const tagMetaById = new Map(tagMetaList.map(item => [ item.id, item ]));
+      /**
+       * 旧文章表字段为 cid，分类名称可能为空，补一次分类名称兜底。
+       */
+      if (
+        isLegacyArticle
+        && !String(article?.category || '').trim()
+        && this.parsePositiveInt(article?.cid, 0) > 0
+      ) {
+        try {
+          const legacyCategory = await ctx.service.article.cateDetail(this.parsePositiveInt(article.cid, 0));
+          article.category = String(legacyCategory?.name || '').trim();
+        } catch (legacyCategoryError) {
+          ctx.logger.warn(
+            `articleDetail legacy category fallback skipped: ${legacyCategoryError?.message || legacyCategoryError}`
+          );
+        }
+      }
       ctx.body = this.formatArticleDetailItem(article, { categoryMap, tagMetaById });
     } catch (error) {
       ctx.logger.error('获取文章详情失败:', error);
@@ -1848,6 +2007,19 @@ class FrontendController extends Controller {
       }
       const pageNo = this.parsePositiveInt(page, 1);
       const limit = this.parsePositiveInt(pageSize, 10);
+      /**
+       * 文章评论被后台关闭时，返回空列表，前端可保持稳定渲染。
+       */
+      if (!(await this.isArticleCommentsEnabled())) {
+        ctx.body = {
+          lists: [],
+          total: 0,
+          page: pageNo,
+          pageSize: limit,
+          totalPages: 0,
+        };
+        return;
+      }
       const result = await ctx.service.uied.comment.list({
         articleId,
         page: pageNo,
@@ -1905,6 +2077,14 @@ class FrontendController extends Controller {
         ctx.body = { error: '评论内容不能超过1000字符' };
         return;
       }
+      /**
+       * 文章评论被后台关闭时，不允许继续提交。
+       */
+      if (!(await this.isArticleCommentsEnabled())) {
+        ctx.status = 403;
+        ctx.body = { error: '文章评论功能已关闭' };
+        return;
+      }
 
       const comment = await ctx.service.uied.comment.add({
         articleId,
@@ -1930,6 +2110,135 @@ class FrontendController extends Controller {
       ctx.body = { message, error: message };
     }
   }
+  /**
+   * 全站搜索
+   * GET /api/search
+   */
+  async globalSearch() {
+    const { ctx } = this;
+    try {
+      const rawSearchConfig = await ctx.service.uied.setting.get('searchConfig');
+      const searchConfig = ctx.service.uied.setting.normalizeSearchConfig(rawSearchConfig || {});
+      if (searchConfig.enabled === false) {
+        ctx.status = 403;
+        ctx.body = {
+          lists: [],
+          categories: [],
+          tags: [],
+          total: 0,
+          pageNo: 1,
+          pageSize: 20,
+          message: '站内搜索功能已关闭',
+        };
+        return;
+      }
+
+      const { keyword, page = 1, pageSize = 20, type = 'all' } = ctx.query;
+
+      if (!keyword || keyword.trim().length === 0) {
+        ctx.body = {
+          lists: [],
+          total: 0,
+          pageNo: parseInt(page),
+          pageSize: parseInt(pageSize),
+          message: '请输入搜索关键词',
+        };
+        return;
+      }
+
+      const data = await ctx.service.uied.search.globalSearch({
+        keyword: keyword.trim(),
+        page: Number(page),
+        pageSize: Number(pageSize),
+        type,
+      });
+
+      ctx.body = data;
+    } catch (e) {
+      ctx.logger.error('全站搜索失败:', e);
+      ctx.status = 500;
+      ctx.body = { error: e.message };
+    }
+  }
+
+  /**
+   * 高级搜索
+   * POST /api/search/advanced
+   */
+  async advancedSearch() {
+    const { ctx } = this;
+    try {
+      const rawSearchConfig = await ctx.service.uied.setting.get('searchConfig');
+      const searchConfig = ctx.service.uied.setting.normalizeSearchConfig(rawSearchConfig || {});
+      if (searchConfig.enabled === false) {
+        ctx.status = 403;
+        ctx.body = {
+          lists: [],
+          total: 0,
+          pageNo: 1,
+          pageSize: 20,
+          message: '站内搜索功能已关闭',
+        };
+        return;
+      }
+
+      const params = ctx.request.body || {};
+      const data = await ctx.service.uied.search.advancedSearch(params);
+      ctx.body = data;
+    } catch (e) {
+      ctx.logger.error('高级搜索失败:', e);
+      ctx.status = 500;
+      ctx.body = { error: e.message };
+    }
+  }
+
+  /**
+   * 搜索建议
+   * GET /api/search/suggestions
+   */
+  async searchSuggestions() {
+    const { ctx } = this;
+    try {
+      const rawSearchConfig = await ctx.service.uied.setting.get('searchConfig');
+      const searchConfig = ctx.service.uied.setting.normalizeSearchConfig(rawSearchConfig || {});
+      if (searchConfig.enabled === false) {
+        ctx.body = { websites: [], categories: [] };
+        return;
+      }
+
+      const { keyword } = ctx.query;
+      const data = await ctx.service.uied.search.getSuggestions(keyword);
+      ctx.body = data;
+    } catch (e) {
+      ctx.logger.error('获取搜索建议失败:', e);
+      ctx.status = 500;
+      ctx.body = { error: e.message };
+    }
+  }
+
+  /**
+   * 热门搜索
+   * GET /api/search/hot
+   */
+  async hotSearches() {
+    const { ctx } = this;
+    try {
+      const rawSearchConfig = await ctx.service.uied.setting.get('searchConfig');
+      const searchConfig = ctx.service.uied.setting.normalizeSearchConfig(rawSearchConfig || {});
+      if (searchConfig.enabled === false) {
+        ctx.body = [];
+        return;
+      }
+
+      const data = await ctx.service.uied.search.getHotSearches();
+      ctx.body = data;
+    } catch (e) {
+      ctx.logger.error('获取热门搜索失败:', e);
+      ctx.status = 500;
+      ctx.body = { error: e.message };
+    }
+  }
+
   /**
    * 获取分类列表（前端公开，树形结构含网站数量）
    * GET /api/categories

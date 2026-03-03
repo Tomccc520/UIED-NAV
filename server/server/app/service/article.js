@@ -8,7 +8,7 @@ const { backstageTokenKey, publicUrl, userTokenKey, reqAdminIdKey } = require('.
 
 const Op = Sequelize.Op;
 
-const formatTime = (value) => {
+const formatTime = value => {
   if (!value) return '';
   return moment(Number(value) * 1000).format('YYYY-MM-DD HH:mm:ss');
 };
@@ -107,7 +107,7 @@ class ArticleService extends Service {
     /**
      * 判断 slug 是否被其他记录占用（含软删除记录，避免唯一索引冲突）
      */
-    const isSlugTaken = async (slug) => {
+    const isSlugTaken = async slug => {
       const where = { slug };
       if (id > 0) {
         where.id = { [Op.ne]: id };
@@ -161,7 +161,7 @@ class ArticleService extends Service {
       const id = Number(row.id || 0);
       const rawName = String(row.name || '');
       const currentSlug = this.normalizeSlug(row.slug || '');
-      let baseSlug = currentSlug || this.normalizeSlug(rawName) || `${prefix}-${id}`;
+      const baseSlug = currentSlug || this.normalizeSlug(rawName) || `${prefix}-${id}`;
       let candidate = baseSlug;
       let seq = 2;
       while (used.has(candidate)) {
@@ -470,7 +470,8 @@ class ArticleService extends Service {
    * 去除 HTML 标签并提取纯文本
    */
   stripHtmlTags(html = '') {
-    return this.decodeHtmlEntities(String(html || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim());
+    return this.decodeHtmlEntities(String(html || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')
+      .trim());
   }
 
   /**
@@ -478,7 +479,7 @@ class ArticleService extends Service {
    */
   normalizeWechatImages(contentHtml = '') {
     const source = String(contentHtml || '');
-    return source.replace(/<img\b[^>]*>/gi, (tag) => {
+    return source.replace(/<img\b[^>]*>/gi, tag => {
       const rawSrc =
         this.getAttrFromTag(tag, 'data-src') ||
         this.getAttrFromTag(tag, 'data-original') ||
@@ -554,7 +555,7 @@ class ArticleService extends Service {
     const source = String(contentHtml || '');
     if (!source) return '';
     const reg = /<([a-z0-9-]+)\b[^>]*(?:data-src|data-original|data-actualsrc|style\s*=\s*(?:"[^"]*url\([^)]+\)[^"]*"|'[^']*url\([^)]+\)[^']*'))[^>]*>(?:[\s\S]*?<\/\1>)?/gi;
-    return source.replace(reg, (tag) => {
+    return source.replace(reg, tag => {
       const raw = String(tag || '');
       if (!raw) return '';
       if (/^<img\b/i.test(raw)) return raw;
@@ -815,7 +816,7 @@ class ArticleService extends Service {
     /**
      * 判断错误是否为证书链相关错误
      */
-    const isTlsIssuerError = (error) => {
+    const isTlsIssuerError = error => {
       const message = String(error && error.message ? error.message : '').toLowerCase();
       const code = String(error && error.code ? error.code : '').toUpperCase();
       return (
@@ -1009,7 +1010,7 @@ class ArticleService extends Service {
         .replace(/&gt;/g, '>')
         .trim();
     };
-    const getAttr = (attrName) => {
+    const getAttr = attrName => {
       const re = new RegExp(`\\b${attrName}\\s*=\\s*(?:\"([^\"]*)\"|'([^']*)'|([^\\s>]+))`, 'i');
       const m = tag.match(re);
       return decodeHtml(m ? (m[1] || m[2] || m[3] || '') : '');
@@ -1297,7 +1298,7 @@ class ArticleService extends Service {
     const countMap = new Map();
     if (!ids.length) return countMap;
     const rows = await ctx.model.ArticleCollect.findAll({
-      attributes: [ 'article_id', [Sequelize.fn('COUNT', Sequelize.col('id')), 'total' ] ],
+      attributes: [ 'article_id', [ Sequelize.fn('COUNT', Sequelize.col('id')), 'total' ]],
       where: {
         article_id: { [Op.in]: ids },
         is_delete: 0,
@@ -1322,7 +1323,7 @@ class ArticleService extends Service {
     if (!ready) return countMap;
     try {
       const rows = await ctx.model.ArticleLike.findAll({
-        attributes: [ 'article_id', [Sequelize.fn('COUNT', Sequelize.col('id')), 'total' ] ],
+        attributes: [ 'article_id', [ Sequelize.fn('COUNT', Sequelize.col('id')), 'total' ]],
         where: {
           article_id: { [Op.in]: ids },
           is_delete: 0,
@@ -1350,7 +1351,7 @@ class ArticleService extends Service {
     if (!ready) return countMap;
     try {
       const rows = await ctx.model.ArticleComment.findAll({
-        attributes: [ 'article_id', [Sequelize.fn('COUNT', Sequelize.col('id')), 'total' ] ],
+        attributes: [ 'article_id', [ Sequelize.fn('COUNT', Sequelize.col('id')), 'total' ]],
         where: {
           article_id: { [Op.in]: ids },
           is_delete: 0,
@@ -1847,7 +1848,7 @@ class ArticleService extends Service {
     });
 
     const articleCounts = await ctx.model.Article.findAll({
-      attributes: [ 'cid', [Sequelize.fn('COUNT', Sequelize.col('id')), 'total'] ],
+      attributes: [ 'cid', [ Sequelize.fn('COUNT', Sequelize.col('id')), 'total' ]],
       where: articleWhere,
       group: [ 'cid' ],
     });
@@ -1983,7 +1984,7 @@ class ArticleService extends Service {
 
     const tagIds = rows.map(item => Number(item.id || 0)).filter(Boolean);
     const relCounts = tagIds.length ? await ctx.model.ArticleTagRel.findAll({
-      attributes: [ 'tag_id', [Sequelize.fn('COUNT', Sequelize.col('article_id')), 'total'] ],
+      attributes: [ 'tag_id', [ Sequelize.fn('COUNT', Sequelize.col('article_id')), 'total' ]],
       where: {
         tag_id: { [Op.in]: tagIds },
         is_delete: 0,
@@ -2301,7 +2302,7 @@ class ArticleService extends Service {
 
     const topicIds = rows.map(item => Number(item.id || 0)).filter(Boolean);
     const relCounts = topicIds.length ? await ctx.model.ArticleTopicRel.findAll({
-      attributes: [ 'topic_id', [Sequelize.fn('COUNT', Sequelize.col('article_id')), 'total'] ],
+      attributes: [ 'topic_id', [ Sequelize.fn('COUNT', Sequelize.col('article_id')), 'total' ]],
       where: {
         topic_id: { [Op.in]: topicIds },
         is_delete: 0,
@@ -3126,9 +3127,9 @@ class ArticleService extends Service {
     });
     if (!row) throw new Error('文章不存在');
     const authorUserMap = await ctx.service.user.getAuthorProfileMap([ Number(userId) ], false);
-    const { tagIdsMap, tagNamesMap, tagObjectsMap } = await this.getArticleTagInfoByArticleIds([id]);
-    const { topicIdMap, topicNameMap } = await this.getArticleTopicInfoByArticleIds([id]);
-    const { collectMap, likeMap, commentMap } = await this.getArticleInteractionStats([id], 0);
+    const { tagIdsMap, tagNamesMap, tagObjectsMap } = await this.getArticleTagInfoByArticleIds([ id ]);
+    const { topicIdMap, topicNameMap } = await this.getArticleTopicInfoByArticleIds([ id ]);
+    const { collectMap, likeMap, commentMap } = await this.getArticleInteractionStats([ id ], 0);
     return {
       id,
       cid: Number(row.cid || 0),
@@ -3923,7 +3924,7 @@ class ArticleService extends Service {
     const row = await ctx.model.query(
       'SELECT id,user_id,ip,reason,expire_time FROM la_article_comment_mute WHERE is_delete=0 AND expire_time>? AND ((user_id>0 AND user_id=?) OR (ip<>"" AND ip=?)) ORDER BY expire_time DESC LIMIT 1',
       { replacements: [ now, uid, addr ], type: ctx.model.QueryTypes.SELECT }
-    ).then(res => Array.isArray(res) ? res[0] : null).catch(() => null);
+    ).then(res => (Array.isArray(res) ? res[0] : null)).catch(() => null);
     return row || null;
   }
 
@@ -4297,7 +4298,7 @@ class ArticleService extends Service {
         replacements: [ Number(userId), commentId ],
         type: ctx.model.QueryTypes.SELECT,
       }
-    ).then(res => Array.isArray(res) ? res[0] : null).catch(() => null);
+    ).then(res => (Array.isArray(res) ? res[0] : null)).catch(() => null);
     let isLike = 0;
     if (!existRow) {
       await ctx.model.query(
@@ -4770,7 +4771,7 @@ class ArticleService extends Service {
     const exist = await ctx.model.query(
       'SELECT id FROM la_article_comment_report WHERE is_delete=0 AND status=0 AND comment_id=? AND reporter_user_id=? LIMIT 1',
       { replacements: [ commentId, userId ], type: ctx.model.QueryTypes.SELECT }
-    ).then(res => Array.isArray(res) ? res[0] : null);
+    ).then(res => (Array.isArray(res) ? res[0] : null));
     if (exist && Number(exist.id || 0) > 0) {
       throw new Error('你已举报过该评论，请等待处理');
     }
@@ -4898,7 +4899,7 @@ class ArticleService extends Service {
     const reportRow = await ctx.model.query(
       'SELECT id,comment_id,status FROM la_article_comment_report WHERE id=? AND is_delete=0 LIMIT 1',
       { replacements: [ id ], type: ctx.model.QueryTypes.SELECT }
-    ).then(res => Array.isArray(res) ? res[0] : null);
+    ).then(res => (Array.isArray(res) ? res[0] : null));
     if (!reportRow) throw new Error('举报记录不存在');
     const commentId = Number(reportRow.comment_id || 0);
     if (commentId > 0 && status === 1) {

@@ -78,7 +78,7 @@ module.exports = app => {
     indexes: [
       {
         unique: true,
-        fields: ['page_id', 'category_id'],
+        fields: [ 'page_id', 'category_id' ],
       },
     ],
   });

@@ -12,7 +12,11 @@
                     <breadcrumb />
                 </div>
             </div>
-            <div class="flex">
+            <div class="flex items-center">
+                <!-- 搜索框 -->
+                <div class="navbar-item mr-2" v-if="!isMobile">
+                    <header-search />
+                </div>
                 <div class="navbar-item" v-if="!isMobile">
                     <full-screen />
                 </div>
@@ -37,6 +41,7 @@ import FullScreen from './full-screen.vue'
 import UserDropDown from './user-drop-down.vue'
 import Setting from '../setting/index.vue'
 import MultipleTabs from './multiple-tabs.vue'
+import HeaderSearch from '@/components/HeaderSearch.vue'
 
 import useSettingStore from '@/stores/modules/setting'
 const appStore = useAppStore()

@@ -85,7 +85,11 @@
                     </popover-input>
                 </el-form-item>
                 <el-form-item label="用户标签：">
-                    {{ Array.isArray(formData.tags) && formData.tags.length ? formData.tags.join('、') : '-' }}
+                    {{
+                        Array.isArray(formData.tags) && formData.tags.length
+                            ? formData.tags.join('、')
+                            : '-'
+                    }}
                 </el-form-item>
                 <el-form-item label="注册来源："> {{ formData.channelName || '-' }} </el-form-item>
                 <el-form-item label="注册时间："> {{ formData.createTime }} </el-form-item>

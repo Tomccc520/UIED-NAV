@@ -821,6 +821,15 @@
   background: var(--bg-input);
 }
 
+.order-detail-form textarea {
+  width: 100%;
+  border: 1px solid var(--border-medium);
+  border-radius: 8px;
+  padding: 9px 10px;
+  background: var(--bg-input);
+  resize: vertical;
+}
+
 .security-section {
   border: 1px solid var(--border-light);
   border-radius: 12px;

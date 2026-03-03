@@ -62,28 +62,28 @@ module.exports = app => {
    * 注册旧兼容 DELETE 路由（可被严格商业版模式一键关闭）
    */
   const delLegacy = (path, action) => router.delete(path, legacyRouteGuard, frontendNormalize, action);
-  
+
   // ==================== 页面相关 ====================
   // GET /api/pages - 获取所有页面
   get('/api/pages', controller.uied.frontend.pages);
-  
+
   // GET /api/pages/:slug - 获取单个页面配置
   get('/api/pages/:slug', controller.uied.frontend.pageDetail);
-  
+
   // GET /api/pages/:slug/full - 获取页面完整数据
   get('/api/pages/:slug/full', controller.uied.frontend.pageFullData);
   // GET /api/pages/:slug/stats - 获取页面统计（兼容旧前端）
   get('/api/pages/:slug/stats', controller.uied.frontend.pageStats);
-  
+
   // GET /api/pages/:slug/hot - 获取页面热门推荐
   get('/api/pages/:slug/hot', controller.uied.frontend.pageHotWebsites);
-  
+
   // GET /api/pages/:slug/hot-tags - 获取页面热门标签
   get('/api/pages/:slug/hot-tags', controller.uied.frontend.pageHotTags);
-  
+
   // GET /api/pages/:slug/search - 搜索页面内的网站
   get('/api/pages/:slug/search', controller.uied.frontend.pageSearch);
-  
+
   // ==================== 网站相关 ====================
   // GET /api/websites - 获取网站列表（支持通过 ids 参数批量获取）
   get('/api/websites', controller.uied.frontend.websites);
@@ -115,7 +115,7 @@ module.exports = app => {
   post('/api/websites/:id/like', controller.uied.frontend.websiteLikeAdd);
   // DELETE /api/websites/:id/like - 取消点赞（匿名/登录均可）
   del('/api/websites/:id/like', controller.uied.frontend.websiteLikeDel);
-  
+
   // ==================== 公开设置 ====================
   // GET /api/settings/public - 获取公开设置
   get('/api/settings/public', controller.uied.frontend.publicSettings);
@@ -147,7 +147,7 @@ module.exports = app => {
   postLegacy('/websites/:id/like', controller.uied.frontend.websiteLikeAdd);
   // DELETE /websites/:id/like - 取消网站点赞（兼容旧前端无 /api 前缀）
   delLegacy('/websites/:id/like', controller.uied.frontend.websiteLikeDel);
-  
+
   // ==================== 前端兼容路由（原 Express API 路径）====================
   // 导航菜单
   get('/api/settings/nav-menus', controller.uied.frontend.navMenus);
@@ -155,7 +155,7 @@ module.exports = app => {
   get('/api/settings/footer-groups', controller.uied.frontend.footer);
   // 友情链接
   get('/api/settings/friend-links', controller.uied.frontend.friendLinks);
-  
+
   // ==================== 热门推荐 ====================
   // GET /api/hot-recommendations - 获取热门推荐
   get('/api/hot-recommendations', controller.uied.frontend.hotRecommendations);
@@ -187,26 +187,26 @@ module.exports = app => {
   getFeature('/api/wordpress/tags', 'wordpress_channel', controller.uied.frontend.wordpressTags);
   // GET /api/wordpress/widgets/active - WordPress 组件（兼容旧前端）
   getFeature('/api/wordpress/widgets/active', 'wordpress_channel', controller.uied.frontend.wordpressWidgetsActive);
-  
+
   // GET /api/nav-menus - 获取导航菜单
   get('/api/nav-menus', controller.uied.frontend.navMenus);
-  
+
   // GET /api/friend-links - 获取友情链接
   get('/api/friend-links', controller.uied.frontend.friendLinks);
-  
+
   // GET /api/footer - 获取页脚设置
   get('/api/footer', controller.uied.frontend.footer);
-  
+
   // GET /api/social-media - 获取社交媒体
   get('/api/social-media', controller.uied.frontend.socialMedia);
-  
+
   // GET /api/banners - 获取广告
   get('/api/banners', controller.uied.frontend.banners);
   // GET /api/banners/active - 获取激活广告
   get('/api/banners/active', controller.uied.frontend.bannersActive);
   // POST /api/banners/:id/click - 记录广告点击
   post('/api/banners/:id/click', controller.uied.frontend.bannerClick);
-  
+
   // GET /api/site-info - 获取站点信息
   get('/api/site-info', controller.uied.frontend.siteInfo);
 
@@ -249,7 +249,17 @@ module.exports = app => {
   getFeature('/api/commercial/placements', 'operations_blocks', controller.uied.frontend.commercialPlacements);
   // GET /commercial/placements - 兼容旧前端无 /api 前缀
   getLegacyFeature('/commercial/placements', 'operations_blocks', controller.uied.frontend.commercialPlacements);
-  
+
+  // ==================== 搜索功能 ====================
+  // GET /api/search - 全站搜索
+  get('/api/search', controller.uied.frontend.globalSearch);
+  // POST /api/search/advanced - 高级搜索
+  post('/api/search/advanced', controller.uied.frontend.advancedSearch);
+  // GET /api/search/suggestions - 搜索建议
+  get('/api/search/suggestions', controller.uied.frontend.searchSuggestions);
+  // GET /api/search/hot - 热门搜索
+  get('/api/search/hot', controller.uied.frontend.hotSearches);
+
   // ==================== 分类和标签（前端公开） ====================
   // GET /api/categories - 获取分类列表（树形结构，含网站数量）
   get('/api/categories', controller.uied.frontend.categories);

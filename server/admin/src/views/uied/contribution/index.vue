@@ -7,159 +7,217 @@
 <template>
     <div class="uied-contribution-page">
         <template v-if="!featureDeniedState.denied">
-        <el-alert
-            title="投稿激励闭环：投稿积分、等级、勋章、优质投稿推荐位"
-            type="info"
-            :closable="false"
-            class="mb-4"
-        />
+            <el-alert
+                title="投稿激励闭环：投稿积分、等级、勋章、优质投稿推荐位"
+                type="info"
+                :closable="false"
+                class="mb-4"
+            />
 
-        <el-tabs v-model="activeTab">
-            <el-tab-pane label="积分设置" name="settings">
-                <el-card class="!border-none mb-4" shadow="never">
-                    <template #header>
-                        <div class="flex items-center justify-between">
-                            <span class="font-medium">积分规则</span>
-                            <el-button type="primary" :loading="savingSettings" @click="handleSaveSettings">
-                                保存设置
-                            </el-button>
-                        </div>
-                    </template>
-                    <el-form :model="settingsForm" label-width="170px" class="settings-form">
-                        <el-form-item label="启用投稿激励">
-                            <el-switch v-model="settingsForm.enabled" />
-                        </el-form-item>
-                        <el-form-item label="投稿提交积分">
-                            <el-input-number v-model="settingsForm.submitPoints" :min="0" :max="1000" />
-                        </el-form-item>
-                        <el-form-item label="审核通过积分">
-                            <el-input-number v-model="settingsForm.publishPoints" :min="0" :max="2000" />
-                        </el-form-item>
-                        <el-form-item label="推荐位奖励积分">
-                            <el-input-number v-model="settingsForm.featuredPoints" :min="0" :max="5000" />
-                        </el-form-item>
-                        <el-form-item label="每日投稿积分上限">
-                            <el-input-number v-model="settingsForm.dailySubmitLimit" :min="1" :max="1000" />
-                        </el-form-item>
-                        <el-form-item label="每日审核通过积分上限">
-                            <el-input-number v-model="settingsForm.dailyPublishLimit" :min="1" :max="1000" />
-                        </el-form-item>
-                        <el-form-item label="自动授予勋章">
-                            <el-switch v-model="settingsForm.autoGrantBadge" />
-                        </el-form-item>
-                    </el-form>
-                </el-card>
+            <el-tabs v-model="activeTab">
+                <el-tab-pane label="积分设置" name="settings">
+                    <el-card class="!border-none mb-4" shadow="never">
+                        <template #header>
+                            <div class="flex items-center justify-between">
+                                <span class="font-medium">积分规则</span>
+                                <el-button
+                                    type="primary"
+                                    :loading="savingSettings"
+                                    @click="handleSaveSettings"
+                                >
+                                    保存设置
+                                </el-button>
+                            </div>
+                        </template>
+                        <el-form :model="settingsForm" label-width="170px" class="settings-form">
+                            <el-form-item label="启用投稿激励">
+                                <el-switch v-model="settingsForm.enabled" />
+                            </el-form-item>
+                            <el-form-item label="投稿提交积分">
+                                <el-input-number
+                                    v-model="settingsForm.submitPoints"
+                                    :min="0"
+                                    :max="1000"
+                                />
+                            </el-form-item>
+                            <el-form-item label="审核通过积分">
+                                <el-input-number
+                                    v-model="settingsForm.publishPoints"
+                                    :min="0"
+                                    :max="2000"
+                                />
+                            </el-form-item>
+                            <el-form-item label="推荐位奖励积分">
+                                <el-input-number
+                                    v-model="settingsForm.featuredPoints"
+                                    :min="0"
+                                    :max="5000"
+                                />
+                            </el-form-item>
+                            <el-form-item label="每日投稿积分上限">
+                                <el-input-number
+                                    v-model="settingsForm.dailySubmitLimit"
+                                    :min="1"
+                                    :max="1000"
+                                />
+                            </el-form-item>
+                            <el-form-item label="每日审核通过积分上限">
+                                <el-input-number
+                                    v-model="settingsForm.dailyPublishLimit"
+                                    :min="1"
+                                    :max="1000"
+                                />
+                            </el-form-item>
+                            <el-form-item label="自动授予勋章">
+                                <el-switch v-model="settingsForm.autoGrantBadge" />
+                            </el-form-item>
+                        </el-form>
+                    </el-card>
 
-                <el-card class="!border-none" shadow="never">
-                    <template #header>
-                        <div class="flex items-center justify-between">
-                            <span class="font-medium">投稿排行榜预览</span>
-                            <el-button @click="loadLeaderboard">刷新</el-button>
-                        </div>
-                    </template>
-                    <el-table :data="leaderboardRows" size="small">
-                        <el-table-column prop="rank" label="排名" width="80" />
-                        <el-table-column prop="nickname" label="昵称" min-width="140" />
-                        <el-table-column prop="levelName" label="等级" width="120" />
-                        <el-table-column prop="totalPoints" label="总积分" width="120" />
-                        <el-table-column prop="publishCount" label="通过数" width="110" />
-                        <el-table-column prop="featuredCount" label="推荐数" width="110" />
-                        <el-table-column prop="badgeCount" label="勋章数" width="100" />
-                    </el-table>
-                </el-card>
-            </el-tab-pane>
+                    <el-card class="!border-none" shadow="never">
+                        <template #header>
+                            <div class="flex items-center justify-between">
+                                <span class="font-medium">投稿排行榜预览</span>
+                                <el-button @click="loadLeaderboard">刷新</el-button>
+                            </div>
+                        </template>
+                        <el-table :data="leaderboardRows" size="small">
+                            <el-table-column prop="rank" label="排名" width="80" />
+                            <el-table-column prop="nickname" label="昵称" min-width="140" />
+                            <el-table-column prop="levelName" label="等级" width="120" />
+                            <el-table-column prop="totalPoints" label="总积分" width="120" />
+                            <el-table-column prop="publishCount" label="通过数" width="110" />
+                            <el-table-column prop="featuredCount" label="推荐数" width="110" />
+                            <el-table-column prop="badgeCount" label="勋章数" width="100" />
+                        </el-table>
+                    </el-card>
+                </el-tab-pane>
 
-            <el-tab-pane label="勋章管理" name="badges">
-                <el-card class="!border-none" shadow="never">
-                    <template #header>
-                        <div class="flex items-center justify-between">
-                            <span class="font-medium">勋章规则</span>
-                            <el-button type="primary" @click="handleAddBadge">新增勋章</el-button>
-                        </div>
-                    </template>
-                    <el-table :data="badgeRows" size="small">
-                        <el-table-column label="勋章键" min-width="150">
-                            <template #default="{ row }">
-                                <el-input v-model="row.badgeKey" placeholder="badge-key" />
-                            </template>
-                        </el-table-column>
-                        <el-table-column label="勋章名称" min-width="140">
-                            <template #default="{ row }">
-                                <el-input v-model="row.badgeName" placeholder="勋章名称" />
-                            </template>
-                        </el-table-column>
-                        <el-table-column label="图标" width="120">
-                            <template #default="{ row }">
-                                <el-input v-model="row.icon" placeholder="Medal" />
-                            </template>
-                        </el-table-column>
-                        <el-table-column label="颜色" width="130">
-                            <template #default="{ row }">
-                                <el-input v-model="row.color" placeholder="#409EFF" />
-                            </template>
-                        </el-table-column>
-                        <el-table-column label="所需积分" width="120">
-                            <template #default="{ row }">
-                                <el-input-number v-model="row.requirePoints" :min="0" :max="1000000" class="!w-full" />
-                            </template>
-                        </el-table-column>
-                        <el-table-column label="所需通过数" width="120">
-                            <template #default="{ row }">
-                                <el-input-number v-model="row.requirePublishCount" :min="0" :max="100000" class="!w-full" />
-                            </template>
-                        </el-table-column>
-                        <el-table-column label="启用" width="90">
-                            <template #default="{ row }">
-                                <el-switch v-model="row.isEnabled" />
-                            </template>
-                        </el-table-column>
-                        <el-table-column label="排序" width="110">
-                            <template #default="{ row }">
-                                <el-input-number v-model="row.sort" :min="1" :max="100000" class="!w-full" />
-                            </template>
-                        </el-table-column>
-                        <el-table-column label="操作" width="150" fixed="right">
-                            <template #default="{ row }">
-                                <el-button link type="primary" @click="handleSaveBadge(row)">保存</el-button>
-                                <el-button link type="danger" @click="handleDeleteBadge(row)">删除</el-button>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                </el-card>
-            </el-tab-pane>
+                <el-tab-pane label="勋章管理" name="badges">
+                    <el-card class="!border-none" shadow="never">
+                        <template #header>
+                            <div class="flex items-center justify-between">
+                                <span class="font-medium">勋章规则</span>
+                                <el-button type="primary" @click="handleAddBadge"
+                                    >新增勋章</el-button
+                                >
+                            </div>
+                        </template>
+                        <el-table :data="badgeRows" size="small">
+                            <el-table-column label="勋章键" min-width="150">
+                                <template #default="{ row }">
+                                    <el-input v-model="row.badgeKey" placeholder="badge-key" />
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="勋章名称" min-width="140">
+                                <template #default="{ row }">
+                                    <el-input v-model="row.badgeName" placeholder="勋章名称" />
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="图标" width="120">
+                                <template #default="{ row }">
+                                    <el-input v-model="row.icon" placeholder="Medal" />
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="颜色" width="130">
+                                <template #default="{ row }">
+                                    <el-input v-model="row.color" placeholder="#409EFF" />
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="所需积分" width="120">
+                                <template #default="{ row }">
+                                    <el-input-number
+                                        v-model="row.requirePoints"
+                                        :min="0"
+                                        :max="1000000"
+                                        class="!w-full"
+                                    />
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="所需通过数" width="120">
+                                <template #default="{ row }">
+                                    <el-input-number
+                                        v-model="row.requirePublishCount"
+                                        :min="0"
+                                        :max="100000"
+                                        class="!w-full"
+                                    />
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="启用" width="90">
+                                <template #default="{ row }">
+                                    <el-switch v-model="row.isEnabled" />
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="排序" width="110">
+                                <template #default="{ row }">
+                                    <el-input-number
+                                        v-model="row.sort"
+                                        :min="1"
+                                        :max="100000"
+                                        class="!w-full"
+                                    />
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="操作" width="150" fixed="right">
+                                <template #default="{ row }">
+                                    <el-button link type="primary" @click="handleSaveBadge(row)"
+                                        >保存</el-button
+                                    >
+                                    <el-button link type="danger" @click="handleDeleteBadge(row)"
+                                        >删除</el-button
+                                    >
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </el-card>
+                </el-tab-pane>
 
-            <el-tab-pane label="推荐位" name="featured">
-                <el-card class="!border-none" shadow="never">
-                    <template #header>
-                        <div class="flex items-center justify-between">
-                            <span class="font-medium">优质投稿推荐位</span>
-                            <el-button type="primary" @click="openFeaturedDialog()">新增推荐位</el-button>
-                        </div>
-                    </template>
-                    <el-table :data="featuredRows" size="small">
-                        <el-table-column prop="id" label="ID" width="90" />
-                        <el-table-column prop="title" label="标题" min-width="200" />
-                        <el-table-column prop="articleId" label="文章ID" width="100" />
-                        <el-table-column prop="sort" label="排序" width="90" />
-                        <el-table-column label="显示" width="90">
-                            <template #default="{ row }">
-                                <el-tag :type="row.isShow ? 'success' : 'info'">{{ row.isShow ? '显示' : '隐藏' }}</el-tag>
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="targetUrl" label="跳转链接" min-width="240" show-overflow-tooltip />
-                        <el-table-column label="操作" width="150" fixed="right">
-                            <template #default="{ row }">
-                                <el-button link type="primary" @click="openFeaturedDialog(row)">编辑</el-button>
-                                <el-button link type="danger" @click="handleDeleteFeatured(row)">删除</el-button>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                </el-card>
-            </el-tab-pane>
+                <el-tab-pane label="推荐位" name="featured">
+                    <el-card class="!border-none" shadow="never">
+                        <template #header>
+                            <div class="flex items-center justify-between">
+                                <span class="font-medium">优质投稿推荐位</span>
+                                <el-button type="primary" @click="openFeaturedDialog()"
+                                    >新增推荐位</el-button
+                                >
+                            </div>
+                        </template>
+                        <el-table :data="featuredRows" size="small">
+                            <el-table-column prop="id" label="ID" width="90" />
+                            <el-table-column prop="title" label="标题" min-width="200" />
+                            <el-table-column prop="articleId" label="文章ID" width="100" />
+                            <el-table-column prop="sort" label="排序" width="90" />
+                            <el-table-column label="显示" width="90">
+                                <template #default="{ row }">
+                                    <el-tag :type="row.isShow ? 'success' : 'info'">{{
+                                        row.isShow ? '显示' : '隐藏'
+                                    }}</el-tag>
+                                </template>
+                            </el-table-column>
+                            <el-table-column
+                                prop="targetUrl"
+                                label="跳转链接"
+                                min-width="240"
+                                show-overflow-tooltip
+                            />
+                            <el-table-column label="操作" width="150" fixed="right">
+                                <template #default="{ row }">
+                                    <el-button link type="primary" @click="openFeaturedDialog(row)"
+                                        >编辑</el-button
+                                    >
+                                    <el-button link type="danger" @click="handleDeleteFeatured(row)"
+                                        >删除</el-button
+                                    >
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </el-card>
+                </el-tab-pane>
 
-            <el-tab-pane label="用户激励数据" name="users">
-                <el-card class="!border-none" shadow="never">
-                    <template #header>
+                <el-tab-pane label="用户激励数据" name="users">
+                    <el-card class="!border-none" shadow="never">
+                        <template #header>
                             <div class="flex items-center justify-between">
                                 <span class="font-medium">用户积分与等级</span>
                                 <div class="flex items-center gap-2 flex-wrap justify-end">
@@ -200,39 +258,41 @@
                                     <el-button @click="resetUserSearch">重置</el-button>
                                 </div>
                             </div>
-                    </template>
-                    <el-table :data="userRows" v-loading="userLoading" size="small">
-                        <el-table-column prop="id" label="用户ID" width="90" />
-                        <el-table-column prop="nickname" label="昵称" min-width="140" />
-                        <el-table-column prop="username" label="账号" min-width="140" />
-                        <el-table-column prop="levelName" label="等级" width="120" />
-                        <el-table-column prop="totalPoints" label="总积分" width="120" />
-                        <el-table-column prop="submitCount" label="投稿数" width="110" />
-                        <el-table-column prop="publishCount" label="通过数" width="110" />
-                        <el-table-column prop="featuredCount" label="推荐数" width="110" />
-                        <el-table-column prop="badgeCount" label="勋章数" width="100" />
-                        <el-table-column label="操作" width="100" fixed="right">
-                            <template #default="{ row }">
-                                <el-button link type="primary" @click="openUserDetail(row)">详情</el-button>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                    <div class="mt-4 flex justify-end">
-                        <el-pagination
-                            background
-                            layout="total, prev, pager, next"
-                            :total="userPagination.total"
-                            :page-size="userPagination.pageSize"
-                            :current-page="userPagination.pageNo"
-                            @current-change="handleUserPageChange"
-                        />
-                    </div>
-                </el-card>
-            </el-tab-pane>
+                        </template>
+                        <el-table :data="userRows" v-loading="userLoading" size="small">
+                            <el-table-column prop="id" label="用户ID" width="90" />
+                            <el-table-column prop="nickname" label="昵称" min-width="140" />
+                            <el-table-column prop="username" label="账号" min-width="140" />
+                            <el-table-column prop="levelName" label="等级" width="120" />
+                            <el-table-column prop="totalPoints" label="总积分" width="120" />
+                            <el-table-column prop="submitCount" label="投稿数" width="110" />
+                            <el-table-column prop="publishCount" label="通过数" width="110" />
+                            <el-table-column prop="featuredCount" label="推荐数" width="110" />
+                            <el-table-column prop="badgeCount" label="勋章数" width="100" />
+                            <el-table-column label="操作" width="100" fixed="right">
+                                <template #default="{ row }">
+                                    <el-button link type="primary" @click="openUserDetail(row)"
+                                        >详情</el-button
+                                    >
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <div class="mt-4 flex justify-end">
+                            <el-pagination
+                                background
+                                layout="total, prev, pager, next"
+                                :total="userPagination.total"
+                                :page-size="userPagination.pageSize"
+                                :current-page="userPagination.pageNo"
+                                @current-change="handleUserPageChange"
+                            />
+                        </div>
+                    </el-card>
+                </el-tab-pane>
 
-            <el-tab-pane label="积分日志" name="logs">
-                <el-card class="!border-none" shadow="never">
-                    <template #header>
+                <el-tab-pane label="积分日志" name="logs">
+                    <el-card class="!border-none" shadow="never">
+                        <template #header>
                             <div class="flex items-center justify-between">
                                 <span class="font-medium">积分变更日志</span>
                                 <div class="flex items-center gap-2 flex-wrap justify-end">
@@ -264,113 +324,181 @@
                                     <el-button @click="resetLogSearch">重置</el-button>
                                 </div>
                             </div>
-                    </template>
-                    <el-table :data="logRows" size="small">
-                        <el-table-column prop="id" label="ID" width="90" />
-                        <el-table-column prop="eventType" label="事件" min-width="180" />
-                        <el-table-column prop="userId" label="用户ID" width="100" />
-                        <el-table-column prop="nickname" label="昵称" min-width="120" />
-                        <el-table-column prop="pointsChange" label="积分变更" width="110" />
-                        <el-table-column prop="balanceAfter" label="变更后积分" width="120" />
-                        <el-table-column prop="remark" label="备注" min-width="200" show-overflow-tooltip />
-                        <el-table-column prop="createTime" label="时间戳" width="140" />
-                    </el-table>
-                </el-card>
-            </el-tab-pane>
+                        </template>
+                        <el-table :data="logRows" size="small">
+                            <el-table-column prop="id" label="ID" width="90" />
+                            <el-table-column prop="eventType" label="事件" min-width="180" />
+                            <el-table-column prop="userId" label="用户ID" width="100" />
+                            <el-table-column prop="nickname" label="昵称" min-width="120" />
+                            <el-table-column prop="pointsChange" label="积分变更" width="110" />
+                            <el-table-column prop="balanceAfter" label="变更后积分" width="120" />
+                            <el-table-column
+                                prop="remark"
+                                label="备注"
+                                min-width="200"
+                                show-overflow-tooltip
+                            />
+                            <el-table-column prop="createTime" label="时间戳" width="140" />
+                        </el-table>
+                    </el-card>
+                </el-tab-pane>
 
-            <el-tab-pane label="字段草案" name="schema">
-                <el-card class="!border-none" shadow="never">
-                    <template #header>
-                        <div class="flex items-center justify-between">
-                            <span class="font-medium">后台字段草案（前后端对接）</span>
-                            <el-button @click="loadSchema">刷新草案</el-button>
+                <el-tab-pane label="字段草案" name="schema">
+                    <el-card class="!border-none" shadow="never">
+                        <template #header>
+                            <div class="flex items-center justify-between">
+                                <span class="font-medium">后台字段草案（前后端对接）</span>
+                                <el-button @click="loadSchema">刷新草案</el-button>
+                            </div>
+                        </template>
+                        <pre class="schema-view">{{ schemaText }}</pre>
+                    </el-card>
+                </el-tab-pane>
+            </el-tabs>
+
+            <el-dialog
+                v-model="featuredDialog.visible"
+                :title="featuredDialog.form.id ? '编辑推荐位' : '新增推荐位'"
+                width="720px"
+            >
+                <el-form :model="featuredDialog.form" label-width="120px">
+                    <el-form-item label="推荐标题">
+                        <el-input v-model="featuredDialog.form.title" placeholder="推荐标题" />
+                    </el-form-item>
+                    <el-form-item label="文章ID">
+                        <el-input-number
+                            v-model="featuredDialog.form.articleId"
+                            :min="0"
+                            :max="99999999"
+                            class="!w-full"
+                        />
+                    </el-form-item>
+                    <el-form-item label="封面图">
+                        <el-input v-model="featuredDialog.form.coverImage" placeholder="图片 URL" />
+                    </el-form-item>
+                    <el-form-item label="摘要">
+                        <el-input v-model="featuredDialog.form.summary" type="textarea" :rows="3" />
+                    </el-form-item>
+                    <el-form-item label="跳转链接">
+                        <el-input
+                            v-model="featuredDialog.form.targetUrl"
+                            placeholder="/article/123"
+                        />
+                    </el-form-item>
+                    <el-form-item label="排序">
+                        <el-input-number
+                            v-model="featuredDialog.form.sort"
+                            :min="0"
+                            :max="100000"
+                        />
+                    </el-form-item>
+                    <el-form-item label="是否显示">
+                        <el-switch v-model="featuredDialog.form.isShow" />
+                    </el-form-item>
+                    <el-form-item label="开始时间戳">
+                        <el-input-number
+                            v-model="featuredDialog.form.startTime"
+                            :min="0"
+                            :max="9999999999"
+                            class="!w-full"
+                        />
+                    </el-form-item>
+                    <el-form-item label="结束时间戳">
+                        <el-input-number
+                            v-model="featuredDialog.form.endTime"
+                            :min="0"
+                            :max="9999999999"
+                            class="!w-full"
+                        />
+                    </el-form-item>
+                </el-form>
+                <template #footer>
+                    <el-button @click="featuredDialog.visible = false">取消</el-button>
+                    <el-button
+                        type="primary"
+                        :loading="featuredDialog.saving"
+                        @click="handleSaveFeatured"
+                        >保存</el-button
+                    >
+                </template>
+            </el-dialog>
+
+            <el-drawer
+                v-model="userDrawer.visible"
+                size="720px"
+                :title="`用户投稿激励详情 #${userDrawer.userId || '-'}`"
+            >
+                <template v-if="userDrawer.data">
+                    <el-descriptions :column="2" border class="mb-4">
+                        <el-descriptions-item label="昵称">{{
+                            userDrawer.data.user?.nickname || '-'
+                        }}</el-descriptions-item>
+                        <el-descriptions-item label="账号">{{
+                            userDrawer.data.user?.username || '-'
+                        }}</el-descriptions-item>
+                        <el-descriptions-item label="等级">{{
+                            userDrawer.data.contribution?.levelName || '-'
+                        }}</el-descriptions-item>
+                        <el-descriptions-item label="总积分">{{
+                            userDrawer.data.contribution?.totalPoints || 0
+                        }}</el-descriptions-item>
+                        <el-descriptions-item label="投稿数">{{
+                            userDrawer.data.contribution?.submitCount || 0
+                        }}</el-descriptions-item>
+                        <el-descriptions-item label="通过数">{{
+                            userDrawer.data.contribution?.publishCount || 0
+                        }}</el-descriptions-item>
+                        <el-descriptions-item label="推荐数">{{
+                            userDrawer.data.contribution?.featuredCount || 0
+                        }}</el-descriptions-item>
+                        <el-descriptions-item label="勋章数">{{
+                            userDrawer.data.contribution?.badgeCount || 0
+                        }}</el-descriptions-item>
+                    </el-descriptions>
+
+                    <el-card class="!border-none mb-4" shadow="never">
+                        <template #header>
+                            <span class="font-medium">勋章</span>
+                        </template>
+                        <div class="flex flex-wrap gap-2">
+                            <el-tag
+                                v-for="badge in userDrawer.data.badges || []"
+                                :key="badge.badgeId"
+                                :style="{
+                                    borderColor: badge.color || '#409EFF',
+                                    color: badge.color || '#409EFF'
+                                }"
+                                effect="plain"
+                            >
+                                {{ badge.badgeName }}
+                            </el-tag>
+                            <el-empty
+                                v-if="(userDrawer.data.badges || []).length === 0"
+                                description="暂无勋章"
+                                :image-size="80"
+                            />
                         </div>
-                    </template>
-                    <pre class="schema-view">{{ schemaText }}</pre>
-                </el-card>
-            </el-tab-pane>
-        </el-tabs>
+                    </el-card>
 
-        <el-dialog v-model="featuredDialog.visible" :title="featuredDialog.form.id ? '编辑推荐位' : '新增推荐位'" width="720px">
-            <el-form :model="featuredDialog.form" label-width="120px">
-                <el-form-item label="推荐标题">
-                    <el-input v-model="featuredDialog.form.title" placeholder="推荐标题" />
-                </el-form-item>
-                <el-form-item label="文章ID">
-                    <el-input-number v-model="featuredDialog.form.articleId" :min="0" :max="99999999" class="!w-full" />
-                </el-form-item>
-                <el-form-item label="封面图">
-                    <el-input v-model="featuredDialog.form.coverImage" placeholder="图片 URL" />
-                </el-form-item>
-                <el-form-item label="摘要">
-                    <el-input v-model="featuredDialog.form.summary" type="textarea" :rows="3" />
-                </el-form-item>
-                <el-form-item label="跳转链接">
-                    <el-input v-model="featuredDialog.form.targetUrl" placeholder="/article/123" />
-                </el-form-item>
-                <el-form-item label="排序">
-                    <el-input-number v-model="featuredDialog.form.sort" :min="0" :max="100000" />
-                </el-form-item>
-                <el-form-item label="是否显示">
-                    <el-switch v-model="featuredDialog.form.isShow" />
-                </el-form-item>
-                <el-form-item label="开始时间戳">
-                    <el-input-number v-model="featuredDialog.form.startTime" :min="0" :max="9999999999" class="!w-full" />
-                </el-form-item>
-                <el-form-item label="结束时间戳">
-                    <el-input-number v-model="featuredDialog.form.endTime" :min="0" :max="9999999999" class="!w-full" />
-                </el-form-item>
-            </el-form>
-            <template #footer>
-                <el-button @click="featuredDialog.visible = false">取消</el-button>
-                <el-button type="primary" :loading="featuredDialog.saving" @click="handleSaveFeatured">保存</el-button>
-            </template>
-        </el-dialog>
-
-        <el-drawer v-model="userDrawer.visible" size="720px" :title="`用户投稿激励详情 #${userDrawer.userId || '-'}`">
-            <template v-if="userDrawer.data">
-                <el-descriptions :column="2" border class="mb-4">
-                    <el-descriptions-item label="昵称">{{ userDrawer.data.user?.nickname || '-' }}</el-descriptions-item>
-                    <el-descriptions-item label="账号">{{ userDrawer.data.user?.username || '-' }}</el-descriptions-item>
-                    <el-descriptions-item label="等级">{{ userDrawer.data.contribution?.levelName || '-' }}</el-descriptions-item>
-                    <el-descriptions-item label="总积分">{{ userDrawer.data.contribution?.totalPoints || 0 }}</el-descriptions-item>
-                    <el-descriptions-item label="投稿数">{{ userDrawer.data.contribution?.submitCount || 0 }}</el-descriptions-item>
-                    <el-descriptions-item label="通过数">{{ userDrawer.data.contribution?.publishCount || 0 }}</el-descriptions-item>
-                    <el-descriptions-item label="推荐数">{{ userDrawer.data.contribution?.featuredCount || 0 }}</el-descriptions-item>
-                    <el-descriptions-item label="勋章数">{{ userDrawer.data.contribution?.badgeCount || 0 }}</el-descriptions-item>
-                </el-descriptions>
-
-                <el-card class="!border-none mb-4" shadow="never">
-                    <template #header>
-                        <span class="font-medium">勋章</span>
-                    </template>
-                    <div class="flex flex-wrap gap-2">
-                        <el-tag
-                            v-for="badge in userDrawer.data.badges || []"
-                            :key="badge.badgeId"
-                            :style="{ borderColor: badge.color || '#409EFF', color: badge.color || '#409EFF' }"
-                            effect="plain"
-                        >
-                            {{ badge.badgeName }}
-                        </el-tag>
-                        <el-empty v-if="(userDrawer.data.badges || []).length === 0" description="暂无勋章" :image-size="80" />
-                    </div>
-                </el-card>
-
-                <el-card class="!border-none" shadow="never">
-                    <template #header>
-                        <span class="font-medium">最近积分日志</span>
-                    </template>
-                    <el-table :data="userDrawer.data.logs || []" size="small">
-                        <el-table-column prop="eventType" label="事件" min-width="160" />
-                        <el-table-column prop="pointsChange" label="积分变更" width="110" />
-                        <el-table-column prop="balanceAfter" label="变更后积分" width="120" />
-                        <el-table-column prop="remark" label="备注" min-width="180" show-overflow-tooltip />
-                        <el-table-column prop="createTime" label="时间戳" width="140" />
-                    </el-table>
-                </el-card>
-            </template>
-        </el-drawer>
+                    <el-card class="!border-none" shadow="never">
+                        <template #header>
+                            <span class="font-medium">最近积分日志</span>
+                        </template>
+                        <el-table :data="userDrawer.data.logs || []" size="small">
+                            <el-table-column prop="eventType" label="事件" min-width="160" />
+                            <el-table-column prop="pointsChange" label="积分变更" width="110" />
+                            <el-table-column prop="balanceAfter" label="变更后积分" width="120" />
+                            <el-table-column
+                                prop="remark"
+                                label="备注"
+                                min-width="180"
+                                show-overflow-tooltip
+                            />
+                            <el-table-column prop="createTime" label="时间戳" width="140" />
+                        </el-table>
+                    </el-card>
+                </template>
+            </el-drawer>
         </template>
 
         <el-card v-else class="!border-none" shadow="never">
@@ -378,7 +506,11 @@
                 <template #sub-title>
                     <div class="text-center leading-6">
                         <div>功能键：{{ featureDeniedState.featureKey || 'user_center' }}</div>
-                        <div>当前版本：{{ String(featureDeniedState.edition || 'free').toUpperCase() }}</div>
+                        <div>
+                            当前版本：{{
+                                String(featureDeniedState.edition || 'free').toUpperCase()
+                            }}
+                        </div>
                         <div>请到「许可证中心 / 功能开关」升级或开启后再使用。</div>
                     </div>
                 </template>
@@ -534,7 +666,10 @@ const parseCommercialFeatureDenied = (error: any) => {
     if (!featureKey) return null
     return {
         featureKey,
-        edition: String(body?.data?.edition || 'free').trim().toLowerCase() || 'free'
+        edition:
+            String(body?.data?.edition || 'free')
+                .trim()
+                .toLowerCase() || 'free'
     }
 }
 

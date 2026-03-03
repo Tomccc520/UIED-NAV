@@ -34,5 +34,6 @@ export interface RequestData<T = any> {
     code: number
     data: T
     msg: string
+    message?: string
     show: boolean
 }

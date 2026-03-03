@@ -203,9 +203,7 @@ const frontendArticleListPath = normalizeFrontendRoutePath(
     import.meta.env.VITE_FRONTEND_ARTICLE_LIST_PATH || '/articles',
     '/articles'
 )
-const frontendArticleTagQueryKey = (
-    import.meta.env.VITE_FRONTEND_ARTICLE_TAG_QUERY_KEY || 'tag'
-)
+const frontendArticleTagQueryKey = (import.meta.env.VITE_FRONTEND_ARTICLE_TAG_QUERY_KEY || 'tag')
     .trim()
     .replace(/^\?/, '')
 const selectedIds = ref<number[]>([])
@@ -231,10 +229,9 @@ const handlePopupSuccess = () => {
 const getTagFrontendPath = (row: any) => {
     const path = frontendArticleListPath || '/articles'
     const queryKey = frontendArticleTagQueryKey || 'tag'
-    const value =
-        queryKey.toLowerCase().includes('id')
-            ? String(row?.id || '').trim()
-            : String(row?.slug || row?.id || '').trim()
+    const value = queryKey.toLowerCase().includes('id')
+        ? String(row?.id || '').trim()
+        : String(row?.slug || row?.id || '').trim()
     if (!value) return path
     return `${path}?${encodeURIComponent(queryKey)}=${encodeURIComponent(value)}`
 }

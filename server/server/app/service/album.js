@@ -542,7 +542,7 @@ class AlbumService extends Service {
     const tags = html.match(/<img\b[^>]*>/gi) || [];
     const urls = [];
     tags.forEach(tag => {
-      const readAttr = (name) => {
+      const readAttr = name => {
         const re = new RegExp(`\\b${name}\\s*=\\s*(?:\"([^\"]*)\"|'([^']*)'|([^\\s>]+))`, 'i');
         const matched = String(tag || '').match(re);
         return String(matched?.[1] || matched?.[2] || matched?.[3] || '').replace(/&amp;/g, '&').trim();

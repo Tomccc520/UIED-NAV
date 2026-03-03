@@ -108,6 +108,7 @@ export interface SidebarConfig {
 
 // 搜索配置
 export interface SearchConfig {
+  enabled: boolean;
   placeholder: string;
   debounceDelay: number;
   aiSearchEnabled: boolean;
@@ -146,14 +147,27 @@ export interface DetailPageConfig {
   relatedCount?: number;
   relatedMode?: 'same_category' | 'same_tags' | 'hot' | 'manual';
   manualWebsiteIds?: string | string[];
+  showHotWebsites?: boolean;
+  hotWebsitesTitle?: string;
+  hotWebsitesCount?: number;
+  showArticles?: boolean;
+  articlesTitle?: string;
+  articlesCount?: number;
   showTags?: boolean;
   tagsTitle?: string;
   tagSource?: 'website' | 'category' | 'manual';
   manualTags?: string | string[];
   showCategory?: boolean;
   categoryTitle?: string;
+  sidebarLinksNewWindow?: boolean;
   sidebarAdEnabled?: boolean;
   sidebarAdSlotKey?: string;
+  sidebarModules?: Array<{
+    key: string;
+    name: string;
+    enabled: boolean;
+    sort: number;
+  }>;
   detailTopAdEnabled?: boolean;
   detailTopAdSlotKey?: string;
   detailInlineAdEnabled?: boolean;
@@ -178,6 +192,14 @@ export interface DetailPageConfig {
   ratingsEnabled: boolean;
   commentsEnabled: boolean;
   sharingEnabled: boolean;
+  shareText?: string;
+  shareChannels?: Array<{
+    key: string;
+    name: string;
+    enabled: boolean;
+    sort: number;
+    icon?: string;
+  }>;
   favoritesEnabled: boolean;
   relatedEnabled: boolean;
   tagsEnabled: boolean;
@@ -208,6 +230,21 @@ export interface ArticleConfig {
   detailLayoutWidthMode: 'contained' | 'wide' | 'fluid';
   detailContentMaxWidth: number;
   detailHeaderAlign: 'left' | 'center';
+  detailSidebarEnabled: boolean;
+  detailSidebarSticky: boolean;
+  detailSidebarTopOffset: number;
+  detailSidebarLinksNewWindow: boolean;
+  detailSidebarLatestArticlesTitle: string;
+  detailSidebarLatestArticlesCount: number;
+  detailSidebarHotWebsitesTitle: string;
+  detailSidebarHotWebsitesCount: number;
+  detailSidebarTagsTitle: string;
+  detailSidebarModules: Array<{
+    key: string;
+    name: string;
+    enabled: boolean;
+    sort: number;
+  }>;
   commentsEnabled: boolean;
   topicsEnabled: boolean;
 }
@@ -344,6 +381,7 @@ export const DEFAULT_SIDEBAR: SidebarConfig = {
 };
 
 export const DEFAULT_SEARCH: SearchConfig = {
+  enabled: true,
   placeholder: '搜索网站名称...',
   debounceDelay: 300,
   aiSearchEnabled: true,
@@ -380,12 +418,19 @@ export const DEFAULT_DETAIL_PAGE: DetailPageConfig = {
   relatedCount: 6,
   relatedMode: 'same_category',
   manualWebsiteIds: '',
+  showHotWebsites: true,
+  hotWebsitesTitle: '热门网址',
+  hotWebsitesCount: 6,
+  showArticles: true,
+  articlesTitle: '推荐文章',
+  articlesCount: 5,
   showTags: true,
   tagsTitle: '深入探索',
   tagSource: 'website',
   manualTags: '',
   showCategory: true,
   categoryTitle: '相关分类',
+  sidebarLinksNewWindow: false,
   sidebarAdEnabled: false,
   sidebarAdSlotKey: 'website_detail_sidebar',
   detailTopAdEnabled: false,
@@ -412,9 +457,30 @@ export const DEFAULT_DETAIL_PAGE: DetailPageConfig = {
   ratingsEnabled: true,
   commentsEnabled: true,
   sharingEnabled: true,
+  shareText: '分享给更多朋友',
+  shareChannels: [
+    { key: 'wechat', name: '微信', enabled: true, sort: 1, icon: 'wechat' },
+    { key: 'weibo', name: '微博', enabled: true, sort: 2, icon: 'weibo' },
+    { key: 'qq', name: 'QQ', enabled: true, sort: 3, icon: 'qq' },
+    { key: 'qzone', name: 'QQ空间', enabled: true, sort: 4, icon: 'qzone' },
+    { key: 'twitter', name: 'Twitter', enabled: true, sort: 5, icon: 'twitter' },
+    { key: 'facebook', name: 'Facebook', enabled: true, sort: 6, icon: 'facebook' },
+    { key: 'linkedin', name: 'LinkedIn', enabled: false, sort: 7, icon: 'linkedin' },
+    { key: 'copylink', name: '复制链接', enabled: true, sort: 8, icon: 'link' },
+  ],
   favoritesEnabled: true,
   relatedEnabled: true,
   tagsEnabled: true,
+  sidebarModules: [
+    { key: 'info', name: '网站信息', enabled: true, sort: 1 },
+    { key: 'category', name: '分类', enabled: true, sort: 2 },
+    { key: 'related', name: '相关推荐', enabled: true, sort: 3 },
+    { key: 'hot_websites', name: '热门网址', enabled: true, sort: 4 },
+    { key: 'articles', name: '推荐文章', enabled: true, sort: 5 },
+    { key: 'tags', name: '标签', enabled: true, sort: 6 },
+    { key: 'qrcode', name: '二维码', enabled: false, sort: 7 },
+    { key: 'ad', name: '广告位', enabled: false, sort: 8 },
+  ],
   visitArrowEnabled: true,
   visitArrowText: '直达网站',
   copyrightEnabled: true,
@@ -441,6 +507,20 @@ export const DEFAULT_ARTICLE_SETTING: ArticleConfig = {
   detailLayoutWidthMode: 'contained',
   detailContentMaxWidth: 880,
   detailHeaderAlign: 'center',
+  detailSidebarEnabled: true,
+  detailSidebarSticky: true,
+  detailSidebarTopOffset: 16,
+  detailSidebarLinksNewWindow: false,
+  detailSidebarLatestArticlesTitle: '最新文章',
+  detailSidebarLatestArticlesCount: 6,
+  detailSidebarHotWebsitesTitle: '热门网址',
+  detailSidebarHotWebsitesCount: 6,
+  detailSidebarTagsTitle: '文章标签',
+  detailSidebarModules: [
+    { key: 'latest_articles', name: '最新文章', enabled: true, sort: 1 },
+    { key: 'hot_websites', name: '热门网址', enabled: true, sort: 2 },
+    { key: 'article_tags', name: '文章标签', enabled: true, sort: 3 },
+  ],
   commentsEnabled: true,
   topicsEnabled: true,
 };
@@ -517,6 +597,38 @@ export const publicSettingService = {
    */
   normalizeArticleConfig: (config: unknown): ArticleConfig => {
     const merged = { ...DEFAULT_ARTICLE_SETTING, ...((config as Partial<ArticleConfig>) || {}) };
+    const defaultSidebarModules = DEFAULT_ARTICLE_SETTING.detailSidebarModules || [];
+    const rawSidebarModules = Array.isArray(merged.detailSidebarModules)
+      ? merged.detailSidebarModules
+      : [];
+    /**
+     * 规范化文章详情侧栏模块列表，确保旧配置升级后仍有完整模块。
+     */
+    const normalizedSidebarModules = (() => {
+      const defaultMap = new Map(defaultSidebarModules.map(item => [item.key, item]));
+      const existed = new Set<string>();
+      const mergedList = rawSidebarModules
+        .filter(item => String(item?.key || '').trim())
+        .map(item => {
+          const key = String(item.key || '').trim();
+          existed.add(key);
+          const defaultItem = defaultMap.get(key);
+          return {
+            key,
+            name: String(item.name || defaultItem?.name || key),
+            enabled: item.enabled !== false,
+            sort: Number.isFinite(Number(item.sort)) ? Number(item.sort) : 0,
+          };
+        });
+      defaultSidebarModules.forEach(item => {
+        if (!existed.has(item.key)) {
+          mergedList.push({ ...item });
+        }
+      });
+      return mergedList
+        .sort((a, b) => a.sort - b.sort)
+        .map((item, index) => ({ ...item, sort: index + 1 }));
+    })();
     const detailLayoutWidthMode = [ 'contained', 'wide', 'fluid' ].includes(String(merged.detailLayoutWidthMode || '').trim())
       ? (String(merged.detailLayoutWidthMode || '').trim() as 'contained' | 'wide' | 'fluid')
       : DEFAULT_ARTICLE_SETTING.detailLayoutWidthMode;
@@ -538,6 +650,28 @@ export const publicSettingService = {
         ? Math.max(680, Math.min(1600, Number(merged.detailContentMaxWidth)))
         : DEFAULT_ARTICLE_SETTING.detailContentMaxWidth,
       detailHeaderAlign,
+      detailSidebarEnabled: merged.detailSidebarEnabled !== false,
+      detailSidebarSticky: merged.detailSidebarSticky !== false,
+      detailSidebarTopOffset: Number.isFinite(Number(merged.detailSidebarTopOffset))
+        ? Math.max(0, Math.min(240, Number(merged.detailSidebarTopOffset)))
+        : DEFAULT_ARTICLE_SETTING.detailSidebarTopOffset,
+      detailSidebarLinksNewWindow: merged.detailSidebarLinksNewWindow === true,
+      detailSidebarLatestArticlesTitle: String(
+        merged.detailSidebarLatestArticlesTitle || DEFAULT_ARTICLE_SETTING.detailSidebarLatestArticlesTitle
+      ),
+      detailSidebarLatestArticlesCount: Number.isFinite(Number(merged.detailSidebarLatestArticlesCount))
+        ? Math.max(1, Math.min(20, Number(merged.detailSidebarLatestArticlesCount)))
+        : DEFAULT_ARTICLE_SETTING.detailSidebarLatestArticlesCount,
+      detailSidebarHotWebsitesTitle: String(
+        merged.detailSidebarHotWebsitesTitle || DEFAULT_ARTICLE_SETTING.detailSidebarHotWebsitesTitle
+      ),
+      detailSidebarHotWebsitesCount: Number.isFinite(Number(merged.detailSidebarHotWebsitesCount))
+        ? Math.max(1, Math.min(20, Number(merged.detailSidebarHotWebsitesCount)))
+        : DEFAULT_ARTICLE_SETTING.detailSidebarHotWebsitesCount,
+      detailSidebarTagsTitle: String(
+        merged.detailSidebarTagsTitle || DEFAULT_ARTICLE_SETTING.detailSidebarTagsTitle
+      ),
+      detailSidebarModules: normalizedSidebarModules,
       homeSectionTitle: String(merged.homeSectionTitle || DEFAULT_ARTICLE_SETTING.homeSectionTitle),
       homeSectionSubtitle: String(merged.homeSectionSubtitle || DEFAULT_ARTICLE_SETTING.homeSectionSubtitle),
       commentsEnabled: merged.commentsEnabled !== false,
@@ -594,9 +728,11 @@ export const publicSettingService = {
   /**
    * 获取所有公开设置
    */
-  getPublicSettings: async (): Promise<PublicSettings> => {
+  getPublicSettings: async (options?: { forceFresh?: boolean }): Promise<PublicSettings> => {
     try {
-      const response = await api.get('/settings/public');
+      const response = await api.get('/settings/public', {
+        params: options?.forceFresh ? { _t: Date.now() } : undefined,
+      });
       const data = publicSettingService.unwrapResponseData<PublicSettingsPayload>(response.data, {});
       const exitModalConfig = data.exitModal || data.popup;
       return {
@@ -606,7 +742,7 @@ export const publicSettingService = {
         pageGlobal: publicSettingService.normalizePageGlobalConfig(data.pageGlobal),
         cardStyle: data.cardStyle || DEFAULT_CARD_STYLE,
         sidebar: data.sidebar || DEFAULT_SIDEBAR,
-        search: data.search || DEFAULT_SEARCH,
+        search: { ...DEFAULT_SEARCH, ...(data.search || {}) },
         exitModal: exitModalConfig || DEFAULT_EXIT_MODAL,
         detailPage: data.detailPage || DEFAULT_DETAIL_PAGE,
         article: publicSettingService.normalizeArticleConfig(data.article),
@@ -715,7 +851,7 @@ export const publicSettingService = {
   getSearchConfig: async (): Promise<SearchConfig> => {
     try {
       const settings = await publicSettingService.getPublicSettings();
-      return settings.search || DEFAULT_SEARCH;
+      return { ...DEFAULT_SEARCH, ...(settings.search || {}) };
     } catch (error) {
       debugLog.error('获取搜索配置失败，使用默认配置:', error);
       return DEFAULT_SEARCH;
@@ -738,9 +874,11 @@ export const publicSettingService = {
   /**
    * 获取详情页配置
    */
-  getDetailPageConfig: async (): Promise<DetailPageConfig> => {
+  getDetailPageConfig: async (options?: { forceFresh?: boolean }): Promise<DetailPageConfig> => {
     try {
-      const response = await api.get('/settings/detailPageConfig');
+      const response = await api.get('/settings/detailPageConfig', {
+        params: options?.forceFresh ? { _t: Date.now() } : undefined,
+      });
       const config = publicSettingService.unwrapResponseData<DetailPageConfig>(
         response.data,
         DEFAULT_DETAIL_PAGE

@@ -2,14 +2,23 @@
   "extends": "@vue/tsconfig/tsconfig.web.json",
   "include": [
     "global.d.ts",
-    "src/**/*",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.d.ts",
     "src/**/*.vue",
     "components.d.ts",
     "auto-imports.d.ts",
     "typings/**/*.d.ts"
   ],
+  "exclude": [
+    "src/**/*.vue.__VLS_*",
+    "src/**/*.vue.js",
+    "src/**/*.vue.jsx"
+  ],
   "compilerOptions": {
     "isolatedModules": true,
+    "allowJs": true,
+    "checkJs": false,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]

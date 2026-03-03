@@ -41,7 +41,24 @@
                             </el-input>
                         </el-form-item>
                         <el-form-item label="网站URL" prop="url">
-                            <el-input v-model="editData.url" placeholder="请输入网站URL" />
+                            <div class="website-url-tools">
+                                <el-input v-model="editData.url" placeholder="请输入网站URL" />
+                                <el-button :loading="fetchingSeo" @click="handleFetchSeo(false)">
+                                    抓取SEO
+                                </el-button>
+                                <el-button
+                                    :loading="fetchingSeo"
+                                    type="primary"
+                                    plain
+                                    @click="handleFetchSeo(true)"
+                                >
+                                    覆盖填充
+                                </el-button>
+                            </div>
+                            <div class="website-url-tools__tip">
+                                抓取标题、简介、关键词与
+                                favicon。默认仅填充空字段；“覆盖填充”会覆盖已有值。
+                            </div>
                         </el-form-item>
                         <el-form-item label="所属分类" prop="categoryId">
                             <el-select
@@ -64,6 +81,30 @@
                                 :rows="3"
                                 placeholder="请输入网站描述"
                             />
+                        </el-form-item>
+                        <el-form-item v-if="hasSeoPreview" label="抓取预览">
+                            <div class="seo-fetch-preview">
+                                <div class="seo-fetch-preview__head">
+                                    <div class="seo-fetch-preview__title">
+                                        {{ seoPreview.title || '未抓取到标题' }}
+                                    </div>
+                                    <el-image
+                                        v-if="seoPreview.favicon"
+                                        :src="seoPreview.favicon"
+                                        fit="contain"
+                                        class="seo-fetch-preview__favicon"
+                                    />
+                                </div>
+                                <div class="seo-fetch-preview__meta">
+                                    <span v-if="seoPreview.description">
+                                        简介：{{ seoPreview.description }}
+                                    </span>
+                                    <span v-if="seoPreview.keywords">
+                                        关键词：{{ seoPreview.keywords }}
+                                    </span>
+                                    <span v-if="seoPreview.h1">H1：{{ seoPreview.h1 }}</span>
+                                </div>
+                            </div>
                         </el-form-item>
                         <el-form-item label="图标URL">
                             <div class="flex gap-2" style="width: 100%">
@@ -147,7 +188,12 @@
                                             content="网站预览缩略图，支持从素材中心选择或输入URL"
                                             placement="top"
                                         >
-                                            <el-icon style="margin-left: 4px; cursor: help; color: #909399"
+                                            <el-icon
+                                                style="
+                                                    margin-left: 4px;
+                                                    cursor: help;
+                                                    color: #909399;
+                                                "
                                                 ><QuestionFilled
                                             /></el-icon>
                                         </el-tooltip>
@@ -222,7 +268,9 @@
                                 <el-col :span="8">
                                     <el-form-item label="平均访问时长(秒)">
                                         <el-input-number
-                                            v-model="editData.trafficMetrics.avgVisitDurationSeconds"
+                                            v-model="
+                                                editData.trafficMetrics.avgVisitDurationSeconds
+                                            "
                                             :min="0"
                                             :max="86400"
                                             class="!w-full"
@@ -253,7 +301,10 @@
                                 </el-col>
                                 <el-col :span="8">
                                     <el-form-item label="数据来源">
-                                        <el-select v-model="editData.trafficMetrics.dataSource" class="!w-full">
+                                        <el-select
+                                            v-model="editData.trafficMetrics.dataSource"
+                                            class="!w-full"
+                                        >
                                             <el-option label="手动录入" value="manual" />
                                             <el-option label="第三方估算" value="api" />
                                             <el-option label="运营标注" value="ops" />
@@ -276,37 +327,86 @@
                             <el-row :gutter="16">
                                 <el-col :span="8">
                                     <el-form-item label="直接访问">
-                                        <el-input-number v-model="editData.trafficMetrics.sourceBreakdown.direct" :min="0" :max="100" :precision="2" class="!w-full" />
+                                        <el-input-number
+                                            v-model="editData.trafficMetrics.sourceBreakdown.direct"
+                                            :min="0"
+                                            :max="100"
+                                            :precision="2"
+                                            class="!w-full"
+                                        />
                                     </el-form-item>
                                 </el-col>
                                 <el-col :span="8">
                                     <el-form-item label="自然搜索">
-                                        <el-input-number v-model="editData.trafficMetrics.sourceBreakdown.organicSearch" :min="0" :max="100" :precision="2" class="!w-full" />
+                                        <el-input-number
+                                            v-model="
+                                                editData.trafficMetrics.sourceBreakdown
+                                                    .organicSearch
+                                            "
+                                            :min="0"
+                                            :max="100"
+                                            :precision="2"
+                                            class="!w-full"
+                                        />
                                     </el-form-item>
                                 </el-col>
                                 <el-col :span="8">
                                     <el-form-item label="邮件">
-                                        <el-input-number v-model="editData.trafficMetrics.sourceBreakdown.email" :min="0" :max="100" :precision="2" class="!w-full" />
+                                        <el-input-number
+                                            v-model="editData.trafficMetrics.sourceBreakdown.email"
+                                            :min="0"
+                                            :max="100"
+                                            :precision="2"
+                                            class="!w-full"
+                                        />
                                     </el-form-item>
                                 </el-col>
                                 <el-col :span="8">
                                     <el-form-item label="外链引荐">
-                                        <el-input-number v-model="editData.trafficMetrics.sourceBreakdown.referral" :min="0" :max="100" :precision="2" class="!w-full" />
+                                        <el-input-number
+                                            v-model="
+                                                editData.trafficMetrics.sourceBreakdown.referral
+                                            "
+                                            :min="0"
+                                            :max="100"
+                                            :precision="2"
+                                            class="!w-full"
+                                        />
                                     </el-form-item>
                                 </el-col>
                                 <el-col :span="8">
                                     <el-form-item label="社交媒体">
-                                        <el-input-number v-model="editData.trafficMetrics.sourceBreakdown.social" :min="0" :max="100" :precision="2" class="!w-full" />
+                                        <el-input-number
+                                            v-model="editData.trafficMetrics.sourceBreakdown.social"
+                                            :min="0"
+                                            :max="100"
+                                            :precision="2"
+                                            class="!w-full"
+                                        />
                                     </el-form-item>
                                 </el-col>
                                 <el-col :span="8">
                                     <el-form-item label="展示广告">
-                                        <el-input-number v-model="editData.trafficMetrics.sourceBreakdown.displayAds" :min="0" :max="100" :precision="2" class="!w-full" />
+                                        <el-input-number
+                                            v-model="
+                                                editData.trafficMetrics.sourceBreakdown.displayAds
+                                            "
+                                            :min="0"
+                                            :max="100"
+                                            :precision="2"
+                                            class="!w-full"
+                                        />
                                     </el-form-item>
                                 </el-col>
                                 <el-col :span="8">
                                     <el-form-item label="其他">
-                                        <el-input-number v-model="editData.trafficMetrics.sourceBreakdown.others" :min="0" :max="100" :precision="2" class="!w-full" />
+                                        <el-input-number
+                                            v-model="editData.trafficMetrics.sourceBreakdown.others"
+                                            :min="0"
+                                            :max="100"
+                                            :precision="2"
+                                            class="!w-full"
+                                        />
                                     </el-form-item>
                                 </el-col>
                             </el-row>
@@ -360,11 +460,8 @@
                                 mode="default"
                             />
                             <div v-else class="ai-editor-layout__placeholder">
-                                {{
-                                    '切换到“详情页”后初始化编辑器...'
-                                }}
+                                {{ '切换到“详情页”后初始化编辑器...' }}
                             </div>
-
                         </div>
                         <aside class="ai-editor-layout__sidebar">
                             <div class="ai-chat">
@@ -375,7 +472,17 @@
                                             对话式创作，输出可直接落稿
                                         </div>
                                     </div>
-                                    <el-tag size="small" type="success">对话模式</el-tag>
+                                    <div class="ai-chat__header-right">
+                                        <el-tag size="small" type="success">对话模式</el-tag>
+                                        <el-radio-group
+                                            v-model="aiOutputViewMode"
+                                            size="small"
+                                            class="ai-chat__view-switch"
+                                        >
+                                            <el-radio-button label="raw">原文</el-radio-button>
+                                            <el-radio-button label="preview">预览</el-radio-button>
+                                        </el-radio-group>
+                                    </div>
                                 </div>
                                 <div class="ai-chat__shortcut">
                                     <el-button
@@ -404,6 +511,26 @@
                                     >
                                         润色正文
                                     </el-button>
+                                    <el-button
+                                        v-if="aiGenerating"
+                                        type="danger"
+                                        plain
+                                        size="small"
+                                        @click="handleStopAiGeneration"
+                                    >
+                                        停止生成
+                                    </el-button>
+                                </div>
+                                <div class="ai-chat__prompt-templates">
+                                    <el-tag
+                                        v-for="item in aiPromptTemplates"
+                                        :key="item"
+                                        class="ai-chat__prompt-template"
+                                        effect="plain"
+                                        @click="handleUsePromptTemplate(item)"
+                                    >
+                                        {{ item }}
+                                    </el-tag>
                                 </div>
                                 <div class="ai-chat__messages" ref="chatMessagesRef">
                                     <template v-if="chatMessages.length">
@@ -421,10 +548,16 @@
                                                 {{ item.role === 'user' ? '我' : 'AI' }}
                                             </div>
                                             <div class="ai-chat__message-content">
+                                                <pre
+                                                    v-if="aiOutputViewMode === 'raw'"
+                                                    class="ai-chat__message-markdown-plain"
+                                                    >{{ getChatMessageMarkdown(item) }}</pre
+                                                >
                                                 <div
-                                                    class="ai-chat__message-markdown"
-                                                    v-html="renderChatMessageContent(item)"
-                                                />
+                                                    v-else
+                                                    class="ai-chat__message-markdown-preview"
+                                                    v-html="renderChatMessagePreviewHtml(item)"
+                                                ></div>
                                                 <span v-if="item.streaming" class="ai-chat__cursor"
                                                     >|</span
                                                 >
@@ -445,6 +578,10 @@
                                         placeholder="输入你的写作诉求（Shift+Enter 换行）"
                                         @keydown="handleComposerKeydown"
                                     />
+                                    <div class="ai-chat__composer-meta">
+                                        <span>{{ aiOutputViewModeTip }}</span>
+                                        <span>{{ chatPromptLength }}/2000</span>
+                                    </div>
                                     <div class="ai-chat__composer-actions">
                                         <el-button
                                             type="primary"
@@ -471,11 +608,23 @@
                                         >
                                     </div>
                                     <div v-if="hasDraft" class="ai-chat__draft-preview">
-                                        <div class="ai-chat__draft-preview-title">Markdown 预览</div>
-                                        <div
+                                        <div class="ai-chat__draft-preview-title">
+                                            {{
+                                                aiOutputViewMode === 'raw'
+                                                    ? 'Markdown 原文'
+                                                    : '阅读预览'
+                                            }}
+                                        </div>
+                                        <pre
+                                            v-if="aiOutputViewMode === 'raw'"
                                             class="ai-chat__draft-preview-body"
-                                            v-html="renderAiMarkdown(aiDraftText)"
-                                        />
+                                            >{{ aiDraftText }}</pre
+                                        >
+                                        <div
+                                            v-else
+                                            class="ai-chat__draft-preview-markdown"
+                                            v-html="aiDraftPreviewHtml"
+                                        ></div>
                                     </div>
                                     <el-space wrap>
                                         <el-button
@@ -607,10 +756,16 @@ import { getToken } from '@/utils/auth'
 import feedback from '@/utils/feedback'
 import type { FormInstance, FormRules } from 'element-plus'
 import { QuestionFilled, FolderOpened } from '@element-plus/icons-vue'
+import {
+    onBeforeRouteLeave,
+    type NavigationGuardNext,
+    type RouteLocationNormalized
+} from 'vue-router'
 import editor from '@/components/editor/index.vue'
 import MaterialPicker from '@/components/material/picker.vue'
 
 type AiGenerateMode = 'replace' | 'append' | 'polish'
+type AiOutputViewMode = 'raw' | 'preview'
 type ChatRole = 'user' | 'assistant'
 interface ChatMessage {
     id: number
@@ -696,6 +851,23 @@ const getCategoryList = async () => {
 
 // 截图列表
 const screenshotList = ref<string[]>([])
+const fetchingSeo = ref(false)
+const seoPreview = ref({
+    title: '',
+    description: '',
+    keywords: '',
+    favicon: '',
+    h1: ''
+})
+const hasSeoPreview = computed(() =>
+    Boolean(
+        seoPreview.value.title ||
+            seoPreview.value.description ||
+            seoPreview.value.keywords ||
+            seoPreview.value.favicon ||
+            seoPreview.value.h1
+    )
+)
 
 /**
  * 创建默认访问数据（高级版）表单对象
@@ -780,11 +952,17 @@ const loadDetail = async (id: string | number) => {
         editData.seoKeywords = data.seoKeywords || data.seo_keywords || ''
         const trafficMetrics = (data.trafficMetrics || data.traffic_metrics || {}) as any
         Object.assign(editData.trafficMetrics, createDefaultTrafficMetrics(), {
-            monthlyVisits: Number(trafficMetrics.monthlyVisits || trafficMetrics.monthly_visits || 0),
-            avgVisitDurationSeconds: Number(
-                trafficMetrics.avgVisitDurationSeconds || trafficMetrics.avg_visit_duration_seconds || 0
+            monthlyVisits: Number(
+                trafficMetrics.monthlyVisits || trafficMetrics.monthly_visits || 0
             ),
-            pagesPerVisit: Number(trafficMetrics.pagesPerVisit || trafficMetrics.pages_per_visit || 0),
+            avgVisitDurationSeconds: Number(
+                trafficMetrics.avgVisitDurationSeconds ||
+                    trafficMetrics.avg_visit_duration_seconds ||
+                    0
+            ),
+            pagesPerVisit: Number(
+                trafficMetrics.pagesPerVisit || trafficMetrics.pages_per_visit || 0
+            ),
             bounceRate: Number(trafficMetrics.bounceRate || trafficMetrics.bounce_rate || 0),
             dataSource: trafficMetrics.dataSource || trafficMetrics.data_source || 'manual',
             remark: trafficMetrics.remark || '',
@@ -835,14 +1013,11 @@ const handleCaptureThumbnail = async () => {
     try {
         const websiteId = getEditingWebsiteId()
         if (websiteId > 0) {
-            const response = await fetch(
-                `/api/websites/${websiteId}/preview-snapshot?refresh=1`,
-                {
-                    method: 'GET',
-                    credentials: 'same-origin',
-                    headers: { Accept: 'application/json' }
-                }
-            )
+            const response = await fetch(`/api/websites/${websiteId}/preview-snapshot?refresh=1`, {
+                method: 'GET',
+                credentials: 'same-origin',
+                headers: { Accept: 'application/json' }
+            })
             if (response.ok) {
                 const payload = await response.json()
                 const previewUrl = String(payload?.url || '').trim()
@@ -870,6 +1045,82 @@ const handleCaptureThumbnail = async () => {
 
 // ==================== 获取图标 ====================
 const fetchingIcon = ref(false)
+
+/**
+ * 从 SEO 抓取返回中提取字符串字段，兼容 data 包装结构
+ */
+const resolveSeoField = (source: any, key: string) => {
+    const value = source?.[key] ?? source?.data?.[key]
+    return String(value || '').trim()
+}
+
+/**
+ * 回填网站表单字段（支持仅填空/覆盖填充两种模式）
+ */
+const applySeoToForm = (overwrite = false) => {
+    const title = resolveSeoField(seoPreview.value, 'title')
+    const description = resolveSeoField(seoPreview.value, 'description')
+    const keywords = resolveSeoField(seoPreview.value, 'keywords')
+    const favicon = resolveSeoField(seoPreview.value, 'favicon')
+
+    if (title) {
+        if (overwrite || !String(editData.name || '').trim()) {
+            editData.name = title
+        }
+        if (overwrite || !String(editData.seoTitle || '').trim()) {
+            editData.seoTitle = title
+        }
+    }
+
+    if (description) {
+        if (overwrite || !String(editData.description || '').trim()) {
+            editData.description = description
+        }
+        if (overwrite || !String(editData.seoDescription || '').trim()) {
+            editData.seoDescription = description
+        }
+    }
+
+    if (keywords && (overwrite || !String(editData.seoKeywords || '').trim())) {
+        editData.seoKeywords = keywords
+    }
+
+    if (favicon && (overwrite || !String(editData.iconUrl || '').trim())) {
+        editData.iconUrl = favicon
+    }
+}
+
+/**
+ * 抓取网站 SEO（标题/简介/关键词/favicon），并按模式回填
+ */
+const handleFetchSeo = async (overwrite = false) => {
+    if (!editData.url) {
+        feedback.msgWarning('请先填写网站URL')
+        return
+    }
+    fetchingSeo.value = true
+    try {
+        const res = await uiedSeoScraperFetch({ url: editData.url })
+        seoPreview.value = {
+            title: resolveSeoField(res, 'title'),
+            description: resolveSeoField(res, 'description'),
+            keywords: resolveSeoField(res, 'keywords'),
+            favicon: resolveSeoField(res, 'favicon'),
+            h1: resolveSeoField(res, 'h1')
+        }
+        applySeoToForm(overwrite)
+        if (hasSeoPreview.value) {
+            feedback.msgSuccess(overwrite ? 'SEO 已覆盖填充' : 'SEO 已抓取并填充空字段')
+        } else {
+            feedback.msgWarning('已请求成功，但未抓取到可用 SEO 信息')
+        }
+    } catch (error: any) {
+        feedback.msgError(error?.msg || error?.message || 'SEO 抓取失败')
+    } finally {
+        fetchingSeo.value = false
+    }
+}
+
 const handleFetchIcon = async () => {
     if (!editData.url) {
         feedback.msgWarning('请先填写网站URL')
@@ -901,12 +1152,29 @@ const chatSeq = ref(0)
 const chatMessages = ref<ChatMessage[]>([])
 const chatMessagesRef = ref<HTMLDivElement | null>(null)
 const streamTimer = ref<number | null>(null)
+const aiAbortController = ref<AbortController | null>(null)
+const aiPromptTemplates = [
+    '请用要点列表总结这个网站的核心价值',
+    '请输出「适用人群 / 核心功能 / 使用建议」三段式介绍',
+    '请补充 3 个常见问题（FAQ）并给出简短回答',
+    '请把语气改成更偏商业化推广文案'
+]
+const aiOutputViewMode = ref<AiOutputViewMode>('raw')
 
 const hasDraft = computed(() => Boolean(aiDraftText.value.trim()))
+const chatPromptLength = computed(() => String(chatPrompt.value || '').length)
+const aiOutputViewModeTip = computed(() =>
+    aiOutputViewMode.value === 'raw'
+        ? 'Markdown 原文输出模式'
+        : '阅读预览模式（最终落稿仍使用 Markdown）'
+)
 const lastGenerateModeLabel = computed(() => {
     const map: Record<AiGenerateMode, string> = { replace: '生成', append: '续写', polish: '润色' }
     return map[lastGenerateMode.value] || '生成'
 })
+const aiDraftPreviewHtml = computed(
+    () => renderAiMarkdown(aiDraftText.value) || '<p>（暂无可预览内容）</p>'
+)
 
 // 滚动到底部
 const scrollChatToBottom = () => {
@@ -937,28 +1205,36 @@ const stopStream = () => {
 }
 
 // 流式输出效果
-const startStreamReply = (fullText: string) => {
+const startStreamReply = (fullText: string, mode?: AiGenerateMode) => {
     stopStream()
     const text = fullText.trim()
     const msg = appendChatMessage('assistant', '', true)
     if (!text) {
+        if (mode) {
+            lastGenerateMode.value = mode
+            aiDraftText.value = ''
+        }
         msg.streaming = false
         return Promise.resolve()
     }
     const total = text.length
-    const chunkSize = Math.max(1, Math.ceil(total / 100))
+    const chunkSize = Math.max(1, Math.min(5, Math.ceil(total / 180)))
     let cursor = 0
     return new Promise<void>((resolve) => {
         streamTimer.value = window.setInterval(() => {
             cursor = Math.min(total, cursor + chunkSize)
             msg.content = text.slice(0, cursor)
+            if (mode) {
+                lastGenerateMode.value = mode
+                aiDraftText.value = normalizeDraft(msg.content)
+            }
             scrollChatToBottom()
             if (cursor >= total) {
                 msg.streaming = false
                 stopStream()
                 resolve()
             }
-        }, 20)
+        }, 26)
     })
 }
 
@@ -971,12 +1247,42 @@ const clearAiDraft = () => {
 }
 
 /**
+ * 判断异常是否为主动中断（AbortController）
+ */
+const isAiAbortError = (error: any) =>
+    String(error?.name || '') === 'AbortError' ||
+    /aborted|abort/i.test(String(error?.message || ''))
+
+/**
+ * 手动停止 AI 生成
+ */
+const handleStopAiGeneration = () => {
+    aiAbortController.value?.abort()
+    aiAbortController.value = null
+    stopStream()
+    aiGenerating.value = false
+    feedback.msgWarning('已停止本次生成')
+}
+
+/**
+ * 使用快捷模板填充输入框，提升运营写作效率
+ */
+const handleUsePromptTemplate = (template: string) => {
+    if (aiGenerating.value) return
+    const raw = String(template || '').trim()
+    if (!raw) return
+    chatPrompt.value = chatPrompt.value.trim() ? `${chatPrompt.value}\n${raw}` : raw
+}
+
+/**
  * 解析 AI 助手错误提示，给出可执行的排查方向
  */
 const resolveAiAssistantErrorMessage = (error: any) => {
     const status = Number(error?.response?.status || error?.status || 0)
     const responseCode = Number(error?.response?.data?.code || 0)
-    const bodyMessage = String(error?.response?.data?.msg || error?.response?.data?.message || '').trim()
+    const bodyMessage = String(
+        error?.response?.data?.msg || error?.response?.data?.message || ''
+    ).trim()
     const rawMessage = String(error?.msg || error?.message || bodyMessage || '').trim()
 
     // 商业版 403 已由请求拦截器统一提示，页面层不重复弹窗
@@ -1031,11 +1337,13 @@ const renderInlineMarkdown = (text: string) => {
  * 将 Markdown 文本转换为安全 HTML（轻量实现，覆盖 AI 助手常见输出）
  */
 const renderAiMarkdown = (text: string) => {
-    const source = String(text || '').replace(/\r\n/g, '\n').trim()
+    const source = String(text || '')
+        .replace(/\r\n/g, '\n')
+        .trim()
     if (!source) return ''
 
     const codeBlocks: string[] = []
-    let normalized = source.replace(/```([\w-]*)\n?([\s\S]*?)```/g, (_, lang = '', code = '') => {
+    const normalized = source.replace(/```([\w-]*)\n?([\s\S]*?)```/g, (_, lang = '', code = '') => {
         const idx = codeBlocks.length
         const safeLang = escapeHtmlText(String(lang || '').trim())
         const safeCode = escapeHtmlText(String(code || '').replace(/\n$/, ''))
@@ -1070,7 +1378,11 @@ const renderAiMarkdown = (text: string) => {
                 quoteLines.push(lines[i].trim().replace(/^>\s?/, ''))
                 i += 1
             }
-            blocks.push(`<blockquote>${quoteLines.map(item => renderInlineMarkdown(item)).join('<br/>')}</blockquote>`)
+            blocks.push(
+                `<blockquote>${quoteLines
+                    .map((item) => renderInlineMarkdown(item))
+                    .join('<br/>')}</blockquote>`
+            )
             continue
         }
 
@@ -1080,7 +1392,9 @@ const renderAiMarkdown = (text: string) => {
                 items.push(lines[i].trim().replace(/^[-*]\s+/, ''))
                 i += 1
             }
-            blocks.push(`<ul>${items.map(item => `<li>${renderInlineMarkdown(item)}</li>`).join('')}</ul>`)
+            blocks.push(
+                `<ul>${items.map((item) => `<li>${renderInlineMarkdown(item)}</li>`).join('')}</ul>`
+            )
             continue
         }
 
@@ -1090,7 +1404,9 @@ const renderAiMarkdown = (text: string) => {
                 items.push(lines[i].trim().replace(/^\d+\.\s+/, ''))
                 i += 1
             }
-            blocks.push(`<ol>${items.map(item => `<li>${renderInlineMarkdown(item)}</li>`).join('')}</ol>`)
+            blocks.push(
+                `<ol>${items.map((item) => `<li>${renderInlineMarkdown(item)}</li>`).join('')}</ol>`
+            )
             continue
         }
 
@@ -1099,7 +1415,9 @@ const renderAiMarkdown = (text: string) => {
             paragraphLines.push(lines[i])
             i += 1
         }
-        blocks.push(`<p>${paragraphLines.map(item => renderInlineMarkdown(item)).join('<br/>')}</p>`)
+        blocks.push(
+            `<p>${paragraphLines.map((item) => renderInlineMarkdown(item)).join('<br/>')}</p>`
+        )
     }
 
     let html = blocks.join('')
@@ -1124,21 +1442,21 @@ const toPlainText = (html: string) =>
         .trim()
 
 // 规范化 AI 草稿文本（保留 Markdown 语法）
-const normalizeDraft = (text: string) =>
-    (text || '')
+const normalizeDraft = (text: string) => (text || '').replace(/\r\n/g, '\n').trim()
+
+/**
+ * 获取聊天消息的 Markdown 原文（用于直接展示）
+ */
+const getChatMessageMarkdown = (item: ChatMessage) =>
+    String(item?.content || '')
         .replace(/\r\n/g, '\n')
         .trim()
 
 /**
- * 渲染聊天消息内容（AI 消息支持 Markdown，用户消息按纯文本）
+ * 渲染聊天消息预览 HTML（阅读模式）
  */
-const renderChatMessageContent = (item: ChatMessage) => {
-    const content = String(item?.content || '')
-    if (item.role === 'assistant') {
-        return renderAiMarkdown(content)
-    }
-    return escapeHtmlText(content).replace(/\n/g, '<br/>')
-}
+const renderChatMessagePreviewHtml = (item: ChatMessage) =>
+    renderAiMarkdown(getChatMessageMarkdown(item)) || '<p>（暂无可预览内容）</p>'
 
 // 构建 AI 提示
 const buildPrompt = (mode: AiGenerateMode, userPrompt = '') => {
@@ -1156,7 +1474,7 @@ const buildPrompt = (mode: AiGenerateMode, userPrompt = '') => {
     let prompt = `网站名称：${websiteName}\n网站地址：${websiteUrl}\n`
     if (websiteDesc) prompt += `网站描述：${websiteDesc}\n`
     if (currentText && mode !== 'replace') prompt += `\n当前正文内容：\n${currentText}\n`
-    prompt += `\n${modeInstructions[mode]}\n请使用 Markdown 输出内容（可使用标题、列表、加粗），不要输出解释性前缀。`
+    prompt += `\n${modeInstructions[mode]}\n请使用 Markdown 输出内容（可使用标题、列表、加粗），不要输出解释性前缀，也不要输出推理过程或思考过程。`
     if (userPrompt) prompt += `\n用户额外要求：${userPrompt}`
     return prompt
 }
@@ -1175,26 +1493,150 @@ const buildAiChatContext = (): ChatStreamContextItem[] =>
         .slice(-6)
 
 /**
+ * 解析编辑器 AI 流式地址，兼容本地代理与生产域名部署。
+ */
+const resolveAiEditorStreamUrl = () => {
+    const fallback = '/api/ai/chat/completions/editor'
+    const rawBase = String(import.meta.env.VITE_APP_BASE_URL || configs.baseUrl || '')
+        .trim()
+        .replace(/^['"]|['"]$/g, '')
+    if (!rawBase) return fallback
+    try {
+        const target = new URL(rawBase, window.location.origin)
+        if (target.origin !== window.location.origin) {
+            // 后台编辑器默认走同源 /api 代理，避免跨域 CORS + credentials 问题
+            return fallback
+        }
+        return new URL('/api/ai/chat/completions/editor', target.origin).toString()
+    } catch {
+        return fallback
+    }
+}
+
+/**
+ * 兼容解析 SSE delta 内容，支持字符串/数组/对象三种结构。
+ */
+const normalizeSseDeltaText = (value: unknown): string => {
+    if (!value) return ''
+    if (typeof value === 'string') return value
+    if (Array.isArray(value)) {
+        return value
+            .map((item) => {
+                if (typeof item === 'string') return item
+                if (typeof item === 'object' && item !== null && 'text' in item) {
+                    const text = (item as { text?: unknown }).text
+                    return typeof text === 'string' ? text : ''
+                }
+                return ''
+            })
+            .join('')
+    }
+    if (typeof value === 'object' && value !== null && 'text' in value) {
+        const text = (value as { text?: unknown }).text
+        return typeof text === 'string' ? text : ''
+    }
+    return ''
+}
+
+/**
+ * 拆分流式文本片段，避免突发分块时一次性渲染整段内容
+ */
+const splitStreamDelta = (text: string): string[] => {
+    const source = String(text || '')
+    if (!source) return []
+    const chunks: string[] = []
+    let current = ''
+    for (const char of source) {
+        current += char
+        if (/[\n，。！？；：,]/.test(char) || current.length >= 5) {
+            chunks.push(current)
+            current = ''
+        }
+    }
+    if (current) chunks.push(current)
+    return chunks
+}
+
+/**
+ * 创建流式渲染节流器：网络突发时按固定节奏输出，保证“流逝感”
+ */
+const createPacedStreamWriter = (onChunk: (chunk: string) => void, interval = 26) => {
+    const queue: string[] = []
+    let timer: number | null = null
+    let waitResolve: (() => void) | null = null
+
+    const start = () => {
+        if (timer !== null) return
+        timer = window.setInterval(() => {
+            const piece = queue.shift()
+            if (piece) {
+                onChunk(piece)
+                return
+            }
+            if (timer !== null) {
+                window.clearInterval(timer)
+                timer = null
+            }
+            if (waitResolve) {
+                const resolver = waitResolve
+                waitResolve = null
+                resolver()
+            }
+        }, interval)
+    }
+
+    return {
+        push: (text: string) => {
+            splitStreamDelta(text).forEach((item) => queue.push(item))
+            start()
+        },
+        flush: async () => {
+            if (!queue.length && timer === null) return
+            await new Promise<void>((resolve) => {
+                waitResolve = resolve
+                start()
+            })
+        },
+        stop: () => {
+            if (timer !== null) {
+                window.clearInterval(timer)
+                timer = null
+            }
+            queue.length = 0
+            if (waitResolve) {
+                const resolver = waitResolve
+                waitResolve = null
+                resolver()
+            }
+        }
+    }
+}
+
+/**
  * 通过 SSE 接口获取 AI 回复（优先使用真实流式输出）
  */
 const requestAiDraftBySse = async (mode: AiGenerateMode, userPrompt = '') => {
     const message = buildPrompt(mode, userPrompt)
     const token = getToken()
-    const baseUrl = String(configs.baseUrl || '').replace(/\/$/, '')
-    const streamUrl = `${baseUrl}/api/ai/chat/completions/editor`
+    const streamUrl = resolveAiEditorStreamUrl()
 
     const headers: Record<string, string> = {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Accept: 'text/event-stream'
     }
     if (token) headers.token = String(token)
 
+    const controller = new AbortController()
+    aiAbortController.value = controller
     const response = await fetch(streamUrl, {
         method: 'POST',
         headers,
-        credentials: 'include',
+        credentials: 'same-origin',
+        signal: controller.signal,
         body: JSON.stringify({
             message,
-            context: buildAiChatContext()
+            context: buildAiChatContext(),
+            stream: true
         })
     })
 
@@ -1210,18 +1652,28 @@ const requestAiDraftBySse = async (mode: AiGenerateMode, userPrompt = '') => {
     let buffer = ''
     let mergedText = ''
     let hasChunk = false
+    const streamWriter = createPacedStreamWriter((chunk) => {
+        hasChunk = true
+        mergedText += chunk
+        const draft = normalizeDraft(mergedText)
+        assistantMsg.content = draft
+        aiDraftText.value = draft
+        lastGenerateMode.value = mode
+        scrollChatToBottom()
+    })
 
     try {
         while (true) {
             const { done, value } = await reader.read()
             buffer += decoder.decode(value || new Uint8Array(), { stream: !done })
 
-            let splitIndex = buffer.indexOf('\n\n')
-            while (splitIndex !== -1) {
-                const packet = buffer.slice(0, splitIndex)
-                buffer = buffer.slice(splitIndex + 2)
+            const packets = buffer.split(/\r?\n\r?\n/)
+            buffer = packets.pop() || ''
+            for (const packet of packets) {
+                const trimmedPacket = String(packet || '').trim()
+                if (!trimmedPacket) continue
 
-                const dataLine = packet
+                const dataLine = trimmedPacket
                     .split('\n')
                     .map((line) => line.trim())
                     .filter((line) => line.startsWith('data:'))
@@ -1230,6 +1682,7 @@ const requestAiDraftBySse = async (mode: AiGenerateMode, userPrompt = '') => {
 
                 if (dataLine) {
                     if (dataLine === '[DONE]') {
+                        await streamWriter.flush()
                         assistantMsg.streaming = false
                         const draft = normalizeDraft(mergedText)
                         if (draft) {
@@ -1241,31 +1694,26 @@ const requestAiDraftBySse = async (mode: AiGenerateMode, userPrompt = '') => {
                     }
                     try {
                         const payload = JSON.parse(dataLine)
-                        const delta = String(
-                            payload?.choices?.[0]?.delta?.content ||
-                                payload?.content ||
-                                payload?.reply ||
-                                ''
+                        const contentDelta = normalizeSseDeltaText(
+                            payload?.choices?.[0]?.delta?.content || payload?.content
                         )
+                        // 推理内容不写入正文草稿，避免输出出现“思维链”文本
+                        const delta = contentDelta || normalizeSseDeltaText(payload?.reply)
                         if (delta) {
-                            hasChunk = true
-                            mergedText += delta
-                            assistantMsg.content = normalizeDraft(mergedText)
-                            aiDraftText.value = normalizeDraft(mergedText)
-                            lastGenerateMode.value = mode
-                            scrollChatToBottom()
+                            streamWriter.push(delta)
                         }
                     } catch (parseError) {
                         console.warn('[uied.website.ai] SSE 片段解析失败', dataLine, parseError)
                     }
                 }
-                splitIndex = buffer.indexOf('\n\n')
             }
 
             if (done) break
         }
+        await streamWriter.flush()
     } catch (error) {
         assistantMsg.streaming = false
+        await streamWriter.flush()
         if (hasChunk) {
             const draft = normalizeDraft(mergedText)
             if (draft) {
@@ -1277,6 +1725,10 @@ const requestAiDraftBySse = async (mode: AiGenerateMode, userPrompt = '') => {
         }
         throw error
     } finally {
+        if (aiAbortController.value === controller) {
+            aiAbortController.value = null
+        }
+        streamWriter.stop()
         assistantMsg.streaming = false
         reader.releaseLock?.()
     }
@@ -1298,6 +1750,7 @@ const requestAiDraft = async (mode: AiGenerateMode, userPrompt = '') => {
     try {
         return await requestAiDraftBySse(mode, userPrompt)
     } catch (sseError) {
+        if (isAiAbortError(sseError)) return ''
         console.warn('[uied.website.ai] SSE 失败，回退普通接口', sseError)
     }
 
@@ -1306,23 +1759,14 @@ const requestAiDraft = async (mode: AiGenerateMode, userPrompt = '') => {
         message,
         context: buildAiChatContext()
     })
-    const reply =
-        res?.reply ||
-        res?.content ||
-        res?.reasoningContent ||
-        res?.reasoning_content ||
-        res?.data?.reply ||
-        res?.data?.reasoningContent ||
-        ''
+    const reply = res?.reply || res?.content || res?.data?.reply || res?.data?.content || ''
     const draft = normalizeDraft(reply)
     if (!draft) {
         console.warn('[uied.website.ai] 空响应', res)
         feedback.msgWarning('AI 未返回可用结果，请调整模型配置后重试')
         return ''
     }
-    aiDraftText.value = draft
-    lastGenerateMode.value = mode
-    await startStreamReply(draft)
+    await startStreamReply(draft, mode)
     return draft
 }
 
@@ -1339,6 +1783,7 @@ const handleAiGenerate = async (mode: AiGenerateMode) => {
         const draft = await requestAiDraft(mode)
         if (draft) feedback.msgSuccess('AI 已返回结果')
     } catch (error: any) {
+        if (isAiAbortError(error)) return
         const errorMessage = resolveAiAssistantErrorMessage(error)
         errorMessage && feedback.msgError(errorMessage)
     } finally {
@@ -1365,6 +1810,7 @@ const handleSendChatPrompt = async () => {
         const draft = await requestAiDraft(mode, prompt)
         if (draft) feedback.msgSuccess('AI 已返回结果')
     } catch (error: any) {
+        if (isAiAbortError(error)) return
         const errorMessage = resolveAiAssistantErrorMessage(error)
         errorMessage && feedback.msgError(errorMessage)
     } finally {
@@ -1417,19 +1863,24 @@ const handleSubmit = async () => {
         const screenshots = screenshotList.value.filter((url: string) => url?.trim())
         const submitData = {
             ...editData,
+            slug: String(editData.slug || '').trim() || null,
             screenshots,
             thumbnail: editData.thumbnail || null,
             order: editData.sortOrder,
             trafficMetrics: {
                 monthlyVisits: Number(editData.trafficMetrics.monthlyVisits || 0),
-                avgVisitDurationSeconds: Number(editData.trafficMetrics.avgVisitDurationSeconds || 0),
+                avgVisitDurationSeconds: Number(
+                    editData.trafficMetrics.avgVisitDurationSeconds || 0
+                ),
                 pagesPerVisit: Number(editData.trafficMetrics.pagesPerVisit || 0),
                 bounceRate: Number(editData.trafficMetrics.bounceRate || 0),
                 dataSource: editData.trafficMetrics.dataSource || 'manual',
                 remark: editData.trafficMetrics.remark || '',
                 sourceBreakdown: {
                     direct: Number(editData.trafficMetrics.sourceBreakdown.direct || 0),
-                    organicSearch: Number(editData.trafficMetrics.sourceBreakdown.organicSearch || 0),
+                    organicSearch: Number(
+                        editData.trafficMetrics.sourceBreakdown.organicSearch || 0
+                    ),
                     email: Number(editData.trafficMetrics.sourceBreakdown.email || 0),
                     referral: Number(editData.trafficMetrics.sourceBreakdown.referral || 0),
                     social: Number(editData.trafficMetrics.sourceBreakdown.social || 0),
@@ -1487,19 +1938,109 @@ const handleAiHover = async (e: Event) => {
     }
 }
 
+/**
+ * 生成离开页面确认文案（AI 正在输出时）
+ */
+const getAiGeneratingLeaveMessage = () =>
+    'AI 写作助手正在生成内容，离开页面会中断本次生成，是否继续离开？'
+
+/**
+ * 浏览器刷新/关闭拦截（AI 生成中）
+ */
+const handlePageBeforeUnload = (event: BeforeUnloadEvent) => {
+    if (!aiGenerating.value) return
+    event.preventDefault()
+    event.returnValue = ''
+}
+
+onBeforeRouteLeave(
+    (_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+        if (!aiGenerating.value) {
+            next()
+            return
+        }
+        const allowLeave = window.confirm(getAiGeneratingLeaveMessage())
+        if (!allowLeave) {
+            next(false)
+            return
+        }
+        aiAbortController.value?.abort()
+        aiAbortController.value = null
+        stopStream()
+        aiGenerating.value = false
+        next()
+    }
+)
+
 onMounted(async () => {
     await getCategoryList()
     if (route.query.id) await loadDetail(route.query.id as string)
     window.addEventListener('wangeditor-ai-hover', handleAiHover)
+    window.addEventListener('beforeunload', handlePageBeforeUnload)
 })
 
 onBeforeUnmount(() => {
+    aiAbortController.value?.abort()
+    aiAbortController.value = null
     stopStream()
     window.removeEventListener('wangeditor-ai-hover', handleAiHover)
+    window.removeEventListener('beforeunload', handlePageBeforeUnload)
 })
 </script>
 
 <style scoped>
+.website-url-tools {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 8px;
+}
+
+.website-url-tools__tip {
+    margin-top: 6px;
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--el-text-color-secondary);
+}
+
+.seo-fetch-preview {
+    width: 100%;
+    border: 1px solid var(--el-border-color-light);
+    border-radius: 10px;
+    background: #fafafa;
+    padding: 10px 12px;
+}
+
+.seo-fetch-preview__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.seo-fetch-preview__title {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--el-text-color-primary);
+}
+
+.seo-fetch-preview__favicon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.seo-fetch-preview__meta {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+    line-height: 1.5;
+}
+
 .website-edit-footer {
     position: sticky;
     bottom: 0;
@@ -1674,12 +2215,23 @@ onBeforeUnmount(() => {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    height: 560px;
+    height: 680px;
 }
 .ai-chat__header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
+    gap: 8px;
+}
+.ai-chat__header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+.ai-chat__view-switch {
+    flex-shrink: 0;
 }
 .ai-chat__title {
     font-size: 15px;
@@ -1693,6 +2245,15 @@ onBeforeUnmount(() => {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+}
+.ai-chat__prompt-templates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.ai-chat__prompt-template {
+    cursor: pointer;
+    user-select: none;
 }
 .ai-chat__messages {
     border: 1px solid var(--el-border-color-light);
@@ -1719,73 +2280,42 @@ onBeforeUnmount(() => {
     padding: 10px 12px;
     border-radius: 10px;
 }
-.ai-chat__message-markdown {
+.ai-chat__message-markdown-plain {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: inherit;
+}
+.ai-chat__message-markdown-preview {
+    margin: 0;
+    line-height: 1.68;
+    color: var(--el-text-color-primary);
+    font-size: 13px;
     word-break: break-word;
 }
-.ai-chat__message-markdown :deep(p) {
+.ai-chat__message-markdown-preview :deep(h1),
+.ai-chat__message-markdown-preview :deep(h2),
+.ai-chat__message-markdown-preview :deep(h3) {
+    margin: 0 0 8px;
+    font-weight: 600;
+}
+.ai-chat__message-markdown-preview :deep(p),
+.ai-chat__message-markdown-preview :deep(blockquote),
+.ai-chat__message-markdown-preview :deep(ul),
+.ai-chat__message-markdown-preview :deep(ol) {
     margin: 0 0 8px;
 }
-.ai-chat__message-markdown :deep(p:last-child) {
-    margin-bottom: 0;
-}
-.ai-chat__message-markdown :deep(h1),
-.ai-chat__message-markdown :deep(h2),
-.ai-chat__message-markdown :deep(h3),
-.ai-chat__message-markdown :deep(h4) {
-    margin: 6px 0 8px;
-    font-weight: 600;
-    line-height: 1.4;
-}
-.ai-chat__message-markdown :deep(h1) {
-    font-size: 16px;
-}
-.ai-chat__message-markdown :deep(h2) {
-    font-size: 15px;
-}
-.ai-chat__message-markdown :deep(h3),
-.ai-chat__message-markdown :deep(h4) {
-    font-size: 14px;
-}
-.ai-chat__message-markdown :deep(ul),
-.ai-chat__message-markdown :deep(ol) {
-    margin: 6px 0 8px 18px;
-    padding: 0;
-}
-.ai-chat__message-markdown :deep(li) {
-    margin: 2px 0;
-}
-.ai-chat__message-markdown :deep(blockquote) {
-    margin: 6px 0;
-    padding: 6px 10px;
-    border-left: 3px solid #d0d7de;
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 6px;
-}
-.ai-chat__message-markdown :deep(code) {
-    padding: 1px 5px;
+.ai-chat__message-markdown-preview :deep(code) {
+    background: rgba(15, 23, 42, 0.06);
     border-radius: 4px;
-    background: rgba(15, 23, 42, 0.08);
-    font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;
-    font-size: 12px;
+    padding: 1px 4px;
 }
-.ai-chat__message-markdown :deep(.ai-md-pre) {
-    margin: 8px 0;
-    padding: 10px;
+.ai-chat__message-markdown-preview :deep(pre) {
+    margin: 0 0 8px;
+    padding: 8px 10px;
     border-radius: 8px;
-    background: #0f172a;
-    color: #e2e8f0;
+    background: rgba(15, 23, 42, 0.06);
     overflow-x: auto;
-}
-.ai-chat__message-markdown :deep(.ai-md-pre code) {
-    padding: 0;
-    background: transparent;
-    color: inherit;
-    font-size: 12px;
-    line-height: 1.55;
-}
-.ai-chat__message-markdown :deep(a) {
-    color: #2563eb;
-    text-decoration: underline;
 }
 .ai-chat__message--user .ai-chat__message-content {
     background: #e9f3ff;
@@ -1809,6 +2339,13 @@ onBeforeUnmount(() => {
     border-radius: 10px;
     padding: 8px;
     background: #fff;
+}
+.ai-chat__composer-meta {
+    margin-top: 6px;
+    display: flex;
+    justify-content: space-between;
+    color: var(--el-text-color-secondary);
+    font-size: 12px;
 }
 .ai-chat__composer-actions {
     display: flex;
@@ -1835,14 +2372,54 @@ onBeforeUnmount(() => {
     background: #fff;
 }
 .ai-chat__draft-preview-body {
+    margin: 0;
     max-height: 160px;
     overflow-y: auto;
     padding: 10px;
     font-size: 12px;
     line-height: 1.65;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+.ai-chat__draft-preview-markdown {
+    max-height: 220px;
+    overflow-y: auto;
+    padding: 10px;
+    font-size: 13px;
+    line-height: 1.7;
+    word-break: break-word;
+    color: var(--el-text-color-primary);
+}
+.ai-chat__draft-preview-markdown :deep(h1),
+.ai-chat__draft-preview-markdown :deep(h2),
+.ai-chat__draft-preview-markdown :deep(h3) {
+    margin: 0 0 8px;
+    font-weight: 600;
+}
+.ai-chat__draft-preview-markdown :deep(p),
+.ai-chat__draft-preview-markdown :deep(blockquote),
+.ai-chat__draft-preview-markdown :deep(ul),
+.ai-chat__draft-preview-markdown :deep(ol) {
+    margin: 0 0 8px;
+}
+.ai-chat__draft-preview-markdown :deep(code) {
+    background: rgba(15, 23, 42, 0.06);
+    border-radius: 4px;
+    padding: 1px 4px;
+}
+.ai-chat__draft-preview-markdown :deep(pre) {
+    margin: 0 0 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.06);
+    overflow-x: auto;
 }
 
 @media (max-width: 1280px) {
+    .website-url-tools {
+        grid-template-columns: minmax(0, 1fr);
+    }
     .detail-config-grid {
         grid-template-columns: minmax(0, 1fr);
     }
@@ -1854,6 +2431,14 @@ onBeforeUnmount(() => {
     }
     .ai-editor-layout__sidebar {
         position: static;
+    }
+    .ai-chat__header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .ai-chat__header-right {
+        width: 100%;
+        justify-content: space-between;
     }
 }
 .ai-chat__apply-title {

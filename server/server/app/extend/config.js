@@ -130,6 +130,7 @@ const rsa = {
   // 免登录验证
   notLoginUri: [
     'system:login', // 登录接口
+    'system:login:captcha', // 登录验证码
     'common:index:config', // 配置接口
     // 前端兼容接口 - 免登录（支持通配符 * 匹配）
     'pages', // GET /api/pages

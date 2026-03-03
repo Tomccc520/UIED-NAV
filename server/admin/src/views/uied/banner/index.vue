@@ -26,21 +26,42 @@
                 <div class="banner-ops-helper__grid">
                     <div class="banner-ops-helper__card">
                         <div class="banner-ops-helper__title">常用位置说明</div>
-                        <div class="banner-ops-helper__row"><code>global_strip / top / home</code><span>首页顶部横条广告</span></div>
-                        <div class="banner-ops-helper__row"><code>sidebar / website_detail_sidebar</code><span>侧栏广告（首页/详情页按 pageSlug 区分）</span></div>
-                        <div class="banner-ops-helper__row"><code>footer / bottom</code><span>底部广告</span></div>
-                        <div class="banner-ops-helper__row"><code>detail / popup</code><span>详情页旧兼容位置</span></div>
+                        <div class="banner-ops-helper__row">
+                            <code>global_strip / top / home</code><span>首页顶部横条广告</span>
+                        </div>
+                        <div class="banner-ops-helper__row">
+                            <code>sidebar / website_detail_sidebar</code
+                            ><span>侧栏广告（首页/详情页按 pageSlug 区分）</span>
+                        </div>
+                        <div class="banner-ops-helper__row">
+                            <code>footer / bottom</code><span>底部广告</span>
+                        </div>
+                        <div class="banner-ops-helper__row">
+                            <code>detail / popup</code><span>详情页旧兼容位置</span>
+                        </div>
                     </div>
                     <div class="banner-ops-helper__card">
                         <div class="banner-ops-helper__title">快捷预览入口</div>
                         <div class="flex flex-wrap gap-2">
-                            <el-button size="small" @click="openPreviewPage('/')">前端首页</el-button>
-                            <el-button size="small" @click="openPreviewPage('/p/daily-hot')">每日热榜</el-button>
-                            <el-button size="small" @click="openPreviewPage('/p/rankings')">榜单系统</el-button>
-                            <el-button size="small" @click="openPreviewPage('/website/1')">网址详情（示例）</el-button>
+                            <el-button size="small" @click="openPreviewPage('/')"
+                                >前端首页</el-button
+                            >
+                            <el-button size="small" @click="openPreviewPage('/p/daily-hot')"
+                                >每日热榜</el-button
+                            >
+                            <el-button size="small" @click="openPreviewPage('/p/rankings')"
+                                >榜单系统</el-button
+                            >
+                            <el-button size="small" @click="openPreviewPage('/website/1')"
+                                >网址详情（示例）</el-button
+                            >
                         </div>
                         <div class="banner-ops-helper__tip">
-                            提示：请同时检查 <code>位置(position)</code>、<code>页面标识(pageSlug)</code>、<code>状态</code> 和 <code>时间窗</code>。
+                            提示：请同时检查
+                            <code>位置(position)</code>、<code>页面标识(pageSlug)</code>、<code
+                                >状态</code
+                            >
+                            和 <code>时间窗</code>。
                         </div>
                     </div>
                 </div>
@@ -56,7 +77,10 @@
                 <el-table-column label="ID" prop="id" width="80" />
                 <el-table-column label="类型" width="90">
                     <template #default="{ row }">
-                        <el-tag size="small" :type="row.contentType === 'html' ? 'warning' : 'success'">
+                        <el-tag
+                            size="small"
+                            :type="row.contentType === 'html' ? 'warning' : 'success'"
+                        >
                             {{ row.contentType === 'html' ? 'HTML' : '图片' }}
                         </el-tag>
                     </template>
@@ -70,14 +94,26 @@
                             fit="cover"
                             style="width: 80px; height: 45px"
                         />
-                        <span v-else-if="row.contentType === 'html'" class="text-xs text-gray-500">HTML代码</span>
+                        <span v-else-if="row.contentType === 'html'" class="text-xs text-gray-500"
+                            >HTML代码</span
+                        >
                         <span v-else>-</span>
                     </template>
                 </el-table-column>
                 <el-table-column label="标题" prop="title" min-width="150" />
                 <el-table-column label="链接" prop="url" min-width="200" show-overflow-tooltip />
-                <el-table-column label="位置/slot" prop="position" min-width="130" show-overflow-tooltip />
-                <el-table-column label="页面标识" prop="pageSlug" min-width="120" show-overflow-tooltip />
+                <el-table-column
+                    label="位置/slot"
+                    prop="position"
+                    min-width="130"
+                    show-overflow-tooltip
+                />
+                <el-table-column
+                    label="页面标识"
+                    prop="pageSlug"
+                    min-width="120"
+                    show-overflow-tooltip
+                />
                 <el-table-column label="排序" prop="sortOrder" width="80" />
                 <el-table-column label="状态" width="80">
                     <template #default="{ row }">
@@ -114,7 +150,10 @@
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item v-if="editData.contentType !== 'html'" label="图片" prop="image">
-                    <el-input v-model="editData.image" placeholder="图片URL（可接上传组件返回地址）" />
+                    <el-input
+                        v-model="editData.image"
+                        placeholder="图片URL（可接上传组件返回地址）"
+                    />
                 </el-form-item>
                 <el-form-item v-else label="HTML代码" prop="htmlContent">
                     <el-input
@@ -125,7 +164,10 @@
                     />
                 </el-form-item>
                 <el-form-item label="跳转链接">
-                    <el-input v-model="editData.linkUrl" placeholder="点击跳转链接（HTML广告可留空）" />
+                    <el-input
+                        v-model="editData.linkUrl"
+                        placeholder="点击跳转链接（HTML广告可留空）"
+                    />
                 </el-form-item>
                 <el-form-item label="打开方式">
                     <el-select v-model="editData.linkTarget" style="width: 100%">
@@ -143,7 +185,10 @@
                         <el-option label="详情顶部（detail_top）" value="detail_top" />
                         <el-option label="详情正文中（detail_inline）" value="detail_inline" />
                         <el-option label="详情底部（detail_bottom）" value="detail_bottom" />
-                        <el-option label="详情侧栏（website_detail_sidebar）" value="website_detail_sidebar" />
+                        <el-option
+                            label="详情侧栏（website_detail_sidebar）"
+                            value="website_detail_sidebar"
+                        />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="页面标识">

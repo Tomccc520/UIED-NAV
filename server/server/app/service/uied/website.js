@@ -176,12 +176,15 @@ class WebsiteService extends Service {
   async add(data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
+    const normalizedSlug = data.slug === undefined || data.slug === null
+      ? null
+      : (String(data.slug).trim() || null);
 
     // 检查 slug 是否已存在
-    if (data.slug) {
+    if (normalizedSlug) {
       const [ existing ] = await app.model.query(
         'SELECT id FROM uied_website WHERE slug = ? AND is_delete = 0',
-        { replacements: [ data.slug ], type: app.Sequelize.QueryTypes.SELECT }
+        { replacements: [ normalizedSlug ], type: app.Sequelize.QueryTypes.SELECT }
       );
       if (existing) {
         throw new Error('网站别名已存在');
@@ -197,7 +200,7 @@ class WebsiteService extends Service {
       {
         replacements: [
           data.name,
-          data.slug || null,
+          normalizedSlug,
           data.description || '',
           data.url,
           data.iconUrl || null,
@@ -243,6 +246,10 @@ class WebsiteService extends Service {
   async edit(data) {
     const { app } = this;
     const now = Math.floor(Date.now() / 1000);
+    const hasSlugField = Object.prototype.hasOwnProperty.call(data, 'slug');
+    const normalizedSlug = hasSlugField
+      ? (data.slug === undefined || data.slug === null ? null : (String(data.slug).trim() || null))
+      : undefined;
 
     // 检查网站是否存在
     const [ existing ] = await app.model.query(
@@ -254,10 +261,10 @@ class WebsiteService extends Service {
     }
 
     // 检查 slug 是否被其他网站使用
-    if (data.slug) {
+    if (hasSlugField && normalizedSlug) {
       const [ slugExists ] = await app.model.query(
         'SELECT id FROM uied_website WHERE slug = ? AND id != ? AND is_delete = 0',
-        { replacements: [ data.slug, data.id ], type: app.Sequelize.QueryTypes.SELECT }
+        { replacements: [ normalizedSlug, data.id ], type: app.Sequelize.QueryTypes.SELECT }
       );
       if (slugExists) {
         throw new Error('网站别名已存在');
@@ -269,7 +276,7 @@ class WebsiteService extends Service {
     const values = [];
 
     if (data.name !== undefined) { updates.push('name = ?'); values.push(data.name); }
-    if (data.slug !== undefined) { updates.push('slug = ?'); values.push(data.slug); }
+    if (hasSlugField) { updates.push('slug = ?'); values.push(normalizedSlug); }
     if (data.description !== undefined) { updates.push('description = ?'); values.push(data.description); }
     if (data.url !== undefined) { updates.push('url = ?'); values.push(data.url); }
     if (data.iconUrl !== undefined) { updates.push('icon_url = ?'); values.push(data.iconUrl); }

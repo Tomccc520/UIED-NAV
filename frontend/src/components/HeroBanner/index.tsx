@@ -42,6 +42,9 @@ interface HeroBannerProps {
   // 新增：显示模式配置
   heroDisplayMode?: string; // search, iconScroll
   heroScrollWebsites?: { id: string; name: string; iconUrl?: string; url: string }[]; // 滚动图标的网站列表
+  // 搜索能力开关配置
+  aiSearchEnabled?: boolean;
+  aiSearchBtnText?: string;
 }
 
 
@@ -70,6 +73,8 @@ const HeroBanner: React.FC<HeroBannerProps> = ({
   highlightText,
   heroDisplayMode = 'search',
   heroScrollWebsites = [],
+  aiSearchEnabled = true,
+  aiSearchBtnText = 'AI 搜索',
 }) => {
   // 如果没有传入props，使用默认的新版本样式
   const isNewVersion = !title && !subtitle;
@@ -482,23 +487,25 @@ const HeroBanner: React.FC<HeroBannerProps> = ({
                   id="hero-search-input"
                 />
                 {/* AI 搜索按钮 */}
-                <button 
-                  type="button"
-                  className={`ai-search-btn ${aiLoading ? 'loading' : ''}`}
-                  disabled={aiLoading}
-                  onClick={() => {
-                    const input = document.getElementById('hero-search-input') as HTMLInputElement;
-                    const query = input?.value?.trim() || '';
-                    if (query) {
-                      window.location.href = `/search?q=${encodeURIComponent(query)}&ai=1`;
-                    }
-                  }}
-                >
-                  <svg height="18" width="18" fill="currentColor" viewBox="0 0 24 24" className="sparkle">
-                    <path d="M10,21.236,6.755,14.745.264,11.5,6.755,8.255,10,1.764l3.245,6.491L19.736,11.5l-6.491,3.245ZM18,21l1.5,3L21,21l3-1.5L21,18l-1.5-3L18,18l-3,1.5ZM19.333,4.667,20.5,7l1.167-2.333L24,3.5,21.667,2.333,20.5,0,19.333,2.333,17,3.5Z"></path>
-                  </svg>
-                  <span className="text">{aiLoading ? '搜索中...' : 'AI 搜索'}</span>
-                </button>
+                {aiSearchEnabled && (
+                  <button
+                    type="button"
+                    className={`ai-search-btn ${aiLoading ? 'loading' : ''}`}
+                    disabled={aiLoading}
+                    onClick={() => {
+                      const input = document.getElementById('hero-search-input') as HTMLInputElement;
+                      const query = input?.value?.trim() || '';
+                      if (query) {
+                        window.location.href = `/search?q=${encodeURIComponent(query)}&ai=1`;
+                      }
+                    }}
+                  >
+                    <svg height="18" width="18" fill="currentColor" viewBox="0 0 24 24" className="sparkle">
+                      <path d="M10,21.236,6.755,14.745.264,11.5,6.755,8.255,10,1.764l3.245,6.491L19.736,11.5l-6.491,3.245ZM18,21l1.5,3L21,21l3-1.5L21,18l-1.5-3L18,18l-3,1.5ZM19.333,4.667,20.5,7l1.167-2.333L24,3.5,21.667,2.333,20.5,0,19.333,2.333,17,3.5Z"></path>
+                    </svg>
+                    <span className="text">{aiLoading ? '搜索中...' : aiSearchBtnText}</span>
+                  </button>
+                )}
               </div>
             </div>
 

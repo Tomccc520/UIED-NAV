@@ -430,7 +430,8 @@ class LicenseCenterService extends Service {
       return (Array.isArray(rows) ? rows : []).map(item => ({
         perms: String(item?.perms || ''),
         total: Number(item?.total || 0),
-        ids: String(item?.ids || '').split(',').map(v => Number(v || 0)).filter(Boolean),
+        ids: String(item?.ids || '').split(',').map(v => Number(v || 0))
+          .filter(Boolean),
       })).filter(item => item.perms);
     } catch (error) {
       this.ctx.logger.warn(`[licenseCenter] scanCommercialMenuDuplicates 降级: ${error.message}`);

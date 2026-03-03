@@ -19,7 +19,7 @@ class WebsiteHealthProbeService extends Service {
   /**
    * 健康探测缓存 TTL（秒）
    * 说明：避免详情页频繁刷新时反复实时探测外站。
-   * @returns {number} 缓存时长
+   * @return {number} 缓存时长
    */
   getCacheTtlSeconds() {
     return 300;
@@ -29,7 +29,7 @@ class WebsiteHealthProbeService extends Service {
    * 构建健康探测缓存键
    * @param {number|string} websiteId 网站ID
    * @param {number} timeoutMs 探测超时
-   * @returns {string} Redis 缓存键
+   * @return {string} Redis 缓存键
    */
   buildCacheKey(websiteId, timeoutMs) {
     return `uied:website-health:${websiteId}:${timeoutMs}`;
@@ -38,7 +38,7 @@ class WebsiteHealthProbeService extends Service {
   /**
    * 读取健康探测缓存（失败时静默降级）
    * @param {string} cacheKey Redis 缓存键
-   * @returns {Promise<object|null>} 缓存内容
+   * @return {Promise<object|null>} 缓存内容
    */
   async getCachedProbe(cacheKey) {
     try {
@@ -68,7 +68,7 @@ class WebsiteHealthProbeService extends Service {
    * 根据网站 ID 探测健康状态（仅探测库内网址，避免开放任意 URL 探测）
    * @param {number|string} websiteId 网站ID
    * @param {{ timeoutMs?: number, forceRefresh?: boolean }} options 探测选项
-   * @returns {Promise<object>} 健康探测结果
+   * @return {Promise<object>} 健康探测结果
    */
   async probeByWebsiteId(websiteId, options = {}) {
     const detail = await this.ctx.service.uied.website.detail(websiteId, null);
@@ -112,7 +112,7 @@ class WebsiteHealthProbeService extends Service {
    * 探测指定网址（HTTP/HTTPS 状态、响应时间、SSL、DNS）
    * @param {string} rawUrl 原始网址
    * @param {{ timeoutMs?: number, websiteId?: string, websiteName?: string }} options 探测选项
-   * @returns {Promise<object>} 健康探测结果
+   * @return {Promise<object>} 健康探测结果
    */
   async probeByUrl(rawUrl, options = {}) {
     const timeoutMs = this.normalizeTimeout(options.timeoutMs);
@@ -147,7 +147,7 @@ class WebsiteHealthProbeService extends Service {
   /**
    * 标准化探测超时时间，限制最大值避免阻塞
    * @param {unknown} timeoutMs 超时时间（毫秒）
-   * @returns {number} 规范化超时时间
+   * @return {number} 规范化超时时间
    */
   normalizeTimeout(timeoutMs) {
     const parsed = Number.parseInt(String(timeoutMs || ''), 10);
@@ -158,7 +158,7 @@ class WebsiteHealthProbeService extends Service {
   /**
    * 标准化网址（兼容未填写协议的情况）
    * @param {string} rawUrl 原始网址
-   * @returns {string} 可被 URL 构造器解析的网址
+   * @return {string} 可被 URL 构造器解析的网址
    */
   normalizeUrl(rawUrl) {
     const value = String(rawUrl || '').trim();
@@ -170,7 +170,7 @@ class WebsiteHealthProbeService extends Service {
   /**
    * 解析域名 DNS 信息（仅作为展示辅助，不影响主探测结果）
    * @param {string} hostname 域名
-   * @returns {Promise<object>} DNS 解析信息
+   * @return {Promise<object>} DNS 解析信息
    */
   async resolveDnsInfo(hostname) {
     try {
@@ -196,7 +196,7 @@ class WebsiteHealthProbeService extends Service {
    * 执行 HTTP 探测（优先 HEAD，失败时降级 GET）
    * @param {URL} urlObj 目标 URL 对象
    * @param {number} timeoutMs 超时时间（毫秒）
-   * @returns {Promise<object>} HTTP 探测信息
+   * @return {Promise<object>} HTTP 探测信息
    */
   async probeHttp(urlObj, timeoutMs) {
     const headResult = await this.probeHttpOnce(urlObj, 'HEAD', timeoutMs);
@@ -214,7 +214,7 @@ class WebsiteHealthProbeService extends Service {
    * @param {URL} urlObj 目标 URL 对象
    * @param {'HEAD'|'GET'} method 请求方法
    * @param {number} timeoutMs 超时时间（毫秒）
-   * @returns {Promise<object>} 探测结果
+   * @return {Promise<object>} 探测结果
    */
   probeHttpOnce(urlObj, method, timeoutMs) {
     return new Promise(resolve => {
@@ -288,7 +288,7 @@ class WebsiteHealthProbeService extends Service {
    * 探测 HTTPS 证书信息（有效期、签发者、剩余天数）
    * @param {URL} urlObj 目标 URL 对象
    * @param {number} timeoutMs 超时时间（毫秒）
-   * @returns {Promise<object>} SSL 探测结果
+   * @return {Promise<object>} SSL 探测结果
    */
   probeSsl(urlObj, timeoutMs) {
     return new Promise(resolve => {
@@ -373,7 +373,7 @@ class WebsiteHealthProbeService extends Service {
 
   /**
    * 构建空 SSL 信息（非 HTTPS 网址使用）
-   * @returns {object} 空 SSL 结构
+   * @return {object} 空 SSL 结构
    */
   buildEmptySslInfo() {
     return {
@@ -393,7 +393,7 @@ class WebsiteHealthProbeService extends Service {
    * 生成健康状态摘要（用于前端快速展示）
    * @param {object} httpInfo HTTP 探测结果
    * @param {object} sslInfo SSL 探测结果
-   * @returns {object} 摘要信息
+   * @return {object} 摘要信息
    */
   buildSummary(httpInfo, sslInfo) {
     const statusCode = Number(httpInfo?.statusCode || 0);

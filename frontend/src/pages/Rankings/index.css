@@ -57,6 +57,26 @@
   max-width: 760px;
 }
 
+.rankings-page__meta {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rankings-page__meta-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.07);
+  background: rgba(255, 255, 255, 0.82);
+  color: #334155;
+  font-size: 12px;
+  font-weight: 600;
+}
+
 .rankings-page__refresh {
   height: 38px;
   padding: 0 14px;

@@ -35,10 +35,17 @@
                     <el-input v-model="articleConfig.listPageTitle" />
                 </el-form-item>
                 <el-form-item label="列表页描述">
-                    <el-input v-model="articleConfig.listPageDescription" type="textarea" :rows="3" />
+                    <el-input
+                        v-model="articleConfig.listPageDescription"
+                        type="textarea"
+                        :rows="3"
+                    />
                 </el-form-item>
                 <el-form-item label="列表页封面图">
-                    <el-input v-model="articleConfig.listPageCoverImage" placeholder="https://..." />
+                    <el-input
+                        v-model="articleConfig.listPageCoverImage"
+                        placeholder="https://..."
+                    />
                 </el-form-item>
                 <el-divider content-position="left">详情页布局</el-divider>
                 <el-form-item label="详情页宽度模式">
@@ -63,6 +70,124 @@
                         <el-radio-button label="left">左对齐</el-radio-button>
                     </el-radio-group>
                 </el-form-item>
+                <el-divider content-position="left">详情页侧栏配置</el-divider>
+                <el-form-item label="启用详情侧栏">
+                    <el-switch v-model="articleConfig.detailSidebarEnabled" />
+                </el-form-item>
+                <el-form-item label="侧栏吸顶">
+                    <el-switch
+                        v-model="articleConfig.detailSidebarSticky"
+                        :disabled="!articleConfig.detailSidebarEnabled"
+                    />
+                </el-form-item>
+                <el-form-item label="吸顶偏移">
+                    <el-input-number
+                        v-model="articleConfig.detailSidebarTopOffset"
+                        :min="0"
+                        :max="240"
+                        :disabled="
+                            !articleConfig.detailSidebarEnabled ||
+                            !articleConfig.detailSidebarSticky
+                        "
+                    />
+                    <span class="ml-2 text-xs text-[#909399]">px</span>
+                </el-form-item>
+                <el-form-item label="侧栏链接新窗口打开">
+                    <el-switch
+                        v-model="articleConfig.detailSidebarLinksNewWindow"
+                        :disabled="!articleConfig.detailSidebarEnabled"
+                    />
+                    <span class="ml-2 text-xs text-[#909399]"
+                        >开启后侧栏内文章/网址/标签链接将新开窗口</span
+                    >
+                </el-form-item>
+                <el-form-item label="最新文章标题">
+                    <el-input
+                        v-model="articleConfig.detailSidebarLatestArticlesTitle"
+                        :disabled="!articleConfig.detailSidebarEnabled"
+                    />
+                </el-form-item>
+                <el-form-item label="最新文章数量">
+                    <el-input-number
+                        v-model="articleConfig.detailSidebarLatestArticlesCount"
+                        :min="1"
+                        :max="20"
+                        :disabled="!articleConfig.detailSidebarEnabled"
+                    />
+                </el-form-item>
+                <el-form-item label="热门网址标题">
+                    <el-input
+                        v-model="articleConfig.detailSidebarHotWebsitesTitle"
+                        :disabled="!articleConfig.detailSidebarEnabled"
+                    />
+                </el-form-item>
+                <el-form-item label="热门网址数量">
+                    <el-input-number
+                        v-model="articleConfig.detailSidebarHotWebsitesCount"
+                        :min="1"
+                        :max="20"
+                        :disabled="!articleConfig.detailSidebarEnabled"
+                    />
+                </el-form-item>
+                <el-form-item label="标签模块标题">
+                    <el-input
+                        v-model="articleConfig.detailSidebarTagsTitle"
+                        :disabled="!articleConfig.detailSidebarEnabled"
+                    />
+                </el-form-item>
+                <div class="config-table-wrap">
+                    <el-table
+                        :data="articleConfig.detailSidebarModules"
+                        row-key="key"
+                        border
+                        size="small"
+                        style="width: 100%"
+                    >
+                        <el-table-column label="排序" width="68" align="center">
+                            <template #default="{ $index }">
+                                <span>{{ $index + 1 }}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="模块名称" prop="name" min-width="140" />
+                        <el-table-column label="模块标识" prop="key" min-width="140" />
+                        <el-table-column label="启用" width="88" align="center">
+                            <template #default="{ row }">
+                                <el-switch
+                                    v-model="row.enabled"
+                                    :disabled="!articleConfig.detailSidebarEnabled"
+                                />
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="操作" width="120" align="center">
+                            <template #default="{ $index }">
+                                <div class="sort-actions">
+                                    <el-button
+                                        type="primary"
+                                        link
+                                        :disabled="
+                                            $index === 0 || !articleConfig.detailSidebarEnabled
+                                        "
+                                        @click="moveSidebarModuleUp($index)"
+                                    >
+                                        上移
+                                    </el-button>
+                                    <el-button
+                                        type="primary"
+                                        link
+                                        :disabled="
+                                            $index ===
+                                                articleConfig.detailSidebarModules.length - 1 ||
+                                            !articleConfig.detailSidebarEnabled
+                                        "
+                                        @click="moveSidebarModuleDown($index)"
+                                    >
+                                        下移
+                                    </el-button>
+                                </div>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>
                 <el-form-item label="评论启用">
                     <el-switch v-model="articleConfig.commentsEnabled" />
                 </el-form-item>
@@ -114,6 +239,19 @@ import {
     uiedSaveArticleTopicsConfig
 } from '@/api/uied'
 
+interface ArticleSidebarModuleItem {
+    key: string
+    name: string
+    enabled: boolean
+    sort: number
+}
+
+const DEFAULT_ARTICLE_SIDEBAR_MODULES: ArticleSidebarModuleItem[] = [
+    { key: 'latest_articles', name: '最新文章', enabled: true, sort: 1 },
+    { key: 'hot_websites', name: '热门网址', enabled: true, sort: 2 },
+    { key: 'article_tags', name: '文章标签', enabled: true, sort: 3 }
+]
+
 const savingConfig = ref(false)
 const savingTopics = ref(false)
 const topicsJson = ref('{}')
@@ -130,9 +268,83 @@ const articleConfig = reactive({
     detailLayoutWidthMode: 'contained',
     detailContentMaxWidth: 880,
     detailHeaderAlign: 'center',
+    detailSidebarEnabled: true,
+    detailSidebarSticky: true,
+    detailSidebarTopOffset: 16,
+    detailSidebarLinksNewWindow: false,
+    detailSidebarLatestArticlesTitle: '最新文章',
+    detailSidebarLatestArticlesCount: 6,
+    detailSidebarHotWebsitesTitle: '热门网址',
+    detailSidebarHotWebsitesCount: 6,
+    detailSidebarTagsTitle: '文章标签',
+    detailSidebarModules: DEFAULT_ARTICLE_SIDEBAR_MODULES.map((item) => ({ ...item })),
     commentsEnabled: true,
     topicsEnabled: true
 })
+
+/**
+ * 规范化侧栏模块排序字段，避免保存后排序紊乱。
+ */
+const normalizeSidebarModuleSort = (
+    list: ArticleSidebarModuleItem[]
+): ArticleSidebarModuleItem[] => {
+    return list.map((item, index) => ({
+        ...item,
+        sort: index + 1
+    }))
+}
+
+/**
+ * 合并默认侧栏模块，确保旧配置升级后仍可看到新增模块。
+ */
+const mergeSidebarModulesWithDefaults = (list: unknown): ArticleSidebarModuleItem[] => {
+    const currentList = Array.isArray(list) ? (list as ArticleSidebarModuleItem[]) : []
+    const defaultMap = new Map(DEFAULT_ARTICLE_SIDEBAR_MODULES.map((item) => [item.key, item]))
+    const existed = new Set<string>()
+    const merged = currentList
+        .filter((item) => String(item?.key || '').trim())
+        .map((item) => {
+            const key = String(item.key || '').trim()
+            existed.add(key)
+            const defaultItem = defaultMap.get(key)
+            return {
+                key,
+                name: String(item.name || defaultItem?.name || key),
+                enabled: item.enabled !== false,
+                sort: Number(item.sort || 0) || 0
+            }
+        })
+    DEFAULT_ARTICLE_SIDEBAR_MODULES.forEach((item) => {
+        if (!existed.has(item.key)) {
+            merged.push({ ...item })
+        }
+    })
+    return normalizeSidebarModuleSort(merged)
+}
+
+/**
+ * 上移侧栏模块。
+ */
+const moveSidebarModuleUp = (index: number) => {
+    if (index <= 0) return
+    const list = articleConfig.detailSidebarModules
+    const temp = list[index]
+    list[index] = list[index - 1]
+    list[index - 1] = temp
+    articleConfig.detailSidebarModules = normalizeSidebarModuleSort(list)
+}
+
+/**
+ * 下移侧栏模块。
+ */
+const moveSidebarModuleDown = (index: number) => {
+    const list = articleConfig.detailSidebarModules
+    if (index < 0 || index >= list.length - 1) return
+    const temp = list[index]
+    list[index] = list[index + 1]
+    list[index + 1] = temp
+    articleConfig.detailSidebarModules = normalizeSidebarModuleSort(list)
+}
 
 /**
  * 加载文章配置
@@ -143,6 +355,9 @@ const loadArticleConfig = async () => {
         ...articleConfig,
         ...(data || {})
     })
+    articleConfig.detailSidebarModules = mergeSidebarModulesWithDefaults(
+        articleConfig.detailSidebarModules
+    )
 }
 
 /**
@@ -159,6 +374,9 @@ const loadTopicsConfig = async () => {
 const handleSaveConfig = async () => {
     savingConfig.value = true
     try {
+        articleConfig.detailSidebarModules = normalizeSidebarModuleSort(
+            mergeSidebarModulesWithDefaults(articleConfig.detailSidebarModules)
+        )
         await uiedSaveArticleConfig({ ...articleConfig })
         feedback.msgSuccess('文章配置保存成功')
         await loadArticleConfig()
@@ -195,3 +413,16 @@ onMounted(() => {
     initializePage()
 })
 </script>
+
+<style scoped>
+.config-table-wrap {
+    margin-bottom: 12px;
+}
+
+.sort-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+</style>

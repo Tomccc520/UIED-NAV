@@ -26,7 +26,11 @@
             <template #header>
                 <div class="flex items-center justify-between">
                     <span class="font-medium">每日热榜全局配置</span>
-                    <el-button type="primary" :loading="globalSaving" @click="handleSaveGlobalConfig">
+                    <el-button
+                        type="primary"
+                        :loading="globalSaving"
+                        @click="handleSaveGlobalConfig"
+                    >
                         保存全局配置
                     </el-button>
                 </div>
@@ -40,12 +44,22 @@
                     </el-col>
                     <el-col :span="8">
                         <el-form-item label="默认每平台条数">
-                            <el-input-number v-model="globalForm.defaultLimit" :min="1" :max="30" class="!w-full" />
+                            <el-input-number
+                                v-model="globalForm.defaultLimit"
+                                :min="1"
+                                :max="30"
+                                class="!w-full"
+                            />
                         </el-form-item>
                     </el-col>
                     <el-col :span="8">
                         <el-form-item label="最多聚合平台数">
-                            <el-input-number v-model="globalForm.maxPlatforms" :min="1" :max="50" class="!w-full" />
+                            <el-input-number
+                                v-model="globalForm.maxPlatforms"
+                                :min="1"
+                                :max="50"
+                                class="!w-full"
+                            />
                         </el-form-item>
                     </el-col>
                     <el-col :span="24">
@@ -63,17 +77,30 @@
                     <template v-if="showAdvancedConfig">
                         <el-col :span="12">
                             <el-form-item label="接口地址">
-                                <el-input v-model="globalForm.apiBaseUrl" placeholder="https://api.pearktrue.cn/api/dailyhot/" />
+                                <el-input
+                                    v-model="globalForm.apiBaseUrl"
+                                    placeholder="https://api.pearktrue.cn/api/dailyhot/"
+                                />
                             </el-form-item>
                         </el-col>
                         <el-col :span="6">
                             <el-form-item label="请求超时(ms)">
-                                <el-input-number v-model="globalForm.timeoutMs" :min="1000" :max="30000" class="!w-full" />
+                                <el-input-number
+                                    v-model="globalForm.timeoutMs"
+                                    :min="1000"
+                                    :max="30000"
+                                    class="!w-full"
+                                />
                             </el-form-item>
                         </el-col>
                         <el-col :span="6">
                             <el-form-item label="全局缓存秒数">
-                                <el-input-number v-model="globalForm.cacheTtlSeconds" :min="30" :max="86400" class="!w-full" />
+                                <el-input-number
+                                    v-model="globalForm.cacheTtlSeconds"
+                                    :min="30"
+                                    :max="86400"
+                                    class="!w-full"
+                                />
                             </el-form-item>
                         </el-col>
                     </template>
@@ -100,14 +127,20 @@
                                 </el-select>
                                 <div class="flex flex-wrap gap-2 items-center">
                                     <span class="text-xs text-tx-secondary">快捷选择：</span>
-                                    <el-button size="small" @click="handleUseEnabledPlatformsAsDefault">
+                                    <el-button
+                                        size="small"
+                                        @click="handleUseEnabledPlatformsAsDefault"
+                                    >
                                         使用已启用平台
                                     </el-button>
                                     <el-button size="small" @click="handleClearDefaultPlatforms">
                                         清空选择
                                     </el-button>
                                 </div>
-                                <el-checkbox-group v-model="globalForm.defaultPlatforms" class="platform-quick-checklist">
+                                <el-checkbox-group
+                                    v-model="globalForm.defaultPlatforms"
+                                    class="platform-quick-checklist"
+                                >
                                     <el-checkbox
                                         v-for="item in enabledPlatformQuickOptions"
                                         :key="item.value"
@@ -116,7 +149,9 @@
                                         {{ item.label }}
                                     </el-checkbox>
                                 </el-checkbox-group>
-                                <span class="form-tip">前端会按这里的顺序展示平台区块（支持勾选或多选，不需要手工换行输入）。</span>
+                                <span class="form-tip"
+                                    >前端会按这里的顺序展示平台区块（支持勾选或多选，不需要手工换行输入）。</span
+                                >
                             </div>
                         </el-form-item>
                     </el-col>
@@ -133,7 +168,9 @@
                                     </el-checkbox-button>
                                 </el-checkbox-group>
                             </div>
-                            <span class="form-tip">勾选后会自动注入对应前台位置（导航/页脚/悬浮入口等）。</span>
+                            <span class="form-tip"
+                                >勾选后会自动注入对应前台位置（导航/页脚/悬浮入口等）。</span
+                            >
                         </el-form-item>
                     </el-col>
                     <el-col :span="24">
@@ -145,7 +182,10 @@
                                 <el-button size="small" @click="handleApplyOpsPreset('quick_only')">
                                     仅导航快捷入口
                                 </el-button>
-                                <el-button size="small" @click="handleApplyOpsPreset('floating_focus')">
+                                <el-button
+                                    size="small"
+                                    @click="handleApplyOpsPreset('floating_focus')"
+                                >
                                     悬浮入口优先
                                 </el-button>
                                 <el-button size="small" @click="handleApplyOpsPreset('all')">
@@ -169,7 +209,12 @@
                     </el-col>
                     <el-col :span="6">
                         <el-form-item label="入口排序">
-                            <el-input-number v-model="globalForm.displaySort" :min="1" :max="9999" class="!w-full" />
+                            <el-input-number
+                                v-model="globalForm.displaySort"
+                                :min="1"
+                                :max="9999"
+                                class="!w-full"
+                            />
                         </el-form-item>
                     </el-col>
                     <el-col :span="8">
@@ -190,10 +235,17 @@
                     <el-col :span="24">
                         <el-form-item label="前台效果预览">
                             <div class="ops-preview-line">
-                                <span class="ops-preview-line__label">{{ globalForm.displayLabel || '每日热榜' }}</span>
+                                <span class="ops-preview-line__label">{{
+                                    globalForm.displayLabel || '每日热榜'
+                                }}</span>
                                 <code>{{ normalizedDisplayPath }}</code>
-                                <span>位置 {{ (globalForm.displayPlacements || []).length }} 个</span>
-                                <span>默认平台 {{ (globalForm.defaultPlatforms || []).length }} 个</span>
+                                <span
+                                    >位置 {{ (globalForm.displayPlacements || []).length }} 个</span
+                                >
+                                <span
+                                    >默认平台
+                                    {{ (globalForm.defaultPlatforms || []).length }} 个</span
+                                >
                                 <span>每平台 {{ globalForm.defaultLimit }} 条</span>
                             </div>
                         </el-form-item>
@@ -209,7 +261,11 @@
                     <div class="flex gap-2">
                         <el-button @click="loadPlatformConfigs">刷新</el-button>
                         <el-button @click="handleAddPlatformRow">新增平台</el-button>
-                        <el-button type="primary" :loading="platformSaving" @click="handleSavePlatformRows">
+                        <el-button
+                            type="primary"
+                            :loading="platformSaving"
+                            @click="handleSavePlatformRows"
+                        >
                             保存平台配置
                         </el-button>
                     </div>
@@ -238,6 +294,22 @@
                         <el-input v-model="row.displayName" placeholder="前台显示名" />
                     </template>
                 </el-table-column>
+                <el-table-column label="图标URL" min-width="200">
+                    <template #default="{ row }">
+                        <el-input
+                            v-model="row.icon"
+                            placeholder="可选，支持 /uploads/ 或完整地址"
+                        />
+                    </template>
+                </el-table-column>
+                <el-table-column label="平台链接" min-width="200">
+                    <template #default="{ row }">
+                        <el-input
+                            v-model="row.url"
+                            placeholder="可选，例如 https://www.zhihu.com"
+                        />
+                    </template>
+                </el-table-column>
                 <el-table-column label="启用" width="90">
                     <template #default="{ row }">
                         <el-switch v-model="row.isEnabled" />
@@ -245,22 +317,42 @@
                 </el-table-column>
                 <el-table-column label="排序" width="100">
                     <template #default="{ row }">
-                        <el-input-number v-model="row.sort" :min="1" :max="100000" class="!w-full" />
+                        <el-input-number
+                            v-model="row.sort"
+                            :min="1"
+                            :max="100000"
+                            class="!w-full"
+                        />
                     </template>
                 </el-table-column>
                 <el-table-column label="缓存秒数" width="120">
                     <template #default="{ row }">
-                        <el-input-number v-model="row.cacheTtlSeconds" :min="30" :max="86400" class="!w-full" />
+                        <el-input-number
+                            v-model="row.cacheTtlSeconds"
+                            :min="30"
+                            :max="86400"
+                            class="!w-full"
+                        />
                     </template>
                 </el-table-column>
                 <el-table-column label="默认条数" width="110">
                     <template #default="{ row }">
-                        <el-input-number v-model="row.limitCount" :min="1" :max="30" class="!w-full" />
+                        <el-input-number
+                            v-model="row.limitCount"
+                            :min="1"
+                            :max="30"
+                            class="!w-full"
+                        />
                     </template>
                 </el-table-column>
                 <el-table-column label="超时(ms)" width="120">
                     <template #default="{ row }">
-                        <el-input-number v-model="row.requestTimeoutMs" :min="1000" :max="30000" class="!w-full" />
+                        <el-input-number
+                            v-model="row.requestTimeoutMs"
+                            :min="1000"
+                            :max="30000"
+                            class="!w-full"
+                        />
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" width="100" fixed="right">
@@ -330,6 +422,8 @@ interface PlatformRow {
     id?: number
     platformTitle: string
     displayName: string
+    icon: string
+    url: string
     isEnabled: boolean
     sort: number
     cacheTtlSeconds: number
@@ -358,10 +452,10 @@ const globalForm = reactive<GlobalForm>({
     apiBaseUrl: 'https://api.pearktrue.cn/api/dailyhot/',
     timeoutMs: 12000,
     cacheTtlSeconds: 600,
-    defaultPlatforms: [ '哔哩哔哩', '知乎', '微博' ],
+    defaultPlatforms: ['哔哩哔哩', '知乎', '微博'],
     defaultLimit: 10,
     maxPlatforms: 20,
-    displayPlacements: [ 'home_menu', 'footer_link' ],
+    displayPlacements: ['home_menu', 'footer_link'],
     displayLabel: '每日热榜',
     displayPath: '/p/daily-hot',
     displaySort: 90,
@@ -383,18 +477,22 @@ const toInt = (value: any, fallback: number, min: number, max: number) => {
  * 平台下拉选项（优先读取平台配置表中的展示名与标题）
  */
 const platformSelectOptions = computed(() => {
-    const quick = platformRows.value.map((row) => ({
-        value: String(row.platformTitle || '').trim(),
-        label: String(row.displayName || row.platformTitle || '').trim()
-    })).filter((item) => item.value)
+    const quick = platformRows.value
+        .map((row) => ({
+            value: String(row.platformTitle || '').trim(),
+            label: String(row.displayName || row.platformTitle || '').trim()
+        }))
+        .filter((item) => item.value)
 
-    const selectedOnly = (Array.isArray(globalForm.defaultPlatforms) ? globalForm.defaultPlatforms : [])
+    const selectedOnly = (
+        Array.isArray(globalForm.defaultPlatforms) ? globalForm.defaultPlatforms : []
+    )
         .map((item) => String(item || '').trim())
         .filter(Boolean)
         .map((value) => ({ value, label: value }))
 
     const map = new Map<string, { value: string; label: string }>()
-    ;[ ...quick, ...selectedOnly ].forEach((item) => {
+    ;[...quick, ...selectedOnly].forEach((item) => {
         if (!map.has(item.value)) map.set(item.value, item)
     })
     return Array.from(map.values())
@@ -437,10 +535,12 @@ const loadGlobalConfig = async () => {
         globalForm.cacheTtlSeconds = toInt(data?.cacheTtlSeconds, 600, 30, 86400)
         globalForm.defaultLimit = toInt(data?.defaultLimit, 10, 1, 30)
         globalForm.maxPlatforms = toInt(data?.maxPlatforms, 20, 1, 50)
-        globalForm.defaultPlatforms = Array.isArray(data?.defaultPlatforms) ? data.defaultPlatforms : []
+        globalForm.defaultPlatforms = Array.isArray(data?.defaultPlatforms)
+            ? data.defaultPlatforms
+            : []
         globalForm.displayPlacements = Array.isArray(data?.displayPlacements)
             ? data.displayPlacements.map((item: any) => String(item || '')).filter(Boolean)
-            : [ 'home_menu', 'footer_link' ]
+            : ['home_menu', 'footer_link']
         globalForm.displayLabel = String(data?.displayLabel || '每日热榜')
         globalForm.displayPath = String(data?.displayPath || '/p/daily-hot')
         globalForm.displaySort = toInt(data?.displaySort, 90, 1, 9999)
@@ -464,6 +564,8 @@ const loadPlatformConfigs = async () => {
             id: item.id,
             platformTitle: String(item.platformTitle || ''),
             displayName: String(item.displayName || item.platformTitle || ''),
+            icon: String(item.icon || ''),
+            url: String(item.url || item.link || ''),
             isEnabled: item.isEnabled !== false,
             sort: toInt(item.sort, 10, 1, 100000),
             cacheTtlSeconds: toInt(item.cacheTtlSeconds, 600, 30, 86400),
@@ -492,7 +594,7 @@ const loadSchema = async () => {
  * 初次加载页面数据
  */
 const loadPageData = async () => {
-    await Promise.all([ loadGlobalConfig(), loadPlatformConfigs(), loadSchema() ])
+    await Promise.all([loadGlobalConfig(), loadPlatformConfigs(), loadSchema()])
 }
 
 /**
@@ -506,11 +608,15 @@ const handleSaveGlobalConfig = async () => {
             apiBaseUrl: globalForm.apiBaseUrl,
             timeoutMs: toInt(globalForm.timeoutMs, 12000, 1000, 30000),
             cacheTtlSeconds: toInt(globalForm.cacheTtlSeconds, 600, 30, 86400),
-            defaultPlatforms: Array.isArray(globalForm.defaultPlatforms) ? globalForm.defaultPlatforms : [],
+            defaultPlatforms: Array.isArray(globalForm.defaultPlatforms)
+                ? globalForm.defaultPlatforms
+                : [],
             defaultLimit: toInt(globalForm.defaultLimit, 10, 1, 30),
             maxPlatforms: toInt(globalForm.maxPlatforms, 20, 1, 50),
             displayPlacements: Array.isArray(globalForm.displayPlacements)
-                ? globalForm.displayPlacements.map((item) => String(item || '').trim()).filter(Boolean)
+                ? globalForm.displayPlacements
+                      .map((item) => String(item || '').trim())
+                      .filter(Boolean)
                 : [],
             displayLabel: String(globalForm.displayLabel || '').trim() || '每日热榜',
             displayPath: String(globalForm.displayPath || '').trim() || '/p/daily-hot',
@@ -532,6 +638,8 @@ const handleAddPlatformRow = () => {
     platformRows.value.push({
         platformTitle: '',
         displayName: '',
+        icon: '',
+        url: '',
         isEnabled: true,
         sort: (platformRows.value.length + 1) * 10,
         cacheTtlSeconds: 600,
@@ -559,17 +667,17 @@ const handleClearDefaultPlatforms = () => {
  */
 const handleApplyOpsPreset = (preset: 'nav_footer' | 'quick_only' | 'floating_focus' | 'all') => {
     if (preset === 'nav_footer') {
-        globalForm.displayPlacements = [ 'home_menu', 'footer_link' ]
+        globalForm.displayPlacements = ['home_menu', 'footer_link']
         if (!String(globalForm.displayLabel || '').trim()) globalForm.displayLabel = '每日热榜'
         return
     }
     if (preset === 'quick_only') {
-        globalForm.displayPlacements = [ 'nav_quick_entry' ]
+        globalForm.displayPlacements = ['nav_quick_entry']
         if (!String(globalForm.displayLabel || '').trim()) globalForm.displayLabel = '今日热榜'
         return
     }
     if (preset === 'floating_focus') {
-        globalForm.displayPlacements = [ 'fixed_link', 'nav_quick_entry' ]
+        globalForm.displayPlacements = ['fixed_link', 'nav_quick_entry']
         if (!String(globalForm.displayLabel || '').trim()) globalForm.displayLabel = '热点速览'
         return
     }
@@ -598,7 +706,10 @@ const handleSavePlatformRows = async () => {
         .map((row) => ({
             id: row.id,
             platformTitle: String(row.platformTitle || '').trim(),
-            displayName: String(row.displayName || '').trim() || String(row.platformTitle || '').trim(),
+            displayName:
+                String(row.displayName || '').trim() || String(row.platformTitle || '').trim(),
+            icon: String(row.icon || '').trim(),
+            url: String(row.url || '').trim(),
             isEnabled: row.isEnabled !== false,
             sort: toInt(row.sort, 10, 1, 100000),
             cacheTtlSeconds: toInt(row.cacheTtlSeconds, 600, 30, 86400),
@@ -616,7 +727,7 @@ const handleSavePlatformRows = async () => {
     try {
         await uiedDailyHotPlatformConfigSave({ list: payload })
         feedback.msgSuccess('平台配置保存成功')
-        await Promise.all([ loadPlatformConfigs(), loadSchema() ])
+        await Promise.all([loadPlatformConfigs(), loadSchema()])
     } finally {
         platformSaving.value = false
     }

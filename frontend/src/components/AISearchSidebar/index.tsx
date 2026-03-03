@@ -5,8 +5,7 @@
  */
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import api from '../../services/api';
-import { unwrapApiResponse } from '../../utils/apiResponse';
+import searchService from '../../services/searchService';
 import './index.css';
 
 // SVG 图标组件
@@ -76,11 +75,12 @@ interface AiSearchApiResult {
 
 interface AISearchSidebarProps {
   visible: boolean;
+  enabled?: boolean;
   onClose: () => void;
   onWebsiteClick?: (website: SearchResult) => void;
 }
 
-const AISearchSidebar: React.FC<AISearchSidebarProps> = ({ visible, onClose, onWebsiteClick }) => {
+const AISearchSidebar: React.FC<AISearchSidebarProps> = ({ visible, enabled = true, onClose, onWebsiteClick }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(false);
@@ -119,6 +119,17 @@ const AISearchSidebar: React.FC<AISearchSidebarProps> = ({ visible, onClose, onW
 
   // 发送消息并获取AI响应
   const handleSend = useCallback(async (content?: string) => {
+    if (!enabled) {
+      const disabledMessage: Message = {
+        id: `disabled-${Date.now()}`,
+        content: 'AI 搜索功能已关闭，请在后台配置中开启后再使用。',
+        role: 'assistant',
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, disabledMessage]);
+      return;
+    }
+
     const query = content || inputValue;
     if (!query.trim() || loading) return;
 
@@ -134,16 +145,12 @@ const AISearchSidebar: React.FC<AISearchSidebarProps> = ({ visible, onClose, onW
     setLoading(true);
 
     try {
-      const response = await api.post('/ai-search', {
-        query: query.trim(),
-        limit: 10,
-      });
-      const payload = unwrapApiResponse<{
+      const payload = await searchService.aiSearch(query.trim(), 10) as {
         results?: AiSearchApiResult[];
         mode?: 'ai' | 'keyword';
         reason?: string;
         reasoning?: string;
-      }>(response.data, {});
+      };
       const results = (payload.results || []) as AiSearchApiResult[];
       const mode = payload.mode || 'keyword';
       const reason = payload.reason || '';
@@ -186,7 +193,7 @@ const AISearchSidebar: React.FC<AISearchSidebarProps> = ({ visible, onClose, onW
     } finally {
       setLoading(false);
     }
-  }, [inputValue, loading]);
+  }, [enabled, inputValue, loading]);
 
   // 处理键盘事件
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -314,13 +321,13 @@ const AISearchSidebar: React.FC<AISearchSidebarProps> = ({ visible, onClose, onW
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="描述你想找的资源..."
-          disabled={loading}
+          placeholder={enabled ? '描述你想找的资源...' : 'AI 搜索已关闭'}
+          disabled={loading || !enabled}
         />
         <button 
           className="ai-sidebar-send"
           onClick={() => handleSend()}
-          disabled={loading || !inputValue.trim()}
+          disabled={loading || !enabled || !inputValue.trim()}
           aria-label="搜索"
         >
           <SearchIcon />

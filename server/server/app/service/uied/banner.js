@@ -28,7 +28,7 @@ class BannerService extends Service {
   /**
    * 获取广告位置别名集合（兼容后台配置值与前端请求值不一致）
    * @param {string} position 前端传入的位置标识
-   * @returns {string[]} 可匹配的位置列表
+   * @return {string[]} 可匹配的位置列表
    */
   getPositionAliases(position) {
     const normalized = String(position || '').trim();

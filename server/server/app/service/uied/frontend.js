@@ -671,7 +671,7 @@ class FrontendService extends Service {
     /**
      * 统一格式化结果，供详情页侧边栏展示
      * @param {Array<object>} rows 原始行数据
-     * @returns {Array<object>} 规范化结果
+     * @return {Array<object>} 规范化结果
      */
     const formatRows = rows => (Array.isArray(rows) ? rows : []).map(w => ({
       id: String(w.id),
@@ -750,7 +750,7 @@ class FrontendService extends Service {
    * 生成网站对比 AI 分析文案（复用后台 AI 配置服务）
    * @param {string} leftIdOrSlug 左侧网站ID或slug
    * @param {string} rightIdOrSlug 右侧网站ID或slug
-   * @returns {Promise<object>} AI 分析结果
+   * @return {Promise<object>} AI 分析结果
    */
   async getWebsiteCompareAiAnalysis(leftIdOrSlug, rightIdOrSlug) {
     const left = String(leftIdOrSlug || '').trim();
@@ -776,14 +776,14 @@ class FrontendService extends Service {
     const rightTraffic = rightWebsite.trafficMetrics || {};
 
     const prompt = [
-      `请为以下两个网站输出一份中文对比分析，使用 Markdown 格式。`,
-      `要求：`,
-      `1. 输出结构固定为：概览结论、核心差异、适用人群、选择建议、风险提示`,
-      `2. 不要编造无法确认的数据；没有数据就明确写“未录入/未知”`,
-      `3. 语气专业、简洁，适合直接展示在导航站详情对比页`,
-      `4. 每个小节用二级标题（##）`,
-      ``,
-      `左侧网站：`,
+      '请为以下两个网站输出一份中文对比分析，使用 Markdown 格式。',
+      '要求：',
+      '1. 输出结构固定为：概览结论、核心差异、适用人群、选择建议、风险提示',
+      '2. 不要编造无法确认的数据；没有数据就明确写“未录入/未知”',
+      '3. 语气专业、简洁，适合直接展示在导航站详情对比页',
+      '4. 每个小节用二级标题（##）',
+      '',
+      '左侧网站：',
       `- 名称：${leftWebsite.name}`,
       `- 分类：${leftWebsite.category?.name || '未分类'}`,
       `- 描述：${leftWebsite.description || '无'}`,
@@ -795,8 +795,8 @@ class FrontendService extends Service {
       `- 平均访问时长(秒)：${Number(leftTraffic.avgVisitDurationSeconds || 0) || '未录入'}`,
       `- 每次访问页数：${Number(leftTraffic.pagesPerVisit || 0) || '未录入'}`,
       `- 跳出率：${Number(leftTraffic.bounceRate || 0) ? `${Number(leftTraffic.bounceRate || 0)}%` : '未录入'}`,
-      ``,
-      `右侧网站：`,
+      '',
+      '右侧网站：',
       `- 名称：${rightWebsite.name}`,
       `- 分类：${rightWebsite.category?.name || '未分类'}`,
       `- 描述：${rightWebsite.description || '无'}`,

@@ -5,6 +5,7 @@ import '@vue/runtime-core'
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    AdminSearch: typeof import('./src/components/AdminSearch.vue')['default']
     AiEditor: typeof import('./src/components/ai-editor/index.vue')['default']
     AppLink: typeof import('./src/components/app-link/index.vue')['default']
     ColorPicker: typeof import('./src/components/color-picker/index.vue')['default']
@@ -21,6 +22,7 @@ declare module '@vue/runtime-core' {
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
+    ElCheckboxButton: typeof import('element-plus/es')['ElCheckboxButton']
     ElCheckboxGroup: typeof import('element-plus/es')['ElCheckboxGroup']
     ElCol: typeof import('element-plus/es')['ElCol']
     ElColorPicker: typeof import('element-plus/es')['ElColorPicker']
@@ -73,6 +75,7 @@ declare module '@vue/runtime-core' {
     ElTreeSelect: typeof import('element-plus/es')['ElTreeSelect']
     ElUpload: typeof import('element-plus/es')['ElUpload']
     FooterBtns: typeof import('./src/components/footer-btns/index.vue')['default']
+    HeaderSearch: typeof import('./src/components/HeaderSearch.vue')['default']
     Icon: typeof import('./src/components/icon/index.vue')['default']
     IconPicker: typeof import('./src/components/icon/picker.vue')['default']
     IconSvgIcon: typeof import('./src/components/icon/svg-icon.vue')['default']

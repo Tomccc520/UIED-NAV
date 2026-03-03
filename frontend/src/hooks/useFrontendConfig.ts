@@ -134,6 +134,7 @@ interface SidebarConfig {
 
 /** 搜索配置 */
 interface SearchConfig {
+  enabled: boolean;
   placeholder: string;
   debounceDelay: number;
   aiSearchEnabled: boolean;
@@ -264,6 +265,7 @@ const defaultSidebarConfig: SidebarConfig = {
 };
 
 const defaultSearchConfig: SearchConfig = {
+  enabled: true,
   placeholder: '搜索网站名称...',
   debounceDelay: 300,
   aiSearchEnabled: true,

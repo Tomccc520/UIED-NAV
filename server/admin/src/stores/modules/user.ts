@@ -34,15 +34,24 @@ const useUserStore = defineStore({
             this.perms = []
         },
         login(playload: any) {
-            const { account, password } = playload
+            const { account, password, ...extra } = playload
             return new Promise((resolve, reject) => {
                 login({
                     username: account,
-                    password: password
+                    password: password,
+                    ...extra
                 })
                     .then((data) => {
-                        this.token = data.token
-                        cache.set(TOKEN_KEY, data.token)
+                        /**
+                         * 登录接口必须返回 token，防止异常响应被误判为登录成功。
+                         */
+                        const token = String(data?.token || '').trim()
+                        if (!token) {
+                            reject(new Error('登录失败：未获取到登录凭证'))
+                            return
+                        }
+                        this.token = token
+                        cache.set(TOKEN_KEY, token)
                         resolve(data)
                     })
                     .catch((error) => {
